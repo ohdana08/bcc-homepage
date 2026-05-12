@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ohdana08.github.io/bcc-homepage/sitemap.xml
