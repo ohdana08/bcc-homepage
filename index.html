@@ -5,31 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BCC | 비즈니스커리어컨설팅</title>
 <meta name="description" content="BCC 비즈니스커리어컨설팅 - 오예림 강사와 함께하는 1:1 커리어·유튜브 컨설팅" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K94NGCTP');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TYJSYWW5Q6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TYJSYWW5Q6');
+</script>
+
+<!-- Pretendard Variable -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+
 <style>
   :root {
-    --bg: #0a0a0d;
-    --bg-2: #111116;
-    --surface: #15151b;
-    --surface-2: #1d1d24;
-    --border: #26262e;
+    --bg: #0a0a0a;
+    --bg-2: #0f0f10;
+    --surface: #16161a;
+    --surface-2: #1d1d22;
+    --border: #26262c;
     --text: #f3f3f5;
     --text-dim: #9a9aa6;
     --text-mute: #6c6c78;
-    --accent: #ffcc00;
-    --accent-2: #ff8a3d;
+    --gold: #C9A84C;
+    --gold-2: #a88835;
+    --gold-3: #e6c878;
     --kakao: #fee500;
     --kakao-text: #181600;
-    --gradient: linear-gradient(135deg, #ffcc00 0%, #ff8a3d 100%);
-    --shadow-lg: 0 20px 50px rgba(0,0,0,0.5);
-    --shadow-sm: 0 4px 16px rgba(0,0,0,0.35);
+    --gradient: linear-gradient(135deg, #C9A84C 0%, #a88835 100%);
+    --gradient-soft: linear-gradient(135deg, #e6c878 0%, #C9A84C 100%);
+    --shadow-lg: 0 20px 50px rgba(0,0,0,0.55);
+    --shadow-sm: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-gold: 0 8px 24px rgba(201,168,76,0.22);
+
+    --font-en: Georgia, "Times New Roman", serif;
+    --font-ko: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+               "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard",
-                 "Apple SD Gothic Neo", Roboto, sans-serif;
+    font-family: var(--font-ko);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -44,7 +71,7 @@
     z-index: 100;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    background: rgba(10,10,13,0.75);
+    background: rgba(10,10,10,0.78);
     border-bottom: 1px solid var(--border);
   }
   .nav-inner {
@@ -54,6 +81,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
   }
   .brand {
     display: flex;
@@ -62,22 +90,21 @@
     font-weight: 800;
     letter-spacing: -0.3px;
   }
-  .brand-logo {
-    width: 34px; height: 34px;
-    border-radius: 9px;
-    background: var(--gradient);
-    display: grid; place-items: center;
-    color: #1a1300;
-    font-weight: 900;
-    font-size: 14px;
+  .brand-name {
+    font-size: 16px;
+    font-family: var(--font-en);
+    letter-spacing: 0.5px;
   }
-  .brand-name { font-size: 16px; }
   .brand-sub { font-size: 11px; color: var(--text-dim); font-weight: 500; letter-spacing: 0.4px; }
   .nav-links {
     display: flex;
     gap: 22px;
     font-size: 14px;
     color: var(--text-dim);
+  }
+  .nav-links a {
+    transition: color 0.15s;
+    padding: 6px 2px;
   }
   .nav-links a:hover { color: var(--text); }
   .nav-cta {
@@ -87,6 +114,7 @@
     padding: 8px 14px;
     border-radius: 8px;
     font-size: 13px;
+    white-space: nowrap;
   }
 
   /* HERO */
@@ -101,7 +129,7 @@
     top: -200px; left: 50%;
     transform: translateX(-50%);
     width: 800px; height: 800px;
-    background: radial-gradient(circle, rgba(255,204,0,0.18) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(201,168,76,0.16) 0%, transparent 60%);
     pointer-events: none;
   }
   .hero-inner {
@@ -119,18 +147,19 @@
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     margin-bottom: 22px;
+    font-family: var(--font-en);
   }
   .hero h1 {
     font-size: 52px;
-    line-height: 1.15;
+    line-height: 1.18;
     letter-spacing: -1.2px;
     font-weight: 800;
     margin-bottom: 20px;
   }
   .hero h1 .accent {
-    background: var(--gradient);
+    background: var(--gradient-soft);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -156,15 +185,15 @@
     font-size: 15px;
     border: none;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.15s, opacity 0.15s;
+    transition: transform 0.1s, box-shadow 0.15s, opacity 0.15s, background 0.15s;
   }
   .btn:active { transform: scale(0.98); }
   .btn-primary {
     background: var(--gradient);
     color: #1a1300;
-    box-shadow: 0 8px 24px rgba(255,204,0,0.25);
+    box-shadow: var(--shadow-gold);
   }
-  .btn-primary:hover { box-shadow: 0 10px 28px rgba(255,204,0,0.4); }
+  .btn-primary:hover { box-shadow: 0 12px 30px rgba(201,168,76,0.38); }
   .btn-ghost {
     background: var(--surface-2);
     color: var(--text);
@@ -181,19 +210,20 @@
   section { padding: 80px 20px; }
   .section-inner { max-width: 1200px; margin: 0 auto; }
   .section-label {
-    color: var(--accent);
+    color: var(--gold);
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.6px;
     text-transform: uppercase;
     margin-bottom: 14px;
+    font-family: var(--font-en);
   }
   .section-title {
     font-size: 36px;
     font-weight: 800;
     letter-spacing: -0.8px;
     margin-bottom: 14px;
-    line-height: 1.2;
+    line-height: 1.25;
   }
   .section-desc {
     color: var(--text-dim);
@@ -225,22 +255,10 @@
     position: absolute;
     top: -100px; right: -100px;
     width: 250px; height: 250px;
-    background: radial-gradient(circle, rgba(255,204,0,0.15), transparent 70%);
-  }
-  .avatar {
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: var(--gradient);
-    margin: 0 auto 20px;
-    display: grid;
-    place-items: center;
-    font-size: 52px;
-    font-weight: 900;
-    color: #1a1300;
-    box-shadow: 0 12px 30px rgba(255,138,61,0.35);
+    background: radial-gradient(circle, rgba(201,168,76,0.15), transparent 70%);
   }
   .profile-name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
-  .profile-role { color: var(--accent); font-size: 14px; font-weight: 600; margin-bottom: 18px; }
+  .profile-role { color: var(--gold); font-size: 14px; font-weight: 600; margin-bottom: 18px; }
   .profile-bio { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
 
   .credentials {
@@ -285,7 +303,7 @@
   }
   .service-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(255,204,0,0.4);
+    border-color: rgba(201,168,76,0.4);
     box-shadow: var(--shadow-sm);
   }
   .service-icon {
@@ -299,61 +317,141 @@
   .service-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
   .service-desc { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
 
-  /* FINDER */
-  .finder { background: var(--bg-2); }
-  .finder-frame-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
+  /* TOOLS HUB */
+  .tools { background: var(--bg-2); }
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .tool-card {
+    --platform-color: var(--gold);
+    --platform-color-soft: rgba(201,168,76,0.15);
     position: relative;
-  }
-  .finder-frame-bar {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    background: var(--surface-2);
-    border-bottom: 1px solid var(--border);
-  }
-  .finder-dots { display: flex; gap: 6px; }
-  .finder-dots span {
-    width: 11px; height: 11px;
-    border-radius: 50%;
-    background: #3a3a44;
-  }
-  .finder-dots span:nth-child(1) { background: #ff5f57; }
-  .finder-dots span:nth-child(2) { background: #febc2e; }
-  .finder-dots span:nth-child(3) { background: #28c840; }
-  .finder-url {
-    font-size: 12px;
-    color: var(--text-dim);
-    font-family: ui-monospace, SFMono-Regular, monospace;
-    margin-left: 8px;
-    white-space: nowrap;
+    flex-direction: column;
+    background: var(--bg);
+    border: 3px solid var(--platform-color);
+    border-radius: 18px;
+    padding: 26px 24px 24px;
+    min-height: 220px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     overflow: hidden;
-    text-overflow: ellipsis;
+    color: inherit;
   }
-  .finder-iframe {
-    width: 100%;
-    height: 780px;
-    border: none;
-    background: #0f0f0f;
-    display: block;
+  .tool-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, var(--platform-color-soft), transparent 60%);
+    pointer-events: none;
+    opacity: 0.8;
   }
-  .finder-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 18px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .tool-card.is-active { cursor: pointer; }
+  .tool-card.is-active:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.45), 0 0 0 1px var(--platform-color);
+  }
+  .tool-card.is-disabled {
+    border-color: color-mix(in srgb, var(--platform-color) 40%, transparent);
+    cursor: not-allowed;
+  }
+  /* Fallback for browsers without color-mix */
+  @supports not (color: color-mix(in srgb, white, black)) {
+    .tool-card.is-disabled { opacity: 0.78; }
+  }
+  .tool-card.is-disabled .tool-name,
+  .tool-card.is-disabled .tool-desc {
+    opacity: 0.85;
+  }
+
+  /* Instagram gradient border */
+  .tool-card[data-tool="instagram"] {
+    border: 3px solid transparent;
+    background:
+      linear-gradient(var(--bg), var(--bg)) padding-box,
+      linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045) border-box;
+  }
+  .tool-card[data-tool="instagram"].is-disabled {
+    background:
+      linear-gradient(var(--bg), var(--bg)) padding-box,
+      linear-gradient(45deg,
+        rgba(131,58,180,0.45),
+        rgba(253,29,29,0.45),
+        rgba(252,176,69,0.45)) border-box;
+  }
+
+  .tool-icon {
+    position: relative;
+    width: 54px; height: 54px;
+    border-radius: 14px;
+    background: var(--platform-color);
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    font-family: var(--font-en);
+  }
+  .tool-card[data-tool="instagram"] .tool-icon {
+    background: linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045);
+  }
+  .tool-icon svg { width: 30px; height: 30px; display: block; }
+
+  .tool-name {
+    position: relative;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
+  }
+  .tool-desc {
+    position: relative;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.65;
+    flex: 1;
+  }
+  .tool-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-family: var(--font-en);
+    z-index: 2;
+  }
+  .tool-badge-active {
+    background: var(--platform-color);
+    color: #fff;
+  }
+  .tool-badge-soon {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .tool-arrow {
+    position: relative;
+    margin-top: 16px;
+    color: var(--platform-color);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .tool-card[data-tool="instagram"] .tool-arrow {
+    background: linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   /* CONTACT */
   .contact-card {
-    background: linear-gradient(135deg, rgba(255,204,0,0.1), rgba(255,138,61,0.05));
-    border: 1px solid rgba(255,204,0,0.25);
+    background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(168,136,53,0.04));
+    border: 1px solid rgba(201,168,76,0.25);
     border-radius: 24px;
     padding: 50px 40px;
     text-align: center;
@@ -400,6 +498,9 @@
   footer .footer-links a:hover { color: var(--text); }
 
   /* RESPONSIVE */
+  @media (max-width: 1000px) {
+    .tools-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 900px) {
     .about-grid { grid-template-columns: 1fr; gap: 30px; }
     .services-grid { grid-template-columns: repeat(2, 1fr); }
@@ -414,9 +515,8 @@
     section { padding: 60px 18px; }
     .section-title { font-size: 24px; }
     .services-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: 1fr; }
     .profile-card { padding: 28px 22px; }
-    .avatar { width: 110px; height: 110px; font-size: 42px; }
-    .finder-iframe { height: 680px; }
     .contact-card { padding: 36px 22px; }
     .contact-card h3 { font-size: 22px; }
     .btn { padding: 12px 18px; font-size: 14px; }
@@ -447,6 +547,11 @@
 </head>
 <body>
 
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K94NGCTP"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
@@ -460,10 +565,10 @@
     <div class="nav-links">
       <a href="#about">소개</a>
       <a href="#services">서비스</a>
-      <a href="#finder">채널 탐색기</a>
+      <a href="#tools" data-nav="tools">분석도구</a>
       <a href="#contact">문의</a>
     </div>
-    <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav-cta">카톡 상담</a>
+    <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
   </div>
 </nav>
 
@@ -477,7 +582,7 @@
       유튜브 채널 전략 · 커리어 컨설팅 전문 브랜드입니다.
     </p>
     <div class="hero-actions">
-      <a href="#finder" class="btn btn-primary">채널 탐색기 사용하기</a>
+      <a href="#tools" class="btn btn-primary" data-nav="tools-hero">분석도구 사용하기</a>
       <a href="#about" class="btn btn-ghost">강사 소개 보기</a>
     </div>
   </div>
@@ -601,35 +706,85 @@
   </div>
 </section>
 
-<!-- FINDER -->
-<section class="finder" id="finder">
+<!-- TOOLS HUB -->
+<section class="tools" id="tools">
   <div class="section-inner">
-    <div class="section-label">TOOL</div>
-    <h2 class="section-title">YouTube 채널 탐색기</h2>
+    <div class="section-label">TOOLS</div>
+    <h2 class="section-title">BCC 분석도구</h2>
     <p class="section-desc">
-      키워드 한 번으로 경쟁 채널, 인기 영상, 트렌드를 한눈에.
-      BCC가 무료로 제공하는 채널 리서치 도구입니다.
+      AI 시대 콘텐츠·마케팅 분석 도구 모음
     </p>
 
-    <div class="finder-frame-wrap">
-      <div class="finder-frame-bar">
-        <div class="finder-dots"><span></span><span></span><span></span></div>
-        <div class="finder-url">ohdana08.github.io/youtube-finder/</div>
-      </div>
-      <iframe
-        class="finder-iframe"
-        src="https://ohdana08.github.io/youtube-finder/"
-        title="YouTube 채널 탐색기"
-        loading="lazy"
-        referrerpolicy="no-referrer"
-        allow="clipboard-write"
-      ></iframe>
-    </div>
-
-    <div class="finder-actions">
-      <a href="https://ohdana08.github.io/youtube-finder/" target="_blank" rel="noopener" class="btn btn-ghost">
-        새 창에서 열기 ↗
+    <div class="tools-grid">
+      <!-- 1. YouTube -->
+      <a
+        class="tool-card is-active"
+        data-tool="youtube"
+        data-tool-name="유튜브 분석기"
+        style="--platform-color: #FF0000; --platform-color-soft: rgba(255,0,0,0.14);"
+        href="https://ohdana08.github.io/bcc-youtube-analyzer/"
+        target="_blank"
+        rel="noopener"
+      >
+        <span class="tool-badge tool-badge-active">Active</span>
+        <div class="tool-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+        </div>
+        <div class="tool-name">유튜브 분석기</div>
+        <div class="tool-desc">잘 나가는 영상 분석 + 콘텐츠 컨설팅</div>
+        <div class="tool-arrow">바로 가기 →</div>
       </a>
+
+      <!-- 2. Naver -->
+      <div
+        class="tool-card is-disabled"
+        data-tool="naver"
+        data-tool-name="네이버 분석기"
+        style="--platform-color: #03C75A; --platform-color-soft: rgba(3,199,90,0.12);"
+        role="button"
+        aria-disabled="true"
+        tabindex="0"
+      >
+        <span class="tool-badge tool-badge-soon">Coming Soon</span>
+        <div class="tool-icon" aria-hidden="true">N</div>
+        <div class="tool-name">네이버 분석기</div>
+        <div class="tool-desc">네이버 검색 트렌드 분석</div>
+        <div class="tool-arrow">준비 중</div>
+      </div>
+
+      <!-- 3. Instagram -->
+      <div
+        class="tool-card is-disabled"
+        data-tool="instagram"
+        data-tool-name="인스타그램 분석기"
+        style="--platform-color: #E1306C; --platform-color-soft: rgba(225,48,108,0.12);"
+        role="button"
+        aria-disabled="true"
+        tabindex="0"
+      >
+        <span class="tool-badge tool-badge-soon">Coming Soon</span>
+        <div class="tool-icon" aria-hidden="true">📷</div>
+        <div class="tool-name">인스타그램 분석기</div>
+        <div class="tool-desc">릴스·피드 트렌드 분석</div>
+        <div class="tool-arrow">준비 중</div>
+      </div>
+
+      <!-- 4. Smart Store -->
+      <div
+        class="tool-card is-disabled"
+        data-tool="smartstore"
+        data-tool-name="스마트스토어 분석기"
+        style="--platform-color: #FF6F0F; --platform-color-soft: rgba(255,111,15,0.12);"
+        role="button"
+        aria-disabled="true"
+        tabindex="0"
+      >
+        <span class="tool-badge tool-badge-soon">Coming Soon</span>
+        <div class="tool-icon" aria-hidden="true">🛍</div>
+        <div class="tool-name">스마트스토어 분석기</div>
+        <div class="tool-desc">베스트 vs 워스트 상품 비교</div>
+        <div class="tool-arrow">준비 중</div>
+      </div>
     </div>
   </div>
 </section>
@@ -643,7 +798,7 @@
         카카오톡 채널로 편하게 문의하세요.<br />
         영업일 기준 24시간 이내 답변드립니다.
       </p>
-      <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn-kakao">
+      <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn-kakao" data-kakao="contact">
         <span class="kakao-icon">K</span>
         카카오톡 채널로 상담하기
       </a>
@@ -663,17 +818,141 @@
   <div class="footer-links">
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
-    <a href="#finder">채널 탐색기</a>
+    <a href="#tools" data-nav="tools-footer">분석도구</a>
     <a href="#contact">문의</a>
   </div>
   <div>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</div>
 </footer>
 
 <!-- Floating Kakao -->
-<a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="float-kakao">
+<a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="float-kakao" data-kakao="float">
   <span class="kakao-icon">K</span>
   카톡 상담
 </a>
+
+<!-- GA4 custom events -->
+<script>
+(function () {
+  function track(name, params) {
+    try {
+      if (typeof gtag === 'function') {
+        gtag('event', name, params || {});
+      }
+      if (window.dataLayer) {
+        window.dataLayer.push(Object.assign({ event: name }, params || {}));
+      }
+    } catch (e) { /* no-op */ }
+  }
+
+  // ---- Visitor flags ----
+  var LS_VISITED = 'bcc_visited';
+  var SS_TOOL_USED = 'bcc_tool_used_session';
+  var SS_HOVER_PREFIX = 'bcc_hover_';
+  var SS_POST_VIEW_PREFIX = 'bcc_post_view_';
+
+  var isReturningVisitor = false;
+  try {
+    isReturningVisitor = !!localStorage.getItem(LS_VISITED);
+    if (!isReturningVisitor) {
+      localStorage.setItem(LS_VISITED, String(Date.now()));
+    }
+  } catch (e) { /* private mode */ }
+
+  // ---- Nav: 분석도구 click ----
+  document.querySelectorAll('[data-nav^="tools"]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      track('tool_nav_clicked', {
+        source: el.getAttribute('data-nav'),
+        returning_visitor: isReturningVisitor
+      });
+    });
+  });
+
+  // ---- Tool cards ----
+  var toolCards = document.querySelectorAll('.tool-card');
+  toolCards.forEach(function (card) {
+    var tool = card.getAttribute('data-tool');
+    var toolName = card.getAttribute('data-tool-name') || tool;
+    var isActive = card.classList.contains('is-active');
+
+    if (isActive) {
+      card.addEventListener('click', function () {
+        try { sessionStorage.setItem(SS_TOOL_USED, tool); } catch (e) {}
+
+        track('tool_card_clicked', {
+          tool_name: toolName,
+          tool_id: tool,
+          returning_visitor: isReturningVisitor
+        });
+
+        if (isReturningVisitor) {
+          track('returning_visitor_tool_use', {
+            tool_name: toolName,
+            tool_id: tool
+          });
+        }
+      });
+    } else {
+      // coming_soon_hovered: limit once per session per tool
+      var hoverFired = false;
+      card.addEventListener('mouseenter', function () {
+        if (hoverFired) return;
+        var key = SS_HOVER_PREFIX + tool;
+        try {
+          if (sessionStorage.getItem(key)) { hoverFired = true; return; }
+          sessionStorage.setItem(key, '1');
+        } catch (e) {}
+        hoverFired = true;
+        track('coming_soon_hovered', {
+          tool_name: toolName,
+          tool_id: tool
+        });
+      });
+    }
+  });
+
+  // ---- post_tool_section_view: fire when user scrolls back to another section
+  //      AFTER having clicked a tool card this session ----
+  if ('IntersectionObserver' in window) {
+    var observed = document.querySelectorAll(
+      'section#about, section#services, section#contact'
+    );
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var section = entry.target;
+        var sid = section.id;
+        var toolUsed;
+        try { toolUsed = sessionStorage.getItem(SS_TOOL_USED); } catch (e) {}
+        if (!toolUsed) return;
+        var key = SS_POST_VIEW_PREFIX + sid;
+        try {
+          if (sessionStorage.getItem(key)) return;
+          sessionStorage.setItem(key, '1');
+        } catch (e) {}
+        track('post_tool_section_view', {
+          section_id: sid,
+          prior_tool: toolUsed
+        });
+      });
+    }, { threshold: 0.5 });
+    observed.forEach(function (s) { io.observe(s); });
+  }
+
+  // ---- consultation_after_tool ----
+  document.querySelectorAll('[data-kakao]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var toolUsed;
+      try { toolUsed = sessionStorage.getItem(SS_TOOL_USED); } catch (e) {}
+      if (!toolUsed) return;
+      track('consultation_after_tool', {
+        prior_tool: toolUsed,
+        kakao_source: el.getAttribute('data-kakao')
+      });
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
