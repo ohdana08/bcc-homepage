@@ -606,8 +606,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="nav-links">
       <a href="#about">소개</a>
       <a href="#services">서비스</a>
-      <a href="#tools" data-nav="tools">분석도구</a>
-      <a href="tools/" data-nav="ittools">잇툴즈</a>
+      <a href="#tools" data-nav="ittools">잇툴즈</a>
       <a href="#contact">문의</a>
     </div>
     <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
@@ -624,7 +623,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       유튜브 채널 전략 · 커리어 컨설팅 전문 브랜드입니다.
     </p>
     <div class="hero-actions">
-      <a href="#tools" class="btn btn-primary" data-nav="tools-hero">분석도구 사용하기</a>
+      <a href="#tools" class="btn btn-primary" data-nav="ittools-hero">잇툴즈 사용하기</a>
       <a href="#about" class="btn btn-ghost">강사 소개 보기</a>
     </div>
   </div>
@@ -748,11 +747,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- TOOLS HUB -->
+<!-- ITTOOLS HUB -->
+<span id="ittools" aria-hidden="true" style="display:block; position:relative; top:-72px;"></span>
 <section class="tools" id="tools">
   <div class="section-inner">
-    <div class="section-label">TOOLS</div>
-    <h2 class="section-title">BCC 분석도구</h2>
+    <div class="section-label">ITTOOLS</div>
+    <h2 class="section-title">잇툴즈</h2>
     <p class="section-desc">
       AI 시대 콘텐츠·마케팅 분석 도구 모음
     </p>
@@ -860,8 +860,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="footer-links">
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
-    <a href="#tools" data-nav="tools-footer">분석도구</a>
-    <a href="tools/" data-nav="ittools-footer">잇툴즈</a>
+    <a href="#tools" data-nav="ittools-footer">잇툴즈</a>
     <a href="#contact">문의</a>
   </div>
   <div>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</div>
@@ -901,8 +900,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   } catch (e) { /* private mode */ }
 
-  // ---- Nav: 분석도구 click ----
-  document.querySelectorAll('[data-nav^="tools"]').forEach(function (el) {
+  // ---- Nav: 잇툴즈 click ----
+  document.querySelectorAll('[data-nav^="ittools"]').forEach(function (el) {
     el.addEventListener('click', function () {
       track('tool_nav_clicked', {
         source: el.getAttribute('data-nav'),
