@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# BCC pre-commit hook — gitleaks 자동 secrets 스캔
+# 활성화 (1회): git config core.hooksPath .githooks && chmod +x .githooks/pre-commit
+# 설치: brew install gitleaks  (macOS)
+#       또는 https://github.com/gitleaks/gitleaks#installing
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "⚠️  gitleaks 미설치 — secrets 스캔 건너뜀."
+  echo "    설치: brew install gitleaks"
+  echo "    (Push 전에 협업자도 반드시 설치)"
+  exit 0
+fi
+
+# protect --staged: 스테이지된 변경분만 빠르게 검사
+if ! gitleaks protect --staged --redact --config=.gitleaks.toml --no-banner --exit-code=1; then
+  echo ""
+  echo "🚨 gitleaks 가 staged 변경에서 secrets 의심 패턴을 감지했습니다."
+  echo "    위 보고서 검토 후:"
+  echo "      • 진짜 secret 이면 → 즉시 발급처에서 폐기 + 새 키 발급 + .git 히스토리에서 제거"
+  echo "      • 오탐이면 → .gitleaks.toml allowlist 에 패턴 추가"
+  echo ""
+  echo "    이 hook 을 강제 우회하려면: git commit --no-verify"
+  echo "    (단, push 시 CI 가 다시 잡습니다)"
+  exit 1
+fi
+
+exit 0

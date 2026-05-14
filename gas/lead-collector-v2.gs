@@ -29,6 +29,42 @@
 // =============== 설정 ===============
 var SHEET_NAME = '리드';           // 시트 탭 이름 (기존 그대로)
 var LOYAL_THRESHOLD = 3;           // 방문 N회 이상 → 충성 사용자
+
+// =============== 보안: origin + token 검증 ===============
+// GAS Web App URL은 본질적으로 공개 endpoint이므로, 다음 2층 방어로 abuse 차단.
+// 1) origin/referer 화이트리스트 — GAS doPost가 e.headers를 항상 노출하진 않으므로
+//    best-effort 검사 (헤더가 있으면 검증, 없으면 통과 → 토큰 검사로 위임)
+// 2) Script Properties 'BCC_LEAD_TOKEN' 과 payload._token 매칭 — 봇/외부 스팸 차단
+//
+// 토큰은 비밀이 아니라 식별자(클라이언트 JS에 결국 노출됨). 단 임의 봇은 모르므로
+// 우연/대량 스팸은 99% 봉쇄. 결정적 공격자는 GAS의 본질적 한계상 막을 수 없음
+// → 더 강한 보호 필요 시 Cloudflare Worker 프록시 도입.
+var ALLOWED_ORIGINS = [
+  'https://ohdana08.github.io'
+  // 협업자/추가 도메인은 여기에 추가
+];
+
+function verifyRequest_(e, body) {
+  // Layer 1: origin / referer (best-effort)
+  if (e && e.headers) {
+    var origin = e.headers['Origin'] || e.headers['origin'] || '';
+    var referer = e.headers['Referer'] || e.headers['referer'] || '';
+    var source = origin || referer;
+    if (source) {
+      var allowed = ALLOWED_ORIGINS.some(function (a) { return source.indexOf(a) === 0; });
+      if (!allowed) return { ok: false, reason: 'forbidden_origin', detail: source };
+    }
+  }
+  // Layer 2: shared token (Script Property BCC_LEAD_TOKEN)
+  var expected = PropertiesService.getScriptProperties().getProperty('BCC_LEAD_TOKEN');
+  if (expected) {
+    var got = body && body._token ? String(body._token) : '';
+    if (got !== expected) return { ok: false, reason: 'invalid_token' };
+  }
+  // Layer 3: schema sanity
+  if (!body || typeof body !== 'object') return { ok: false, reason: 'invalid_payload' };
+  return { ok: true };
+}
 var COLS = {
   NAME:        1,  // A
   PHONE:       2,  // B
@@ -52,7 +88,13 @@ var HEADER = [
 // =============== 엔드포인트 ===============
 function doPost(e) {
   var body = parsePayload_(e);
-  if (!body) return jsonOk_({ ok: false, error: 'invalid_payload' });
+
+  // origin + token + schema 검증
+  var check = verifyRequest_(e, body);
+  if (!check.ok) {
+    console.warn('[REJECT] ' + check.reason + (check.detail ? ' :: ' + check.detail : ''));
+    return jsonOk_({ ok: false, error: check.reason });
+  }
 
   var email = String(body.email || '').trim().toLowerCase();
   if (!email) return jsonOk_({ ok: false, error: 'missing_email' });

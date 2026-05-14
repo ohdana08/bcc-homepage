@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Backup files (never commit)
+*.backup
+*.backup.html
+*.bak
+*.orig
+index.backup.html
+
+# Local env / secret files (use bcc-config.js + GAS Script Properties instead)
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+config.local.json
+
+# Node (in case anyone adds tooling)
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / misc
+.cache/

@@ -1,0 +1,61 @@
+# BCC 잇툴즈 — gitleaks 보안 스캔 설정
+# 사용: pre-commit hook이 자동으로 'gitleaks protect --staged --config=.gitleaks.toml' 실행
+#       전체 히스토리 점검:  gitleaks detect --config=.gitleaks.toml
+
+title = "BCC repos — gitleaks rules"
+
+# 기본 룰 + 아래 BCC 커스텀 룰 사용
+[extend]
+useDefault = true
+
+# ============================================================
+# BCC 커스텀 룰
+# ============================================================
+
+[[rules]]
+id = "google-api-key"
+description = "Google API Key (AIza... 35-char identifier — YouTube/Maps/etc)"
+regex = '''AIza[0-9A-Za-z_-]{35}'''
+keywords = ["AIza"]
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API Key (sk-ant-...)"
+regex = '''sk-ant-[a-zA-Z0-9_-]{20,}'''
+keywords = ["sk-ant"]
+
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API Key (sk-...)"
+regex = '''sk-(?:proj-)?[a-zA-Z0-9_-]{40,}'''
+keywords = ["sk-"]
+
+[[rules]]
+id = "private-key-block"
+description = "PEM private key"
+regex = '''-----BEGIN (?:RSA |DSA |EC |OPENSSH |PGP )?PRIVATE KEY-----'''
+keywords = ["BEGIN", "PRIVATE KEY"]
+
+# ============================================================
+# Allowlist — 의도된 공개 식별자만 (실제 secret이 아닌 값)
+# ============================================================
+[allowlist]
+description = "BCC 공개 클라이언트 식별자 — 실제 비밀 아님"
+regexTarget = "line"
+regexes = [
+    # bcc-config.js 의 LEAD_TOKEN (32-hex). 봇 차단용 식별자라 공개 OK.
+    '''LEAD_TOKEN:\s*['"][a-f0-9]{32}['"]''',
+    # GAS Web App URL — 공개 endpoint (실제 보호는 GAS 측 origin+token 검증)
+    '''script\.google\.com/macros/s/AKfyc[a-zA-Z0-9_-]+/exec''',
+    # AIza placeholder (가이드 문서 등에서 예시로 쓰는 경우)
+    '''AIza[a-zA-Z]{1,5}<your-key-here>''',
+]
+paths = [
+    # 의도적으로 공개 식별자만 담는 파일 — 진짜 secret이 들어가면 안 되지만
+    # 가짜 secret 으로 잡혀서 commit 실패하는 일은 피한다 (gitleaks는 다른
+    # 파일에서 같은 패턴이 보이면 여전히 잡는다)
+    '''common/bcc-config\.js$''',
+    # 백업/빌드 산출물
+    '''.*\.backup\.html$''',
+    '''.*\.bak$''',
+]
