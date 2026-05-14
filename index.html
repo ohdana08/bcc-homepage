@@ -607,9 +607,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#about">소개</a>
       <a href="#services">서비스</a>
       <a href="#tools" data-nav="tools">분석도구</a>
+      <a href="tools/" data-nav="ittools">잇툴즈</a>
       <a href="#contact">문의</a>
     </div>
-    <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
   </div>
 </nav>
 
@@ -839,7 +840,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         카카오톡 채널로 편하게 문의하세요.<br />
         영업일 기준 24시간 이내 답변드립니다.
       </p>
-      <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn-kakao" data-kakao="contact">
+      <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn btn-kakao" data-kakao="contact">
         <span class="kakao-icon">K</span>
         카카오톡 채널로 상담하기
       </a>
@@ -860,13 +861,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
     <a href="#tools" data-nav="tools-footer">분석도구</a>
+    <a href="tools/" data-nav="ittools-footer">잇툴즈</a>
     <a href="#contact">문의</a>
   </div>
   <div>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</div>
 </footer>
 
 <!-- Floating Kakao -->
-<a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="float-kakao" data-kakao="float">
+<a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="float-kakao" data-kakao="float">
   <span class="kakao-icon">K</span>
   카톡 상담
 </a>
@@ -980,16 +982,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     observed.forEach(function (s) { io.observe(s); });
   }
 
-  // ---- consultation_after_tool ----
-  document.querySelectorAll('[data-kakao]').forEach(function (el) {
+  // ---- consultation_after_tool + unified kakao_consult_click ----
+  document.querySelectorAll('[data-kakao], a[href*="pf.kakao.com"]').forEach(function (el) {
     el.addEventListener('click', function () {
+      var location = el.getAttribute('data-kakao') || 'unknown';
+      track('kakao_consult_click', {
+        source_page: 'home',
+        button_location: location
+      });
       var toolUsed;
       try { toolUsed = sessionStorage.getItem(SS_TOOL_USED); } catch (e) {}
-      if (!toolUsed) return;
-      track('consultation_after_tool', {
-        prior_tool: toolUsed,
-        kakao_source: el.getAttribute('data-kakao')
-      });
+      if (toolUsed) {
+        track('consultation_after_tool', {
+          prior_tool: toolUsed,
+          kakao_source: location
+        });
+      }
     });
   });
 })();
