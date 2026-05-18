@@ -45,7 +45,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- Pretendard Variable -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 
+<!-- 잇툴즈 글로벌 네비 (외부 로드: 변경은 bcc-youtube-analyzer/common/ 한 곳만) -->
+<script src="https://ohdana08.github.io/bcc-youtube-analyzer/common/bcc-config.js"></script>
+<script src="https://ohdana08.github.io/bcc-youtube-analyzer/common/bcc-nav.js"></script>
+
 <style>
+  /* 잇툴즈 글로벌 네비가 상단 sticky 영역을 차지하므로
+     기존 BCC 사이트 nav는 일반 흐름으로 두고 함께 스크롤됨 */
+  .nav { position: static; }
+
   :root {
     --bg: #0a0a0a;
     --bg-2: #0f0f10;
@@ -445,6 +453,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K94NGCTP"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
+<!-- 잇툴즈 글로벌 네비 마운트 (메인 허브: currentTool/Category 없음 → 카테고리 단만 표시) -->
+<script>
+  if (window.BCCNav) BCCNav.attach({});
+  else document.addEventListener('DOMContentLoaded', function(){ if (window.BCCNav) BCCNav.attach({}); });
+</script>
 
 <!-- NAV -->
 <nav class="nav">
