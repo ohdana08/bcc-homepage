@@ -334,6 +334,66 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   .tool-card.is-disabled .tool-cta { color: var(--text-mute); }
 
+  /* OPENCHAT BAND (도구 카드 바로 아래) */
+  .openchat-band { padding: 0 20px 60px; }
+  .openchat-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(254,229,0,0.06), rgba(201,168,76,0.06));
+    border: 1px solid rgba(254,229,0,0.18);
+    border-radius: 16px;
+    padding: 30px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .openchat-text { flex: 1; min-width: 260px; }
+  .openchat-kicker {
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold-3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .openchat-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    margin-bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .openchat-desc {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .openchat-desc strong { color: var(--text); font-weight: 600; }
+  .openchat-cta {
+    background: var(--gold);
+    color: var(--bg);
+    font-weight: 700;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .openchat-cta:hover { box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+  .openchat-cta:active { transform: scale(0.98); }
+  @media (max-width: 720px) {
+    .openchat-card { padding: 24px 22px; }
+    .openchat-title { font-size: 19px; }
+  }
+
   /* CONTACT BAND */
   .contact-band {
     background: var(--bg-2);
@@ -598,6 +658,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- OPENCHAT BAND -->
+<section class="openchat-band">
+  <a class="openchat-card" href="https://open.kakao.com/o/gmPptFti" target="_blank" rel="noopener noreferrer" data-openchat="main_bottom">
+    <div class="openchat-text">
+      <div class="openchat-kicker">OPEN CHAT · BCC</div>
+      <div class="openchat-title">💬 BCC 오픈채팅방</div>
+      <div class="openchat-desc">
+        <strong>잇툴즈 사용 노하우</strong> + API 발급법<br>
+        무료 챌린지·강의 공지를 가장 먼저 받아보세요
+      </div>
+    </div>
+    <span class="openchat-cta">참여하기 →</span>
+  </a>
+</section>
+
 <!-- CONTACT BAND -->
 <section class="contact-band">
   <div class="contact-card">
@@ -626,6 +701,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="../#services">서비스</a>
     <a href="./">잇툴즈</a>
     <a href="../#contact">문의</a>
+    <a href="https://open.kakao.com/o/gmPptFti" target="_blank" rel="noopener noreferrer" data-openchat="footer">💬 오픈채팅방</a>
   </div>
   <div>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</div>
 </footer>
