@@ -205,7 +205,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .tools-section-inner { max-width: 1200px; margin: 0 auto; }
   .tools-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
   .tool-card {
@@ -428,9 +428,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .float-kakao:hover { transform: translateY(-2px); }
 
   /* RESPONSIVE */
-  @media (max-width: 1000px) {
-    .tools-grid { grid-template-columns: repeat(2, 1fr); }
-  }
   @media (max-width: 720px) {
     .nav-links { display: none; }
     .page-hero { padding: 50px 18px 30px; }
@@ -492,16 +489,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- TOOLS GRID -->
+<!-- TOOLS GRID — 사용자 워크플로우 순서: 발굴 → 분석 → 키워드 → 경쟁사 -->
 <section class="tools-section">
   <div class="tools-section-inner">
     <div class="tools-grid">
 
-      <!-- 1호: 유튜브 채널탐색기 (Active) -->
+      <!-- 1호: 잘 나가는 영상 찾기 (Active) -->
       <a
         class="tool-card is-active"
-        data-tool-id="youtube-channel-finder"
-        data-tool-name="유튜브 채널탐색기"
+        data-tool-id="finder"
+        data-tool-name="잘 나가는 영상 찾기"
         style="--platform-color: #FF0000; --platform-color-soft: rgba(255,0,0,0.14);"
         href="https://ohdana08.github.io/bcc-youtube-analyzer/finder/"
         target="_blank"
@@ -509,70 +506,93 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       >
         <span class="tool-badge tool-badge-active">Active</span>
         <div class="tool-head">
-          <div class="tool-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
-          </div>
+          <div class="tool-icon" aria-hidden="true">🔥</div>
           <div class="tool-number">No. 01</div>
         </div>
-        <div class="tool-name">유튜브 채널탐색기</div>
-        <div class="tool-desc">경쟁 채널의 성장 패턴과 인기 영상을 한눈에 확인</div>
+        <div class="tool-name">잘 나가는 영상 찾기</div>
+        <div class="tool-desc">키워드로 인기 영상을 발굴하고 바이럴 지수까지 한 번에</div>
         <div class="tool-tags">
           <span class="tool-tag">YouTube</span>
-          <span class="tool-tag">채널 분석</span>
+          <span class="tool-tag">콘텐츠 발굴</span>
           <span class="tool-tag">무료</span>
         </div>
         <div class="tool-cta">바로 사용하기 →</div>
       </a>
 
-      <!-- 2호: 유튜브 황금키워드 (Coming Soon) -->
-      <div
-        class="tool-card is-disabled"
-        data-tool-id="youtube-golden-keyword"
-        data-tool-name="유튜브 황금키워드"
-        style="--platform-color: #FF8A00; --platform-color-soft: rgba(255,138,0,0.14);"
-        role="button"
-        aria-disabled="true"
-        tabindex="0"
+      <!-- 2호: 영상 분석 (Active) -->
+      <a
+        class="tool-card is-active"
+        data-tool-id="video-analyzer"
+        data-tool-name="영상 분석"
+        style="--platform-color: #FF0000; --platform-color-soft: rgba(255,0,0,0.14);"
+        href="https://ohdana08.github.io/bcc-youtube-analyzer/video-analyzer/"
+        target="_blank"
+        rel="noopener"
       >
-        <span class="tool-badge tool-badge-soon">Coming Soon</span>
+        <span class="tool-badge tool-badge-active">Active</span>
         <div class="tool-head">
-          <div class="tool-icon" aria-hidden="true">🔑</div>
+          <div class="tool-icon" aria-hidden="true">🎬</div>
           <div class="tool-number">No. 02</div>
         </div>
-        <div class="tool-name">유튜브 황금키워드</div>
-        <div class="tool-desc">검색량 많고 경쟁 약한 키워드 발굴</div>
+        <div class="tool-name">영상 분석</div>
+        <div class="tool-desc">영상 URL로 성과·후킹 포인트·콘텐츠 메타까지 진단</div>
+        <div class="tool-tags">
+          <span class="tool-tag">YouTube</span>
+          <span class="tool-tag">영상 분석</span>
+          <span class="tool-tag">무료</span>
+        </div>
+        <div class="tool-cta">바로 사용하기 →</div>
+      </a>
+
+      <!-- 3호: 황금키워드 발견 (Active) -->
+      <a
+        class="tool-card is-active"
+        data-tool-id="keyword-finder"
+        data-tool-name="황금키워드 발견"
+        style="--platform-color: #FF0000; --platform-color-soft: rgba(255,0,0,0.14);"
+        href="https://ohdana08.github.io/bcc-youtube-analyzer/keyword-finder/"
+        target="_blank"
+        rel="noopener"
+      >
+        <span class="tool-badge tool-badge-active">Active</span>
+        <div class="tool-head">
+          <div class="tool-icon" aria-hidden="true">💎</div>
+          <div class="tool-number">No. 03</div>
+        </div>
+        <div class="tool-name">황금키워드 발견</div>
+        <div class="tool-desc">키워드 경쟁도·트렌드·관련 키워드까지 한 번에 발굴</div>
         <div class="tool-tags">
           <span class="tool-tag">YouTube</span>
           <span class="tool-tag">SEO</span>
           <span class="tool-tag">키워드</span>
         </div>
-        <div class="tool-cta">준비 중</div>
-      </div>
+        <div class="tool-cta">바로 사용하기 →</div>
+      </a>
 
-      <!-- 3호: 스마트스토어 상세 비교 (Coming Soon) -->
-      <div
-        class="tool-card is-disabled"
-        data-tool-id="smartstore-detail-compare"
-        data-tool-name="스마트스토어 상세 비교"
-        style="--platform-color: #03C75A; --platform-color-soft: rgba(3,199,90,0.14);"
-        role="button"
-        aria-disabled="true"
-        tabindex="0"
+      <!-- 4호: 경쟁채널 분석 (Active) -->
+      <a
+        class="tool-card is-active"
+        data-tool-id="competitor-analyzer"
+        data-tool-name="경쟁채널 분석"
+        style="--platform-color: #FF0000; --platform-color-soft: rgba(255,0,0,0.14);"
+        href="https://ohdana08.github.io/bcc-youtube-analyzer/competitor-analyzer/"
+        target="_blank"
+        rel="noopener"
       >
-        <span class="tool-badge tool-badge-soon">Coming Soon</span>
+        <span class="tool-badge tool-badge-active">Active</span>
         <div class="tool-head">
-          <div class="tool-icon" aria-hidden="true">🛍</div>
-          <div class="tool-number">No. 03</div>
+          <div class="tool-icon" aria-hidden="true">🎯</div>
+          <div class="tool-number">No. 04</div>
         </div>
-        <div class="tool-name">스마트스토어 상세 비교</div>
-        <div class="tool-desc">경쟁 상품 상세페이지 구조와 후킹 포인트 분석</div>
+        <div class="tool-name">경쟁채널 분석</div>
+        <div class="tool-desc">채널 URL로 운영 패턴·TOP5 영상까지 종합 진단</div>
         <div class="tool-tags">
-          <span class="tool-tag">스마트스토어</span>
-          <span class="tool-tag">상세페이지</span>
-          <span class="tool-tag">AI 분석</span>
+          <span class="tool-tag">YouTube</span>
+          <span class="tool-tag">채널 분석</span>
+          <span class="tool-tag">고급</span>
         </div>
-        <div class="tool-cta">준비 중</div>
-      </div>
+        <div class="tool-cta">바로 사용하기 →</div>
+      </a>
 
     </div>
   </div>
