@@ -43,5 +43,14 @@
     "url": "https://chatgpt.com/g/g-69f1fa7b57fc819194090f0ed0bae951-inseutageuraem-peuropil-jejag-bos",
     "visibility": "public",
     "icon": "📸"
+  },
+  {
+    "id": "customer-interview",
+    "title": "고객 인터뷰",
+    "desc": "고객이 되어 10단계로 내 아이템의 빈틈을 찔러줘요",
+    "category": "창업",
+    "url": "https://chatgpt.com/g/g-69d199ba3f108191acbc9ebf40f89c0c-gogaeginteobyucaesbos",
+    "visibility": "public",
+    "icon": "🗣️"
   }
 ]
