@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>무료챗봇 | BCC 비즈니스커리어컨설팅</title>
+<meta name="description" content="BCC가 만든 ChatGPT 무료챗봇(GPTs) 모음. 자기소개서·마케팅·창업·첨삭까지, 강의에서 바로 쓰는 챗봇을 한곳에서.">
+<meta name="keywords" content="무료챗봇, BCC, GPTs, ChatGPT, 자기소개서, 마케팅, 창업, 첨삭, 잇툴즈">
+<meta name="author" content="오예림">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ohdana08.github.io/bcc-homepage/ittools-gpts.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="무료챗봇 | BCC 비즈니스커리어컨설팅">
+<meta property="og:description" content="BCC가 만든 ChatGPT 무료챗봇(GPTs) 모음. 강의에서 바로 쓰는 챗봇을 한곳에서.">
+<meta property="og:url" content="https://ohdana08.github.io/bcc-homepage/ittools-gpts.html">
+<meta property="og:image" content="https://ohdana08.github.io/bcc-homepage/og-image.png">
+<meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+<meta property="og:locale" content="ko_KR">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="무료챗봇 | BCC 비즈니스커리어컨설팅">
+<meta name="twitter:description" content="BCC가 만든 ChatGPT 무료챗봇(GPTs) 모음. 강의에서 바로 쓰는 챗봇을 한곳에서.">
+<meta name="twitter:image" content="https://ohdana08.github.io/bcc-homepage/og-image.png">
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K94NGCTP');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TYJSYWW5Q6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TYJSYWW5Q6');
+</script>
+
+<!-- Pretendard Variable -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+
+<!-- 잇툴즈 글로벌 네비 (외부 로드: 변경은 bcc-youtube-analyzer/common/ 한 곳만) -->
+<script src="https://ohdana08.github.io/bcc-youtube-analyzer/common/bcc-config.js"></script>
+<script src="https://ohdana08.github.io/bcc-youtube-analyzer/common/bcc-nav.js"></script>
+
+<style>
+  /* 잇툴즈 글로벌 네비가 상단 sticky 영역을 차지하므로
+     기존 BCC 사이트 nav는 일반 흐름으로 두고 함께 스크롤됨 */
+  .nav { position: static; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg-2: #0f0f10;
+    --surface: #16161a;
+    --surface-2: #1d1d22;
+    --border: #26262c;
+    --text: #f3f3f5;
+    --text-dim: #9a9aa6;
+    --text-mute: #6c6c78;
+    --gold: #C9A84C;
+    --gold-2: #a88835;
+    --gold-3: #e6c878;
+    --kakao: #fee500;
+    --kakao-text: #181600;
+    --gradient: linear-gradient(135deg, #C9A84C 0%, #a88835 100%);
+    --gradient-soft: linear-gradient(135deg, #e6c878 0%, #C9A84C 100%);
+    --shadow-lg: 0 20px 50px rgba(0,0,0,0.55);
+    --shadow-sm: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-gold: 0 8px 24px rgba(201,168,76,0.22);
+
+    --font-en: Georgia, "Times New Roman", serif;
+    --font-ko: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+               "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ko);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  /* NAV */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(10,10,10,0.78);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .brand-name {
+    font-size: 16px;
+    font-family: var(--font-en);
+    letter-spacing: 0.5px;
+  }
+  .brand-sub { font-size: 11px; color: var(--text-dim); font-weight: 500; letter-spacing: 0.4px; }
+  .nav-links {
+    display: flex;
+    gap: 22px;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .nav-links a {
+    transition: color 0.15s;
+    padding: 6px 2px;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a.is-current { color: var(--gold); }
+  .nav-cta {
+    background: var(--kakao);
+    color: var(--kakao-text);
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* PAGE HERO */
+  .page-hero {
+    position: relative;
+    padding: 70px 20px 40px;
+    overflow: hidden;
+  }
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(201,168,76,0.14) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .page-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .pill {
+    display: inline-block;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    font-family: var(--font-en);
+  }
+  .page-hero h1 {
+    font-size: 44px;
+    line-height: 1.2;
+    letter-spacing: -1px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .page-hero h1 .accent {
+    background: var(--gradient-soft);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .page-hero p {
+    color: var(--text-dim);
+    font-size: 16px;
+    max-width: 640px;
+  }
+
+  /* FILTER TABS */
+  .filter-bar { max-width: 1200px; margin: 0 auto 22px; padding: 0 20px; }
+  .filter-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filter-tab {
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-ko);
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+  .filter-tab:hover { color: var(--text); border-color: var(--text-mute); }
+  .filter-tab.is-current { background: var(--gradient); color: #1a1505; border-color: transparent; }
+
+  /* TOOLS GRID */
+  .tools-section { padding: 8px 20px 80px; flex: 1; }
+  .tools-section-inner { max-width: 1200px; margin: 0 auto; }
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .tool-card {
+    --platform-color: var(--gold);
+    --platform-color-soft: rgba(201,168,76,0.15);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--platform-color);
+    border-radius: 18px;
+    padding: 28px 26px 26px;
+    min-height: 280px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    overflow: hidden;
+    color: inherit;
+  }
+  .tool-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, var(--platform-color-soft), transparent 60%);
+    pointer-events: none;
+    opacity: 0.8;
+  }
+  .tool-card.is-active { cursor: pointer; }
+  .tool-card.is-active:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    border-color: var(--platform-color);
+  }
+
+  .tool-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .tool-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--platform-color);
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 800;
+    font-family: var(--font-en);
+    flex-shrink: 0;
+  }
+  .tool-number {
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    color: var(--platform-color);
+    text-transform: uppercase;
+  }
+  .tool-name {
+    position: relative;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+  .tool-desc {
+    position: relative;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .tool-tags {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .tool-tag {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .tool-badge {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-family: var(--font-en);
+    z-index: 2;
+  }
+  .tool-badge-active {
+    background: var(--platform-color);
+    color: #fff;
+  }
+  .tool-cta {
+    position: relative;
+    color: var(--platform-color);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* CARD FOOT: 링크(전체 클릭) + QR 버튼.
+     position을 주지 않아야 .card-link::after가 .tool-card 전체를 덮는다 */
+  .card-foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  /* stretched-link: 카드 전체를 클릭영역으로 (QR 버튼은 z-index로 위에 떠 있음) */
+  .card-link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+  .qr-btn {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    background: var(--surface-2);
+    color: var(--platform-color);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 13px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    font-family: var(--font-en);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .qr-btn:hover { border-color: var(--platform-color); background: var(--platform-color); color: #fff; }
+
+  /* EMPTY / ERROR STATE */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-dim);
+    padding: 60px 20px;
+    font-size: 15px;
+    border: 1px dashed var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+  }
+
+  /* QR MODAL */
+  .qr-modal {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .qr-modal[hidden] { display: none; }
+  .qr-modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  }
+  .qr-modal-card {
+    position: relative; z-index: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 30px 26px 24px;
+    width: 100%; max-width: 320px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .qr-modal-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none;
+    color: var(--text-dim); font-size: 26px; line-height: 1;
+    cursor: pointer; padding: 4px;
+  }
+  .qr-modal-close:hover { color: var(--text); }
+  .qr-modal-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; padding: 0 18px; letter-spacing: -0.3px; }
+  .qr-box {
+    display: inline-grid; place-items: center;
+    background: #fff; padding: 10px; border-radius: 12px;
+    min-width: 200px; min-height: 200px;
+  }
+  .qr-box img, .qr-box canvas { display: block; }
+  .qr-fallback { font-size: 12px; color: #181600; padding: 10px; max-width: 180px; }
+  .qr-hint { margin-top: 14px; font-size: 13px; color: var(--text-dim); }
+  .qr-link { margin-top: 8px; font-size: 10px; color: var(--text-mute); word-break: break-all; font-family: var(--font-en); }
+
+  /* CONTACT BAND */
+  .contact-band {
+    background: var(--bg-2);
+    padding: 60px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .contact-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(168,136,53,0.04));
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 24px;
+    padding: 44px 36px;
+    text-align: center;
+  }
+  .contact-card h3 {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .contact-card p {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 22px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-kakao {
+    background: var(--kakao);
+    color: var(--kakao-text);
+  }
+  .btn-kakao:hover { box-shadow: 0 8px 24px rgba(254,229,0,0.3); }
+  .kakao-icon {
+    width: 22px; height: 22px;
+    background: #181600;
+    color: var(--kakao);
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 900;
+    display: inline-grid;
+    place-items: center;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #07070a;
+    border-top: 1px solid var(--border);
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 13px;
+  }
+  footer .brand { justify-content: center; margin-bottom: 14px; }
+  footer .footer-links {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  footer .footer-links a:hover { color: var(--text); }
+
+  /* Floating Kakao Button */
+  .float-kakao {
+    position: fixed;
+    bottom: 22px; right: 22px;
+    background: var(--kakao);
+    color: var(--kakao-text);
+    padding: 14px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    z-index: 50;
+    transition: transform 0.15s;
+  }
+  .float-kakao:hover { transform: translateY(-2px); }
+
+  /* RESPONSIVE */
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .page-hero { padding: 50px 18px 30px; }
+    .page-hero h1 { font-size: 30px; letter-spacing: -0.4px; }
+    .page-hero p { font-size: 14px; }
+    .filter-bar { padding: 0 18px; }
+    .filter-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .filter-tab { flex-shrink: 0; }
+    .tools-section { padding: 8px 18px 60px; }
+    .tools-grid { grid-template-columns: 1fr; gap: 16px; }
+    .tool-card { min-height: auto; padding: 24px 22px; }
+    .tool-name { font-size: 18px; }
+    .contact-band { padding: 44px 18px; }
+    .contact-card { padding: 32px 22px; }
+    .contact-card h3 { font-size: 21px; }
+    .float-kakao { bottom: 16px; right: 16px; padding: 12px 16px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K94NGCTP"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- 잇툴즈 글로벌 네비 마운트 -->
+<script>
+  if (window.BCCNav) BCCNav.attach({});
+  else document.addEventListener('DOMContentLoaded', function(){ if (window.BCCNav) BCCNav.attach({}); });
+</script>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="./" class="brand">
+      <img src="./logo.png?v=3" alt="BCC 로고" style="height: 48px; width: auto; background: white; border-radius: 8px; padding: 4px;" />
+      <div>
+        <div class="brand-name">BCC</div>
+        <div class="brand-sub">비즈니스커리어컨설팅</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="./#about">소개</a>
+      <a href="./#services">서비스</a>
+      <a href="./tools/" class="is-current">잇툴즈</a>
+      <a href="./#contact">문의</a>
+    </div>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <div class="pill">FREE CHATBOT · BCC</div>
+    <h1>무료챗봇, <span class="accent">강의를 잇는 도구</span></h1>
+    <p>
+      BCC가 직접 만든 ChatGPT 챗봇(GPTs) 모음입니다.
+      필요한 챗봇 카드를 눌러 바로 사용하거나, QR로 휴대폰에서 열어보세요.
+    </p>
+  </div>
+</section>
+
+<!-- FILTER TABS -->
+<div class="filter-bar">
+  <div class="filter-tabs" id="filterTabs"></div>
+</div>
+
+<!-- CHATBOT GRID -->
+<section class="tools-section">
+  <div class="tools-section-inner">
+    <div class="tools-grid" id="chatbotGrid"></div>
+  </div>
+</section>
+
+<!-- CONTACT BAND -->
+<section class="contact-band">
+  <div class="contact-card">
+    <h3>챗봇 사용 중 막히신다면?</h3>
+    <p>
+      카카오톡 채널로 편하게 문의하세요. 강의·1:1 컨설팅도 함께 진행합니다.
+    </p>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn btn-kakao" data-kakao="contact">
+      <span class="kakao-icon">K</span>
+      카카오톡 채널로 상담하기
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="./" class="brand">
+    <img src="./logo.png?v=3" alt="BCC 로고" style="height: 48px; width: auto; background: white; border-radius: 8px; padding: 4px;" />
+    <div>
+      <div class="brand-name">BCC</div>
+      <div class="brand-sub">비즈니스커리어컨설팅</div>
+    </div>
+  </a>
+  <div class="footer-links">
+    <a href="./#about">소개</a>
+    <a href="./#services">서비스</a>
+    <a href="./tools/">잇툴즈</a>
+    <a href="./#contact">문의</a>
+    <a href="https://open.kakao.com/o/gmPptFti" target="_blank" rel="noopener noreferrer" data-openchat="footer">💬 오픈채팅방</a>
+  </div>
+  <div>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</div>
+</footer>
+
+<!-- Floating Kakao -->
+<a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="float-kakao" data-kakao="float">
+  <span class="kakao-icon">K</span>
+  카톡 상담
+</a>
+
+<!-- QR MODAL -->
+<div class="qr-modal" id="qrModal" hidden>
+  <div class="qr-modal-backdrop" data-close></div>
+  <div class="qr-modal-card" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+    <button class="qr-modal-close" type="button" data-close aria-label="닫기">&times;</button>
+    <div class="qr-modal-title" id="qrModalTitle"></div>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="qr-hint">휴대폰 카메라로 스캔하세요</div>
+    <div class="qr-link" id="qrLink"></div>
+  </div>
+</div>
+
+<!-- QR 코드 라이브러리 (클라이언트 사이드 생성 · 무료 · 정적) -->
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+
+<!-- 무료챗봇 렌더링 + GA4 이벤트 -->
+<script>
+(function () {
+  // 테마 기반 카테고리 (GA4 콘텐츠 그룹과 매칭).
+  // 탭은 JSON에 실제 존재하는 카테고리만 자동 표시 → 새 테마를 JSON에 넣으면 코드 수정 없이 탭에 나타남.
+  // PRIORITY는 탭 정렬 순서일 뿐(목록에 없는 새 카테고리는 맨 뒤·가나다순으로 자동 정렬).
+  var PRIORITY = ['인스타그램', '블로그', '스마트스토어', '사고력', '자기소개서', '마케팅', '콘텐츠제작', '첨삭', '분석도구', '기타'];
+  var COLORS = {
+    '인스타그램': '#E1306C', '블로그': '#03C75A', '스마트스토어': '#FF6F0F', '사고력': '#A78BFA',
+    '자기소개서': '#C9A84C', '마케팅': '#FF6B6B', '콘텐츠제작': '#60A5FA',
+    '첨삭': '#34D399', '분석도구': '#4ECDC4', '기타': '#9a9aa6'
+  };
+  var DEFAULT_COLOR = '#C9A84C';
+  function orderCats(cats) {
+    var inP = PRIORITY.filter(function (c) { return cats.indexOf(c) > -1; });
+    var extra = cats.filter(function (c) { return PRIORITY.indexOf(c) === -1; }).sort();
+    return inP.concat(extra);
+  }
+
+  function hexToRgba(hex, a) {
+    var h = String(hex).replace('#', '');
+    var r = parseInt(h.substring(0, 2), 16),
+        g = parseInt(h.substring(2, 4), 16),
+        b = parseInt(h.substring(4, 6), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  // gtag + dataLayer 이중 push (기존 tools/index.html track() 헬퍼 재사용)
+  function track(name, params) {
+    try {
+      if (typeof gtag === 'function') { gtag('event', name, params || {}); }
+      if (window.dataLayer) { window.dataLayer.push(Object.assign({ event: name }, params || {})); }
+    } catch (e) { /* no-op */ }
+  }
+
+  function qs(name) {
+    try { return new URLSearchParams(window.location.search).get(name); }
+    catch (e) { return null; }
+  }
+
+  function getLectureParam() {
+    var v = qs('lecture');
+    return (v && v.trim()) ? v.trim() : 'organic';
+  }
+
+  var LECTURE = getLectureParam();
+
+  // 재방문 식별: 최초 방문 시 비식별 값만 저장(만료 90일), 같은 세션에선 한 번만 판정
+  var IS_RETURNING = (function () {
+    try {
+      var KEY = 'bcc_gpt_lib_visit', now = Date.now(), NINETY = 90 * 24 * 60 * 60 * 1000;
+      var raw = localStorage.getItem(KEY), returning = false;
+      if (raw) {
+        var rec = JSON.parse(raw);
+        if (rec && rec.ts && (now - rec.ts) < NINETY) returning = true;
+      }
+      localStorage.setItem(KEY, JSON.stringify({ lecture: LECTURE, ts: now }));
+      return returning;
+    } catch (e) { return false; }
+  })();
+
+  // GPTs 직링크에 UTM·강의ID·카테고리 부착
+  function buildOutbound(item) {
+    var u = item.url || '#';
+    var sep = u.indexOf('?') > -1 ? '&' : '?';
+    var params = [
+      'lecture=' + encodeURIComponent(LECTURE),
+      'utm_source=ittools',
+      'utm_medium=free_chatbot',
+      'content_group=' + encodeURIComponent(item.category || '')
+    ];
+    return u + sep + params.join('&');
+  }
+
+  // QR이 가리키는 값: GPT 직링크가 아니라 "홈페이지 경유" URL (스캔도 GA4에 기록)
+  function qrUrlFor(item) {
+    var base = window.location.origin + window.location.pathname;
+    var s = base + '?go=' + encodeURIComponent(item.id);
+    if (LECTURE !== 'organic') s += '&lecture=' + encodeURIComponent(LECTURE);
+    return s;
+  }
+
+  function fireSelect(item, source) {
+    track('select_chatbot', {
+      chatbot_id: item.id,
+      chatbot_title: item.title,
+      content_group: item.category,
+      lecture_id: LECTURE,
+      is_returning: IS_RETURNING,
+      source: source            // 'card' (탭 클릭) | 'qr' (QR 스캔)
+    });
+  }
+
+  var grid = document.getElementById('chatbotGrid');
+  var tabsEl = document.getElementById('filterTabs');
+  var modal = document.getElementById('qrModal');
+  var qrBox = document.getElementById('qrBox');
+  var qrTitle = document.getElementById('qrModalTitle');
+  var qrLink = document.getElementById('qrLink');
+
+  // XSS 안전: 모든 텍스트는 textContent로만 삽입 (innerHTML 미사용)
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function renderCard(item) {
+    var cat = item.category || '기타';
+    var color = COLORS[cat] || DEFAULT_COLOR;
+    var card = el('article', 'tool-card is-active');
+    card.style.setProperty('--platform-color', color);
+    card.style.setProperty('--platform-color-soft', hexToRgba(color, 0.14));
+    card.setAttribute('data-category', cat);
+
+    card.appendChild(el('span', 'tool-badge tool-badge-active', '무료'));
+
+    var head = el('div', 'tool-head');
+    head.appendChild(el('div', 'tool-icon', item.icon || '🤖'));
+    head.appendChild(el('div', 'tool-number', cat));
+    card.appendChild(head);
+
+    card.appendChild(el('div', 'tool-name', item.title || ''));
+    card.appendChild(el('div', 'tool-desc', item.desc || ''));
+
+    var tags = el('div', 'tool-tags');
+    tags.appendChild(el('span', 'tool-tag', cat));
+    tags.appendChild(el('span', 'tool-tag', 'GPTs'));
+    card.appendChild(tags);
+
+    var foot = el('div', 'card-foot');
+    var link = el('a', 'card-link tool-cta', '바로 쓰기 →');
+    link.href = buildOutbound(item);
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.setAttribute('aria-label', (item.title || '챗봇') + ' 바로 쓰기');
+    link.addEventListener('click', function () { fireSelect(item, 'card'); });
+    foot.appendChild(link);
+
+    var qrBtn = el('button', 'qr-btn', 'QR');
+    qrBtn.type = 'button';
+    qrBtn.setAttribute('aria-label', (item.title || '챗봇') + ' QR 코드 보기');
+    qrBtn.addEventListener('click', function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      openQr(item);
+    });
+    foot.appendChild(qrBtn);
+
+    card.appendChild(foot);
+    return card;
+  }
+
+  function applyFilter(f) {
+    Array.prototype.forEach.call(tabsEl.querySelectorAll('.filter-tab'), function (x) {
+      x.classList.toggle('is-current', x.getAttribute('data-filter') === f);
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.tool-card'), function (card) {
+      var show = (f === '*') || (card.getAttribute('data-category') === f);
+      card.style.display = show ? '' : 'none';
+    });
+  }
+
+  function renderTabs(cats) {
+    var all = el('button', 'filter-tab is-current', '전체');
+    all.type = 'button';
+    all.setAttribute('data-filter', '*');
+    tabsEl.appendChild(all);
+    cats.forEach(function (c) {
+      var b = el('button', 'filter-tab', c);
+      b.type = 'button';
+      b.setAttribute('data-filter', c);
+      tabsEl.appendChild(b);
+    });
+    tabsEl.addEventListener('click', function (ev) {
+      var btn = ev.target.closest ? ev.target.closest('.filter-tab') : null;
+      if (!btn) return;
+      var f = btn.getAttribute('data-filter');
+      applyFilter(f);
+      track('chatbot_filter', { content_group: f === '*' ? '전체' : f });
+    });
+  }
+
+  function openQr(item) {
+    qrTitle.textContent = item.title || 'QR';
+    var url = qrUrlFor(item);
+    qrLink.textContent = url;
+    while (qrBox.firstChild) qrBox.removeChild(qrBox.firstChild);
+    try {
+      if (typeof QRCode === 'function') {
+        new QRCode(qrBox, {
+          text: url, width: 200, height: 200,
+          colorDark: '#0a0a0a', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        qrBox.appendChild(el('div', 'qr-fallback', 'QR을 불러오지 못했습니다. 아래 링크를 사용하세요.'));
+      }
+    } catch (e) {
+      qrBox.appendChild(el('div', 'qr-fallback', 'QR 생성 오류. 아래 링크를 사용하세요.'));
+    }
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    track('chatbot_qr_open', { chatbot_id: item.id, content_group: item.category, lecture_id: LECTURE });
+  }
+  function closeQr() { modal.hidden = true; document.body.style.overflow = ''; }
+  modal.addEventListener('click', function (ev) {
+    if (ev.target && ev.target.hasAttribute('data-close')) closeQr();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && !modal.hidden) closeQr();
+  });
+
+  // ---- 데이터 로드 ----
+  fetch('./ittools-gpts.json', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error('load'); return r.json(); })
+    .then(function (data) {
+      var items = (Array.isArray(data) ? data : []).filter(function (x) {
+        return x && x.visibility === 'public' && x.id && x.url;
+      });
+
+      // QR 스캔 착지: ?go=<id> → 이벤트 기록 후 실제 GPT로 리다이렉트 (경유 보존)
+      var go = qs('go');
+      if (go) {
+        var target = items.filter(function (x) { return x.id === go; })[0];
+        if (target) {
+          fireSelect(target, 'qr');
+          window.location.replace(buildOutbound(target));
+          return;
+        }
+        // 잘못된 id → 일반 페이지로 폴백
+      }
+
+      track('gpt_library_page_view', {
+        page_path: window.location.pathname,
+        lecture_id: LECTURE,
+        is_returning: IS_RETURNING
+      });
+
+      if (!items.length) {
+        grid.appendChild(el('div', 'empty-state', '곧 무료챗봇이 추가됩니다. 잠시만 기다려 주세요 🙏'));
+        return;
+      }
+
+      var catSet = {};
+      items.forEach(function (x) { if (x.category) catSet[x.category] = 1; });
+      var present = orderCats(Object.keys(catSet));
+      renderTabs(present);
+      items.forEach(function (item) { grid.appendChild(renderCard(item)); });
+
+      // 허브 플랫폼 카드 딥링크: ?cat=<카테고리> 로 들어오면 해당 탭 자동 선택
+      var preCat = qs('cat');
+      if (preCat && present.indexOf(preCat) > -1) {
+        applyFilter(preCat);
+      }
+    })
+    .catch(function () {
+      grid.appendChild(el('div', 'empty-state', '목록을 불러오지 못했습니다. 새로고침 해주세요.'));
+    });
+
+  // ---- 통합 kakao_consult_click (기존 잇툴즈와 동일 패턴) ----
+  document.querySelectorAll('[data-kakao], a[href*="pf.kakao.com"]').forEach(function (elm) {
+    elm.addEventListener('click', function () {
+      track('kakao_consult_click', {
+        source_page: 'free_chatbot',
+        button_location: elm.getAttribute('data-kakao') || 'unknown'
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "press-release",
+    "title": "보도자료 작성",
+    "desc": "기관·행사 정보를 단계별로 묻고 기사체 보도자료를 완성해 줘요",
+    "category": "콘텐츠제작",
+    "url": "https://chatgpt.com/g/g-6a16d8216308819188e9b79198d6dcce-bodojaryo-caesbos",
+    "visibility": "public",
+    "icon": "📰"
+  },
+  {
+    "id": "naver-blog-writing",
+    "title": "네이버 블로그 글쓰기",
+    "desc": "인터뷰로 내 경험을 끌어내 상위노출용 블로그 글을 함께 설계해요",
+    "category": "블로그",
+    "url": "https://chatgpt.com/g/g-6a0b26f6bdf881919eee1de3a845bcd6-neibeobeulrogeu-geulsseugi",
+    "visibility": "public",
+    "icon": "✍️"
+  },
+  {
+    "id": "smartstore-product-planning",
+    "title": "스마트스토어 상품기획",
+    "desc": "네이버 데이터랩으로 감이 아닌 데이터로 상품을 기획하게 도와줘요",
+    "category": "스마트스토어",
+    "url": "https://chatgpt.com/g/g-6a01ea9213e48191b9d48889f8c20c38-neibeo-deiteoraeb-sangpumgihoeg-koci",
+    "visibility": "public",
+    "icon": "🛍"
+  }
+]
