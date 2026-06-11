@@ -52,5 +52,14 @@
     "url": "https://chatgpt.com/g/g-69d199ba3f108191acbc9ebf40f89c0c-gogaeginteobyucaesbos",
     "visibility": "public",
     "icon": "🗣️"
+  },
+  {
+    "id": "business-filter",
+    "title": "사업 필터링",
+    "desc": "내 아이템이 돈 받을 구조인지 현실 기준으로 걸러줘요",
+    "category": "창업",
+    "url": "https://chatgpt.com/g/g-69d13cd58a488191a2806206dd8fb901-saeob-pilteoring-caesbos-jeonmungapeureim",
+    "visibility": "public",
+    "icon": "🔍"
   }
 ]
