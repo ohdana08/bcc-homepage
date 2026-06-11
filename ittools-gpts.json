@@ -61,5 +61,14 @@
     "url": "https://chatgpt.com/g/g-69d13cd58a488191a2806206dd8fb901-saeob-pilteoring-caesbos-jeonmungapeureim",
     "visibility": "public",
     "icon": "🔍"
+  },
+  {
+    "id": "business-process-design",
+    "title": "사업프로세스 설계",
+    "desc": "아이템부터 예산까지, 사업 굴러가는 순서를 6단계로 그려줘요",
+    "category": "창업",
+    "url": "https://chatgpt.com/g/g-69a849f95fe4819196012596528c79dc-saeobpeuroseseu-seolgye-caesbos",
+    "visibility": "public",
+    "icon": "🧭"
   }
 ]
