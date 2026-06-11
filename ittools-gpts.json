@@ -25,5 +25,14 @@
     "url": "https://chatgpt.com/g/g-6a01ea9213e48191b9d48889f8c20c38-neibeo-deiteoraeb-sangpumgihoeg-koci",
     "visibility": "public",
     "icon": "🛍"
+  },
+  {
+    "id": "shortform-subtitle",
+    "title": "숏폼 자막 코치",
+    "desc": "4컷 콘티의 컷마다 어울리는 자막 아이디어를 함께 잡아줘요",
+    "category": "콘텐츠제작",
+    "url": "https://chatgpt.com/g/g-69fd2117908c8191a229008be9bbb8eb-seutoribodeu-gihoeg-bos",
+    "visibility": "public",
+    "icon": "🎬"
   }
 ]
