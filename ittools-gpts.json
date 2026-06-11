@@ -34,5 +34,14 @@
     "url": "https://chatgpt.com/g/g-69fd2117908c8191a229008be9bbb8eb-seutoribodeu-gihoeg-bos",
     "visibility": "public",
     "icon": "🎬"
+  },
+  {
+    "id": "instagram-profile",
+    "title": "인스타 프로필 설계",
+    "desc": "질문·선택만으로 팔로우를 부르는 4줄 프로필을 완성해 줘요",
+    "category": "인스타그램",
+    "url": "https://chatgpt.com/g/g-69f1fa7b57fc819194090f0ed0bae951-inseutageuraem-peuropil-jejag-bos",
+    "visibility": "public",
+    "icon": "📸"
   }
 ]
