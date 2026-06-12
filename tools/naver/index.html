@@ -230,6 +230,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </div>
     </div>
     <p class="hint" style="margin-top:14px">포화 지수 = 발행량 ÷ 검색량. <b>낮을수록</b> 검색 수요 대비 글이 적어 <b>노출 기회</b>가 큽니다.</p>
+
+    <div class="leadmagnet">
+      <h2>📝 이 키워드로 "노출되는" 블로그 글 쓰기</h2>
+      <p>발행량·포화도를 반영한 <b>차별화 각도 → 제목·구조 → 초안</b> 프롬프트입니다. 내 AI에 붙여넣으면 AI가 먼저 질문을 던져, 경쟁 글 사이에서 묻히지 않는 글을 함께 만듭니다.</p>
+      <button id="seoWordBtn" class="btn btn-gold">블로그 글쓰기 프롬프트 Word 받기</button>
+    </div>
   </section>
 
   <!-- ── 탭 3: 쇼핑 키워드 ── -->
@@ -253,6 +259,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </div>
     <div class="section-title">상위 상품</div>
     <div id="shopProducts"><div class="hint">상품 없음</div></div>
+
+    <div class="leadmagnet">
+      <h2>🛒 이 키워드 상세페이지 기획안 만들기</h2>
+      <p>경쟁 상품 수·가격대를 반영한 <b>차별점·포지셔닝 → 구성 → 카피</b> 프롬프트입니다. 내 AI에 붙여넣으면 AI가 내 상품을 먼저 묻고, 팔리는 상세페이지 기획안을 함께 만듭니다.</p>
+      <button id="shopWordBtn" class="btn btn-gold">상세페이지 기획 프롬프트 Word 받기</button>
+    </div>
   </section>
 
   <div class="related-tools">
@@ -265,7 +277,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- 리드 폼 모달 -->
 <div class="modal-bg hidden" id="leadModal">
   <div class="modal">
-    <h2>맞춤 프롬프트 Word 받기</h2>
+    <h2 id="leadTitle">맞춤 프롬프트 Word 받기</h2>
     <p class="lead-sub">아래 정보를 남겨 주시면 바로 다운로드됩니다.</p>
     <form id="leadForm">
       <div class="field"><label>이름 *</label><input type="text" id="leadName" required /></div>
@@ -314,7 +326,10 @@ function track(name, params) {
 }
 
 /* ── 상태 ── */
-let lastAnalysis = null;   // 마지막 분석 결과(§4-4)
+let lastAnalysis = null;     // 검색 분석 결과(§4-4)
+let lastSeoData = null;      // 블로그·카페 분석 결과
+let lastShoppingData = null; // 쇼핑 분석 결과
+let pendingWordType = "search"; // 리드 폼 제출 시 만들 Word 종류
 const POPULAR = ["챗지피티", "스마트스토어 창업", "블로그 글쓰기", "마케팅"]; // Phase 1 더미
 
 const $ = (id) => document.getElementById(id);
@@ -459,6 +474,7 @@ async function loadSeo(keyword) {
   try {
     const { res, data } = await post("/api/seo", keyword);
     if (!res.ok) { showError(data.message || "블로그·카페 분석에 실패했습니다."); return false; }
+    lastSeoData = data;
     track("seo_view", { keyword: keyword });
     $("seoPublish").textContent = fmt(data.publish.total);
     $("seoPublishSub").textContent = "블로그 " + fmt(data.publish.blog) + " · 카페 " + fmt(data.publish.cafe);
@@ -476,6 +492,7 @@ async function loadShopping(keyword) {
   try {
     const { res, data } = await post("/api/shopping", keyword);
     if (!res.ok) { showError(data.message || "쇼핑 분석에 실패했습니다."); return false; }
+    lastShoppingData = data;
     track("shopping_view", { keyword: keyword });
     $("shopCount").textContent = fmt(data.productCount);
     if (data.priceRange) {
@@ -505,9 +522,48 @@ async function loadShopping(keyword) {
   } catch (e) { showError("네트워크 오류가 발생했습니다."); return false; }
 }
 
-/* ── 리드 폼 → Word 다운로드 ── */
+/* ── 리드 폼 → Word 다운로드 (검색/블로그/쇼핑 3종) ── */
 $("privacyLink").href = PRIVACY_URL;
-$("wordBtn").onclick = () => { if (!lastAnalysis) { showError("먼저 키워드를 분석해 주세요."); return; } $("leadModal").classList.remove("hidden"); };
+
+// 종류별: 데이터 출처·모달 제목·파일명·서버 페이로드
+const WORD_META = {
+  search: {
+    title: "맞춤 프롬프트 Word 받기", filePrefix: "프롬프트",
+    data: () => lastAnalysis,
+    build: () => ({
+      keyword: lastAnalysis.keyword, type: "search",
+      volume: lastAnalysis.volume, competition: lastAnalysis.competition,
+      golden: (lastAnalysis.related || []).filter((r) => r.grade === "golden").map((r) => r.keyword),
+    }),
+  },
+  blog: {
+    title: "블로그 글쓰기 프롬프트 받기", filePrefix: "블로그프롬프트",
+    data: () => lastSeoData,
+    build: () => ({
+      keyword: lastSeoData.keyword, type: "blog",
+      publish: lastSeoData.publish, searchVolume: lastSeoData.volume, saturation: lastSeoData.saturation,
+    }),
+  },
+  shopping: {
+    title: "상세페이지 기획 프롬프트 받기", filePrefix: "상세페이지기획",
+    data: () => lastShoppingData,
+    build: () => ({
+      keyword: lastShoppingData.keyword, type: "shopping",
+      productCount: lastShoppingData.productCount, priceRange: lastShoppingData.priceRange,
+    }),
+  },
+};
+
+function openLead(type) {
+  const m = WORD_META[type];
+  if (!m.data()) { showError("먼저 이 탭에서 키워드를 분석해 주세요."); return; }
+  pendingWordType = type;
+  $("leadTitle").textContent = m.title;
+  $("leadModal").classList.remove("hidden");
+}
+$("wordBtn").onclick = () => openLead("search");
+$("seoWordBtn").onclick = () => openLead("blog");
+$("shopWordBtn").onclick = () => openLead("shopping");
 $("leadCancel").onclick = () => $("leadModal").classList.add("hidden");
 
 $("leadForm").addEventListener("submit", async (e) => {
@@ -516,6 +572,8 @@ $("leadForm").addEventListener("submit", async (e) => {
   const name = $("leadName").value.trim();
   const email = $("leadEmail").value.trim();
   const phone = $("leadPhone").value.trim();
+  const m = WORD_META[pendingWordType];
+  const keyword = m.data().keyword;
   const submitBtn = $("leadSubmit");
   submitBtn.disabled = true; submitBtn.textContent = "처리 중…";
 
@@ -527,7 +585,7 @@ $("leadForm").addEventListener("submit", async (e) => {
         name: name, email: email, phone: phone,
         privacyConsent: true, marketingConsent: false,
         tool: "네이버 분석기", subtool: "naver-analyzer", category: "네이버",
-        keyword: lastAnalysis.keyword, activity: "lead_word_download",
+        keyword: keyword, activity: "lead_word_" + pendingWordType,
         _token: LEAD_TOKEN,
       }),
     });
@@ -536,22 +594,18 @@ $("leadForm").addEventListener("submit", async (e) => {
 
   // 2) Word 생성·다운로드 (서버, AI 호출 없음)
   try {
-    const goldenKw = (lastAnalysis.related || []).filter((r) => r.grade === "golden").map((r) => r.keyword);
     const res = await fetch(VERCEL_API + "/api/word", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        keyword: lastAnalysis.keyword, volume: lastAnalysis.volume,
-        competition: lastAnalysis.competition, golden: goldenKw,
-      }),
+      body: JSON.stringify(m.build()),
     });
     if (!res.ok) throw new Error("word");
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "BCC_프롬프트_" + lastAnalysis.keyword + ".docx";
+    a.href = url; a.download = "BCC_" + m.filePrefix + "_" + keyword + ".docx";
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
-    track("lead_word_download", { keyword: lastAnalysis.keyword, has_phone: !!phone });
+    track("lead_word_download", { keyword: keyword, type: pendingWordType, has_phone: !!phone });
     $("leadModal").classList.add("hidden");
   } catch (e) {
     showError("Word 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.");
