@@ -43,8 +43,9 @@ keywords = ["BEGIN", "PRIVATE KEY"]
 description = "BCC 공개 클라이언트 식별자 — 실제 비밀 아님"
 regexTarget = "line"
 regexes = [
-    # bcc-config.js 의 LEAD_TOKEN (32-hex). 봇 차단용 식별자라 공개 OK.
-    '''LEAD_TOKEN:\s*['"][a-f0-9]{32}['"]''',
+    # LEAD_TOKEN (32-hex). 봇 차단용 식별자라 공개 OK. `LEAD_TOKEN: '..'`(bcc-config.js)와
+    # `const LEAD_TOKEN = ".."`(잇툴즈 페이지) 두 형식 모두 허용.
+    '''LEAD_TOKEN\s*[:=]\s*['"][a-f0-9]{32}['"]''',
     # GAS Web App URL — 공개 endpoint (실제 보호는 GAS 측 origin+token 검증)
     '''script\.google\.com/macros/s/AKfyc[a-zA-Z0-9_-]+/exec''',
     # AIza placeholder (가이드 문서 등에서 예시로 쓰는 경우)
