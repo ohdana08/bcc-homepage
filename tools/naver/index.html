@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>네이버 키워드 분석기 | BCC 잇툴즈</title>
+<meta name="description" content="네이버 월간 검색량·트렌드·연관 키워드를 무료로 분석하고, 키워드 맞춤 콘텐츠 프롬프트(Word)를 받아보세요. — 비즈니스커리어컨설팅(BCC)" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K94NGCTP');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TYJSYWW5Q6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TYJSYWW5Q6');
+</script>
+
+<!-- Pretendard Variable -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+
+<style>
+  /* 기존 BCC 홈페이지 톤(다크·카드형·골드 액센트) 재사용 */
+  :root {
+    --bg: #0a0a0a; --bg-2: #0f0f10; --surface: #16161a; --surface-2: #1d1d22;
+    --border: #26262c; --text: #f3f3f5; --text-dim: #9a9aa6; --text-mute: #6c6c78;
+    --gold: #C9A84C; --gold-2: #a88835; --gold-3: #e6c878;
+    --naver: #03C75A; --naver-soft: rgba(3,199,90,0.12);
+    --kakao: #fee500; --kakao-text: #181600;
+    --radius: 16px; --shadow-lg: 0 20px 50px rgba(0,0,0,0.55); --shadow-sm: 0 4px 16px rgba(0,0,0,0.4);
+    --font-ko: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ko); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+
+  /* 글로벌 네비 (sticky) */
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(10,10,10,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; }
+  .nav-brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--gold); color: #1a1500; display: grid; place-items: center; font-weight: 800; }
+  .nav-links { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+  .nav-links a { color: var(--text-dim); text-decoration: none; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { background: var(--kakao); color: var(--kakao-text) !important; padding: 7px 14px; border-radius: 999px; font-weight: 700; }
+
+  /* 헤더 */
+  header.hero { padding: 40px 0 18px; }
+  .badge-naver { display: inline-flex; align-items: center; gap: 7px; background: var(--naver-soft); color: var(--naver); font-weight: 700; font-size: 13px; padding: 5px 12px; border-radius: 999px; }
+  .badge-naver .dot { width: 16px; height: 16px; border-radius: 5px; background: var(--naver); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+  h1 { font-size: clamp(26px, 4vw, 36px); margin: 14px 0 8px; letter-spacing: -0.02em; }
+  .sub { color: var(--text-dim); margin: 0; max-width: 640px; }
+
+  /* 탭 (Phase 2·3 확장 자리) */
+  .tabs { display: flex; gap: 6px; margin: 22px 0 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tab { padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--text-mute); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; }
+  .tab.active { color: var(--gold-3); border-bottom-color: var(--gold); }
+  .tab[disabled] { cursor: not-allowed; opacity: 0.5; }
+  .tab .soon { font-size: 10px; background: var(--surface-2); color: var(--text-mute); padding: 1px 6px; border-radius: 999px; margin-left: 5px; }
+
+  /* 검색바 */
+  .searchbar { display: flex; gap: 10px; margin: 22px 0 10px; }
+  .searchbar input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 16px; font-family: inherit; }
+  .searchbar input:focus { outline: none; border-color: var(--naver); }
+  .btn { border: none; cursor: pointer; font-family: inherit; font-weight: 700; border-radius: 12px; }
+  .btn-primary { background: var(--naver); color: #fff; padding: 14px 24px; font-size: 16px; }
+  .btn-primary:disabled { opacity: 0.6; cursor: progress; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .chip { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; }
+  .chip:hover { border-color: var(--naver); color: var(--text); }
+
+  .hint { color: var(--text-mute); font-size: 13px; }
+  .error { background: rgba(220,80,80,0.12); border: 1px solid rgba(220,80,80,0.4); color: #f3b3b3; padding: 12px 16px; border-radius: 12px; margin-top: 16px; }
+
+  /* 결과 */
+  #results { margin-top: 8px; }
+  .hidden { display: none !important; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px; }
+  @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .card h3 { margin: 0 0 12px; font-size: 14px; color: var(--text-dim); font-weight: 600; }
+  .vol-total { font-size: 30px; font-weight: 800; color: var(--gold-3); }
+  .vol-sub { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+  .comp-badge { display: inline-block; font-size: 22px; font-weight: 800; padding: 8px 18px; border-radius: 12px; }
+  .comp-낮음 { background: rgba(3,199,90,0.15); color: #5fe39a; }
+  .comp-중간 { background: rgba(201,168,76,0.15); color: var(--gold-3); }
+  .comp-높음 { background: rgba(220,80,80,0.15); color: #f3a3a3; }
+  .comp-정보없음 { background: var(--surface-2); color: var(--text-mute); font-size: 15px; }
+  svg.trend { width: 100%; height: 90px; display: block; }
+
+  .section-title { margin: 28px 0 12px; font-size: 16px; font-weight: 700; }
+  .kw-list { display: flex; gap: 8px; flex-wrap: wrap; }
+  .kw { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .kw.golden { border-color: var(--gold-2); background: rgba(201,168,76,0.08); }
+  .kw .star { color: var(--gold-3); }
+  .kw .v { color: var(--text-mute); font-size: 12px; }
+
+  /* 리드마그넷 */
+  .leadmagnet { margin: 32px 0; background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(3,199,90,0.06)); border: 1px solid var(--gold-2); border-radius: var(--radius); padding: 26px; }
+  .leadmagnet h2 { margin: 0 0 8px; font-size: 20px; }
+  .leadmagnet p { color: var(--text-dim); margin: 0 0 16px; }
+  .btn-gold { background: var(--gold); color: #1a1500; padding: 14px 24px; font-size: 16px; }
+
+  /* 모달 (리드 폼) */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: grid; place-items: center; z-index: 100; padding: 20px; }
+  .modal { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; max-width: 460px; width: 100%; box-shadow: var(--shadow-lg); }
+  .modal h2 { margin: 0 0 4px; font-size: 20px; }
+  .modal .lead-sub { color: var(--text-dim); font-size: 14px; margin: 0 0 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+  .field input[type=text], .field input[type=email], .field input[type=tel] { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-size: 15px; font-family: inherit; }
+  .field input:focus { outline: none; border-color: var(--naver); }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text-dim); background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; border-radius: 10px; }
+  .consent input { margin-top: 3px; }
+  .consent a { color: var(--gold-3); }
+  .privacy-note { font-size: 12px; color: var(--text-mute); margin: 10px 0 16px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-ghost { background: var(--surface-2); color: var(--text-dim); padding: 12px 18px; }
+  .modal-actions .btn { flex: 1; }
+
+  /* 푸터 */
+  footer { border-top: 1px solid var(--border); margin-top: 50px; padding: 30px 0 50px; color: var(--text-mute); font-size: 13px; }
+  footer .foot-cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .related-tools { margin: 30px 0; }
+  .related-tools a { color: var(--gold-3); text-decoration: none; font-size: 14px; margin-right: 16px; }
+</style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K94NGCTP" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav class="nav"><div class="wrap nav-inner">
+  <a class="nav-brand" href="../../index.html"><span class="logo">B</span> BCC 잇툴즈</a>
+  <div class="nav-links">
+    <a href="../../index.html#tools">전체 도구</a>
+    <a class="nav-cta" href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" data-kakao="nav">카톡 상담</a>
+  </div>
+</div></nav>
+
+<main class="wrap">
+  <header class="hero">
+    <span class="badge-naver"><span class="dot">N</span> NAVER 키워드 분석기</span>
+    <h1>네이버 검색량 · 트렌드 · 연관 키워드</h1>
+    <p class="sub">키워드를 입력하면 네이버 기준 월간 검색량과 12개월 트렌드, 연관·황금 키워드를 무료로 보여드립니다. 분석 후 <b>맞춤 콘텐츠 프롬프트(Word)</b>까지 받아 가세요.</p>
+
+    <!-- 탭: Phase 1은 1개, Phase 2·3 자리 마련 -->
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="search">검색 분석</button>
+      <button class="tab" data-tab="seo" disabled>블로그·카페 노출 <span class="soon">준비 중</span></button>
+      <button class="tab" data-tab="shopping" disabled>쇼핑 키워드 <span class="soon">준비 중</span></button>
+    </div>
+
+    <div class="searchbar">
+      <input id="keyword" type="text" placeholder="예: 챗지피티, 스마트스토어 창업" autocomplete="off" />
+      <button id="analyzeBtn" class="btn btn-primary">분석</button>
+    </div>
+    <div class="chips" id="popular">
+      <span class="hint">인기 키워드:</span>
+    </div>
+  </header>
+
+  <div id="errorBox" class="error hidden"></div>
+
+  <section id="results" class="hidden">
+    <div class="cards">
+      <div class="card">
+        <h3>월간 검색량 (PC + 모바일)</h3>
+        <div class="vol-total" id="volTotal">–</div>
+        <div class="vol-sub" id="volSub">PC – · 모바일 –</div>
+      </div>
+      <div class="card">
+        <h3>검색 트렌드 (최근 12개월)</h3>
+        <div id="trendWrap"><div class="hint">트렌드 데이터 없음</div></div>
+      </div>
+      <div class="card">
+        <h3>경쟁 강도</h3>
+        <div id="compBadge" class="comp-badge comp-정보없음">–</div>
+      </div>
+    </div>
+
+    <div class="section-title">연관 · 황금 키워드 <span class="hint">(★ 황금: 검색량 충분 + 경쟁 낮음)</span></div>
+    <div class="kw-list" id="relatedList"><div class="hint">연관 키워드 없음</div></div>
+
+    <!-- 리드마그넷 (차별점 · 비용 0) -->
+    <div class="leadmagnet">
+      <h2>📄 이 키워드 맞춤 프롬프트 3종 받기</h2>
+      <p>분석한 키워드를 끼워넣은 <b>콘텐츠 기획 → 초안 → SEO 최적화</b> 프롬프트가 담긴 Word 파일입니다. 내 ChatGPT/Gemini/Claude에 붙여 바로 쓰세요. (AI 비용 0원)</p>
+      <button id="wordBtn" class="btn btn-gold">맞춤 프롬프트 Word 받기</button>
+    </div>
+  </section>
+
+  <div class="related-tools">
+    <span class="hint">함께 쓰면 좋은 도구:</span>
+    <a href="../../ittools-gpts.html">무료 챗봇(GPTs) 모음 →</a>
+    <a href="../../index.html#tools">전체 잇툴즈 →</a>
+  </div>
+</main>
+
+<!-- 리드 폼 모달 -->
+<div class="modal-bg hidden" id="leadModal">
+  <div class="modal">
+    <h2>맞춤 프롬프트 Word 받기</h2>
+    <p class="lead-sub">아래 정보를 남겨 주시면 바로 다운로드됩니다.</p>
+    <form id="leadForm">
+      <div class="field"><label>이름 *</label><input type="text" id="leadName" required /></div>
+      <div class="field"><label>이메일 *</label><input type="email" id="leadEmail" required /></div>
+      <div class="field"><label>전화번호 *</label><input type="tel" id="leadPhone" required placeholder="010-0000-0000" /></div>
+      <label class="consent">
+        <input type="checkbox" id="leadConsent" required />
+        <span>[필수] 개인정보 수집·이용에 동의합니다. <a href="#" id="privacyLink" target="_blank" rel="noopener">개인정보처리방침</a></span>
+      </label>
+      <p class="privacy-note">수집 항목: 이름·이메일·전화번호 / 목적: 자료 제공 및 상담 안내 / 보유기간: 동의 철회 또는 목적 달성 시까지. 동의하지 않으면 다운로드가 제공되지 않습니다.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="leadCancel">취소</button>
+        <button type="submit" class="btn btn-gold" id="leadSubmit">동의하고 다운로드</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div class="foot-cta">
+    <span>더 깊이 있는 콘텐츠·마케팅 전략이 필요하신가요?</span>
+    <a class="nav-cta" href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" data-kakao="footer">BCC 카톡 상담</a>
+  </div>
+  <div>© 비즈니스커리어컨설팅(BCC) · 네이버 키워드 분석기</div>
+</div></footer>
+
+<script>
+/* ──────────────────────────────────────────────────────────────
+   설정 — 배포 후 채워야 하는 값
+   ────────────────────────────────────────────────────────────── */
+// Vercel API 도메인 (bcc-naver-analyzer 배포 후 실제 도메인으로 교체)
+const VERCEL_API = "https://bcc-naver-analyzer.vercel.app";
+// 기존 리드 컬렉터 GAS 웹앱 URL (도구 공용)
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxzW84zXGAr8WSKdKhvZ-QK7hPBKgxySNvHapGaAalBSzGapAIjz6wL1bbpwzbomho/exec";
+// 리드 토큰(BCC_LEAD_TOKEN) — 비밀이 아닌 식별자. 다른 잇툴즈와 동일한 값으로 채울 것.
+const LEAD_TOKEN = "";
+// 개인정보처리방침 URL (홈페이지 처리방침 페이지로 교체 · 부록: 변호사 검토 권장)
+const PRIVACY_URL = "../../index.html#privacy";
+
+/* ── GA4 공통 헬퍼 (홈페이지 track() 패턴) ── */
+function track(name, params) {
+  try {
+    if (typeof gtag === "function") gtag("event", name, params || {});
+    if (window.dataLayer) window.dataLayer.push(Object.assign({ event: name }, params || {}));
+  } catch (e) {}
+}
+
+/* ── 상태 ── */
+let lastAnalysis = null;   // 마지막 분석 결과(§4-4)
+const POPULAR = ["챗지피티", "스마트스토어 창업", "블로그 글쓰기", "마케팅"]; // Phase 1 더미
+
+const $ = (id) => document.getElementById(id);
+
+/* ── 인기 키워드 칩 ── */
+(function renderPopular() {
+  const box = $("popular");
+  POPULAR.forEach((k) => {
+    const c = document.createElement("span");
+    c.className = "chip"; c.textContent = k;
+    c.onclick = () => { $("keyword").value = k; analyze(); };
+    box.appendChild(c);
+  });
+})();
+
+/* ── 숫자 포맷 ── */
+const fmt = (n) => (typeof n === "number" ? n.toLocaleString("ko-KR") : "–");
+
+function showError(msg) {
+  const box = $("errorBox");
+  box.textContent = msg; box.classList.remove("hidden");
+}
+function clearError() { $("errorBox").classList.add("hidden"); }
+
+/* ── 트렌드 인라인 SVG ── */
+function renderTrend(trend) {
+  const wrap = $("trendWrap");
+  if (!trend || !trend.length) { wrap.innerHTML = '<div class="hint">트렌드 데이터 없음</div>'; return; }
+  const W = 280, H = 90, pad = 6;
+  const ratios = trend.map((p) => p.ratio);
+  const max = Math.max.apply(null, ratios) || 1;
+  const min = Math.min.apply(null, ratios);
+  const span = max - min || 1;
+  const stepX = (W - pad * 2) / Math.max(1, trend.length - 1);
+  const pts = trend.map((p, i) => {
+    const x = pad + i * stepX;
+    const y = pad + (H - pad * 2) * (1 - (p.ratio - min) / span);
+    return x.toFixed(1) + "," + y.toFixed(1);
+  }).join(" ");
+  const first = trend[0].period, last = trend[trend.length - 1].period;
+  wrap.innerHTML =
+    '<svg class="trend" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="검색 트렌드">' +
+    '<polyline fill="none" stroke="#03C75A" stroke-width="2" points="' + pts + '" />' +
+    '</svg>' +
+    '<div class="vol-sub">' + first + ' → ' + last + '</div>';
+}
+
+/* ── 경쟁 강도 뱃지 ── */
+function renderComp(comp) {
+  const el = $("compBadge");
+  const key = (comp || "정보 없음").replace(/\s/g, "");
+  el.className = "comp-badge comp-" + key;
+  el.textContent = comp || "정보 없음";
+}
+
+/* ── 연관·황금 키워드 ── */
+function renderRelated(related) {
+  const box = $("relatedList");
+  if (!related || !related.length) { box.innerHTML = '<div class="hint">연관 키워드 없음</div>'; return; }
+  box.innerHTML = "";
+  related.forEach((r) => {
+    const el = document.createElement("span");
+    el.className = "kw" + (r.grade === "golden" ? " golden" : "");
+    el.innerHTML = (r.grade === "golden" ? '<span class="star">★</span>' : "") +
+      '<span>' + escapeHtml(r.keyword) + '</span><span class="v">' + fmt(r.volume) + '</span>';
+    el.onclick = () => { $("keyword").value = r.keyword; analyze(); };
+    el.style.cursor = "pointer";
+    box.appendChild(el);
+  });
+}
+function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+/* ── 분석 ── */
+async function analyze() {
+  const keyword = $("keyword").value.trim();
+  if (!keyword) { showError("키워드를 입력해 주세요."); return; }
+  clearError();
+  const btn = $("analyzeBtn");
+  btn.disabled = true; btn.textContent = "분석 중…";
+  try {
+    const res = await fetch(VERCEL_API + "/api/naver", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ keyword }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showError(data.message || "분석에 실패했습니다. 잠시 후 다시 시도해 주세요."); return; }
+
+    lastAnalysis = data;
+    track("keyword_search", { keyword: keyword, role: data.role || "visitor" });
+
+    $("volTotal").textContent = fmt(data.volume.total);
+    $("volSub").textContent = "PC " + fmt(data.volume.pc) + " · 모바일 " + fmt(data.volume.mobile);
+    renderComp(data.competition);
+    renderTrend(data.trend);
+    renderRelated(data.related);
+
+    $("results").classList.remove("hidden");
+    $("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) {
+    showError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+  } finally {
+    btn.disabled = false; btn.textContent = "분석";
+  }
+}
+$("analyzeBtn").onclick = analyze;
+$("keyword").addEventListener("keydown", (e) => { if (e.key === "Enter") analyze(); });
+
+/* ── 리드 폼 → Word 다운로드 ── */
+$("privacyLink").href = PRIVACY_URL;
+$("wordBtn").onclick = () => { if (!lastAnalysis) { showError("먼저 키워드를 분석해 주세요."); return; } $("leadModal").classList.remove("hidden"); };
+$("leadCancel").onclick = () => $("leadModal").classList.add("hidden");
+
+$("leadForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!$("leadConsent").checked) return; // required가 1차 방어
+  const name = $("leadName").value.trim();
+  const email = $("leadEmail").value.trim();
+  const phone = $("leadPhone").value.trim();
+  const submitBtn = $("leadSubmit");
+  submitBtn.disabled = true; submitBtn.textContent = "처리 중…";
+
+  // 1) 기존 GAS로 리드 저장 (실패해도 다운로드는 진행)
+  try {
+    await fetch(GAS_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS 단순요청(프리플라이트 회피)
+      body: JSON.stringify({
+        name: name, email: email, phone: phone,
+        privacyConsent: true, marketingConsent: false,
+        tool: "네이버 분석기", subtool: "naver-analyzer", category: "네이버",
+        keyword: lastAnalysis.keyword, activity: "lead_word_download",
+        _token: LEAD_TOKEN,
+      }),
+    });
+    track("sign_up", { source: "naver_analyzer" });
+  } catch (e) { /* 저장 실패는 무시하고 다운로드 진행 */ }
+
+  // 2) Word 생성·다운로드 (서버, AI 호출 없음)
+  try {
+    const goldenKw = (lastAnalysis.related || []).filter((r) => r.grade === "golden").map((r) => r.keyword);
+    const res = await fetch(VERCEL_API + "/api/word", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        keyword: lastAnalysis.keyword, volume: lastAnalysis.volume,
+        competition: lastAnalysis.competition, golden: goldenKw,
+      }),
+    });
+    if (!res.ok) throw new Error("word");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "BCC_프롬프트_" + lastAnalysis.keyword + ".docx";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    track("lead_word_download", { keyword: lastAnalysis.keyword, has_phone: !!phone });
+    $("leadModal").classList.add("hidden");
+  } catch (e) {
+    showError("Word 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+  } finally {
+    submitBtn.disabled = false; submitBtn.textContent = "동의하고 다운로드";
+  }
+});
+</script>
+</body>
+</html>
