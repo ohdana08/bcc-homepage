@@ -877,6 +877,177 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         카카오톡 채널로 상담하기
       </a>
     </div>
+
+    <!-- ===== BCC 견적/문의 폼 (Vercel /api/lead 연동) ===== -->
+    <style>
+      .lead-form-card {
+        margin: 24px auto 0; max-width: 520px; text-align: left;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 16px; padding: 28px 24px;
+      }
+      .lead-form-card h3 { margin: 0 0 6px; font-size: 20px; }
+      .lead-form-sub { margin: 0 0 18px; opacity: .7; font-size: 14px; }
+      .lf-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+      .lf-row label { font-size: 13px; opacity: .85; }
+      .lf-req { color: var(--gold, #c9a84c); }
+      .lead-form-card input[type="text"],
+      .lead-form-card select,
+      .lead-form-card textarea {
+        width: 100%; box-sizing: border-box; padding: 11px 12px;
+        background: rgba(0, 0, 0, 0.35); color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px;
+        font-size: 15px; font-family: inherit;
+      }
+      .lead-form-card input:focus,
+      .lead-form-card select:focus,
+      .lead-form-card textarea:focus { outline: none; border-color: var(--gold, #c9a84c); }
+      .lf-consent {
+        display: flex; align-items: flex-start; gap: 8px;
+        font-size: 13px; opacity: .9; margin: 4px 0 16px; cursor: pointer;
+      }
+      .lf-consent input { margin-top: 2px; }
+      .lf-consent a { color: var(--gold, #c9a84c); text-decoration: underline; }
+      .lf-submit {
+        width: 100%; padding: 13px; font-size: 15px; font-weight: 700;
+        background: var(--gold, #c9a84c); color: #1a1407;
+        border: none; border-radius: 10px; cursor: pointer;
+      }
+      .lf-submit:disabled { opacity: .6; cursor: default; }
+      .lf-status { margin: 12px 0 0; font-size: 13px; min-height: 18px; }
+      .lf-status.lf-ok { color: #5fd38b; }
+      .lf-status.lf-err { color: #ff8080; }
+      .lf-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    </style>
+
+    <div class="lead-form-card">
+      <h3>견적·문의 남기기</h3>
+      <p class="lead-form-sub">연락처를 남겨주시면 영업일 기준 24시간 이내 회신드립니다.</p>
+
+      <form id="bccLeadForm" novalidate>
+        <div class="lf-row">
+          <label for="lf-name">이름 <span class="lf-req">*</span></label>
+          <input id="lf-name" name="name" type="text" maxlength="100" required autocomplete="name" />
+        </div>
+        <div class="lf-row">
+          <label for="lf-contact">연락처 <span class="lf-req">*</span></label>
+          <input id="lf-contact" name="contact" type="text" maxlength="100" required
+                 placeholder="휴대폰 번호 또는 이메일" autocomplete="tel" />
+        </div>
+        <div class="lf-row">
+          <label for="lf-type">문의 유형</label>
+          <select id="lf-type" name="request_type">
+            <option value="quote_b2b">기업 견적 (B2B)</option>
+            <option value="product_b2c">제품 구매 (B2C)</option>
+            <option value="general" selected>일반 문의</option>
+          </select>
+        </div>
+        <div class="lf-row">
+          <label for="lf-message">요청 내용</label>
+          <textarea id="lf-message" name="message" rows="3" maxlength="2000"
+                    placeholder="필요하신 내용을 적어주세요 (선택)"></textarea>
+        </div>
+
+        <!-- 허니팟(봇 전용 함정). 사람은 비워둠 -->
+        <div class="lf-hp" aria-hidden="true">
+          <label>웹사이트<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <label class="lf-consent">
+          <input id="lf-consent" name="consent" type="checkbox" required />
+          <span><a href="privacy.html" target="_blank" rel="noopener">개인정보 수집·이용</a>에 동의합니다. <span class="lf-req">*</span></span>
+        </label>
+
+        <button type="submit" class="lf-submit">문의 보내기</button>
+        <p id="lf-status" class="lf-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <script>
+    (function () {
+      // BCC admin (Vercel) 프로덕션 엔드포인트
+      var LEAD_ENDPOINT = 'https://bcc-admin-eight.vercel.app/api/lead';
+
+      var form = document.getElementById('bccLeadForm');
+      if (!form) return;
+      var statusEl = document.getElementById('lf-status');
+
+      // UTM/유입경로 → source (최대 200자). 첫 유입 UTM을 세션에 저장해 유지.
+      function collectSource() {
+        try {
+          var p = new URLSearchParams(window.location.search);
+          var parts = [];
+          ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (k) {
+            var v = p.get(k); if (v) parts.push(k + '=' + v);
+          });
+          var KEY = 'bcc_first_utm';
+          if (parts.length) { try { sessionStorage.setItem(KEY, parts.join('&')); } catch (e) {} }
+          var saved = ''; try { saved = sessionStorage.getItem(KEY) || ''; } catch (e) {}
+          var src = parts.join('&') || saved;
+          if (!src) { var ref = document.referrer || ''; src = ref ? 'referrer=' + ref : 'direct'; }
+          return src.slice(0, 200);
+        } catch (e) { return 'direct'; }
+      }
+
+      function setStatus(msg, kind) {
+        if (!statusEl) return;
+        statusEl.textContent = msg;
+        statusEl.className = 'lf-status' + (kind ? ' lf-' + kind : '');
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var btn = form.querySelector('.lf-submit');
+
+        if (!form.name.value.trim() || !form.contact.value.trim()) {
+          setStatus('이름과 연락처를 입력해 주세요.', 'err'); return;
+        }
+        if (!form.consent.checked) {
+          setStatus('개인정보 수집·이용 동의가 필요합니다.', 'err'); return;
+        }
+
+        var payload = {
+          name: form.name.value.trim(),
+          contact: form.contact.value.trim(),
+          request_type: form.request_type.value,
+          message: form.message.value.trim(),
+          source: collectSource(),
+          consent: true,
+          website: form.website.value // 허니팟
+        };
+
+        btn.disabled = true; setStatus('보내는 중…', '');
+
+        fetch(LEAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(function (res) {
+          if (res.status === 201) {
+            setStatus('접수되었습니다. 빠르게 연락드리겠습니다. 감사합니다!', 'ok');
+            form.reset();
+            try {
+              if (typeof gtag === 'function') {
+                gtag('event', 'lead_form_submitted', { request_type: payload.request_type });
+              }
+            } catch (e) {}
+          } else if (res.status === 429) {
+            setStatus('요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.', 'err');
+          } else {
+            return res.json().then(function (d) {
+              setStatus(d && d.error ? d.error : '전송에 실패했습니다. 다시 시도해 주세요.', 'err');
+            }).catch(function () { setStatus('전송에 실패했습니다. 다시 시도해 주세요.', 'err'); });
+          }
+        }).catch(function () {
+          setStatus('네트워크 오류로 전송하지 못했습니다.', 'err');
+        }).finally(function () {
+          btn.disabled = false;
+        });
+      });
+    })();
+    </script>
+    <!-- ===== /BCC 견적/문의 폼 ===== -->
+
   </div>
 </section>
 
