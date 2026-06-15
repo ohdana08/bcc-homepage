@@ -937,8 +937,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="lf-row">
           <label for="lf-type">문의 유형</label>
           <select id="lf-type" name="request_type">
-            <option value="quote_b2b">기업 견적 (B2B)</option>
-            <option value="product_b2c">제품 구매 (B2C)</option>
+            <option value="quote_b2b">정부지원사업</option>
             <option value="general" selected>일반 문의</option>
           </select>
         </div>
@@ -1024,7 +1023,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           body: JSON.stringify(payload)
         }).then(function (res) {
           if (res.status === 201) {
-            setStatus('접수되었습니다. 빠르게 연락드리겠습니다. 감사합니다!', 'ok');
+            setStatus('신청 완료! 곧 연락드릴게요', 'ok');
             form.reset();
             try {
               if (typeof gtag === 'function') {
