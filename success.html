@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>결제 완료 | BCC</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5TN5XW0T2J');
+</script>
+<script src="pay-config.js"></script>
+
+<style>
+  :root{--bg:#0a0a0a;--text:#f3f3f5;--text-dim:#9a9aa6;--text-mute:#6c6c78;--gold:#C9A84C;--gold-3:#e6c878;--border:#26262c;
+    --font-ko:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ko);line-height:1.6;padding:40px 16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:480px;margin:0 auto;text-align:center}
+  .icon{width:64px;height:64px;border-radius:50%;background:rgba(95,211,139,.12);color:#5fd38b;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 20px}
+  h1{font-size:24px;letter-spacing:-.5px;margin-bottom:8px}
+  .sub{color:var(--text-dim);font-size:14px;margin-bottom:24px}
+  .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:22px;text-align:left}
+  .summary{font-size:14px;color:var(--text-dim);margin-bottom:18px}
+  .summary b{color:var(--text)}
+  .pw-title{font-size:15px;font-weight:700;margin-bottom:4px}
+  .pw-desc{font-size:12px;color:var(--text-mute);margin-bottom:14px}
+  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .row label{font-size:13px;color:var(--text-dim)}
+  input{width:100%;padding:12px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:10px;font-size:15px;font-family:inherit}
+  input:focus{outline:none;border-color:var(--gold)}
+  .btn{width:100%;padding:13px;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer}
+  .btn-gold{background:var(--gold);color:#1a1407}
+  .btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border);margin-top:10px}
+  .btn:disabled{opacity:.55;cursor:default}
+  .status{margin-top:10px;font-size:13px;min-height:18px}
+  .status.err{color:#ff8080}.status.ok{color:#5fd38b}
+  .loading{color:var(--text-dim);font-size:14px}
+  a.link{color:var(--gold);text-decoration:underline;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="loadingBox">
+    <p class="loading">결제를 확인하는 중입니다…</p>
+  </div>
+
+  <div id="resultBox" style="display:none">
+    <div class="icon">✓</div>
+    <h1>결제 완료!</h1>
+    <p class="sub">비밀번호를 설정하면 마이페이지에서 수강이력을 확인할 수 있어요. <br>(선택사항)</p>
+
+    <div class="card">
+      <p class="summary" id="summary"></p>
+
+      <div class="pw-title">비밀번호 설정 (선택)</div>
+      <p class="pw-desc">설정하지 않아도 결제는 완료됐습니다. 나중에 설정해도 됩니다.</p>
+      <form id="pwForm" novalidate>
+        <div class="row">
+          <label for="pw">비밀번호 (8자 이상)</label>
+          <input id="pw" type="password" minlength="8" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-gold" id="pwBtn">비밀번호 설정하고 마이페이지로</button>
+        <a class="btn btn-ghost" href="mypage.html">나중에 할게요 (마이페이지)</a>
+        <p id="pwStatus" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="errorBox" style="display:none">
+    <h1>결제 확인 실패</h1>
+    <p class="sub" id="errMsg"></p>
+    <a class="link" href="apply.html">다시 신청하기</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var API = window.BCC_API_BASE;
+  var q = new URLSearchParams(location.search);
+  var paymentKey = q.get('paymentKey');
+  var orderId = q.get('orderId');
+  var amount = q.get('amount');
+  var customerEmail = null;
+
+  function show(id){ ['loadingBox','resultBox','errorBox'].forEach(function(x){document.getElementById(x).style.display = (x===id?'block':'none');}); }
+  function won(n){ return Number(n).toLocaleString('ko-KR') + '원'; }
+  function track(name, params){ try{ if(typeof gtag==='function') gtag('event', name, params||{}); }catch(e){} }
+
+  if(!paymentKey || !orderId || !amount){
+    document.getElementById('errMsg').textContent = '결제 정보가 없습니다.';
+    show('errorBox'); return;
+  }
+
+  fetch(API + '/api/confirm-payment', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ paymentKey:paymentKey, orderId:orderId, amount:amount })
+  }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+  .then(function(res){
+    if(!res.ok || !res.j.success){ throw new Error(res.j && res.j.error || '결제 승인에 실패했습니다.'); }
+    var d = res.j;
+    customerEmail = d.customerEmail || null;
+    if(!d.alreadyProcessed){
+      track('purchase', { product_name:d.orderName, value:d.amount, currency:'KRW', is_recourse:d.isRecourse, transaction_id:orderId });
+    }
+    document.getElementById('summary').innerHTML =
+      '<b>' + (d.orderName||'강의') + '</b> · 결제금액 <b>' + won(d.amount) + '</b>' +
+      (d.isRecourse ? ' (재수강가 적용)' : '');
+    show('resultBox');
+  }).catch(function(err){
+    document.getElementById('errMsg').textContent = (err && err.message) || '결제 확인 중 오류가 발생했습니다.';
+    show('errorBox');
+  });
+
+  // 비밀번호 설정 (선택)
+  document.getElementById('pwForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var pw = document.getElementById('pw').value;
+    var btn = document.getElementById('pwBtn');
+    var st = document.getElementById('pwStatus');
+    function setSt(m,k){ st.textContent=m; st.className='status'+(k?' '+k:''); }
+
+    if(pw.length < 8){ setSt('비밀번호는 8자 이상이어야 합니다.','err'); return; }
+    if(!customerEmail){ setSt('계정 정보를 확인하지 못했습니다.','err'); return; }
+
+    btn.disabled = true; setSt('설정 중…');
+    fetch(API + '/api/set-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ orderId:orderId, email:customerEmail, password:pw })
+    }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+    .then(function(res){
+      if(!res.ok || !res.j.success){ throw new Error(res.j && res.j.error || '설정 실패'); }
+      track('sign_up', { method:'password' });
+      setSt('완료! 마이페이지로 이동합니다…','ok');
+      setTimeout(function(){ location.href = 'mypage.html'; }, 900);
+    }).catch(function(err){
+      setSt((err && err.message) || '비밀번호 설정에 실패했습니다.','err');
+      btn.disabled = false;
+    });
+  });
+})();
+</script>
+</body>
+</html>

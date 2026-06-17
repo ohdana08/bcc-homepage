@@ -1,0 +1,10 @@
+{
+  "name": "bcc-payment-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "BCC 챌린지 결제·회원 시스템 — Vercel 서버리스 함수(/api)",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

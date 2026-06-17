@@ -1,0 +1,112 @@
+-- ============================================================
+-- BCC 챌린지 결제·회원 시스템 — Supabase 스키마 (v1)
+-- 업무지시서 §3 기반. Supabase SQL Editor에 그대로 실행.
+-- 모든 쓰기(insert/update)는 Vercel 함수의 service_role 키로만 수행.
+--   → 프론트(anon key)는 RLS로 "읽기 본인 행"만 허용, 쓰기 불가.
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 1) 상품 테이블: 새 강의는 여기 INSERT 한 줄로 끝 (코드 수정 0)
+-- ------------------------------------------------------------
+create table if not exists products (
+  id             text primary key,        -- 'shorts2', 'cardnews', 'ai_staff'
+  name           text not null,           -- '쇼츠2기'
+  price          integer not null,        -- 119000 (정가)
+  recourse_price integer,                 -- 30000 (강의별 재수강가, null이면 정가 적용)
+  is_active      boolean default true,
+  created_at     timestamptz default now()
+);
+
+-- ------------------------------------------------------------
+-- 2) 회원 테이블 (Supabase auth.users 확장)
+-- ------------------------------------------------------------
+create table if not exists profiles (
+  id                   uuid primary key references auth.users(id) on delete cascade,
+  name                 text,
+  phone                text,
+  email                text unique,
+  status               text default 'pending',    -- 'pending' | 'active'
+  password_set         boolean default false,
+  marketing_consent    boolean default false,      -- 마케팅 정보 수신 동의(선택)
+  marketing_consent_at timestamptz,                -- 동의한 시점(미동의 시 null)
+  created_at           timestamptz default now()
+);
+
+-- 기존 DB 마이그레이션: create table 는 이미 있으면 건너뛰므로 컬럼을 따로 보강
+alter table profiles add column if not exists marketing_consent    boolean default false;
+alter table profiles add column if not exists marketing_consent_at timestamptz;
+
+-- ------------------------------------------------------------
+-- 3) 결제 대기 주문 (주문번호-금액 매핑) — confirm 단계의 조작 방지 핵심
+--    create-checkout 가 여기에 amount 를 박아두고,
+--    confirm-payment 가 토스가 보낸 amount 와 대조한다.
+-- ------------------------------------------------------------
+create table if not exists pending_orders (
+  order_id    text primary key,           -- 'shorts2_<uuid>_<ts>'
+  user_id     uuid references profiles(id) on delete cascade,
+  product_id  text references products(id),
+  amount      integer not null,           -- 서버가 결정한 결제 금액 (★신뢰 기준★)
+  is_recourse boolean default false,
+  status      text default 'pending',     -- 'pending' | 'paid' | 'expired'
+  created_at  timestamptz default now()
+);
+
+-- ------------------------------------------------------------
+-- 4) 수강 이력
+--    order_id UNIQUE → confirm-payment 재호출(새로고침)에도 중복 적재 방지(멱등).
+-- ------------------------------------------------------------
+create table if not exists enrollments (
+  id          bigint generated always as identity primary key,
+  user_id     uuid references profiles(id) on delete cascade,
+  product_id  text references products(id),
+  paid_amount integer not null,
+  is_recourse boolean default false,
+  order_id    text unique,                -- 토스 주문번호 (멱등 키)
+  paid_at     timestamptz default now()
+);
+
+create index if not exists idx_enrollments_user on enrollments(user_id);
+create index if not exists idx_pending_orders_status_created
+  on pending_orders(status, created_at);
+
+-- ------------------------------------------------------------
+-- 5) 초기 상품 데이터 (이미 있으면 무시)
+-- ------------------------------------------------------------
+insert into products (id, name, price, recourse_price) values
+  ('shorts2',  '쇼츠2기',        119000, 30000),
+  ('cardnews', '카드뉴스공장장', 119000, 30000)
+on conflict (id) do nothing;
+
+-- ============================================================
+-- RLS (Row Level Security) — 보안 최대 포인트 (업무지시서 §3)
+-- ============================================================
+alter table products       enable row level security;
+alter table profiles       enable row level security;
+alter table enrollments    enable row level security;
+alter table pending_orders enable row level security;
+
+-- 상품: 누구나 읽기(가격 표시용), 쓰기 정책 없음 → 프론트 쓰기 불가
+drop policy if exists "products readable" on products;
+create policy "products readable" on products
+  for select using (true);
+
+-- 본인 프로필만 조회
+drop policy if exists "own profile" on profiles;
+create policy "own profile" on profiles
+  for select using (auth.uid() = id);
+
+-- 본인 수강이력만 조회
+drop policy if exists "own enrollments" on enrollments;
+create policy "own enrollments" on enrollments
+  for select using (auth.uid() = user_id);
+
+-- pending_orders: select 정책 없음 → anon/authenticated 모두 접근 불가.
+--   service_role 키는 RLS 를 우회하므로 Vercel 함수에서만 읽고 쓴다.
+
+-- ============================================================
+-- 참고: 미결제 pending 정리 (업무지시서 §8 — pending 계정 방치 대응)
+--   /api/cleanup-pending (Vercel Cron, 매시간)에서 아래 로직을 service_role 로 수행:
+--     - 24h 초과 pending_orders.status='pending' → 'expired'
+--     - 결제 이력(enrollments) 없는 24h 초과 profiles.status='pending' → 정리
+--   필요 시 정책을 데이터 보고 조정.
+-- ============================================================
