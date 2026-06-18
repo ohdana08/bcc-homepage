@@ -34,3 +34,5 @@ npm-debug.log*
 
 # OS / misc
 .cache/
+.vercel
+.env*
