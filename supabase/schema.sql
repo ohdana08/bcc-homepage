@@ -89,6 +89,12 @@ insert into products (id, name, price, recourse_price) values
   ('cardnews', '카드뉴스공장장', 119000, 30000)
 on conflict (id) do nothing;
 
+-- 지난 강의(판매중지): 신규 결제/목록에는 노출 안 됨(is_active=false).
+-- 기존 수강생 과거 이력(enrollments) FK 연결 용도로만 존재.
+insert into products (id, name, price, recourse_price, is_active) values
+  ('shorts1', 'AI 숏폼 크리에이터 1기', 119000, 30000, false)
+on conflict (id) do nothing;
+
 -- ============================================================
 -- RLS (Row Level Security) — 보안 최대 포인트 (업무지시서 §3)
 -- ============================================================

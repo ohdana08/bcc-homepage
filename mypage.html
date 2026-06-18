@@ -28,6 +28,9 @@
   .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
   .head .name{font-weight:700}
   .head .logout{font-size:13px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer}
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{flex:1;padding:9px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
+  .tab.active{color:#1a1407;background:var(--gold);border-color:var(--gold)}
   .enr{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
   .enr .t{font-weight:600;display:flex;justify-content:space-between}
   .enr .m{font-size:12px;color:var(--text-mute);margin-top:4px}
@@ -42,10 +45,15 @@
   <!-- 로그인 -->
   <div id="loginView">
     <h1>마이페이지 로그인</h1>
-    <p class="sub">결제 후 설정한 이메일·비밀번호로 로그인하세요.</p>
+    <p class="sub">결제 후 설정한 이메일, 또는 기존 수강생은 전화번호로 로그인하세요.</p>
     <div class="card">
+      <div class="tabs">
+        <button type="button" class="tab active" data-mode="email">이메일</button>
+        <button type="button" class="tab" data-mode="phone">전화번호</button>
+      </div>
       <form id="loginForm" novalidate>
-        <div class="row"><label for="email">이메일</label><input id="email" type="email" autocomplete="email" /></div>
+        <div class="row" id="rowEmail"><label for="email">이메일</label><input id="email" type="email" autocomplete="email" /></div>
+        <div class="row" id="rowPhone" style="display:none"><label for="phone">전화번호</label><input id="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000" /></div>
         <div class="row"><label for="pw">비밀번호</label><input id="pw" type="password" autocomplete="current-password" /></div>
         <button type="submit" class="btn" id="loginBtn">로그인</button>
         <p id="loginStatus" class="status" role="status" aria-live="polite"></p>
@@ -69,6 +77,8 @@
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
   const API = window.BCC_API_BASE;
+  const PHONE_DOMAIN = 'phone.bcc.kr';   // 전화 로그인 합성 이메일 도메인(seed 스크립트와 동일)
+  let loginMode = 'email';               // 'email' | 'phone'
   const loginView = document.getElementById('loginView');
   const dashView = document.getElementById('dashView');
   const loginStatus = document.getElementById('loginStatus');
@@ -115,18 +125,37 @@
     } catch(e){ /* 로그인 화면 유지 */ }
   })();
 
+  // 로그인 방식 탭(이메일 / 전화번호) 전환
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    loginMode = t.dataset.mode;
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === t));
+    document.getElementById('rowEmail').style.display = loginMode === 'email' ? '' : 'none';
+    document.getElementById('rowPhone').style.display = loginMode === 'phone' ? '' : 'none';
+    setStatus('');
+  }));
+
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value.trim();
+    // 전화번호 로그인은 전화번호(숫자만)를 합성 이메일로 변환해 동일 Auth 경로로 처리
+    let email;
+    if (loginMode === 'phone') {
+      const digits = document.getElementById('phone').value.replace(/\D/g, '');
+      if (digits.length < 10) { setStatus('전화번호를 정확히 입력해 주세요.', 'err'); return; }
+      email = digits + '@' + PHONE_DOMAIN;
+    } else {
+      email = document.getElementById('email').value.trim();
+    }
     const pw = document.getElementById('pw').value;
     const btn = document.getElementById('loginBtn');
-    if (!email || !pw) { setStatus('이메일과 비밀번호를 입력해 주세요.', 'err'); return; }
+    if (!email || !pw) { setStatus('로그인 정보를 입력해 주세요.', 'err'); return; }
 
     btn.disabled = true; setStatus('로그인 중…');
     try {
       const sb = await getClient();
       const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
-      if (error || !data.session) throw new Error('이메일 또는 비밀번호가 올바르지 않습니다. (비밀번호 미설정 시 결제 완료 화면에서 먼저 설정하세요)');
+      if (error || !data.session) throw new Error(loginMode === 'phone'
+        ? '전화번호 또는 비밀번호가 올바르지 않습니다. (초기 비밀번호는 전화번호 숫자입니다)'
+        : '이메일 또는 비밀번호가 올바르지 않습니다. (비밀번호 미설정 시 결제 완료 화면에서 먼저 설정하세요)');
       await loadDashboard(data.session.access_token);
     } catch(err){
       setStatus(err.message || '로그인에 실패했습니다.', 'err');

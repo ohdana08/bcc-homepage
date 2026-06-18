@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   const body = req.body || {};
   const name = String(body.name || '').trim();
-  const phone = String(body.phone || '').trim();
+  const phone = String(body.phone || '').replace(/\D/g, ''); // 숫자만 정규화(전화 매칭·합성이메일 일관성)
   const email = String(body.email || '').trim().toLowerCase();
   const productId = String(body.productId || '').trim();
   // 마케팅 정보 수신 동의(선택) — 동의 시 시점도 기록
@@ -42,8 +42,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: '판매하지 않는 상품입니다.' });
 
   // 2) 계정 먼저 생성(pending) 또는 기존 계정 조회
+  //    이메일로 먼저 찾고, 없으면 전화번호로도 조회한다.
+  //    (기존 수강생은 전화번호로 시드됨 → 새 이메일로 재신청해도 전화가 같으면 재수강가 연결)
   let { data: profile } = await db
-    .from('profiles').select('*').eq('email', email).single();
+    .from('profiles').select('*').eq('email', email).maybeSingle();
+  if (!profile && phone)
+    ({ data: profile } = await db.from('profiles').select('*').eq('phone', phone).maybeSingle());
 
   if (!profile) {
     const { data: created, error: aErr } = await db.auth.admin.createUser({
