@@ -48,8 +48,14 @@ create table if not exists pending_orders (
   amount      integer not null,           -- 서버가 결정한 결제 금액 (★신뢰 기준★)
   is_recourse boolean default false,
   status      text default 'pending',     -- 'pending' | 'paid' | 'expired'
+  refund_policy_agreed    boolean default false,  -- 환불(청약철회) 제한 고지 동의(필수) — 분쟁 증거
+  refund_policy_agreed_at timestamptz,            -- 동의한 시점
   created_at  timestamptz default now()
 );
+
+-- 기존 DB 마이그레이션: 컬럼 보강
+alter table pending_orders add column if not exists refund_policy_agreed    boolean default false;
+alter table pending_orders add column if not exists refund_policy_agreed_at timestamptz;
 
 -- ------------------------------------------------------------
 -- 4) 수강 이력
@@ -62,8 +68,14 @@ create table if not exists enrollments (
   paid_amount integer not null,
   is_recourse boolean default false,
   order_id    text unique,                -- 토스 주문번호 (멱등 키)
+  refund_policy_agreed    boolean default false,  -- 결제 시점 환불 제한 동의(분쟁 증거) — pending_orders 에서 복사
+  refund_policy_agreed_at timestamptz,            -- 동의한 시점
   paid_at     timestamptz default now()
 );
+
+-- 기존 DB 마이그레이션: 컬럼 보강
+alter table enrollments add column if not exists refund_policy_agreed    boolean default false;
+alter table enrollments add column if not exists refund_policy_agreed_at timestamptz;
 
 create index if not exists idx_enrollments_user on enrollments(user_id);
 create index if not exists idx_pending_orders_status_created

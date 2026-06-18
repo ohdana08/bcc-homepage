@@ -74,6 +74,8 @@ export default async function handler(req, res) {
     paid_amount: order.amount,
     is_recourse: order.is_recourse,
     order_id: orderId,
+    refund_policy_agreed: order.refund_policy_agreed,
+    refund_policy_agreed_at: order.refund_policy_agreed_at,
   });
   // 동시성으로 이미 들어갔다면(23505) 멱등 성공 처리
   if (enrErr && enrErr.code !== '23505')

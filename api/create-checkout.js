@@ -22,6 +22,9 @@ export default async function handler(req, res) {
   // 마케팅 정보 수신 동의(선택) — 동의 시 시점도 기록
   const marketingConsent = body.marketingConsent === true;
   const marketingConsentAt = marketingConsent ? new Date().toISOString() : null;
+  // 환불(청약철회) 제한 고지 동의(필수) — 결제 건마다 기록(환불 분쟁 증거)
+  const refundConsent = body.refundConsent === true;
+  const refundConsentAt = refundConsent ? new Date().toISOString() : null;
   // 허니팟(봇 차단): 사람은 비워둠
   if (body.website) return res.status(200).json({ ok: true });
 
@@ -88,6 +91,8 @@ export default async function handler(req, res) {
     amount,
     is_recourse: isRecourse,
     status: 'pending',
+    refund_policy_agreed: refundConsent,
+    refund_policy_agreed_at: refundConsentAt,
   });
   if (oErr) return res.status(500).json({ error: '주문 생성에 실패했습니다.' });
 
