@@ -13,6 +13,9 @@ export default async function handler(req, res) {
     .eq('is_active', true)
     .order('created_at', { ascending: true });
 
-  if (error) return res.status(500).json({ error: '상품 조회 실패' });
+  if (error) {
+    console.error('products query error:', JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint }));
+    return res.status(500).json({ error: '상품 조회 실패' });
+  }
   return res.json({ products: data || [] });
 }
