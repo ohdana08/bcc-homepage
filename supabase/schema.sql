@@ -116,6 +116,22 @@ create policy "own enrollments" on enrollments
 --   service_role 키는 RLS 를 우회하므로 Vercel 함수에서만 읽고 쓴다.
 
 -- ============================================================
+-- 테이블 GRANT — 신형 API 키(sb_secret/sb_publishable) 프로젝트 대응
+--   RLS 우회(service_role)와 별개로, 테이블 자체 접근 권한(GRANT)이 없으면
+--   "permission denied for table ..."(42501) 발생. 신형 키 프로젝트에서
+--   기본 GRANT 가 빠질 수 있어 명시적으로 부여한다.
+-- ============================================================
+-- service_role(서버 API): 모든 테이블 읽기·쓰기
+grant all    on all tables    in schema public to service_role;
+grant all    on all sequences in schema public to service_role;
+-- anon/authenticated(프론트): 읽기 (실제 행 접근은 RLS 가 통제)
+grant select on all tables    in schema public to anon, authenticated;
+-- 이후 생성될 객체에도 자동 적용
+alter default privileges in schema public grant all    on tables    to service_role;
+alter default privileges in schema public grant all    on sequences to service_role;
+alter default privileges in schema public grant select on tables    to anon, authenticated;
+
+-- ============================================================
 -- 참고: 미결제 pending 정리 (업무지시서 §8 — pending 계정 방치 대응)
 --   /api/cleanup-pending (Vercel Cron, 매시간)에서 아래 로직을 service_role 로 수행:
 --     - 24h 초과 pending_orders.status='pending' → 'expired'
