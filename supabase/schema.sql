@@ -27,14 +27,20 @@ create table if not exists profiles (
   email                text unique,
   status               text default 'pending',    -- 'pending' | 'active'
   password_set         boolean default false,
-  marketing_consent    boolean default false,      -- 마케팅 정보 수신 동의(선택)
-  marketing_consent_at timestamptz,                -- 동의한 시점(미동의 시 null)
+  marketing_consent    boolean default false,      -- 마케팅 정보 수신 동의(선택). 화면 노출은 "신규 강의·특강·이벤트·무료 자료 안내"
+  marketing_consent_at timestamptz,                -- 동의한 시점(미동의 시 null) = 법적 증빙
+  privacy_agree        boolean default false,      -- 개인정보 수집·이용 동의(필수)
+  privacy_agree_at     timestamptz,                -- 개인정보 동의 시점 = 법적 증빙
+  consent_source       text,                       -- 동의 출처: 'signup'|'free_tool'|'ebook'|'course_done'|'community' (재동의 확장 대비)
   created_at           timestamptz default now()
 );
 
 -- 기존 DB 마이그레이션: create table 는 이미 있으면 건너뛰므로 컬럼을 따로 보강
 alter table profiles add column if not exists marketing_consent    boolean default false;
 alter table profiles add column if not exists marketing_consent_at timestamptz;
+alter table profiles add column if not exists privacy_agree        boolean default false;
+alter table profiles add column if not exists privacy_agree_at      timestamptz;
+alter table profiles add column if not exists consent_source        text;
 
 -- ------------------------------------------------------------
 -- 3) 결제 대기 주문 (주문번호-금액 매핑) — confirm 단계의 조작 방지 핵심

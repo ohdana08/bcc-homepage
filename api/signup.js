@@ -23,7 +23,10 @@ export default async function handler(req, res) {
   const password = String(body.password || '');
   const privacyConsent = body.privacyConsent === true;
   const marketingConsent = body.marketingConsent === true;
-  const marketingConsentAt = marketingConsent ? new Date().toISOString() : null;
+  const nowIso = new Date().toISOString();
+  const marketingConsentAt = marketingConsent ? nowIso : null;
+  // 동의 출처(재동의 확장 대비): 'signup' | 'free_tool' | 'ebook' | 'course_done' | 'community'
+  const consentSource = (String(body.consentSource || 'signup').trim()) || 'signup';
 
   // 허니팟(봇 차단): 사람은 비워둠
   if (body.website) return res.status(200).json({ ok: true });
@@ -54,7 +57,10 @@ export default async function handler(req, res) {
     });
     if (upErr) return res.status(500).json({ error: '계정 활성화에 실패했습니다.' });
 
-    const upd = { name, phone, password_set: true, status: 'active' };
+    const upd = {
+      name, phone, password_set: true, status: 'active',
+      privacy_agree: true, privacy_agree_at: nowIso, consent_source: consentSource,
+    };
     if (marketingConsent) { upd.marketing_consent = true; upd.marketing_consent_at = marketingConsentAt; }
     await db.from('profiles').update(upd).eq('id', existing.id);
 
@@ -77,8 +83,11 @@ export default async function handler(req, res) {
     name, phone, email,
     status: 'active',
     password_set: true,
+    privacy_agree: true,
+    privacy_agree_at: nowIso,
     marketing_consent: marketingConsent,
     marketing_consent_at: marketingConsentAt,
+    consent_source: consentSource,
   });
   if (insErr) return res.status(500).json({ error: '프로필 생성에 실패했습니다.' });
 
