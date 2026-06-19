@@ -538,9 +538,70 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   footer .footer-links a:hover { color: var(--text); }
 
+  /* 로그인 링크 (nav) */
+  .nav-login {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px !important;
+    color: var(--text) !important;
+  }
+  .nav-login:hover { border-color: var(--gold); color: var(--gold-3) !important; }
+
+  /* ITSCHOOL (강의) — tool-card 패턴 재사용 + 강의 전용 요소 */
+  .school-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .course-card { min-height: 260px; }
+  .course-price {
+    position: relative;
+    margin-top: 16px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    font-family: var(--font-en);
+  }
+  .course-price span {
+    font-size: 14px; font-weight: 700; margin-left: 2px;
+    font-family: var(--font-ko); color: var(--text-dim);
+  }
+  .course-recourse {
+    position: relative;
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--text-mute);
+  }
+  .course-card .tool-arrow { margin-top: 16px; }
+  /* 완료(수료) 강의 — 진행중과 시각적 구분 */
+  .course-card.is-done { border-style: dashed; opacity: 0.9; }
+  .course-card.is-done .tool-icon { filter: grayscale(0.45); }
+  .tool-badge-done {
+    background: rgba(201,168,76,0.16);
+    color: var(--gold-3);
+    border: 1px solid rgba(201,168,76,0.4);
+  }
+  .course-grad {
+    position: relative;
+    margin-top: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gold-3);
+  }
+  .course-done-arrow {
+    position: relative;
+    margin-top: 14px;
+    color: var(--text-mute);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
   /* RESPONSIVE */
   @media (max-width: 1000px) {
     .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    .school-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 900px) {
     .about-grid { grid-template-columns: 1fr; gap: 30px; }
@@ -557,6 +618,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .section-title { font-size: 24px; }
     .services-grid { grid-template-columns: 1fr; }
     .tools-grid { grid-template-columns: 1fr; }
+    .school-grid { grid-template-columns: 1fr; }
     .profile-card { padding: 28px 22px; }
     .contact-card { padding: 36px 22px; }
     .contact-card h3 { font-size: 22px; }
@@ -607,7 +669,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#about">소개</a>
       <a href="#services">서비스</a>
       <a href="#tools" data-nav="ittools">잇툴즈</a>
+      <a href="#itschool" data-nav="itschool">잇스쿨</a>
       <a href="#contact">문의</a>
+      <a href="mypage.html" class="nav-login" data-nav="login">로그인</a>
     </div>
     <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
   </div>
@@ -623,7 +687,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       유튜브 채널 전략 · 커리어 컨설팅 전문 브랜드입니다.
     </p>
     <div class="hero-actions">
-      <a href="#tools" class="btn btn-primary" data-nav="ittools-hero">잇툴즈 사용하기</a>
+      <a href="#itschool" class="btn btn-primary" data-nav="itschool-hero">잇스쿨 강의 신청</a>
+      <a href="#tools" class="btn btn-ghost" data-nav="ittools-hero">잇툴즈 사용하기</a>
       <a href="#about" class="btn btn-ghost">강사 소개 보기</a>
     </div>
   </div>
@@ -859,6 +924,70 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="tool-desc">베스트 vs 워스트 상품 비교</div>
         <div class="tool-arrow">준비 중</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ITSCHOOL HUB (강의) -->
+<span id="itschool" aria-hidden="true" style="display:block; position:relative; top:-72px;"></span>
+<section>
+  <div class="section-inner">
+    <div class="section-label">ITSCHOOL</div>
+    <h2 class="section-title">잇스쿨</h2>
+    <p class="section-desc">실전 온라인 강의 — 골라서 바로 수강 신청</p>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         ⚠️ 강의 카드는 정적(static)입니다. 가격은 "두 곳"을 손으로 맞춰야 함:
+           (1) 아래 카드의 .course-price 숫자       ← 화면 표시용
+           (2) Supabase products 테이블 price/recourse_price ← ★실제 결제 금액(진실원천)
+         결제는 항상 DB 값을 신뢰합니다. 카드 숫자는 표시용일 뿐 → 불일치 주의!
+
+         · 가격 변경 시  : 이 카드 숫자 + products 테이블 둘 다 수정
+         · 강의 추가 시  : .course-card 한 블록 복사 → 아이콘/이름/설명/가격/href(?product=) 교체
+                           + products 테이블에 INSERT
+         상세 절차: 레포 루트 PRICING_NOTE.md  (＋ PAYMENT_SETUP.md "새 강의 추가")
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="school-grid">
+
+      <!-- 쇼츠 2기 (모집중) → apply.html?product=shorts2 / DB price 119000 -->
+      <a class="tool-card course-card is-active" data-course="shorts2"
+         style="--platform-color:#C9A84C; --platform-color-soft:rgba(201,168,76,0.15);"
+         href="apply.html?product=shorts2">
+        <span class="tool-badge tool-badge-active">모집중</span>
+        <div class="tool-icon" aria-hidden="true">🎬</div>
+        <div class="tool-name">쇼츠 2기</div>
+        <div class="tool-desc">AI로 숏폼 한 편을 30분 만에. 기획부터 자막까지 한 번에 끝냅니다.</div>
+        <div class="course-price">119,000<span>원</span></div>
+        <div class="course-recourse">재수강 30,000원</div>
+        <div class="tool-arrow">신청하기 →</div>
+      </a>
+
+      <!-- 카드뉴스공장장 (모집중) → apply.html?product=cardnews / DB price 119000 -->
+      <a class="tool-card course-card is-active" data-course="cardnews"
+         style="--platform-color:#5B8DEF; --platform-color-soft:rgba(91,141,239,0.14);"
+         href="apply.html?product=cardnews">
+        <span class="tool-badge tool-badge-active">모집중</span>
+        <div class="tool-icon" aria-hidden="true">🗂️</div>
+        <div class="tool-name">카드뉴스공장장</div>
+        <div class="tool-desc">디자인 외주 비용 0원, 매일 10분 만에 쌓이는 '콘텐츠 공장' 만들기.</div>
+        <div class="course-price">119,000<span>원</span></div>
+        <div class="course-recourse">재수강 30,000원</div>
+        <div class="tool-arrow">신청하기 →</div>
+      </a>
+
+      <!-- 쇼츠 1기 (수료·마감) — 신청 불가(div, 링크 아님). DB: products.shorts1 is_active=false -->
+      <div class="tool-card course-card is-disabled is-done" data-course="shorts1"
+           style="--platform-color:#6c6c78; --platform-color-soft:rgba(108,108,120,0.12);"
+           aria-disabled="true">
+        <span class="tool-badge tool-badge-done">1기 수료</span>
+        <div class="tool-icon" aria-hidden="true">🎬</div>
+        <div class="tool-name">쇼츠 1기</div>
+        <div class="tool-desc">1기 수료 — 30분 만에 숏폼 한 편, 직접 해냈습니다.</div>
+        <!-- TODO: 1기 수료 인원 확정되면 ○○ 교체 (예: 4명) -->
+        <div class="course-grad">🎓 1기 수료생 ○○명</div>
+        <div class="course-done-arrow">모집 마감</div>
+      </div>
+
     </div>
   </div>
 </section>
