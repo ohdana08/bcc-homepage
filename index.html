@@ -1245,6 +1245,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // ---- Tool cards ----
   var toolCards = document.querySelectorAll('.tool-card');
   toolCards.forEach(function (card) {
+    // 잇스쿨 강의 카드(.course-card)는 .tool-card 클래스를 공유하지만 도구가 아니므로 제외
+    // (강의 [신청하기] 클릭은 아래 course_apply_clicked 로 별도 추적)
+    if (card.classList.contains('course-card')) return;
     var tool = card.getAttribute('data-tool');
     var toolName = card.getAttribute('data-tool-name') || tool;
     var isActive = card.classList.contains('is-active');
@@ -1283,6 +1286,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         });
       });
     }
+  });
+
+  // ---- ITSCHOOL: 강의 카드 [신청하기] 클릭 (어느 강의인지 구분) ----
+  document.querySelectorAll('.course-card.is-active').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var courseId = card.getAttribute('data-course');
+      var nameEl = card.querySelector('.tool-name');
+      track('course_apply_clicked', {
+        course_id: courseId,
+        course_name: nameEl ? nameEl.textContent.trim() : courseId,
+        returning_visitor: isReturningVisitor
+      });
+    });
   });
 
   // ---- post_tool_section_view: fire when user scrolls back to another section
