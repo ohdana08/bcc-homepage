@@ -546,6 +546,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     color: var(--text) !important;
   }
   .nav-login:hover { border-color: var(--gold); color: var(--gold-3) !important; }
+  /* 회원가입 — 1차 동선이라 골드 채움으로 강조 */
+  .nav-signup {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #1a1407 !important;
+    font-weight: 700;
+  }
+  .nav-signup:hover { background: var(--gold-3); border-color: var(--gold-3); color: #1a1407 !important; }
 
   /* ITSCHOOL (강의) — tool-card 패턴 재사용 + 강의 전용 요소 */
   .school-grid {
@@ -671,6 +679,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#tools" data-nav="ittools">잇툴즈</a>
       <a href="#itschool" data-nav="itschool">잇스쿨</a>
       <a href="#contact">문의</a>
+      <a href="signup.html" class="nav-login nav-signup" data-nav="signup">회원가입</a>
       <a href="mypage.html" class="nav-login" data-nav="login">로그인</a>
     </div>
     <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
