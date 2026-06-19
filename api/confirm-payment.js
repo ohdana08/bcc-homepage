@@ -84,16 +84,50 @@ export default async function handler(req, res) {
   await db.from('profiles').update({ status: 'active' }).eq('id', order.user_id);
   await db.from('pending_orders').update({ status: 'paid' }).eq('order_id', orderId);
 
-  // GA purchase 이벤트용 데이터 반환
+  // 결제 완료자 정보 (반환용 + 고객시트 적재용)
   const { data: product } = await db
     .from('products').select('name').eq('id', order.product_id).single();
+  const { data: profile } = await db
+    .from('profiles').select('name, phone, email, marketing_consent').eq('id', order.user_id).single();
 
+  // ── 통합 회원시스템 1단계: 결제자를 고객 시트(시트1)에 합치기 ──
+  //   별도 Apps Script(BCC 결제 적재)가 이메일로 행을 찾아 K~P열에만 기록한다.
+  //   실패해도 결제는 정상 — 결제 진실원천은 Supabase, 시트는 마케팅·열람용 사본.
+  await logToCustomerSheet({
+    name: profile?.name, phone: profile?.phone, email: profile?.email,
+    course: product?.name || order.product_id,
+    amount: order.amount,
+    status: '완료',
+    orderId,
+    marketingConsent: !!profile?.marketing_consent,
+  });
+
+  // GA purchase 이벤트용 데이터 반환
   return res.json({
     success: true,
     orderName: product?.name || null,
     amount: order.amount,
     isRecourse: order.is_recourse,
     productId: order.product_id,
-    customerEmail: (await db.from('profiles').select('email').eq('id', order.user_id).single()).data?.email || null,
+    customerEmail: profile?.email || null,
   });
+}
+
+// 통합 회원시스템 1단계 — 결제 완료자를 기존 고객 시트(시트1)에 "한 사람=한 행"으로 합친다.
+//   전송 대상: 별도 Apps Script(BCC 결제 적재) 웹앱. 그 스크립트가 이메일로 행을 찾아
+//   K~P(결제강의·금액·일·상태·주문번호·마케팅동의)만 기록 → 유튜브 영역(A~J)은 안 건드림.
+//   env(PAYMENT_SHEET_URL/SECRET) 미설정 시 조용히 skip. 실패해도 결제 흐름에 영향 없음.
+async function logToCustomerSheet(payload) {
+  const url = process.env.PAYMENT_SHEET_URL;
+  const secret = process.env.PAYMENT_SHEET_SECRET;
+  if (!url || !secret) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, ...payload }),
+    });
+  } catch (e) {
+    console.error('[customer-sheet] 적재 실패(결제는 정상):', e?.message || e);
+  }
 }

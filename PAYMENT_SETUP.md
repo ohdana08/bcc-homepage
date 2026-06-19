@@ -66,6 +66,8 @@ Supabase   products / profiles / enrollments / pending_orders (RLS)
 | `TOSS_CLIENT_KEY` | 결제창 | 공개 OK |
 | `ALLOWED_ORIGINS` | CORS 허용(선택) | — |
 | `CRON_SECRET` | cleanup cron 보호(선택) | ★절대 금지 |
+| `PAYMENT_SHEET_URL` | 통합1단계: 결제자→고객시트(시트1) 적재 GAS 웹앱 URL | — |
+| `PAYMENT_SHEET_SECRET` | 위 GAS 검증 비밀키(Apps Script SECRET과 동일값) | ★절대 금지 |
 
 ## 보안 체크 (업무지시서 §8 대응)
 - [x] 결제 금액은 `create-checkout` 가 DB·구매이력 보고 산정 (프론트 0원 조작 불가)
