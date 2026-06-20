@@ -10,7 +10,7 @@
 -- ------------------------------------------------------------
 create table if not exists products (
   id             text primary key,        -- 'shorts2', 'cardnews', 'ai_staff'
-  name           text not null,           -- '쇼츠2기'
+  name           text not null,           -- 'AI 숏츠 크리에이터 과정 2기'
   price          integer not null,        -- 119000 (정가)
   recourse_price integer,                 -- 30000 (강의별 재수강가, null이면 정가 적용)
   is_active      boolean default true,
@@ -91,14 +91,14 @@ create index if not exists idx_pending_orders_status_created
 -- 5) 초기 상품 데이터 (이미 있으면 무시)
 -- ------------------------------------------------------------
 insert into products (id, name, price, recourse_price) values
-  ('shorts2',  '쇼츠2기',        119000, 30000),
-  ('cardnews', '카드뉴스공장장', 119000, 30000)
+  ('shorts2',  'AI 숏츠 크리에이터 과정 2기',     119000, 30000),
+  ('cardnews', 'AI 카드뉴스 공장 만들기 과정 1기', 119000, 30000)
 on conflict (id) do nothing;
 
 -- 지난 강의(판매중지): 신규 결제/목록에는 노출 안 됨(is_active=false).
 -- 기존 수강생 과거 이력(enrollments) FK 연결 용도로만 존재.
 insert into products (id, name, price, recourse_price, is_active) values
-  ('shorts1', 'AI 숏폼 크리에이터 1기', 119000, 30000, false)
+  ('shorts1', 'AI 숏츠 크리에이터 과정 1기', 119000, 30000, false)
 on conflict (id) do nothing;
 
 -- ============================================================
