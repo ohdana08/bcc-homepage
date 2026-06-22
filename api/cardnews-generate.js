@@ -121,10 +121,12 @@ export default async function handler(req, res) {
   const { data: profile } = await db.from('profiles').select('is_admin').eq('id', user.id).single();
   if (!profile?.is_admin) return res.status(403).json({ error: '관리자만 사용할 수 있습니다.' });
 
-  // 3) 입력 검증
-  const { script, purpose, intent } = req.body || {};
-  if (!script || script.trim().length < 30) {
-    return res.status(400).json({ error: '스크립트를 30자 이상 붙여넣어 주세요.' });
+  // 3) 입력 검증 (텍스트 벤치마킹 또는 이미지 벤치마킹)
+  const { script, purpose, intent, imageBase64, imageMediaType } = req.body || {};
+  const hasText = script && script.trim().length >= 30;
+  const hasImage = imageBase64 && imageBase64.length > 100;
+  if (!hasText && !hasImage) {
+    return res.status(400).json({ error: '텍스트(30자 이상) 또는 이미지를 입력해 주세요.' });
   }
   if (!purpose || !PURPOSES[purpose]) {
     return res.status(400).json({ error: '목적을 선택해 주세요.' });
@@ -136,10 +138,19 @@ export default async function handler(req, res) {
   }
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  const userContent =
+  const header =
     `# 목적/CTA\n${PURPOSES[purpose]}\n\n` +
-    `# 의도(홍보 대상 / 연결할 BCC 프로그램)\n${(intent || '').trim() || '(미입력 — 스크립트 맥락에서 가장 적절한 BCC 연결을 추론하되, 사실정보는 자리표시자로 둔다)'}\n\n` +
-    `# 스크립트 전문\n${script.trim()}`;
+    `# 의도(홍보 대상 / 연결할 BCC 프로그램)\n${(intent || '').trim() || '(미입력 — 맥락에서 가장 적절한 BCC 연결을 추론하되, 사실정보는 자리표시자로 둔다)'}\n\n`;
+
+  let userMessageContent;
+  if (hasImage) {
+    userMessageContent = [
+      { type: 'image', source: { type: 'base64', media_type: imageMediaType || 'image/jpeg', data: imageBase64 } },
+      { type: 'text', text: header + '# 원본 콘텐츠\n첨부 이미지는 반응이 좋았던 카드뉴스/게시글 캡처다. 이미지 속 메시지·구조·흐름을 읽고, 저작권 규칙대로 표현을 100% 새로 써서 BCC 카드뉴스로 재구성하라.' },
+    ];
+  } else {
+    userMessageContent = header + '# 원본 콘텐츠(텍스트)\n' + script.trim();
+  }
 
   try {
     const msg = await client.messages.create({
@@ -147,7 +158,7 @@ export default async function handler(req, res) {
       max_tokens: 8000,
       system: SYSTEM_PROMPT,
       output_config: { format: { type: 'json_schema', schema: SCHEMA } },
-      messages: [{ role: 'user', content: userContent }],
+      messages: [{ role: 'user', content: userMessageContent }],
     });
 
     if (msg.stop_reason === 'refusal') {

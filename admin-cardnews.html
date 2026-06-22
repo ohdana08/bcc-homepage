@@ -113,12 +113,17 @@
     <div id="inputView" class="card">
       <div class="step-label">① 원본 콘텐츠</div>
       <div class="tabs" id="inputTabs" style="margin-bottom:12px">
-        <button type="button" class="tab active" data-input="video">영상 스크립트</button>
-        <button type="button" class="tab" data-input="text">텍스트 벤치마킹</button>
+        <button type="button" class="tab active" data-input="text">텍스트 벤치마킹</button>
+        <button type="button" class="tab" data-input="image">이미지 벤치마킹</button>
       </div>
-      <div class="row">
-        <textarea id="script" rows="8" placeholder="유튜브 영상 자막/스크립트를 그대로 붙여넣으세요."></textarea>
-        <div class="muted" id="scriptHint">URL이 아니라 텍스트(자막)를 붙여넣어 주세요.</div>
+      <div class="row" id="textRow">
+        <textarea id="script" rows="8" placeholder="블로그·뉴스·스레드·유튜브 자막 등 잘 터진 텍스트를 그대로 붙여넣으세요."></textarea>
+        <div class="muted" id="scriptHint">이미지가 아니라 텍스트만 가능합니다. 여러 글을 합쳐 넣어도 됩니다.</div>
+      </div>
+      <div class="row" id="imageRow" style="display:none">
+        <input id="imageFile" type="file" accept="image/*" />
+        <img id="imagePreview" alt="" style="display:none;max-width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--border)" />
+        <div class="muted">잘 터진 카드뉴스·게시글 캡처를 올리면, AI가 그 내용을 읽고 BCC용으로 재구성해요. (저작권 규칙대로 표현은 100% 새로 씀)</div>
       </div>
 
       <div class="step-label" style="margin-top:6px">② 이 카드뉴스의 목적</div>
@@ -178,6 +183,7 @@
   let loginMode = 'email';
   let supabase = null;
   let selectedPurpose = null;
+  let selectedInput = 'text';  // 'text'(텍스트 벤치마킹) | 'image'(이미지 벤치마킹)
   let lastCards = [];          // 마지막 생성된 구성표
   let renderedCanvases = [];   // 렌더된 캔버스들
   let selectedStyle = 'photo'; // 'photo'(1탄) | 'illu'(2탄)
@@ -253,24 +259,45 @@
   })();
   $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
 
-  // 입력 타입 탭 — 안내 문구만 바뀌고 AI 처리 방식은 동일
-  const INPUT_HINTS = {
-    video: {
-      ph: '유튜브 영상 자막/스크립트를 그대로 붙여넣으세요.',
-      hint: 'URL이 아니라 텍스트(자막)를 붙여넣어 주세요.',
-    },
-    text: {
-      ph: '블로그 글·뉴스·스레드·인스타 캡션 등 잘 터진 텍스트를 그대로 붙여넣으세요.',
-      hint: '이미지는 안 되고 텍스트만 가능합니다. 여러 글을 합쳐 넣어도 됩니다.',
-    },
-  };
+  // 입력 타입 탭 — 텍스트 벤치마킹 / 이미지 벤치마킹
   $('inputTabs').addEventListener('click', (e) => {
     const b = e.target.closest('.tab'); if (!b) return;
+    selectedInput = b.dataset.input;
     document.querySelectorAll('#inputTabs .tab').forEach((x) => x.classList.toggle('active', x === b));
-    const t = INPUT_HINTS[b.dataset.input] || INPUT_HINTS.video;
-    $('script').placeholder = t.ph;
-    $('scriptHint').textContent = t.hint;
+    $('textRow').style.display = selectedInput === 'text' ? '' : 'none';
+    $('imageRow').style.display = selectedInput === 'image' ? '' : 'none';
+    setGenStatus('');
   });
+  // 이미지 미리보기
+  $('imageFile').addEventListener('change', () => {
+    const f = $('imageFile').files[0];
+    if (!f) { $('imagePreview').style.display = 'none'; return; }
+    $('imagePreview').src = URL.createObjectURL(f);
+    $('imagePreview').style.display = 'block';
+  });
+
+  // 업로드 이미지 → 긴 변 1568px 이하로 축소한 JPEG base64 (Claude 비전 권장 + 전송 경량화)
+  function fileToScaledBase64(file, maxEdge = 1568, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          const r = Math.min(1, maxEdge / Math.max(w, h));
+          w = Math.round(w * r); h = Math.round(h * r);
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          const dataUrl = c.toDataURL('image/jpeg', quality);
+          resolve({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg' });
+        };
+        img.onerror = reject;
+        img.src = fr.result;
+      };
+      fr.onerror = reject;
+      fr.readAsDataURL(file);
+    });
+  }
 
   // 목적 선택
   $('purposeBtns').addEventListener('click', (e) => {
@@ -289,18 +316,26 @@
 
   // 생성
   $('genBtn').addEventListener('click', async () => {
-    const script = $('script').value.trim();
     const intent = $('intent').value.trim();
-    if (script.length < 30) { setGenStatus('스크립트를 30자 이상 붙여넣어 주세요.', 'err'); return; }
     if (!selectedPurpose) { setGenStatus('목적을 선택해 주세요.', 'err'); return; }
 
+    // 입력(텍스트/이미지)에 따라 요청 본문 구성
+    let body;
+    if (selectedInput === 'image') {
+      const f = $('imageFile').files[0];
+      if (!f) { setGenStatus('벤치마킹할 이미지를 올려주세요.', 'err'); return; }
+      try {
+        const { base64, mediaType } = await fileToScaledBase64(f);
+        body = { imageBase64: base64, imageMediaType: mediaType, purpose: selectedPurpose, intent };
+      } catch (e) { setGenStatus('이미지를 읽지 못했습니다. 다른 파일로 시도해 주세요.', 'err'); return; }
+    } else {
+      const script = $('script').value.trim();
+      if (script.length < 30) { setGenStatus('텍스트를 30자 이상 붙여넣어 주세요.', 'err'); return; }
+      body = { script, purpose: selectedPurpose, intent };
+    }
+
     let token;
-    try {
-      const sb = await getClient();
-      const { data: { session } } = await sb.auth.getSession();
-      token = session?.access_token;
-      if (!token) throw new Error('로그인이 만료되었습니다. 새로고침 후 다시 로그인하세요.');
-    } catch (err) { setGenStatus(err.message, 'err'); return; }
+    try { token = await authToken(); } catch (err) { setGenStatus(err.message, 'err'); return; }
 
     $('inputView').classList.add('hidden');
     $('loadingView').classList.remove('hidden');
@@ -310,7 +345,7 @@
       const res = await fetch(API + '/api/cardnews-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-        body: JSON.stringify({ script, purpose: selectedPurpose, intent }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
