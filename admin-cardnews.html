@@ -111,10 +111,14 @@
 
     <!-- 입력 -->
     <div id="inputView" class="card">
-      <div class="step-label">① 원본 스크립트</div>
+      <div class="step-label">① 원본 콘텐츠</div>
+      <div class="tabs" id="inputTabs" style="margin-bottom:12px">
+        <button type="button" class="tab active" data-input="video">영상 스크립트</button>
+        <button type="button" class="tab" data-input="text">텍스트 벤치마킹</button>
+      </div>
       <div class="row">
-        <textarea id="script" rows="8" placeholder="유튜브·스레드 등 터진 콘텐츠의 스크립트를 그대로 붙여넣으세요."></textarea>
-        <div class="muted">URL이 아니라 텍스트(자막)를 붙여넣어 주세요.</div>
+        <textarea id="script" rows="8" placeholder="유튜브 영상 자막/스크립트를 그대로 붙여넣으세요."></textarea>
+        <div class="muted" id="scriptHint">URL이 아니라 텍스트(자막)를 붙여넣어 주세요.</div>
       </div>
 
       <div class="step-label" style="margin-top:6px">② 이 카드뉴스의 목적</div>
@@ -200,10 +204,10 @@
     } catch (e) { /* 로그인 화면 유지 */ }
   })();
 
-  // 로그인 탭 전환
-  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
+  // 로그인 탭 전환 (로그인 영역 한정 — 입력 타입 탭과 분리)
+  document.querySelectorAll('#loginView .tab').forEach((t) => t.addEventListener('click', () => {
     loginMode = t.dataset.mode;
-    document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('active', x === t));
+    document.querySelectorAll('#loginView .tab').forEach((x) => x.classList.toggle('active', x === t));
     $('rowEmail').classList.toggle('hidden', loginMode !== 'email');
     $('rowPhone').classList.toggle('hidden', loginMode !== 'phone');
     setLoginStatus('');
@@ -244,6 +248,25 @@
     $('kakaoLink').value = localStorage.getItem(KAKAO_KEY) || '';
   })();
   $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
+
+  // 입력 타입 탭 — 안내 문구만 바뀌고 AI 처리 방식은 동일
+  const INPUT_HINTS = {
+    video: {
+      ph: '유튜브 영상 자막/스크립트를 그대로 붙여넣으세요.',
+      hint: 'URL이 아니라 텍스트(자막)를 붙여넣어 주세요.',
+    },
+    text: {
+      ph: '블로그 글·뉴스·스레드·인스타 캡션 등 잘 터진 텍스트를 그대로 붙여넣으세요.',
+      hint: '이미지는 안 되고 텍스트만 가능합니다. 여러 글을 합쳐 넣어도 됩니다.',
+    },
+  };
+  $('inputTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    document.querySelectorAll('#inputTabs .tab').forEach((x) => x.classList.toggle('active', x === b));
+    const t = INPUT_HINTS[b.dataset.input] || INPUT_HINTS.video;
+    $('script').placeholder = t.ph;
+    $('scriptHint').textContent = t.hint;
+  });
 
   // 목적 선택
   $('purposeBtns').addEventListener('click', (e) => {
