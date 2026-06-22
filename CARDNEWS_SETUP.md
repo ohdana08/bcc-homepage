@@ -41,7 +41,8 @@ Vercel 프로젝트 → **Settings → Environment Variables** 에 추가:
 | 이름 | 값 | 비고 |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | `sk-ant-...` | https://console.anthropic.com → API Keys 에서 발급. **서버 전용** |
-| `UNSPLASH_ACCESS_KEY` | (Access Key) | https://unsplash.com/developers → New Application → Access Key. **서버 전용**. 배경 사진 검색용. 미설정 시 카드가 단색 배경으로 생성됨 |
+| `UNSPLASH_ACCESS_KEY` | (Access Key) | https://unsplash.com/developers → New Application → Access Key. **서버 전용**. 1탄 배경 사진용. 미설정 시 주제별 그라데이션 배경 |
+| `OPENAI_API_KEY` | `sk-...` | https://platform.openai.com/api-keys. **서버 전용**. 2탄 AI 일러스트용. 미설정 시 2탄은 일러스트 없이 밝은 카드. (조직 검증 필요하면 `OPENAI_IMAGE_MODEL=dall-e-3` 로 교체) |
 
 추가 후 **재배포**(Deployments → 최신 빌드 Redeploy)해야 적용됩니다.
 

@@ -148,7 +148,11 @@
       <div id="cardsBox"></div>
 
       <div class="render-card" id="renderControls">
-        <div class="lbl">구성표가 마음에 들면, 배경 사진을 자동으로 찾아 카드 이미지를 만듭니다.</div>
+        <div class="lbl">카드 스타일 선택</div>
+        <div class="purpose" id="styleBtns">
+          <button type="button" class="pbtn active" data-style="photo">📷 사진 배경 (1탄)</button>
+          <button type="button" class="pbtn" data-style="illu">🎨 AI 일러스트 (2탄)</button>
+        </div>
         <button type="button" class="btn" id="renderBtn">🖼 카드 이미지 생성 (1080×1080)</button>
         <p id="renderStatus" class="status"></p>
       </div>
@@ -177,6 +181,7 @@
   let selectedPurpose = null;
   let lastCards = [];          // 마지막 생성된 구성표
   let renderedCanvases = [];   // 렌더된 캔버스들
+  let selectedStyle = 'photo'; // 'photo'(1탄) | 'illu'(2탄)
 
   const $ = (id) => document.getElementById(id);
   const loginView = $('loginView'), appView = $('appView');
@@ -272,8 +277,15 @@
   $('purposeBtns').addEventListener('click', (e) => {
     const b = e.target.closest('.pbtn'); if (!b) return;
     selectedPurpose = b.dataset.purpose;
-    document.querySelectorAll('.pbtn').forEach((x) => x.classList.toggle('active', x === b));
+    document.querySelectorAll('#purposeBtns .pbtn').forEach((x) => x.classList.toggle('active', x === b));
     setGenStatus('');
+  });
+
+  // 스타일 선택 (1탄 사진 / 2탄 일러스트)
+  $('styleBtns').addEventListener('click', (e) => {
+    const b = e.target.closest('.pbtn'); if (!b) return;
+    selectedStyle = b.dataset.style;
+    document.querySelectorAll('#styleBtns .pbtn').forEach((x) => x.classList.toggle('active', x === b));
   });
 
   // 생성
@@ -495,6 +507,79 @@
     return cv;
   }
 
+  // 2탄 — 밝고 심플한 라이트 카드 + (있으면) 투명배경 AI 일러스트
+  function drawCardIllu(card, idx, total, illuImg, qrImg) {
+    const W = 1080, H = 1080, M = 84, cw = W - 2 * M;
+    const isCTA = (String(card.flow || '').toUpperCase() === 'CTA') || (idx === total - 1);
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+
+    // 밝은 배경 (크림 → 옅은 베이지 그라데이션)
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#FAF7F1'); g.addColorStop(1, '#EFEBE3');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    const ink = '#1f2330', sub = '#6b6f7a', gold = '#C9A84C', faint = '#a9a59b';
+
+    // 상단 라벨 + 페이지 번호
+    ctx.font = '700 26px ' + FONT; ctx.fillStyle = gold;
+    ctx.fillText(String(card.flow || '').toUpperCase(), M, 92);
+    ctx.textAlign = 'right'; ctx.font = '600 24px ' + FONT; ctx.fillStyle = faint;
+    ctx.fillText((idx + 1) + ' / ' + total, W - M, 94);
+    ctx.textAlign = 'left';
+
+    // 일러스트(투명 PNG) — 상단 영역에 contain
+    const hasIllu = !!illuImg;
+    const illuBottom = (isCTA && qrImg) ? 470 : 600;
+    if (hasIllu) {
+      const bx = M, by = 150, bw = cw, bh = illuBottom - by;
+      const r = Math.min(bw / illuImg.width, bh / illuImg.height);
+      const iw = illuImg.width * r, ih = illuImg.height * r;
+      ctx.drawImage(illuImg, bx + (bw - iw) / 2, by + (bh - ih) / 2, iw, ih);
+    }
+
+    // 제목 — 진한 잉크색, 굵게
+    const lines = String(card.title || '').replace(/\*/g, '').split('\n').map((s) => s.trim()).filter(Boolean);
+    let ts = 84; const minTs = 50;
+    const widthAt = (ln, s) => { ctx.font = '800 ' + s + 'px ' + FONT; return ctx.measureText(ln).width; };
+    while (ts > minTs) { if (lines.every((ln) => widthAt(ln, ts) <= cw)) break; ts -= 2; }
+    const lh = ts * 1.14;
+    let ty = hasIllu ? (illuBottom + 28) : 360;
+    ctx.font = '800 ' + ts + 'px ' + FONT; ctx.fillStyle = ink;
+    for (const ln of lines) { ctx.fillText(ln, M, ty); ty += lh; }
+
+    if (isCTA && qrImg) {
+      // CTA QR — 라이트 배경이라 흰 패널 + 옅은 테두리
+      const P = 230, pad = 14, qrSize = P - pad * 2;
+      const px = M, pBottom = H - 150, py = pBottom - P;
+      roundRect(ctx, px, py, P, P, 16); ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.strokeStyle = '#e3ddd0'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.drawImage(qrImg, px + pad, py + pad, qrSize, qrSize);
+      const capText = String(card.body || '').trim() ? String(card.body).replace(/\*/g, '') : '카카오톡으로\n바로 상담하기';
+      const capX = px + P + 28, capW = cw - (P + 28);
+      ctx.font = '800 32px ' + FONT; ctx.fillStyle = ink;
+      const capLines = wrapLines(ctx, capText, capW);
+      const clh = 32 * 1.3, capH = capLines.length * clh;
+      let cy = py + Math.max(0, (P - capH) / 2);
+      for (const ln of capLines) { ctx.fillText(ln, capX, cy); cy += clh; }
+    } else {
+      // 본문 — 회색
+      ctx.font = '500 36px ' + FONT; ctx.fillStyle = sub;
+      const bl = wrapLines(ctx, String(card.body || '').replace(/\*/g, ''), cw);
+      const blh = 36 * 1.42, bH = bl.length * blh;
+      let bodyY = ty + 12;
+      const maxStart = H - 150 - bH;
+      if (bodyY > maxStart) bodyY = maxStart;
+      for (const ln of bl) { ctx.fillText(ln, M, bodyY); bodyY += blh; }
+    }
+
+    // 워터마크
+    ctx.font = '600 23px ' + FONT; ctx.fillStyle = faint;
+    ctx.fillText(card.watermark || '@business_career_consulting', M, H - 70);
+    return cv;
+  }
+
   const canvasBlob = (cv) => new Promise((r) => cv.toBlob(r, 'image/png'));
   function downloadBlob(blob, name) {
     const u = URL.createObjectURL(blob);
@@ -508,54 +593,81 @@
     return session.access_token;
   }
 
+  // 미리보기 그리드에 캔버스 1장 + 개별 PNG 저장 링크 추가
+  function appendPreview(cv, i, flow) {
+    renderedCanvases.push(cv);
+    const fig = document.createElement('figure');
+    fig.appendChild(cv);
+    const cap = document.createElement('figcaption');
+    cap.textContent = (i + 1) + '. ' + (flow || '');
+    fig.appendChild(cap);
+    const dl = document.createElement('div'); dl.className = 'dlrow';
+    const a = document.createElement('a'); a.textContent = 'PNG 저장';
+    a.addEventListener('click', async () => { downloadBlob(await canvasBlob(cv), 'card-' + String(i + 1).padStart(2, '0') + '.png'); });
+    dl.appendChild(a); fig.appendChild(dl);
+    $('previewGrid').appendChild(fig);
+  }
+
   $('renderBtn').addEventListener('click', async () => {
     if (!lastCards.length) return;
     const btn = $('renderBtn'); btn.disabled = true;
-    $('renderStatus').className = 'status'; $('renderStatus').textContent = '배경 사진 검색 중…';
+    $('renderStatus').className = 'status';
     try {
-      // 1) 카드별 배경 사진 URL 가져오기(서버 프록시)
-      const imgMap = {};
-      try {
-        const token = await authToken();
-        const queries = lastCards.map((c) => c.bg_query || 'dark abstract');
-        const r = await fetch(API + '/api/unsplash', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-          body: JSON.stringify({ queries }),
-        });
-        const d = await r.json().catch(() => ({}));
-        if (r.ok && d.results) d.results.forEach((x, i) => { imgMap[i] = x.imageUrl; });
-      } catch (e) { /* 사진 못 받으면 그라데이션 배경으로 진행 */ }
-
-      // 2) 폰트 보장 후 렌더
-      $('renderStatus').textContent = '폰트 로딩 및 렌더링 중…';
+      const token = await authToken();
       await ensureFont();
-      // CTA 카드용 카카오톡 QR (저장된 기본값)
       const kakao = (localStorage.getItem(KAKAO_KEY) || '').trim();
       const qrImg = kakao ? await makeQR(kakao) : null;
-      const grid = $('previewGrid'); grid.innerHTML = ''; renderedCanvases = [];
-      for (let i = 0; i < lastCards.length; i++) {
-        const img = await loadImage(imgMap[i]);
-        const cv = drawCard(lastCards[i], i, lastCards.length, img, qrImg);
-        renderedCanvases.push(cv);
+      $('previewGrid').innerHTML = ''; renderedCanvases = [];
+      let note = '';
 
-        const fig = document.createElement('figure');
-        fig.appendChild(cv);
-        const cap = document.createElement('figcaption');
-        cap.textContent = (i + 1) + '. ' + (lastCards[i].flow || '');
-        fig.appendChild(cap);
-        const dl = document.createElement('div'); dl.className = 'dlrow';
-        const a = document.createElement('a'); a.textContent = 'PNG 저장';
-        a.addEventListener('click', async () => { downloadBlob(await canvasBlob(cv), 'card-' + String(i + 1).padStart(2, '0') + '.png'); });
-        dl.appendChild(a); fig.appendChild(dl);
-        grid.appendChild(fig);
+      if (selectedStyle === 'illu') {
+        // 2탄 — AI 일러스트 (카드당 1장 병렬 생성)
+        $('renderStatus').textContent = 'AI 일러스트 생성 중… (20~40초)';
+        const illus = await Promise.all(lastCards.map(async (c) => {
+          try {
+            const subject = c.bg_query || c.flow || 'concept';
+            const prompt = 'Simple flat vector illustration of ' + subject
+              + ', minimal, clean, friendly, modern, soft rounded shapes, muted warm palette, single centered subject, transparent background, no text, no letters, no words.';
+            const r = await fetch(API + '/api/illustrate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+              body: JSON.stringify({ prompt }),
+            });
+            const d = await r.json().catch(() => ({}));
+            if (r.ok && d.b64) return await loadImage('data:image/png;base64,' + d.b64);
+            return null;
+          } catch (e) { return null; }
+        }));
+        $('renderStatus').textContent = '렌더링 중…';
+        for (let i = 0; i < lastCards.length; i++) {
+          appendPreview(drawCardIllu(lastCards[i], i, lastCards.length, illus[i], qrImg), i, lastCards[i].flow);
+        }
+        if (!illus.some(Boolean)) note = 'OPENAI_API_KEY 설정 전이라 일러스트 없이 밝은 카드로 만들었어요. (키 추가 시 일러스트 자동 삽입)';
+      } else {
+        // 1탄 — 사진 배경
+        $('renderStatus').textContent = '배경 사진 검색 중…';
+        const imgMap = {};
+        try {
+          const queries = lastCards.map((c) => c.bg_query || 'dark abstract');
+          const r = await fetch(API + '/api/unsplash', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ queries }),
+          });
+          const d = await r.json().catch(() => ({}));
+          if (r.ok && d.results) d.results.forEach((x, i) => { imgMap[i] = x.imageUrl; });
+        } catch (e) { /* 사진 못 받으면 그라데이션으로 진행 */ }
+        $('renderStatus').textContent = '렌더링 중…';
+        for (let i = 0; i < lastCards.length; i++) {
+          const img = await loadImage(imgMap[i]);
+          appendPreview(drawCard(lastCards[i], i, lastCards.length, img, qrImg), i, lastCards[i].flow);
+        }
+        if (!Object.values(imgMap).some(Boolean)) note = 'Unsplash 키 설정 전이라 주제별 그라데이션 배경으로 만들었어요. (키 추가 시 사진으로 자동 교체)';
       }
+
       $('previewWrap').classList.remove('hidden');
-      const anyPhoto = Object.values(imgMap).some(Boolean);
       $('renderStatus').className = 'status';
-      $('renderStatus').textContent = anyPhoto
-        ? ''
-        : 'Unsplash 키 설정 전이라 주제별 그라데이션 배경으로 만들었어요. (키 추가 시 사진으로 자동 교체)';
+      $('renderStatus').textContent = note;
     } catch (err) {
       $('renderStatus').className = 'status err';
       $('renderStatus').textContent = err.message || '렌더링 중 오류가 발생했습니다.';
