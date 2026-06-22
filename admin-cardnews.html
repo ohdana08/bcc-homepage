@@ -53,6 +53,19 @@
   .cardrow .role{font-size:11px;color:var(--text-mute);margin-top:8px}
   .cardrow .wm{font-size:11px;color:var(--text-mute);margin-top:2px}
   .loading{text-align:center;color:var(--text-dim);font-size:14px;padding:30px 0}
+  /* 렌더링 컨트롤 / 미리보기 */
+  .render-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:18px;margin-bottom:16px}
+  .render-card .lbl{font-size:13px;color:var(--text-dim);margin-bottom:10px}
+  .swatches{display:flex;gap:10px;margin-bottom:14px}
+  .swatch{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+  .swatch.active{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.15)}
+  .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .preview-grid figure{margin:0}
+  .preview-grid canvas{width:100%;height:auto;border-radius:10px;display:block;border:1px solid var(--border)}
+  .preview-grid figcaption{font-size:11px;color:var(--text-mute);margin-top:4px;text-align:center}
+  .dlrow{display:flex;gap:8px;justify-content:center;margin-top:5px}
+  .dlrow a{font-size:11px;color:var(--gold-3);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer}
+  @media(max-width:480px){.preview-grid{grid-template-columns:1fr}}
   .hidden{display:none}
   a{color:var(--gold-3)}
 </style>
@@ -120,25 +133,41 @@
     <div id="resultView" class="hidden">
       <div class="analysis" id="analysisBox"></div>
       <div id="cardsBox"></div>
-      <button type="button" class="btn ghost" id="againBtn" style="margin-top:6px">새 스크립트로 다시 만들기</button>
+
+      <div class="render-card" id="renderControls">
+        <div class="lbl">구성표가 마음에 들면, 배경 사진을 자동으로 찾아 카드 이미지를 만듭니다.</div>
+        <button type="button" class="btn" id="renderBtn">🖼 카드 이미지 생성 (1080×1080)</button>
+        <p id="renderStatus" class="status"></p>
+      </div>
+
+      <div id="previewWrap" class="hidden">
+        <div class="preview-grid" id="previewGrid"></div>
+        <button type="button" class="btn" id="zipBtn">⬇ 전체 ZIP 다운로드</button>
+      </div>
+
+      <button type="button" class="btn ghost" id="againBtn" style="margin-top:10px">새 스크립트로 다시 만들기</button>
     </div>
   </div>
 </div>
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  import JSZip from 'https://esm.sh/jszip@3.10.1';
 
   const API = window.BCC_API_BASE;
   const PHONE_DOMAIN = 'phone.bcc.kr';
   let loginMode = 'email';
   let supabase = null;
   let selectedPurpose = null;
+  let lastCards = [];          // 마지막 생성된 구성표
+  let renderedCanvases = [];   // 렌더된 캔버스들
 
   const $ = (id) => document.getElementById(id);
   const loginView = $('loginView'), appView = $('appView');
   const setLoginStatus = (m, k) => { $('loginStatus').textContent = m; $('loginStatus').className = 'status' + (k ? ' ' + k : ''); };
   const setGenStatus = (m, k) => { $('genStatus').textContent = m; $('genStatus').className = 'status' + (k ? ' ' + k : ''); };
   const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const stripEmph = (s) => String(s ?? '').replace(/\*/g, '');  // 강조 별표 제거(텍스트 표시용)
 
   async function getClient() {
     if (supabase) return supabase;
@@ -248,21 +277,227 @@
       '<div class="core"><strong>가져갈 핵심 10%:</strong> ' + esc(a.core_10pct || '') + '</div>';
 
     const cards = data.cards || [];
+    lastCards = cards;
     $('cardsBox').innerHTML =
       '<div class="step-label">구성표 · 총 ' + cards.length + '장</div>' +
       cards.map((c) =>
         '<div class="cardrow">' +
           '<div class="meta"><span class="no">' + esc(c.no) + '번</span><span class="flow">' + esc(c.flow) + '</span></div>' +
-          '<div class="title">' + esc(c.title) + '</div>' +
-          '<div class="body">' + esc(c.body) + '</div>' +
+          '<div class="title">' + esc(stripEmph(c.title)) + '</div>' +
+          '<div class="body">' + esc(stripEmph(c.body)) + '</div>' +
           '<div class="role">역할: ' + esc(c.role) + '</div>' +
           '<div class="wm">' + esc(c.watermark) + '</div>' +
         '</div>'
       ).join('');
 
+    // 미리보기 초기화
+    $('previewWrap').classList.add('hidden');
+    $('previewGrid').innerHTML = '';
+    renderedCanvases = [];
+    $('renderStatus').textContent = '';
+
     $('loadingView').classList.add('hidden');
     $('resultView').classList.remove('hidden');
   }
+
+  // ───────────────────────── ③ Canvas 렌더링 (1080×1080) ─────────────────────────
+  const FONT = '"Pretendard Variable", Pretendard, sans-serif';
+
+  // 배경 사진이 없을 때(키 미설정/검색실패) 주제 키워드로 일관된 색을 뽑아 그라데이션 배경을 만든다.
+  function hueFromString(s) {
+    let h = 0;
+    for (const ch of String(s || 'bcc')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return h % 360;
+  }
+
+  async function ensureFont() {
+    try {
+      await Promise.all([
+        document.fonts.load('800 96px "Pretendard Variable"'),
+        document.fonts.load('500 38px "Pretendard Variable"'),
+        document.fonts.load('700 26px "Pretendard Variable"'),
+      ]);
+      await document.fonts.ready;
+    } catch (e) { /* 폰트 로드 실패해도 진행(폴백 폰트) */ }
+  }
+
+  function loadImage(url) {
+    return new Promise((resolve) => {
+      if (!url) return resolve(null);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';        // 캔버스 오염 방지(PNG 내보내기 위해 필수)
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);    // 실패 시 단색 배경 폴백
+      img.src = url;
+    });
+  }
+
+  // 한글은 단어 경계가 약해 글자 단위로 줄바꿈한다.
+  function wrapLines(ctx, text, maxW) {
+    const out = [];
+    for (const para of String(text || '').split('\n')) {
+      let cur = '';
+      for (const ch of para) {
+        const t = cur + ch;
+        if (ctx.measureText(t).width > maxW && cur) { out.push(cur); cur = ch; }
+        else cur = t;
+      }
+      out.push(cur);
+    }
+    return out;
+  }
+
+  function drawCard(card, idx, total, img) {
+    const W = 1080, H = 1080, M = 84, cw = W - 2 * M;
+    const cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+
+    // 1) 배경 — 사진을 cover 로 깔고 blur. 사진 없으면 어두운 그라데이션.
+    if (img) {
+      const r = Math.max(W / img.width, H / img.height);
+      const iw = img.width * r, ih = img.height * r;
+      ctx.filter = 'blur(16px)';
+      ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
+      ctx.filter = 'none';
+    } else {
+      // 주제(bg_query) 기반 어두운 대각선 그라데이션. 같은 주제면 항상 같은 색.
+      const hue = hueFromString(card.bg_query || card.flow || ('c' + idx));
+      const g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, 'hsl(' + hue + ',38%,17%)');
+      g.addColorStop(1, 'hsl(' + ((hue + 26) % 360) + ',45%,7%)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+    // 2) 어두운 오버레이(검정 50%) + 하단 강화 그라데이션 → 글자 가독성
+    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0, 0, W, H);
+    const sg = ctx.createLinearGradient(0, H * 0.4, 0, H);
+    sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(1, 'rgba(0,0,0,0.5)');
+    ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
+
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+
+    // 3) 상단 라벨(흐름) + 페이지 번호
+    ctx.font = '700 26px ' + FONT; ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillText(String(card.flow || '').toUpperCase(), M, 92);
+    ctx.textAlign = 'right'; ctx.font = '600 24px ' + FONT; ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText((idx + 1) + ' / ' + total, W - M, 94);
+    ctx.textAlign = 'left';
+
+    // 4) 제목 — 흰색 굵게 크게. 너비/줄수에 맞춰 자동 축소.
+    const lines = String(card.title || '').replace(/\*/g, '').split('\n').map((s) => s.trim()).filter(Boolean);
+    let ts = 96; const minTs = 54;
+    const widthAt = (ln, s) => { ctx.font = '800 ' + s + 'px ' + FONT; return ctx.measureText(ln).width; };
+    while (ts > minTs) {
+      const fits = lines.every((ln) => widthAt(ln, ts) <= cw) && (lines.length * ts * 1.14 <= 500);
+      if (fits) break; ts -= 2;
+    }
+    const lh = ts * 1.14, tH = lines.length * lh;
+    const top = 320, bottom = 780;
+    let y = top + Math.max(0, ((bottom - top) - tH) / 2);
+    ctx.font = '800 ' + ts + 'px ' + FONT; ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 2;
+    for (const ln of lines) { ctx.fillText(ln, M, y); y += lh; }
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+    // 5) 본문 — 연회색, 작게. 하단 정렬.
+    ctx.font = '500 38px ' + FONT; ctx.fillStyle = 'rgba(240,240,245,0.92)';
+    const bl = wrapLines(ctx, String(card.body || '').replace(/\*/g, ''), cw);
+    const blh = 38 * 1.42, bH = bl.length * blh;
+    let by = H - 168 - bH;
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
+    for (const ln of bl) { ctx.fillText(ln, M, by); by += blh; }
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+
+    // 6) 워터마크
+    ctx.font = '600 23px ' + FONT; ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillText(card.watermark || '@business_career_consulting', M, H - 70);
+
+    return cv;
+  }
+
+  const canvasBlob = (cv) => new Promise((r) => cv.toBlob(r, 'image/png'));
+  function downloadBlob(blob, name) {
+    const u = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = u; a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(u), 1500);
+  }
+  async function authToken() {
+    const sb = await getClient();
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session?.access_token) throw new Error('로그인이 만료되었습니다. 새로고침 후 다시 로그인하세요.');
+    return session.access_token;
+  }
+
+  $('renderBtn').addEventListener('click', async () => {
+    if (!lastCards.length) return;
+    const btn = $('renderBtn'); btn.disabled = true;
+    $('renderStatus').className = 'status'; $('renderStatus').textContent = '배경 사진 검색 중…';
+    try {
+      // 1) 카드별 배경 사진 URL 가져오기(서버 프록시)
+      const imgMap = {};
+      try {
+        const token = await authToken();
+        const queries = lastCards.map((c) => c.bg_query || 'dark abstract');
+        const r = await fetch(API + '/api/unsplash', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ queries }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.results) d.results.forEach((x, i) => { imgMap[i] = x.imageUrl; });
+      } catch (e) { /* 사진 못 받으면 그라데이션 배경으로 진행 */ }
+
+      // 2) 폰트 보장 후 렌더
+      $('renderStatus').textContent = '폰트 로딩 및 렌더링 중…';
+      await ensureFont();
+      const grid = $('previewGrid'); grid.innerHTML = ''; renderedCanvases = [];
+      for (let i = 0; i < lastCards.length; i++) {
+        const img = await loadImage(imgMap[i]);
+        const cv = drawCard(lastCards[i], i, lastCards.length, img);
+        renderedCanvases.push(cv);
+
+        const fig = document.createElement('figure');
+        fig.appendChild(cv);
+        const cap = document.createElement('figcaption');
+        cap.textContent = (i + 1) + '. ' + (lastCards[i].flow || '');
+        fig.appendChild(cap);
+        const dl = document.createElement('div'); dl.className = 'dlrow';
+        const a = document.createElement('a'); a.textContent = 'PNG 저장';
+        a.addEventListener('click', async () => { downloadBlob(await canvasBlob(cv), 'card-' + String(i + 1).padStart(2, '0') + '.png'); });
+        dl.appendChild(a); fig.appendChild(dl);
+        grid.appendChild(fig);
+      }
+      $('previewWrap').classList.remove('hidden');
+      const anyPhoto = Object.values(imgMap).some(Boolean);
+      $('renderStatus').className = 'status';
+      $('renderStatus').textContent = anyPhoto
+        ? ''
+        : 'Unsplash 키 설정 전이라 주제별 그라데이션 배경으로 만들었어요. (키 추가 시 사진으로 자동 교체)';
+    } catch (err) {
+      $('renderStatus').className = 'status err';
+      $('renderStatus').textContent = err.message || '렌더링 중 오류가 발생했습니다.';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $('zipBtn').addEventListener('click', async () => {
+    if (!renderedCanvases.length) return;
+    const btn = $('zipBtn'); btn.disabled = true;
+    try {
+      const zip = new JSZip();
+      for (let i = 0; i < renderedCanvases.length; i++) {
+        zip.file('card-' + String(i + 1).padStart(2, '0') + '.png', await canvasBlob(renderedCanvases[i]));
+      }
+      const blob = await zip.generateAsync({ type: 'blob' });
+      downloadBlob(blob, 'cardnews.zip');
+    } catch (e) {
+      $('renderStatus').className = 'status err';
+      $('renderStatus').textContent = 'ZIP 생성 실패: ' + (e.message || '');
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   $('againBtn').addEventListener('click', () => {
     $('resultView').classList.add('hidden');
