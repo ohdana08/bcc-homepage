@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>카드뉴스 공장 (관리자) | BCC</title>
+<script src="pay-config.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root{--bg:#0a0a0a;--surface:#16161a;--text:#f3f3f5;--text-dim:#9a9aa6;--text-mute:#6c6c78;--gold:#C9A84C;--gold-3:#e6c878;--border:#26262c;--lime:#EFFF5A;
+    --font-ko:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ko);line-height:1.6;padding:40px 16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px}
+  .logo img{height:34px;width:auto;background:#fff;border-radius:8px;padding:4px}
+  h1{font-size:22px;letter-spacing:-.5px;text-align:center}
+  .sub{color:var(--text-dim);font-size:14px;text-align:center;margin-bottom:22px}
+  .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:22px;margin-bottom:16px}
+  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .row label{font-size:13px;color:var(--text-dim)}
+  input,textarea{width:100%;padding:12px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:10px;font-size:15px;font-family:inherit;line-height:1.6}
+  textarea{resize:vertical}
+  input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  .btn{width:100%;padding:13px;font-size:15px;font-weight:700;background:var(--gold);color:#1a1407;border:none;border-radius:10px;cursor:pointer}
+  .btn:disabled{opacity:.55;cursor:default}
+  .btn.ghost{background:none;color:var(--text-dim);border:1px solid var(--border)}
+  .status{margin-top:10px;font-size:13px;min-height:18px;text-align:center}
+  .status.err{color:#ff8080}.status.ok{color:#5fd38b}
+  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .head .logout{font-size:13px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer}
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{flex:1;padding:9px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
+  .tab.active{color:#1a1407;background:var(--gold);border-color:var(--gold)}
+  .purpose{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .pbtn{flex:1;min-width:120px;padding:11px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
+  .pbtn.active{color:#1a1407;background:var(--gold-3);border-color:var(--gold-3)}
+  .step-label{font-size:12px;color:var(--gold-3);font-weight:700;letter-spacing:.4px;margin-bottom:8px}
+  .muted{color:var(--text-mute);font-size:12px;margin-top:4px}
+  /* 결과 */
+  .analysis{background:rgba(239,255,90,.05);border:1px solid rgba(239,255,90,.22);border-radius:12px;padding:16px;margin-bottom:16px}
+  .analysis h3{font-size:14px;color:var(--lime);margin-bottom:8px}
+  .analysis ul{margin:0 0 8px 18px}
+  .analysis li{font-size:13px;color:var(--text);margin-bottom:3px}
+  .analysis .core{font-size:13px;color:var(--text-dim)}
+  .cardrow{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--surface)}
+  .cardrow .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .cardrow .no{font-size:12px;color:var(--text-mute)}
+  .cardrow .flow{font-size:11px;color:var(--gold-3);border:1px solid rgba(201,168,76,.4);border-radius:999px;padding:1px 9px}
+  .cardrow .title{font-size:17px;font-weight:800;white-space:pre-line;letter-spacing:-.3px;margin-bottom:6px}
+  .cardrow .body{font-size:14px;color:var(--text-dim);white-space:pre-line}
+  .cardrow .role{font-size:11px;color:var(--text-mute);margin-top:8px}
+  .cardrow .wm{font-size:11px;color:var(--text-mute);margin-top:2px}
+  .loading{text-align:center;color:var(--text-dim);font-size:14px;padding:30px 0}
+  .hidden{display:none}
+  a{color:var(--gold-3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><img src="logo.png?v=3" alt="BCC" /><strong>카드뉴스 공장</strong></div>
+
+  <!-- 로그인 -->
+  <div id="loginView">
+    <h1>관리자 로그인</h1>
+    <p class="sub">관리자 계정으로만 접근할 수 있습니다.</p>
+    <div class="card">
+      <div class="tabs">
+        <button type="button" class="tab active" data-mode="email">이메일</button>
+        <button type="button" class="tab" data-mode="phone">전화번호</button>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="row" id="rowEmail"><label for="email">이메일</label><input id="email" type="email" autocomplete="email" /></div>
+        <div class="row hidden" id="rowPhone"><label for="phone">전화번호</label><input id="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000" /></div>
+        <div class="row"><label for="pw">비밀번호</label><input id="pw" type="password" autocomplete="current-password" /></div>
+        <button type="submit" class="btn" id="loginBtn">로그인</button>
+        <p id="loginStatus" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 도구 -->
+  <div id="appView" class="hidden">
+    <div class="head">
+      <h1 style="text-align:left;font-size:20px">카드뉴스 만들기</h1>
+      <button class="logout" id="logoutBtn">로그아웃</button>
+    </div>
+
+    <!-- 입력 -->
+    <div id="inputView" class="card">
+      <div class="step-label">① 원본 스크립트</div>
+      <div class="row">
+        <textarea id="script" rows="8" placeholder="유튜브·스레드 등 터진 콘텐츠의 스크립트를 그대로 붙여넣으세요."></textarea>
+        <div class="muted">URL이 아니라 텍스트(자막)를 붙여넣어 주세요.</div>
+      </div>
+
+      <div class="step-label" style="margin-top:6px">② 이 카드뉴스의 목적</div>
+      <div class="purpose" id="purposeBtns">
+        <button type="button" class="pbtn" data-purpose="lecture_inquiry">강의문의</button>
+        <button type="button" class="pbtn" data-purpose="challenge_signup">챌린지신청</button>
+        <button type="button" class="pbtn" data-purpose="save_follow">저장·팔로우</button>
+      </div>
+
+      <div class="step-label" style="margin-top:6px">③ 어떤 의도로 만드세요? (홍보 대상 / 연결할 BCC 프로그램)</div>
+      <div class="row">
+        <textarea id="intent" rows="2" placeholder="예) AI에 불안한 40~50대 직장인에게, BCC의 'AI 커리어 전환 챌린지'로 연결하고 싶어요."></textarea>
+      </div>
+
+      <button type="button" class="btn" id="genBtn">구성표 생성</button>
+      <p id="genStatus" class="status" role="status" aria-live="polite"></p>
+    </div>
+
+    <!-- 로딩 -->
+    <div id="loadingView" class="card hidden">
+      <div class="loading">AI가 스크립트를 분석하고 구성표를 짜는 중입니다… (약 20~40초)</div>
+    </div>
+
+    <!-- 결과 -->
+    <div id="resultView" class="hidden">
+      <div class="analysis" id="analysisBox"></div>
+      <div id="cardsBox"></div>
+      <button type="button" class="btn ghost" id="againBtn" style="margin-top:6px">새 스크립트로 다시 만들기</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+  const API = window.BCC_API_BASE;
+  const PHONE_DOMAIN = 'phone.bcc.kr';
+  let loginMode = 'email';
+  let supabase = null;
+  let selectedPurpose = null;
+
+  const $ = (id) => document.getElementById(id);
+  const loginView = $('loginView'), appView = $('appView');
+  const setLoginStatus = (m, k) => { $('loginStatus').textContent = m; $('loginStatus').className = 'status' + (k ? ' ' + k : ''); };
+  const setGenStatus = (m, k) => { $('genStatus').textContent = m; $('genStatus').className = 'status' + (k ? ' ' + k : ''); };
+  const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  async function getClient() {
+    if (supabase) return supabase;
+    const c = await fetch(API + '/api/config').then((r) => r.json());
+    if (!c.supabaseUrl || !c.supabaseAnonKey) throw new Error('설정을 불러오지 못했습니다.');
+    supabase = createClient(c.supabaseUrl, c.supabaseAnonKey);
+    return supabase;
+  }
+
+  function showApp() { loginView.classList.add('hidden'); appView.classList.remove('hidden'); }
+
+  // 이미 로그인된 세션이 있으면 바로 도구로
+  (async () => {
+    try {
+      const sb = await getClient();
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.access_token) showApp();
+    } catch (e) { /* 로그인 화면 유지 */ }
+  })();
+
+  // 로그인 탭 전환
+  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
+    loginMode = t.dataset.mode;
+    document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('active', x === t));
+    $('rowEmail').classList.toggle('hidden', loginMode !== 'email');
+    $('rowPhone').classList.toggle('hidden', loginMode !== 'phone');
+    setLoginStatus('');
+  }));
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let email;
+    if (loginMode === 'phone') {
+      const digits = $('phone').value.replace(/\D/g, '');
+      if (digits.length < 10) { setLoginStatus('전화번호를 정확히 입력해 주세요.', 'err'); return; }
+      email = digits + '@' + PHONE_DOMAIN;
+    } else {
+      email = $('email').value.trim();
+    }
+    const pw = $('pw').value;
+    if (!email || !pw) { setLoginStatus('로그인 정보를 입력해 주세요.', 'err'); return; }
+    $('loginBtn').disabled = true; setLoginStatus('로그인 중…');
+    try {
+      const sb = await getClient();
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error || !data.session) throw new Error('이메일/전화번호 또는 비밀번호가 올바르지 않습니다.');
+      showApp();
+    } catch (err) {
+      setLoginStatus(err.message || '로그인에 실패했습니다.', 'err');
+      $('loginBtn').disabled = false;
+    }
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    try { const sb = await getClient(); await sb.auth.signOut(); } catch (e) {}
+    location.reload();
+  });
+
+  // 목적 선택
+  $('purposeBtns').addEventListener('click', (e) => {
+    const b = e.target.closest('.pbtn'); if (!b) return;
+    selectedPurpose = b.dataset.purpose;
+    document.querySelectorAll('.pbtn').forEach((x) => x.classList.toggle('active', x === b));
+    setGenStatus('');
+  });
+
+  // 생성
+  $('genBtn').addEventListener('click', async () => {
+    const script = $('script').value.trim();
+    const intent = $('intent').value.trim();
+    if (script.length < 30) { setGenStatus('스크립트를 30자 이상 붙여넣어 주세요.', 'err'); return; }
+    if (!selectedPurpose) { setGenStatus('목적을 선택해 주세요.', 'err'); return; }
+
+    let token;
+    try {
+      const sb = await getClient();
+      const { data: { session } } = await sb.auth.getSession();
+      token = session?.access_token;
+      if (!token) throw new Error('로그인이 만료되었습니다. 새로고침 후 다시 로그인하세요.');
+    } catch (err) { setGenStatus(err.message, 'err'); return; }
+
+    $('inputView').classList.add('hidden');
+    $('loadingView').classList.remove('hidden');
+    $('resultView').classList.add('hidden');
+
+    try {
+      const res = await fetch(API + '/api/cardnews-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ script, purpose: selectedPurpose, intent }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
+      renderResult(data);
+    } catch (err) {
+      $('loadingView').classList.add('hidden');
+      $('inputView').classList.remove('hidden');
+      setGenStatus(err.message || '생성 중 오류가 발생했습니다.', 'err');
+    }
+  });
+
+  function renderResult(data) {
+    const a = data.analysis || {};
+    const why = (a.why_worked || []).map((x) => '<li>' + esc(x) + '</li>').join('');
+    $('analysisBox').innerHTML =
+      '<h3>📊 이 콘텐츠가 먹힌 이유</h3><ul>' + why + '</ul>' +
+      '<div class="core"><strong>가져갈 핵심 10%:</strong> ' + esc(a.core_10pct || '') + '</div>';
+
+    const cards = data.cards || [];
+    $('cardsBox').innerHTML =
+      '<div class="step-label">구성표 · 총 ' + cards.length + '장</div>' +
+      cards.map((c) =>
+        '<div class="cardrow">' +
+          '<div class="meta"><span class="no">' + esc(c.no) + '번</span><span class="flow">' + esc(c.flow) + '</span></div>' +
+          '<div class="title">' + esc(c.title) + '</div>' +
+          '<div class="body">' + esc(c.body) + '</div>' +
+          '<div class="role">역할: ' + esc(c.role) + '</div>' +
+          '<div class="wm">' + esc(c.watermark) + '</div>' +
+        '</div>'
+      ).join('');
+
+    $('loadingView').classList.add('hidden');
+    $('resultView').classList.remove('hidden');
+  }
+
+  $('againBtn').addEventListener('click', () => {
+    $('resultView').classList.add('hidden');
+    $('inputView').classList.remove('hidden');
+    setGenStatus('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
