@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     const p = String(prompt).slice(0, 900);
     const payload = (model === 'dall-e-3')
       ? { model, prompt: p, n: 1, size: '1024x1024', quality: (process.env.OPENAI_IMAGE_QUALITY === 'hd' ? 'hd' : 'standard'), response_format: 'b64_json' }
-      : { model, prompt: p, n: 1, size: '1024x1024', quality: process.env.OPENAI_IMAGE_QUALITY || 'medium', output_format: 'png' };
+      : { model, prompt: p, n: 1, size: '1024x1024', quality: process.env.OPENAI_IMAGE_QUALITY || 'low', output_format: 'png' };
 
     const r = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -52,6 +52,6 @@ export default async function handler(req, res) {
     return res.json({ b64 });
   } catch (err) {
     console.error('illustrate error:', err?.message || err);
-    return res.status(500).json({ error: '일러스트 생성 중 오류가 발생했습니다.' });
+    return res.status(500).json({ error: '서버 예외: ' + (err?.message || String(err)) });
   }
 }
