@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   if (error) return res.status(500).json({ error: '수강이력 조회에 실패했습니다.' });
 
   const { data: profile } = await db
-    .from('profiles').select('name, email, status').eq('id', user.id).single();
+    .from('profiles').select('name, email, status, is_admin').eq('id', user.id).single();
 
   return res.json({ profile: profile || null, enrollments: data || [] });
 }
