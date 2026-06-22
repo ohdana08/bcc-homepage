@@ -100,6 +100,15 @@
       <button class="logout" id="logoutBtn">로그아웃</button>
     </div>
 
+    <!-- 기본 설정(한 번만 저장하면 계속 적용) -->
+    <div class="card" id="settingsCard" style="padding:14px 18px">
+      <div class="step-label" style="margin-bottom:8px">기본 설정 (브라우저에 저장 — 매번 입력 불필요)</div>
+      <div class="row" style="margin-bottom:0">
+        <label for="kakaoLink">카카오톡 링크 — 마지막 CTA 카드에 QR로 자동 삽입 (비우면 QR 없음)</label>
+        <input id="kakaoLink" type="url" placeholder="http://pf.kakao.com/..." />
+      </div>
+    </div>
+
     <!-- 입력 -->
     <div id="inputView" class="card">
       <div class="step-label">① 원본 스크립트</div>
@@ -153,8 +162,11 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
   import JSZip from 'https://esm.sh/jszip@3.10.1';
+  import QRCode from 'https://esm.sh/qrcode@1.5.4';
 
   const API = window.BCC_API_BASE;
+  const KAKAO_KEY = 'bcc_cta_kakao';                                  // localStorage 키
+  const DEFAULT_KAKAO = 'http://pf.kakao.com/_xbrxjxkxj/chat';        // 기본값(예림 카톡 채널)
   const PHONE_DOMAIN = 'phone.bcc.kr';
   let loginMode = 'email';
   let supabase = null;
@@ -225,6 +237,13 @@
     try { const sb = await getClient(); await sb.auth.signOut(); } catch (e) {}
     location.reload();
   });
+
+  // 카카오톡 링크 기본값 — 처음이면 기본값 저장, 입력 시 즉시 저장
+  (function initKakao() {
+    if (localStorage.getItem(KAKAO_KEY) === null) localStorage.setItem(KAKAO_KEY, DEFAULT_KAKAO);
+    $('kakaoLink').value = localStorage.getItem(KAKAO_KEY) || '';
+  })();
+  $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
 
   // 목적 선택
   $('purposeBtns').addEventListener('click', (e) => {
@@ -310,6 +329,25 @@
     return h % 360;
   }
 
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+
+  // 카카오톡 링크 → QR 이미지(데이터URL→Image). 실패하면 null(그러면 QR 생략).
+  async function makeQR(text) {
+    try {
+      const dataUrl = await QRCode.toDataURL(text, {
+        margin: 1, width: 480, errorCorrectionLevel: 'M',
+        color: { dark: '#0b0d12', light: '#ffffff' },
+      });
+      return await loadImage(dataUrl);
+    } catch (e) { return null; }
+  }
+
   async function ensureFont() {
     try {
       await Promise.all([
@@ -347,8 +385,9 @@
     return out;
   }
 
-  function drawCard(card, idx, total, img) {
+  function drawCard(card, idx, total, img, qrImg) {
     const W = 1080, H = 1080, M = 84, cw = W - 2 * M;
+    const isCTA = (String(card.flow || '').toUpperCase() === 'CTA') || (idx === total - 1);
     const cv = document.createElement('canvas');
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
@@ -392,21 +431,39 @@
       if (fits) break; ts -= 2;
     }
     const lh = ts * 1.14, tH = lines.length * lh;
-    const top = 320, bottom = 780;
+    const top = 320, bottom = (isCTA && qrImg) ? 560 : 780;  // CTA+QR 이면 제목 영역을 위로 압축
     let y = top + Math.max(0, ((bottom - top) - tH) / 2);
     ctx.font = '800 ' + ts + 'px ' + FONT; ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 2;
     for (const ln of lines) { ctx.fillText(ln, M, y); y += lh; }
     ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
-    // 5) 본문 — 연회색, 작게. 하단 정렬.
-    ctx.font = '500 38px ' + FONT; ctx.fillStyle = 'rgba(240,240,245,0.92)';
-    const bl = wrapLines(ctx, String(card.body || '').replace(/\*/g, ''), cw);
-    const blh = 38 * 1.42, bH = bl.length * blh;
-    let by = H - 168 - bH;
-    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
-    for (const ln of bl) { ctx.fillText(ln, M, by); by += blh; }
-    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+    if (isCTA && qrImg) {
+      // 5-CTA) 카카오톡 QR(흰 패널, 스캔용) + 안내 문구
+      const P = 248, pad = 16, qrSize = P - pad * 2;
+      const px = M, pBottom = H - 150, py = pBottom - P;
+      roundRect(ctx, px, py, P, P, 18); ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.drawImage(qrImg, px + pad, py + pad, qrSize, qrSize);
+      // 안내 문구(본문이 있으면 본문, 없으면 기본 문구) — QR 오른쪽 세로 가운데
+      const capText = String(card.body || '').trim() ? String(card.body).replace(/\*/g, '') : '카카오톡으로\n바로 상담하기';
+      const capX = px + P + 30, capW = cw - (P + 30);
+      ctx.font = '800 34px ' + FONT; ctx.fillStyle = '#ffffff';
+      const capLines = wrapLines(ctx, capText, capW);
+      const clh = 34 * 1.28, capH = capLines.length * clh;
+      let cy = py + Math.max(0, (P - capH) / 2);
+      ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
+      for (const ln of capLines) { ctx.fillText(ln, capX, cy); cy += clh; }
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+    } else {
+      // 5) 본문 — 연회색, 작게. 하단 정렬.
+      ctx.font = '500 38px ' + FONT; ctx.fillStyle = 'rgba(240,240,245,0.92)';
+      const bl = wrapLines(ctx, String(card.body || '').replace(/\*/g, ''), cw);
+      const blh = 38 * 1.42, bH = bl.length * blh;
+      let by = H - 168 - bH;
+      ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
+      for (const ln of bl) { ctx.fillText(ln, M, by); by += blh; }
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+    }
 
     // 6) 워터마크
     ctx.font = '600 23px ' + FONT; ctx.fillStyle = 'rgba(255,255,255,0.55)';
@@ -450,10 +507,13 @@
       // 2) 폰트 보장 후 렌더
       $('renderStatus').textContent = '폰트 로딩 및 렌더링 중…';
       await ensureFont();
+      // CTA 카드용 카카오톡 QR (저장된 기본값)
+      const kakao = (localStorage.getItem(KAKAO_KEY) || '').trim();
+      const qrImg = kakao ? await makeQR(kakao) : null;
       const grid = $('previewGrid'); grid.innerHTML = ''; renderedCanvases = [];
       for (let i = 0; i < lastCards.length; i++) {
         const img = await loadImage(imgMap[i]);
-        const cv = drawCard(lastCards[i], i, lastCards.length, img);
+        const cv = drawCard(lastCards[i], i, lastCards.length, img, qrImg);
         renderedCanvases.push(cv);
 
         const fig = document.createElement('figure');
