@@ -169,8 +169,7 @@
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-  import JSZip from 'https://esm.sh/jszip@3.10.1';
-  import QRCode from 'https://esm.sh/qrcode@1.5.4';
+  // JSZip / QRCode 는 필요할 때만 동적 import (CDN 실패해도 페이지는 정상 로드)
 
   const API = window.BCC_API_BASE;
   const KAKAO_KEY = 'bcc_cta_kakao';                                  // localStorage 키
@@ -373,9 +372,11 @@
   }
 
   // 카카오톡 링크 → QR 이미지(데이터URL→Image). 실패하면 null(그러면 QR 생략).
+  let _QR = null;
   async function makeQR(text) {
     try {
-      const dataUrl = await QRCode.toDataURL(text, {
+      if (!_QR) _QR = (await import('https://esm.sh/qrcode@1.5.4')).default;
+      const dataUrl = await _QR.toDataURL(text, {
         margin: 1, width: 480, errorCorrectionLevel: 'M',
         color: { dark: '#0b0d12', light: '#ffffff' },
       });
@@ -706,6 +707,7 @@
     if (!renderedCanvases.length) return;
     const btn = $('zipBtn'); btn.disabled = true;
     try {
+      const JSZip = (await import('https://esm.sh/jszip@3.10.1')).default;
       const zip = new JSZip();
       for (let i = 0; i < renderedCanvases.length; i++) {
         zip.file('card-' + String(i + 1).padStart(2, '0') + '.png', await canvasBlob(renderedCanvases[i]));
