@@ -1,7 +1,5 @@
-// POST /api/illustrate — 관리자 전용 AI 일러스트 생성(2탄 스타일)
-// 카드 1장당 1회 호출(프롬프트 → 투명배경 PNG base64 반환). 클라이언트가 라이트 카드에 올린다.
-// ★ OPENAI_API_KEY 는 이 서버 함수에만 존재한다. 미설정이면 503 → 프론트가 일러스트 없이 진행.
-// Vercel 응답 4.5MB 제한 때문에 "배치"가 아니라 카드당 1장씩 받는다.
+// POST /api/illustrate — 관리자 전용 AI 일러스트(2탄). Pollinations AI(무료·키 불필요) 프록시.
+// 캔버스 PNG 내보내기가 깨지지 않도록 서버에서 이미지를 받아 base64 로 돌려준다(CORS 안전).
 import { supabaseAdmin } from '../lib/supabase.js';
 import { applyCors } from '../lib/cors.js';
 
@@ -20,36 +18,25 @@ export default async function handler(req, res) {
   const { data: profile } = await db.from('profiles').select('is_admin').eq('id', user.id).single();
   if (!profile?.is_admin) return res.status(403).json({ error: '관리자만 사용할 수 있습니다.' });
 
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) return res.status(503).json({ error: 'OPENAI_API_KEY 미설정' });
-
-  const { prompt } = req.body || {};
+  const { prompt, seed } = req.body || {};
   if (!prompt || String(prompt).trim().length < 4) {
     return res.status(400).json({ error: 'prompt 가 필요합니다.' });
   }
 
   try {
-    // 모델별로 파라미터가 다르다. gpt-image-1 은 output_format/quality(low|medium|high),
-    // dall-e-3 는 response_format/quality(standard|hd) 를 쓴다(org 인증 불필요한 우회용).
-    const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
     const p = String(prompt).slice(0, 900);
-    const payload = (model === 'dall-e-3')
-      ? { model, prompt: p, n: 1, size: '1024x1024', quality: (process.env.OPENAI_IMAGE_QUALITY === 'hd' ? 'hd' : 'standard'), response_format: 'b64_json' }
-      : { model, prompt: p, n: 1, size: '1024x1024', quality: process.env.OPENAI_IMAGE_QUALITY || 'low', output_format: 'png' };
-
-    const r = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
-      body: JSON.stringify(payload),
-    });
-    const j = await r.json().catch(() => ({}));
+    const sd = Number.isFinite(seed) ? seed : 0;
+    const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(p)
+      + '?width=1024&height=1024&nologo=true&model=flux&seed=' + sd;
+    const r = await fetch(url, { headers: { Accept: 'image/*' } });
     if (!r.ok) {
-      const msg = j?.error?.message || ('이미지 생성 실패(' + r.status + ')');
-      return res.status(r.status === 429 ? 429 : 502).json({ error: msg });
+      const t = await r.text().catch(() => '');
+      return res.status(r.status === 429 ? 429 : 502).json({ error: '이미지 생성 실패(' + r.status + ') ' + t.slice(0, 120) });
     }
-    const b64 = j?.data?.[0]?.b64_json;
-    if (!b64) return res.status(502).json({ error: '이미지 응답이 비어 있습니다.' });
-    return res.json({ b64 });
+    const ct = r.headers.get('content-type') || 'image/jpeg';
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (!buf.length) return res.status(502).json({ error: '이미지 응답이 비어 있습니다.' });
+    return res.json({ b64: buf.toString('base64'), mediaType: ct });
   } catch (err) {
     console.error('illustrate error:', err?.message || err);
     return res.status(500).json({ error: '서버 예외: ' + (err?.message || String(err)) });

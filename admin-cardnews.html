@@ -686,7 +686,7 @@
         // 2탄 — AI 일러스트 (카드당 1장 병렬 생성)
         $('renderStatus').textContent = 'AI 일러스트 생성 중… (20~40초)';
         let illuErr = '';
-        const illus = await Promise.all(lastCards.map(async (c) => {
+        const illus = await Promise.all(lastCards.map(async (c, i) => {
           try {
             const subject = c.bg_query || c.flow || 'people talking';
             const prompt = 'Soft warm Korean webtoon illustration, semi-realistic, gentle watercolor and colored-pencil texture, pastel cozy lighting, emotional wholesome mood. Scene: ' + subject
@@ -694,10 +694,10 @@
             const r = await fetch(API + '/api/illustrate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-              body: JSON.stringify({ prompt }),
+              body: JSON.stringify({ prompt, seed: i + 1 }),
             });
             const d = await r.json().catch(() => ({}));
-            if (r.ok && d.b64) return await loadImage('data:image/png;base64,' + d.b64);
+            if (r.ok && d.b64) return await loadImage('data:' + (d.mediaType || 'image/jpeg') + ';base64,' + d.b64);
             if (!r.ok && !illuErr) illuErr = d.error || ('이미지 생성 실패(' + r.status + ')');
             return null;
           } catch (e) { return null; }
@@ -706,7 +706,7 @@
         for (let i = 0; i < lastCards.length; i++) {
           appendPreview(drawCardIllu(lastCards[i], i, lastCards.length, illus[i], qrImg), i, lastCards[i].flow);
         }
-        if (!illus.some(Boolean)) note = illuErr ? ('일러스트 생성 실패: ' + illuErr) : 'OPENAI_API_KEY 설정 전이라 일러스트 없이 밝은 카드로 만들었어요.';
+        if (!illus.some(Boolean)) note = illuErr ? ('일러스트 생성 실패: ' + illuErr) : '일러스트를 불러오지 못해 밝은 카드로 만들었어요. 잠시 후 다시 시도해 보세요.';
       } else {
         // 1탄 — 사진 배경
         $('renderStatus').textContent = '배경 사진 검색 중…';
