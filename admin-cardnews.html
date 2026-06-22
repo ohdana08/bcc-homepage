@@ -420,6 +420,13 @@
     return out;
   }
 
+  // *별표* 강조 파싱: 홀수 토큰이 강조 구간
+  function parseRuns(line) {
+    const parts = String(line).split('*'); const runs = [];
+    for (let i = 0; i < parts.length; i++) { if (parts[i] === '') continue; runs.push({ text: parts[i], em: i % 2 === 1 }); }
+    return runs.length ? runs : [{ text: String(line), em: false }];
+  }
+
   function drawCard(card, idx, total, img, qrImg) {
     const W = 1080, H = 1080, M = 84, cw = W - 2 * M;
     const isCTA = (String(card.flow || '').toUpperCase() === 'CTA') || (idx === total - 1);
@@ -507,76 +514,95 @@
     return cv;
   }
 
-  // 2탄 — 밝고 심플한 라이트 카드 + (있으면) 투명배경 AI 일러스트
+  // 2탄 — 레퍼런스 스타일: 파스텔 배경 + 상단 텍스트(형광펜 강조) + 하단 풀블리드 일러스트
   function drawCardIllu(card, idx, total, illuImg, qrImg) {
-    const W = 1080, H = 1080, M = 84, cw = W - 2 * M;
+    const W = 1080, H = 1080, M = 76, cw = W - 2 * M;
     const isCTA = (String(card.flow || '').toUpperCase() === 'CTA') || (idx === total - 1);
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
     ctx.textBaseline = 'top'; ctx.textAlign = 'left';
 
-    // 밝은 배경 (크림 → 옅은 베이지 그라데이션)
+    const ink = '#23262e', sub = '#5c606b', faint = '#9aa0a6';
+    const hasBottom = (isCTA && qrImg) || !!illuImg;
+    const splitY = hasBottom ? 560 : H;   // 하단 영역 시작(없으면 텍스트 전체)
+
+    // 1) 파스텔 배경 (민트 → 크림)
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#FAF7F1'); g.addColorStop(1, '#EFEBE3');
+    g.addColorStop(0, '#E9F5EF'); g.addColorStop(0.55, '#FBF8F1'); g.addColorStop(1, '#F2ECE0');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-    const ink = '#1f2330', sub = '#6b6f7a', gold = '#C9A84C', faint = '#a9a59b';
-
-    // 상단 라벨 + 페이지 번호
-    ctx.font = '700 26px ' + FONT; ctx.fillStyle = gold;
-    ctx.fillText(String(card.flow || '').toUpperCase(), M, 92);
-    ctx.textAlign = 'right'; ctx.font = '600 24px ' + FONT; ctx.fillStyle = faint;
-    ctx.fillText((idx + 1) + ' / ' + total, W - M, 94);
-    ctx.textAlign = 'left';
-
-    // 일러스트(투명 PNG) — 상단 영역에 contain
-    const hasIllu = !!illuImg;
-    const illuBottom = (isCTA && qrImg) ? 470 : 600;
-    if (hasIllu) {
-      const bx = M, by = 150, bw = cw, bh = illuBottom - by;
-      const r = Math.min(bw / illuImg.width, bh / illuImg.height);
-      const iw = illuImg.width * r, ih = illuImg.height * r;
-      ctx.drawImage(illuImg, bx + (bw - iw) / 2, by + (bh - ih) / 2, iw, ih);
-    }
-
-    // 제목 — 진한 잉크색, 굵게
-    const lines = String(card.title || '').replace(/\*/g, '').split('\n').map((s) => s.trim()).filter(Boolean);
-    let ts = 84; const minTs = 50;
-    const widthAt = (ln, s) => { ctx.font = '800 ' + s + 'px ' + FONT; return ctx.measureText(ln).width; };
-    while (ts > minTs) { if (lines.every((ln) => widthAt(ln, ts) <= cw)) break; ts -= 2; }
-    const lh = ts * 1.14;
-    let ty = hasIllu ? (illuBottom + 28) : 360;
-    ctx.font = '800 ' + ts + 'px ' + FONT; ctx.fillStyle = ink;
-    for (const ln of lines) { ctx.fillText(ln, M, ty); ty += lh; }
-
+    // 2) 하단 영역 — CTA면 QR, 아니면 풀블리드 일러스트
     if (isCTA && qrImg) {
-      // CTA QR — 라이트 배경이라 흰 패널 + 옅은 테두리
-      const P = 230, pad = 14, qrSize = P - pad * 2;
-      const px = M, pBottom = H - 150, py = pBottom - P;
-      roundRect(ctx, px, py, P, P, 16); ctx.fillStyle = '#ffffff'; ctx.fill();
-      ctx.strokeStyle = '#e3ddd0'; ctx.lineWidth = 2; ctx.stroke();
+      const P = 300, pad = 18, qrSize = P - pad * 2;
+      const px = (W - P) / 2, py = splitY + ((H - splitY) - P) / 2 - 20;
+      roundRect(ctx, px, py, P, P, 22); ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.strokeStyle = '#e6dfd0'; ctx.lineWidth = 2; ctx.stroke();
       ctx.drawImage(qrImg, px + pad, py + pad, qrSize, qrSize);
-      const capText = String(card.body || '').trim() ? String(card.body).replace(/\*/g, '') : '카카오톡으로\n바로 상담하기';
-      const capX = px + P + 28, capW = cw - (P + 28);
-      ctx.font = '800 32px ' + FONT; ctx.fillStyle = ink;
-      const capLines = wrapLines(ctx, capText, capW);
-      const clh = 32 * 1.3, capH = capLines.length * clh;
-      let cy = py + Math.max(0, (P - capH) / 2);
-      for (const ln of capLines) { ctx.fillText(ln, capX, cy); cy += clh; }
-    } else {
-      // 본문 — 회색
-      ctx.font = '500 36px ' + FONT; ctx.fillStyle = sub;
-      const bl = wrapLines(ctx, String(card.body || '').replace(/\*/g, ''), cw);
-      const blh = 36 * 1.42, bH = bl.length * blh;
-      let bodyY = ty + 12;
-      const maxStart = H - 150 - bH;
-      if (bodyY > maxStart) bodyY = maxStart;
-      for (const ln of bl) { ctx.fillText(ln, M, bodyY); bodyY += blh; }
+      ctx.font = '700 30px ' + FONT; ctx.fillStyle = sub; ctx.textAlign = 'center';
+      ctx.fillText('카카오톡으로 바로 상담', W / 2, py + P + 18); ctx.textAlign = 'left';
+    } else if (illuImg) {
+      const rh = H - splitY;
+      const r = Math.max(W / illuImg.width, rh / illuImg.height);
+      const iw = illuImg.width * r, ih = illuImg.height * r;
+      ctx.save(); ctx.beginPath(); ctx.rect(0, splitY, W, rh); ctx.clip();
+      ctx.drawImage(illuImg, (W - iw) / 2, splitY + (rh - ih) / 2, iw, ih);
+      ctx.restore();
+      const fade = ctx.createLinearGradient(0, splitY - 50, 0, splitY + 70);
+      fade.addColorStop(0, '#F6F1E6'); fade.addColorStop(1, 'rgba(246,241,230,0)');
+      ctx.fillStyle = fade; ctx.fillRect(0, splitY - 50, W, 120);
     }
 
-    // 워터마크
-    ctx.font = '600 23px ' + FONT; ctx.fillStyle = faint;
-    ctx.fillText(card.watermark || '@business_career_consulting', M, H - 70);
+    // 3) 페이지 번호 (우상단 회색 알약)
+    ctx.font = '700 24px ' + FONT;
+    const pageTxt = (idx + 1) + ' / ' + total;
+    const pillW = ctx.measureText(pageTxt).width + 28, pillH = 38, pillX = W - M - pillW, pillY = 40;
+    roundRect(ctx, pillX, pillY, pillW, pillH, pillH / 2); ctx.fillStyle = 'rgba(60,64,72,0.55)'; ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(pageTxt, pillX + pillW / 2, pillY + pillH / 2 + 1);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+
+    // 4) 상단 텍스트 — 가운데 정렬, 형광펜 강조 제목 + 회색 본문
+    function centerLine(line, yTop, fs, weight, emMode) {
+      const runs = parseRuns(line);
+      ctx.font = weight + ' ' + fs + 'px ' + FONT;
+      let tot = 0; for (const r of runs) tot += ctx.measureText(r.text).width;
+      const x = (W - tot) / 2;
+      if (emMode === 'mark') {
+        let cx = x;
+        for (const r of runs) { const w = ctx.measureText(r.text).width; if (r.em) { ctx.fillStyle = '#FFE94D'; ctx.fillRect(cx - 5, yTop + fs * 0.12, w + 10, fs * 0.84); } cx += w; }
+      }
+      let cx = x;
+      for (const r of runs) {
+        ctx.fillStyle = r.em ? (emMode === 'red' ? '#E23B3B' : ink) : (emMode === 'red' ? sub : ink);
+        ctx.fillText(r.text, cx, yTop); cx += ctx.measureText(r.text).width;
+      }
+    }
+
+    const tLines = String(card.title || '').split('\n').map((s) => s.trim()).filter(Boolean);
+    let ts = 64; const tMin = 40;
+    const tW = (ln, s) => { ctx.font = '800 ' + s + 'px ' + FONT; return ctx.measureText(stripEmph(ln)).width; };
+    while (ts > tMin) { if (tLines.every((ln) => tW(ln, ts) <= cw)) break; ts -= 2; }
+    const tlh = ts * 1.28;
+
+    const bLines = String(card.body || '').split('\n').map((s) => s.trim()).filter(Boolean);
+    let bs = 38;
+    const bW = (ln, s) => { ctx.font = '500 ' + s + 'px ' + FONT; return ctx.measureText(stripEmph(ln)).width; };
+    while (bs > 26) { if (bLines.every((ln) => bW(ln, bs) <= cw)) break; bs -= 2; }
+    const blh = bs * 1.4;
+
+    const blockH = tLines.length * tlh + (bLines.length ? 22 + bLines.length * blh : 0);
+    const region = (splitY === H) ? H : splitY;
+    let y = Math.max(70, (region - blockH) / 2 - 10);
+    for (const ln of tLines) { centerLine(ln, y, ts, '800', 'mark'); y += tlh; }
+    if (bLines.length) { y += 22; for (const ln of bLines) { centerLine(ln, y, bs, '500', 'red'); y += blh; } }
+
+    // 5) 워터마크 (좌하단)
+    ctx.font = '600 22px ' + FONT;
+    if (illuImg) { ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 8; ctx.fillStyle = 'rgba(255,255,255,0.92)'; }
+    else { ctx.fillStyle = faint; }
+    ctx.fillText(card.watermark || '@business_career_consulting', M, H - 56);
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+
     return cv;
   }
 
@@ -625,9 +651,9 @@
         $('renderStatus').textContent = 'AI 일러스트 생성 중… (20~40초)';
         const illus = await Promise.all(lastCards.map(async (c) => {
           try {
-            const subject = c.bg_query || c.flow || 'concept';
-            const prompt = 'Simple flat vector illustration of ' + subject
-              + ', minimal, clean, friendly, modern, soft rounded shapes, muted warm palette, single centered subject, transparent background, no text, no letters, no words.';
+            const subject = c.bg_query || c.flow || 'people talking';
+            const prompt = 'Soft warm Korean webtoon illustration, semi-realistic, gentle watercolor and colored-pencil texture, pastel cozy lighting, emotional wholesome mood. Scene: ' + subject
+              + '. Natural composition, no text, no letters, no words, no captions, no speech bubbles.';
             const r = await fetch(API + '/api/illustrate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },

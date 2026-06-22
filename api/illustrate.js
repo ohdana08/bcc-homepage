@@ -37,8 +37,7 @@ export default async function handler(req, res) {
         prompt: String(prompt).slice(0, 900),
         n: 1,
         size: '1024x1024',
-        quality: process.env.OPENAI_IMAGE_QUALITY || 'low', // low|medium|high
-        background: 'transparent',
+        quality: process.env.OPENAI_IMAGE_QUALITY || 'medium', // low|medium|high
         output_format: 'png',
       }),
     });

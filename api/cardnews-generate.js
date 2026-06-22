@@ -46,8 +46,9 @@ const SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 "터진 콘텐�
 
 # 디자인/길이 규칙 (1080×1080 정사각형 카드 기준)
 - title: 제목. 2~4줄. 한 줄은 한글 8~13자 권장. 의미 단위로 줄바꿈하고 줄바꿈은 \\n 으로 표기한다.
+  · 제목에서 핵심 단어 1~3개를 *별표*로 감싸 강조 표시한다(형광펜 효과용). 예: "*맞아* 대신\\n*그럴 수 있겠다*". (body에는 별표를 쓰지 않는다.)
 - body: 본문. 2~3줄. 한 줄 13~18자 권장. 제목을 반복하지 말고 맥락·근거·다음 행동을 짧게.
-- bg_query: 이 카드 배경 사진을 찾기 위한 Unsplash 검색어를 영어 1~2단어로 넣는다. 카드의 감정·맥락과 어울리되 너무 직설적이지 않게. 예: "office burnout", "city night", "sunrise mountain", "focused work", "crowd blur".
+- bg_query: 이 카드의 "장면"을 묘사하는 영어 검색어 2~4단어. 인물·감정·상황을 담아도 좋다(일러스트/사진 배경 공용). 예: "two friends talking cafe", "tired office worker", "confident woman smiling", "city night street", "team meeting".
 - flow: Hook | Pain | Step | Result | CTA 중 하나.
 - role: 그 카드의 역할을 한 줄로(예: "강한 약속", "공감 후킹", "해결 제시", "행동 유도").
 - watermark: 일반 카드는 "@business_career_consulting", 마지막 CTA 카드만 "BCC · @business_career_consulting".
