@@ -29,17 +29,18 @@ export default async function handler(req, res) {
   }
 
   try {
+    // 모델별로 파라미터가 다르다. gpt-image-1 은 output_format/quality(low|medium|high),
+    // dall-e-3 는 response_format/quality(standard|hd) 를 쓴다(org 인증 불필요한 우회용).
+    const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
+    const p = String(prompt).slice(0, 900);
+    const payload = (model === 'dall-e-3')
+      ? { model, prompt: p, n: 1, size: '1024x1024', quality: (process.env.OPENAI_IMAGE_QUALITY === 'hd' ? 'hd' : 'standard'), response_format: 'b64_json' }
+      : { model, prompt: p, n: 1, size: '1024x1024', quality: process.env.OPENAI_IMAGE_QUALITY || 'medium', output_format: 'png' };
+
     const r = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
-      body: JSON.stringify({
-        model: process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1',
-        prompt: String(prompt).slice(0, 900),
-        n: 1,
-        size: '1024x1024',
-        quality: process.env.OPENAI_IMAGE_QUALITY || 'medium', // low|medium|high
-        output_format: 'png',
-      }),
+      body: JSON.stringify(payload),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) {

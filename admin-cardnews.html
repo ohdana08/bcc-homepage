@@ -685,6 +685,7 @@
       if (selectedStyle === 'illu') {
         // 2탄 — AI 일러스트 (카드당 1장 병렬 생성)
         $('renderStatus').textContent = 'AI 일러스트 생성 중… (20~40초)';
+        let illuErr = '';
         const illus = await Promise.all(lastCards.map(async (c) => {
           try {
             const subject = c.bg_query || c.flow || 'people talking';
@@ -697,6 +698,7 @@
             });
             const d = await r.json().catch(() => ({}));
             if (r.ok && d.b64) return await loadImage('data:image/png;base64,' + d.b64);
+            if (!r.ok && !illuErr) illuErr = d.error || ('이미지 생성 실패(' + r.status + ')');
             return null;
           } catch (e) { return null; }
         }));
@@ -704,7 +706,7 @@
         for (let i = 0; i < lastCards.length; i++) {
           appendPreview(drawCardIllu(lastCards[i], i, lastCards.length, illus[i], qrImg), i, lastCards[i].flow);
         }
-        if (!illus.some(Boolean)) note = 'OPENAI_API_KEY 설정 전이라 일러스트 없이 밝은 카드로 만들었어요. (키 추가 시 일러스트 자동 삽입)';
+        if (!illus.some(Boolean)) note = illuErr ? ('일러스트 생성 실패: ' + illuErr) : 'OPENAI_API_KEY 설정 전이라 일러스트 없이 밝은 카드로 만들었어요.';
       } else {
         // 1탄 — 사진 배경
         $('renderStatus').textContent = '배경 사진 검색 중…';
