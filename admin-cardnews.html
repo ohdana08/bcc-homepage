@@ -137,9 +137,10 @@
         <div class="muted" id="scriptHint">이미지가 아니라 텍스트만 가능합니다. 여러 글을 합쳐 넣어도 됩니다.</div>
       </div>
       <div class="row" id="imageRow" style="display:none">
-        <input id="imageFile" type="file" accept="image/*" />
+        <input id="imageFile" type="file" accept="image/*" multiple />
+        <div id="imageCount" class="muted" style="margin-top:6px"></div>
         <img id="imagePreview" alt="" style="display:none;max-width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--border)" />
-        <div class="muted">잘 터진 카드뉴스·게시글 캡처를 올리면, AI가 그 내용을 읽고 BCC용으로 재구성해요. (저작권 규칙대로 표현은 100% 새로 씀)</div>
+        <div class="muted">잘 터진 카드뉴스·게시글 캡처를 올리면(여러 장 가능, 최대 4장), AI가 그 내용을 읽고 BCC용으로 재구성해요. (저작권 규칙대로 표현은 100% 새로 씀)</div>
       </div>
 
       <div class="step-label" style="margin-top:6px">② 이 카드뉴스의 목적</div>
@@ -173,6 +174,10 @@
         <div class="purpose" id="styleBtns">
           <button type="button" class="pbtn active" data-style="photo">📷 사진 배경 (1탄)</button>
           <button type="button" class="pbtn" data-style="illu">🎨 AI 일러스트 (2탄)</button>
+        </div>
+        <div class="row" style="margin:2px 0 12px">
+          <label for="designStyle" style="font-size:13px;color:var(--text-dim)">🎨 디자인 스타일 (선택 · 2탄 AI 이미지에 적용 · 비우면 자동/레퍼런스 화풍)</label>
+          <input id="designStyle" type="text" placeholder="예: minimal flat pastel / 3D render / editorial magazine / watercolor / bold poster" />
         </div>
         <button type="button" class="btn" id="renderBtn">🖼 카드 이미지 생성 (1080×1080)</button>
         <p id="renderStatus" class="status"></p>
@@ -338,7 +343,7 @@
       $('renderStatus').className = 'status';
       $('renderStatus').textContent = '저장된 미리보기예요. 고화질 PNG/ZIP로 받으려면 "카드 이미지 생성"을 다시 누르세요.';
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    $('resultView').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   $('historyList').addEventListener('click', (ev) => {
     const del = ev.target.closest('[data-del]');
@@ -356,11 +361,12 @@
     $('imageRow').style.display = selectedInput === 'image' ? '' : 'none';
     setGenStatus('');
   });
-  // 이미지 미리보기
+  // 이미지 미리보기(첫 장) + 선택 개수
   $('imageFile').addEventListener('change', () => {
-    const f = $('imageFile').files[0];
-    if (!f) { $('imagePreview').style.display = 'none'; return; }
-    $('imagePreview').src = URL.createObjectURL(f);
+    const files = Array.from($('imageFile').files || []);
+    if (!files.length) { $('imagePreview').style.display = 'none'; $('imageCount').textContent = ''; return; }
+    $('imageCount').textContent = files.length + '장 선택됨' + (files.length > 4 ? ' (최대 4장까지 사용)' : '');
+    $('imagePreview').src = URL.createObjectURL(files[0]);
     $('imagePreview').style.display = 'block';
   });
 
@@ -410,11 +416,11 @@
     // 입력(텍스트/이미지)에 따라 요청 본문 구성
     let body;
     if (selectedInput === 'image') {
-      const f = $('imageFile').files[0];
-      if (!f) { setGenStatus('벤치마킹할 이미지를 올려주세요.', 'err'); return; }
+      const files = Array.from($('imageFile').files || []);
+      if (!files.length) { setGenStatus('벤치마킹할 이미지를 올려주세요.', 'err'); return; }
       try {
-        const { base64, mediaType } = await fileToScaledBase64(f);
-        body = { imageBase64: base64, imageMediaType: mediaType, purpose: selectedPurpose, intent };
+        const images = await Promise.all(files.slice(0, 4).map((f) => fileToScaledBase64(f)));
+        body = { images, purpose: selectedPurpose, intent };
       } catch (e) { setGenStatus('이미지를 읽지 못했습니다. 다른 파일로 시도해 주세요.', 'err'); return; }
     } else {
       const script = $('script').value.trim();
@@ -775,11 +781,12 @@
       if (selectedStyle === 'illu') {
         // 2탄 — AI 일러스트 (카드당 1장 병렬 생성)
         $('renderStatus').textContent = 'AI 일러스트 생성 중… (20~40초)';
+        const userStyle = ($('designStyle').value || '').trim();   // 사용자가 지정한 디자인 스타일
         let illuErr = '';
         const illus = await Promise.all(lastCards.map(async (c, i) => {
           try {
             const subject = c.bg_query || c.flow || 'people talking';
-            const style = (lastMeta && lastMeta.style_hint) || 'Soft warm Korean webtoon illustration, semi-realistic, gentle watercolor, pastel cozy lighting';
+            const style = userStyle || (lastMeta && lastMeta.style_hint) || 'Soft warm Korean webtoon illustration, semi-realistic, gentle watercolor, pastel cozy lighting';
             const prompt = style + '. Scene: ' + subject
               + '. Natural composition, no text, no letters, no words, no captions, no speech bubbles.';
             const r = await fetch(API + '/api/illustrate', {

@@ -128,9 +128,10 @@ export default async function handler(req, res) {
   if (!profile?.is_admin) return res.status(403).json({ error: '관리자만 사용할 수 있습니다.' });
 
   // 3) 입력 검증 (텍스트 벤치마킹 또는 이미지 벤치마킹)
-  const { script, purpose, intent, imageBase64, imageMediaType } = req.body || {};
+  const { script, purpose, intent, images } = req.body || {};
+  const imgs = Array.isArray(images) ? images.filter((im) => im && im.base64 && im.base64.length > 100).slice(0, 4) : [];
   const hasText = script && script.trim().length >= 30;
-  const hasImage = imageBase64 && imageBase64.length > 100;
+  const hasImage = imgs.length > 0;
   if (!hasText && !hasImage) {
     return res.status(400).json({ error: '텍스트(30자 이상) 또는 이미지를 입력해 주세요.' });
   }
@@ -151,8 +152,8 @@ export default async function handler(req, res) {
   let userMessageContent;
   if (hasImage) {
     userMessageContent = [
-      { type: 'image', source: { type: 'base64', media_type: imageMediaType || 'image/jpeg', data: imageBase64 } },
-      { type: 'text', text: header + '# 원본 콘텐츠\n첨부 이미지는 반응이 좋았던 카드뉴스/게시글 캡처다. 이미지 속 메시지·구조·흐름을 읽고, 저작권 규칙대로 표현을 100% 새로 써서 BCC 카드뉴스로 재구성하라.' },
+      ...imgs.map((im) => ({ type: 'image', source: { type: 'base64', media_type: im.mediaType || 'image/jpeg', data: im.base64 } })),
+      { type: 'text', text: header + '# 원본 콘텐츠\n첨부 이미지(들)는 반응이 좋았던 카드뉴스/게시글 캡처다. 이미지 속 메시지·구조·흐름을 읽고, 저작권 규칙대로 표현을 100% 새로 써서 BCC 카드뉴스로 재구성하라.' },
     ];
   } else {
     userMessageContent = header + '# 원본 콘텐츠(텍스트)\n' + script.trim();
