@@ -66,6 +66,16 @@
   .dlrow{display:flex;gap:8px;justify-content:center;margin-top:5px}
   .dlrow a{font-size:11px;color:var(--gold-3);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer}
   @media(max-width:480px){.preview-grid{grid-template-columns:1fr}}
+  /* 히스토리 */
+  .hist{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;background:var(--surface)}
+  .hist:hover{border-color:var(--gold)}
+  .histthumb{width:48px;height:48px;border-radius:8px;object-fit:cover;flex:none;background:#000}
+  .histthumb.ph{display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,.05)}
+  .histmeta{flex:1;min-width:0}
+  .histtitle{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .histsub{font-size:11px;color:var(--text-mute);margin-top:2px}
+  .histdel{background:none;border:none;color:var(--text-mute);font-size:14px;cursor:pointer;padding:4px 6px;flex:none}
+  .histdel:hover{color:#ff8080}
   .hidden{display:none}
   a{color:var(--gold-3)}
 </style>
@@ -107,6 +117,12 @@
         <label for="kakaoLink">카카오톡 링크 — 마지막 CTA 카드에 QR로 자동 삽입 (비우면 QR 없음)</label>
         <input id="kakaoLink" type="url" placeholder="http://pf.kakao.com/..." />
       </div>
+    </div>
+
+    <!-- 이전 카드뉴스 (브라우저 저장) -->
+    <div class="card" id="historyCard" style="display:none">
+      <div class="step-label" style="margin-bottom:10px">📁 이전 카드뉴스 (이 브라우저에 자동 저장)</div>
+      <div id="historyList"></div>
     </div>
 
     <!-- 입력 -->
@@ -185,8 +201,11 @@
   let selectedPurpose = null;
   let selectedInput = 'text';  // 'text'(텍스트 벤치마킹) | 'image'(이미지 벤치마킹)
   let lastCards = [];          // 마지막 생성된 구성표
+  let lastMeta = {};           // 마지막 구성표 메타(style_hint 등)
   let renderedCanvases = [];   // 렌더된 캔버스들
   let selectedStyle = 'photo'; // 'photo'(1탄) | 'illu'(2탄)
+  const HISTORY_KEY = 'bcc_cardnews_history';
+  let currentHistoryId = null; // 현재 보고 있는 히스토리 항목 id
 
   const $ = (id) => document.getElementById(id);
   const loginView = $('loginView'), appView = $('appView');
@@ -258,6 +277,68 @@
     $('kakaoLink').value = localStorage.getItem(KAKAO_KEY) || '';
   })();
   $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
+
+  // ───────── 히스토리 (브라우저 자동 저장) ─────────
+  function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; } }
+  function saveHistoryArr(arr) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
+    catch (e) { while (arr.length > 1) { arr.pop(); try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); return; } catch (e2) {} } }
+  }
+  function histTitle(data) {
+    const c = (data.cards && data.cards[0]) || {};
+    return (stripEmph(String(c.title || '').replace(/\n/g, ' ')).trim().slice(0, 28)) || '(제목 없음)';
+  }
+  function histDate(ts) { try { return new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  function renderHistoryList() {
+    const arr = loadHistory();
+    $('historyCard').style.display = arr.length ? 'block' : 'none';
+    $('historyList').innerHTML = arr.map((e) =>
+      '<div class="hist" data-id="' + e.id + '">'
+      + (e.thumbs && e.thumbs.length ? '<img class="histthumb" src="' + e.thumbs[0] + '" alt="">' : '<div class="histthumb ph">📝</div>')
+      + '<div class="histmeta"><div class="histtitle">' + esc(e.title) + '</div>'
+      + '<div class="histsub">' + histDate(e.ts) + ' · ' + ((e.data && e.data.cards && e.data.cards.length) || 0) + '장</div></div>'
+      + '<button class="histdel" data-del="' + e.id + '" title="삭제">✕</button>'
+      + '</div>'
+    ).join('');
+  }
+  function addHistoryEntry(data) {
+    const arr = loadHistory();
+    const id = 'h' + Date.now() + Math.floor(Math.random() * 1000);
+    arr.unshift({ id, ts: Date.now(), title: histTitle(data), data, thumbs: null });
+    if (arr.length > 30) arr.length = 30;
+    saveHistoryArr(arr); renderHistoryList();
+    return id;
+  }
+  function updateHistThumbs(id, thumbs) {
+    const arr = loadHistory(); const e = arr.find((x) => x.id === id); if (!e) return;
+    e.thumbs = thumbs; saveHistoryArr(arr); renderHistoryList();
+  }
+  function deleteHistory(id) { saveHistoryArr(loadHistory().filter((x) => x.id !== id)); renderHistoryList(); }
+  function openHistory(id) {
+    const e = loadHistory().find((x) => x.id === id); if (!e) return;
+    renderResult(e.data);              // 구성표 다시 표시(미리보기는 초기화됨)
+    currentHistoryId = id;
+    if (e.thumbs && e.thumbs.length) { // 저장된 썸네일을 미리보기로 표시
+      const grid = $('previewGrid'); grid.innerHTML = ''; renderedCanvases = [];
+      e.thumbs.forEach((src, i) => {
+        const fig = document.createElement('figure');
+        const img = new Image(); img.src = src; img.style.width = '100%'; img.style.borderRadius = '10px'; img.style.border = '1px solid var(--border)';
+        fig.appendChild(img);
+        const cap = document.createElement('figcaption'); cap.textContent = (i + 1) + '장'; fig.appendChild(cap);
+        grid.appendChild(fig);
+      });
+      $('previewWrap').classList.remove('hidden');
+      $('renderStatus').className = 'status';
+      $('renderStatus').textContent = '저장된 미리보기예요. 고화질 PNG/ZIP로 받으려면 "카드 이미지 생성"을 다시 누르세요.';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  $('historyList').addEventListener('click', (ev) => {
+    const del = ev.target.closest('[data-del]');
+    if (del) { ev.stopPropagation(); deleteHistory(del.dataset.del); return; }
+    const item = ev.target.closest('.hist'); if (item) openHistory(item.dataset.id);
+  });
+  renderHistoryList();
 
   // 입력 타입 탭 — 텍스트 벤치마킹 / 이미지 벤치마킹
   $('inputTabs').addEventListener('click', (e) => {
@@ -350,6 +431,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
       renderResult(data);
+      currentHistoryId = addHistoryEntry(data);   // 브라우저에 자동 저장
     } catch (err) {
       $('loadingView').classList.add('hidden');
       $('inputView').classList.remove('hidden');
@@ -366,6 +448,7 @@
 
     const cards = data.cards || [];
     lastCards = cards;
+    lastMeta = data.meta || {};
     $('cardsBox').innerHTML =
       '<div class="step-label">구성표 · 총 ' + cards.length + '장</div>' +
       cards.map((c) =>
@@ -689,7 +772,8 @@
         const illus = await Promise.all(lastCards.map(async (c, i) => {
           try {
             const subject = c.bg_query || c.flow || 'people talking';
-            const prompt = 'Soft warm Korean webtoon illustration, semi-realistic, gentle watercolor and colored-pencil texture, pastel cozy lighting, emotional wholesome mood. Scene: ' + subject
+            const style = (lastMeta && lastMeta.style_hint) || 'Soft warm Korean webtoon illustration, semi-realistic, gentle watercolor, pastel cozy lighting';
+            const prompt = style + '. Scene: ' + subject
               + '. Natural composition, no text, no letters, no words, no captions, no speech bubbles.';
             const r = await fetch(API + '/api/illustrate', {
               method: 'POST',
@@ -727,6 +811,16 @@
           appendPreview(drawCard(lastCards[i], i, lastCards.length, img, qrImg), i, lastCards[i].flow);
         }
         if (!Object.values(imgMap).some(Boolean)) note = 'Unsplash 키 설정 전이라 주제별 그라데이션 배경으로 만들었어요. (키 추가 시 사진으로 자동 교체)';
+      }
+
+      // 히스토리에 썸네일 저장(이 카드뉴스 항목에)
+      if (currentHistoryId && renderedCanvases.length) {
+        const thumbs = renderedCanvases.map((cv) => {
+          const t = document.createElement('canvas'); t.width = 256; t.height = 256;
+          t.getContext('2d').drawImage(cv, 0, 0, 256, 256);
+          return t.toDataURL('image/jpeg', 0.7);
+        });
+        updateHistThumbs(currentHistoryId, thumbs);
       }
 
       $('previewWrap').classList.remove('hidden');

@@ -49,6 +49,11 @@ const SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 "터진 콘텐�
   · 제목에서 핵심 단어 1~3개를 *별표*로 감싸 강조 표시한다(형광펜 효과용). 예: "*맞아* 대신\\n*그럴 수 있겠다*". (body에는 별표를 쓰지 않는다.)
 - body: 본문. 2~3줄. 한 줄 13~18자 권장. 제목을 반복하지 말고 맥락·근거·다음 행동을 짧게.
 - bg_query: 이 카드의 "장면"을 묘사하는 영어 검색어 2~4단어. 인물·감정·상황을 담아도 좋다(일러스트/사진 배경 공용). 예: "two friends talking cafe", "tired office worker", "confident woman smiling", "city night street", "team meeting".
+
+# meta.style_hint (일러스트 화풍 — 영어 한 문장)
+- 생성할 일러스트의 화풍을 영어 한 문장으로 meta.style_hint 에 적는다.
+- ★첨부 이미지가 있으면: 그 이미지의 화풍·색감·구도·분위기를 관찰해 그대로 반영해 묘사한다(예: "soft Korean webtoon, semi-realistic faces, warm watercolor texture, pastel cafe lighting, two characters in frame").
+- 이미지가 없으면 기본값: "soft warm Korean webtoon illustration, semi-realistic, gentle watercolor, pastel cozy lighting".
 - flow: Hook | Pain | Step | Result | CTA 중 하나.
 - role: 그 카드의 역할을 한 줄로(예: "강한 약속", "공감 후킹", "해결 제시", "행동 유도").
 - watermark: 일반 카드는 "@business_career_consulting", 마지막 CTA 카드만 "BCC · @business_career_consulting".
@@ -73,8 +78,9 @@ const SCHEMA = {
         purpose: { type: 'string' },
         intent: { type: 'string' },
         total: { type: 'integer' },
+        style_hint: { type: 'string' },
       },
-      required: ['purpose', 'intent', 'total'],
+      required: ['purpose', 'intent', 'total', 'style_hint'],
       additionalProperties: false,
     },
     cards: {
