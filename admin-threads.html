@@ -69,6 +69,27 @@
   .imgp .frame b{color:var(--text);font-weight:700}
   .imgp .copybtn{margin-left:8px;font-size:11px;padding:3px 9px}
   .loading{text-align:center;color:var(--text-dim);font-size:14px;padding:30px 0}
+  /* 보관함 서랍(사이드바) — 카드뉴스 공장과 동일 패턴 */
+  #menuBtn{position:fixed;top:14px;left:14px;z-index:50;width:42px;height:42px;font-size:18px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;cursor:pointer}
+  #drawerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s}
+  #drawerOverlay.open{opacity:1;pointer-events:auto}
+  #drawer{position:fixed;top:0;left:0;height:100%;width:300px;max-width:86vw;background:#111114;border-right:1px solid var(--border);z-index:70;transform:translateX(-100%);transition:transform .22s ease;display:flex;flex-direction:column}
+  #drawer.open{transform:translateX(0)}
+  .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 14px;border-bottom:1px solid var(--border)}
+  .drawer-head strong{font-size:15px}
+  .drawer-close{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer}
+  #historyList{overflow-y:auto;padding:8px;flex:1}
+  .histgroup{font-size:11px;color:var(--text-mute);font-weight:700;letter-spacing:.3px;margin:12px 6px 4px}
+  .hist{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid transparent;border-radius:10px;margin-bottom:4px;cursor:pointer}
+  .hist:hover{background:var(--surface);border-color:var(--border)}
+  .histicon{width:40px;height:40px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.05)}
+  .histmeta{flex:1;min-width:0}
+  .histtitle{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .histsub{font-size:11px;color:var(--text-mute);margin-top:2px}
+  .histactions{display:flex;flex:none}
+  .histbtn{background:none;border:none;color:var(--text-mute);font-size:13px;cursor:pointer;padding:4px 5px}
+  .histbtn.histdel:hover{color:#ff8080}
+  .histrename{width:100%;padding:5px 8px;background:rgba(0,0,0,.4);border:1px solid var(--gold);border-radius:6px;color:#fff;font-size:14px;font-family:inherit}
   .hidden{display:none}
   a{color:var(--gold-3)}
   /* 모바일 최적화 */
@@ -106,6 +127,12 @@
 
   <!-- 도구 -->
   <div id="appView" class="hidden">
+    <button id="menuBtn" aria-label="내 스레드 보관함">☰</button>
+    <div id="drawerOverlay"></div>
+    <aside id="drawer">
+      <div class="drawer-head"><strong>📁 내 스레드 보관함</strong><button class="drawer-close" id="drawerClose" aria-label="닫기">✕</button></div>
+      <div id="historyList"></div>
+    </aside>
     <div class="head">
       <h1 style="text-align:left;font-size:20px">스레드 글 만들기</h1>
       <button class="logout" id="logoutBtn">로그아웃</button>
@@ -166,10 +193,15 @@
     youtube: '유튜브 스크립트 → 주장·논리·사례만 가져와 스레드 문법으로 압축·재작성합니다.',
     lecture: '내 강의 멘트 → 본인 콘텐츠라 재구성이 아니라 다듬어 자산화합니다. (안전)',
   };
+  const INPUT_LABELS = { benchmark: '벤치마킹', youtube: '유튜브', lecture: '강의멘트' };
+  const PURPOSE_LABELS = { openchat: '오픈채팅', reaction_test: '반응테스트', prompt_bait: '프롬프트떡밥' };
   let loginMode = 'email';
   let supabase = null;
   let selectedInput = 'benchmark';
   let selectedPurpose = null;
+  let currentHistoryId = null;   // 현재 보고 있는 보관함 항목 id
+  let historyCache = [];         // 목록 메타 캐시
+  let lastHistError = '';        // 마지막 오류(서랍 배너용)
 
   const $ = (id) => document.getElementById(id);
   const loginView = $('loginView'), appView = $('appView');
@@ -189,6 +221,7 @@
 
   function showApp() {
     loginView.classList.add('hidden'); appView.classList.remove('hidden');
+    fetchHistory();   // 서버에서 보관함 불러오기(기기 간 동기화)
   }
 
   // 이미 로그인된 세션이 있으면 바로 도구로
@@ -263,6 +296,123 @@
     setGenStatus('');
   });
 
+  // ───────── 보관함 (threads_history — 카드뉴스와 동일 패턴, 기기 간 동기화) ─────────
+  function histTitle(data) {
+    const a = (data && data.analysis) || {};
+    const t = (a.topic || (data.threads && data.threads[0] && data.threads[0].hook) || '').replace(/\n/g, ' ').trim();
+    return t.slice(0, 30) || '(제목 없음)';
+  }
+  function histDate(ts) { try { return new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  function dayLabel(ts) {
+    const d = new Date(ts), now = new Date();
+    const a = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const b = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const diff = Math.round((a - b) / 86400000);
+    if (diff <= 0) return '오늘';
+    if (diff === 1) return '어제';
+    if (diff < 7) return diff + '일 전';
+    return (d.getMonth() + 1) + '월 ' + d.getDate() + '일';
+  }
+  async function apiHistGet(id) {
+    const token = await authToken();
+    const qs = '?kind=threads' + (id ? '&id=' + encodeURIComponent(id) : '');
+    const r = await fetch(API + '/api/cardnews-history' + qs, { headers: { Authorization: 'Bearer ' + token } });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  }
+  async function apiHistPost(body) {
+    const token = await authToken();
+    const r = await fetch(API + '/api/cardnews-history', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ kind: 'threads', ...body }),
+    });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  }
+  function renderHistoryList() {
+    const box = $('historyList');
+    const errBanner = lastHistError ? '<div class="muted" style="padding:10px 8px;color:#ff8080;line-height:1.5">⚠ ' + esc(lastHistError) + '</div>' : '';
+    if (!historyCache.length) {
+      box.innerHTML = errBanner + '<div class="muted" style="padding:14px 8px;line-height:1.6">아직 저장된 스레드 글이 없어요.<br>새로 생성하면 여기 쌓여요.</div>';
+      return;
+    }
+    let html = errBanner, lastDay = '';
+    for (const e of historyCache) {
+      const dl = dayLabel(e.created_at);
+      if (dl !== lastDay) { html += '<div class="histgroup">' + dl + '</div>'; lastDay = dl; }
+      const tag = (INPUT_LABELS[e.input_type] || e.input_type || '') + (e.purpose ? ' · ' + (PURPOSE_LABELS[e.purpose] || e.purpose) : '');
+      html += '<div class="hist" data-id="' + e.id + '">'
+        + '<div class="histicon">✍️</div>'
+        + '<div class="histmeta"><div class="histtitle">' + esc(e.title) + '</div>'
+        + '<div class="histsub">' + histDate(e.created_at) + ' · ' + (e.threads_count || 0) + '글' + (tag ? ' · ' + esc(tag) : '') + '</div></div>'
+        + '<div class="histactions"><button class="histbtn" data-rename="' + e.id + '" title="이름 바꾸기">✏️</button>'
+        + '<button class="histbtn histdel" data-del="' + e.id + '" title="삭제">✕</button></div>'
+        + '</div>';
+    }
+    box.innerHTML = html;
+  }
+  async function fetchHistory() {
+    try {
+      const { ok, data } = await apiHistGet();
+      if (ok && Array.isArray(data.items)) { historyCache = data.items; lastHistError = ''; }
+      else { historyCache = []; lastHistError = '불러오기 실패: ' + (data.error || '서버 오류'); }
+    } catch (e) { historyCache = []; lastHistError = '네트워크 오류: ' + (e.message || e); }
+    renderHistoryList();
+  }
+  async function addHistoryEntry(data, inputType, purpose) {
+    const id = 'th' + Date.now() + Math.floor(Math.random() * 1000);
+    let saveErr = '';
+    try {
+      const { ok, data: rd } = await apiHistPost({ op: 'save', id, title: histTitle(data), input_type: inputType, purpose, threads_count: (data.threads && data.threads.length) || 0, data });
+      if (!ok) saveErr = '저장 실패: ' + (rd.error || '서버 오류');
+    } catch (e) { saveErr = '저장 실패: ' + (e.message || e); }
+    await fetchHistory();
+    if (saveErr) { lastHistError = saveErr; renderHistoryList(); }
+    return id;
+  }
+  async function deleteHistory(id) {
+    try { await apiHistPost({ op: 'delete', id }); } catch (e) {}
+    if (currentHistoryId === id) currentHistoryId = null;
+    await fetchHistory();
+  }
+  async function renameHistory(id, title) {
+    try { await apiHistPost({ op: 'rename', id, title }); } catch (e) {}
+    await fetchHistory();
+  }
+  function startRename(id) {
+    const e = historyCache.find((x) => x.id === id); if (!e) return;
+    const item = $('historyList').querySelector('.hist[data-id="' + id + '"]'); if (!item) return;
+    const titleEl = item.querySelector('.histtitle'); if (!titleEl) return;
+    const input = document.createElement('input'); input.type = 'text'; input.value = e.title; input.className = 'histrename';
+    input.addEventListener('click', (ev) => ev.stopPropagation());
+    titleEl.replaceWith(input); input.focus(); input.select();
+    let done = false;
+    const commit = () => { if (done) return; done = true; const v = input.value.trim(); if (v && v !== e.title) renameHistory(id, v); else renderHistoryList(); };
+    input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); commit(); } else if (ev.key === 'Escape') { done = true; renderHistoryList(); } });
+    input.addEventListener('blur', commit);
+  }
+  function openDrawer() { $('drawer').classList.add('open'); $('drawerOverlay').classList.add('open'); }
+  function closeDrawer() { $('drawer').classList.remove('open'); $('drawerOverlay').classList.remove('open'); }
+  async function openHistory(id) {
+    closeDrawer();
+    try {
+      const { ok, data } = await apiHistGet(id);
+      if (!ok || !data.data) return;
+      $('inputView').classList.add('hidden');
+      $('loadingView').classList.add('hidden');
+      renderResult(data.data);
+      currentHistoryId = id;
+    } catch (e) { /* 무시 */ }
+  }
+  $('menuBtn').addEventListener('click', openDrawer);
+  $('drawerClose').addEventListener('click', closeDrawer);
+  $('drawerOverlay').addEventListener('click', closeDrawer);
+  $('historyList').addEventListener('click', (ev) => {
+    const ren = ev.target.closest('[data-rename]');
+    if (ren) { ev.stopPropagation(); startRename(ren.dataset.rename); return; }
+    const del = ev.target.closest('[data-del]');
+    if (del) { ev.stopPropagation(); deleteHistory(del.dataset.del); return; }
+    const item = ev.target.closest('.hist'); if (item) openHistory(item.dataset.id);
+  });
+  renderHistoryList();   // 초기 빈 목록(로그인 후 fetchHistory 로 채움)
+
   // 생성
   $('genBtn').addEventListener('click', async () => {
     const source = $('source').value.trim();
@@ -287,6 +437,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
       renderResult(data);
+      currentHistoryId = await addHistoryEntry(data, selectedInput, selectedPurpose);   // 서버에 자동 저장
     } catch (err) {
       $('loadingView').classList.add('hidden');
       $('inputView').classList.remove('hidden');
