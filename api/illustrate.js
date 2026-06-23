@@ -1,5 +1,7 @@
-// POST /api/illustrate — 관리자 전용 AI 일러스트(2탄). Pollinations AI(무료·키 불필요) 프록시.
-// 캔버스 PNG 내보내기가 깨지지 않도록 서버에서 이미지를 받아 base64 로 돌려준다(CORS 안전).
+// POST /api/illustrate — 관리자 전용. 2탄 카드 이미지 관련 (함수 수 절약 위해 2기능 통합)
+//   { op:'describe', imageBase64 } → 디자인 레퍼런스 화풍을 영어로 요약 {style}  (Claude 비전)
+//   { prompt, seed }              → Pollinations AI(무료) 일러스트 생성 {b64,mediaType}
+import Anthropic from '@anthropic-ai/sdk';
 import { supabaseAdmin } from '../lib/supabase.js';
 import { applyCors } from '../lib/cors.js';
 
@@ -18,11 +20,39 @@ export default async function handler(req, res) {
   const { data: profile } = await db.from('profiles').select('is_admin').eq('id', user.id).single();
   if (!profile?.is_admin) return res.status(403).json({ error: '관리자만 사용할 수 있습니다.' });
 
-  const { prompt, seed } = req.body || {};
-  if (!prompt || String(prompt).trim().length < 4) {
-    return res.status(400).json({ error: 'prompt 가 필요합니다.' });
+  const body = req.body || {};
+
+  // (A) 디자인 레퍼런스 화풍 분석 (Claude 비전)
+  if (body.op === 'describe' || body.imageBase64) {
+    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ANTHROPIC_API_KEY 미설정' });
+    const { imageBase64, imageMediaType } = body;
+    if (!imageBase64 || imageBase64.length < 100) return res.status(400).json({ error: '이미지가 필요합니다.' });
+    try {
+      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const msg = await client.messages.create({
+        model: 'claude-opus-4-8',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imageMediaType || 'image/jpeg', data: imageBase64 } },
+            { type: 'text', text: 'Describe ONLY the visual art style of this image as a concise English comma-separated phrase usable in an AI image generation prompt — medium/technique, rendering style, color palette, texture, lighting, mood. Do NOT describe the subject, scene, or any text/content. Output only the style phrase, nothing else.' },
+          ],
+        }],
+      });
+      const text = (msg.content.find((b) => b.type === 'text') || {}).text || '';
+      const style = text.trim().replace(/^["']|["']$/g, '').slice(0, 400);
+      if (!style) return res.status(502).json({ error: '화풍 분석 결과가 비었습니다.' });
+      return res.json({ style });
+    } catch (err) {
+      console.error('illustrate(describe) error:', err?.message || err);
+      return res.status(500).json({ error: '서버 예외: ' + (err?.message || String(err)) });
+    }
   }
 
+  // (B) 일러스트 생성 (Pollinations AI, 무료·키 불필요)
+  const { prompt, seed } = body;
+  if (!prompt || String(prompt).trim().length < 4) return res.status(400).json({ error: 'prompt 가 필요합니다.' });
   try {
     const p = String(prompt).slice(0, 900);
     const sd = Number.isFinite(seed) ? seed : 0;

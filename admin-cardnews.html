@@ -914,10 +914,10 @@
           $('renderStatus').textContent = '디자인 레퍼런스 화풍 분석 중…';
           try {
             const { base64, mediaType } = await fileToScaledBase64(refFile);
-            const rs = await fetch(API + '/api/describe-style', {
+            const rs = await fetch(API + '/api/illustrate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-              body: JSON.stringify({ imageBase64: base64, imageMediaType: mediaType }),
+              body: JSON.stringify({ op: 'describe', imageBase64: base64, imageMediaType: mediaType }),
             });
             const rd = await rs.json().catch(() => ({}));
             if (rs.ok && rd.style) userStyle = rd.style;
