@@ -477,11 +477,14 @@
   });
 
   function renderResult(data) {
+    const fmtMap = { workflow: '🔧 워크플로우', prompt: '💬 프롬프트', knowhow: '💡 노하우', general: '📄 일반' };
+    const fmt = fmtMap[(data.meta && data.meta.format) || ''] || '';
     const a = data.analysis || {};
     const why = (a.why_worked || []).map((x) => '<li>' + esc(x) + '</li>').join('');
     $('analysisBox').innerHTML =
-      '<h3>📊 이 콘텐츠가 먹힌 이유</h3><ul>' + why + '</ul>' +
-      '<div class="core"><strong>가져갈 핵심 10%:</strong> ' + esc(a.core_10pct || '') + '</div>';
+      (fmt ? '<div style="font-size:12px;color:var(--gold-3);font-weight:700;margin-bottom:8px">AI가 고른 형식 · ' + fmt + '</div>' : '') +
+      '<h3>📊 이 콘텐츠가 먹힌/유용한 이유</h3><ul>' + why + '</ul>' +
+      '<div class="core"><strong>가져갈 핵심:</strong> ' + esc(a.core_10pct || '') + '</div>';
 
     const cards = data.cards || [];
     lastCards = cards;
