@@ -218,7 +218,10 @@
     if (supabase) return supabase;
     const c = await fetch(API + '/api/config').then((r) => r.json());
     if (!c.supabaseUrl || !c.supabaseAnonKey) throw new Error('설정을 불러오지 못했습니다.');
-    supabase = createClient(c.supabaseUrl, c.supabaseAnonKey);
+    // 로그인 세션을 localStorage 에 확실히 보관 + 자동 갱신 → 매번 로그인 안 해도 됨
+    supabase = createClient(c.supabaseUrl, c.supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage },
+    });
     return supabase;
   }
 
@@ -291,7 +294,11 @@
   function histDate(ts) { try { return new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
   function renderHistoryList() {
     const arr = loadHistory();
-    $('historyCard').style.display = arr.length ? 'block' : 'none';
+    $('historyCard').style.display = 'block';
+    if (!arr.length) {
+      $('historyList').innerHTML = '<div class="muted" style="padding:4px 2px">아직 저장된 카드뉴스가 없어요. 새로 생성하면 여기에 자동으로 쌓여요.</div>';
+      return;
+    }
     $('historyList').innerHTML = arr.map((e) =>
       '<div class="hist" data-id="' + e.id + '">'
       + (e.thumbs && e.thumbs.length ? '<img class="histthumb" src="' + e.thumbs[0] + '" alt="">' : '<div class="histthumb ph">📝</div>')
