@@ -2,9 +2,17 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="robots" content="noindex" />
 <title>카드뉴스 공장 (관리자) | BCC</title>
+<!-- PWA (홈 화면 앱) -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="카드뉴스 공장" />
+<link rel="apple-touch-icon" href="logo.png" />
 <script src="pay-config.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 <style>
@@ -66,6 +74,14 @@
   .dlrow{display:flex;gap:8px;justify-content:center;margin-top:5px}
   .dlrow a{font-size:11px;color:var(--gold-3);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer}
   @media(max-width:480px){.preview-grid{grid-template-columns:1fr}}
+  /* 모바일 최적화 */
+  @media(max-width:560px){
+    body{padding:max(16px,env(safe-area-inset-top)) 12px 24px}
+    .card{padding:16px}
+    h1{font-size:20px}
+    .pbtn{min-width:0;flex:1 1 30%}
+    input,textarea,.btn,.tab,.pbtn{font-size:16px}  /* iOS 입력 시 자동 확대 방지 */
+  }
   /* 히스토리 */
   .hist{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;background:var(--surface)}
   .hist:hover{border-color:var(--gold)}
