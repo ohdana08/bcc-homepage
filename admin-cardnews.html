@@ -259,7 +259,11 @@
     return supabase;
   }
 
-  function showApp() { loginView.classList.add('hidden'); appView.classList.remove('hidden'); }
+  async function showApp() {
+    loginView.classList.add('hidden'); appView.classList.remove('hidden');
+    try { await migrateLocalHistory(); } catch (e) {}
+    fetchHistory();   // 서버에서 히스토리 불러오기(기기 간 동기화)
+  }
 
   // 이미 로그인된 세션이 있으면 바로 도구로
   (async () => {
@@ -315,12 +319,8 @@
   })();
   $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
 
-  // ───────── 히스토리 (브라우저 자동 저장) ─────────
-  function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; } }
-  function saveHistoryArr(arr) {
-    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
-    catch (e) { while (arr.length > 1) { arr.pop(); try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); return; } catch (e2) {} } }
-  }
+  // ───────── 히스토리 (Supabase 서버 저장 — 기기 간 동기화) ─────────
+  let historyCache = [];   // 목록 메타 캐시
   function histTitle(data) {
     const c = (data.cards && data.cards[0]) || {};
     return (stripEmph(String(c.title || '').replace(/\n/g, ' ')).trim().slice(0, 28)) || '(제목 없음)';
@@ -336,8 +336,21 @@
     if (diff < 7) return diff + '일 전';
     return (d.getMonth() + 1) + '월 ' + d.getDate() + '일';
   }
+  async function apiHistGet(id) {
+    const token = await authToken();
+    const url = API + '/api/cardnews-history' + (id ? '?id=' + encodeURIComponent(id) : '');
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  }
+  async function apiHistPost(body) {
+    const token = await authToken();
+    const r = await fetch(API + '/api/cardnews-history', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(body),
+    });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  }
   function renderHistoryList() {
-    const arr = loadHistory();
+    const arr = historyCache;
     const box = $('historyList');
     if (!arr.length) {
       box.innerHTML = '<div class="muted" style="padding:14px 8px;line-height:1.6">아직 저장된 카드뉴스가 없어요.<br>새로 생성하면 여기 쌓여요.</div>';
@@ -345,53 +358,78 @@
     }
     let html = '', lastDay = '';
     for (const e of arr) {
-      const dl = dayLabel(e.ts);
+      const dl = dayLabel(e.created_at);
       if (dl !== lastDay) { html += '<div class="histgroup">' + dl + '</div>'; lastDay = dl; }
       html += '<div class="hist" data-id="' + e.id + '">'
-        + (e.thumbs && e.thumbs.length ? '<img class="histthumb" src="' + e.thumbs[0] + '" alt="">' : '<div class="histthumb ph">📝</div>')
+        + (e.thumb0 ? '<img class="histthumb" src="' + e.thumb0 + '" alt="">' : '<div class="histthumb ph">📝</div>')
         + '<div class="histmeta"><div class="histtitle">' + esc(e.title) + '</div>'
-        + '<div class="histsub">' + histDate(e.ts) + ' · ' + ((e.data && e.data.cards && e.data.cards.length) || 0) + '장</div></div>'
+        + '<div class="histsub">' + histDate(e.created_at) + ' · ' + (e.cards_count || 0) + '장</div></div>'
         + '<div class="histactions"><button class="histbtn" data-rename="' + e.id + '" title="이름 바꾸기">✏️</button>'
         + '<button class="histbtn histdel" data-del="' + e.id + '" title="삭제">✕</button></div>'
         + '</div>';
     }
     box.innerHTML = html;
   }
-  function addHistoryEntry(data) {
-    const arr = loadHistory();
+  async function fetchHistory() {
+    try { const { ok, data } = await apiHistGet(); historyCache = (ok && Array.isArray(data.items)) ? data.items : []; }
+    catch (e) { historyCache = []; }
+    renderHistoryList();
+  }
+  // 옛 localStorage 히스토리를 서버로 1회 이전(기존 기기의 기록 보존)
+  async function migrateLocalHistory() {
+    let local = [];
+    try { local = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { local = []; }
+    if (!local.length) return;
+    for (const e of local) {
+      try {
+        await apiHistPost({ op: 'save', id: e.id, title: e.title, cards_count: (e.data && e.data.cards && e.data.cards.length) || 0, data: e.data, thumbs: e.thumbs || null, thumb0: (e.thumbs && e.thumbs[0]) || null, created_at: e.ts });
+      } catch (e2) {}
+    }
+    localStorage.removeItem(HISTORY_KEY);   // 이전 완료
+  }
+  async function addHistoryEntry(data) {
     const id = 'h' + Date.now() + Math.floor(Math.random() * 1000);
-    arr.unshift({ id, ts: Date.now(), title: histTitle(data), data, thumbs: null });
-    if (arr.length > 50) arr.length = 50;
-    saveHistoryArr(arr); renderHistoryList();
+    try { await apiHistPost({ op: 'save', id, title: histTitle(data), cards_count: (data.cards && data.cards.length) || 0, data }); } catch (e) {}
+    await fetchHistory();
     return id;
   }
-  function updateHistThumbs(id, thumbs) {
-    const arr = loadHistory(); const e = arr.find((x) => x.id === id); if (!e) return;
-    e.thumbs = thumbs; saveHistoryArr(arr); renderHistoryList();
+  async function updateHistThumbs(id, thumbs) {
+    try { await apiHistPost({ op: 'thumbs', id, thumbs, thumb0: thumbs[0] || null }); } catch (e) {}
+    await fetchHistory();
   }
-  function deleteHistory(id) { saveHistoryArr(loadHistory().filter((x) => x.id !== id)); renderHistoryList(); }
+  async function deleteHistory(id) {
+    try { await apiHistPost({ op: 'delete', id }); } catch (e) {}
+    await fetchHistory();
+  }
+  async function renameHistory(id, title) {
+    try { await apiHistPost({ op: 'rename', id, title }); } catch (e) {}
+    await fetchHistory();
+  }
   function startRename(id) {
-    const arr = loadHistory(); const e = arr.find((x) => x.id === id); if (!e) return;
+    const e = historyCache.find((x) => x.id === id); if (!e) return;
     const item = $('historyList').querySelector('.hist[data-id="' + id + '"]'); if (!item) return;
     const titleEl = item.querySelector('.histtitle'); if (!titleEl) return;
     const input = document.createElement('input'); input.type = 'text'; input.value = e.title; input.className = 'histrename';
     input.addEventListener('click', (ev) => ev.stopPropagation());
     titleEl.replaceWith(input); input.focus(); input.select();
     let done = false;
-    const commit = () => { if (done) return; done = true; const v = input.value.trim(); if (v) { e.title = v; saveHistoryArr(arr); } renderHistoryList(); };
+    const commit = () => { if (done) return; done = true; const v = input.value.trim(); if (v && v !== e.title) renameHistory(id, v); else renderHistoryList(); };
     input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); commit(); } else if (ev.key === 'Escape') { done = true; renderHistoryList(); } });
     input.addEventListener('blur', commit);
   }
   function openDrawer() { $('drawer').classList.add('open'); $('drawerOverlay').classList.add('open'); }
   function closeDrawer() { $('drawer').classList.remove('open'); $('drawerOverlay').classList.remove('open'); }
-  function openHistory(id) {
-    const e = loadHistory().find((x) => x.id === id); if (!e) return;
+  async function openHistory(id) {
     closeDrawer();
-    renderResult(e.data);              // 구성표 다시 표시(미리보기는 초기화됨)
+    let detail;
+    try { const { ok, data } = await apiHistGet(id); if (!ok || !data.data) return; detail = data; }
+    catch (e) { return; }
+    renderResult(detail.data);          // 구성표 다시 표시(미리보기는 초기화됨)
     currentHistoryId = id;
-    if (e.thumbs && e.thumbs.length) { // 저장된 썸네일을 미리보기로 표시
+    const thumbs = detail.thumbs || [];
+    if (thumbs.length) {                 // 저장된 썸네일을 미리보기로 표시
       const grid = $('previewGrid'); grid.innerHTML = ''; renderedCanvases = [];
-      e.thumbs.forEach((src, i) => {
+      thumbs.forEach((src, i) => {
         const fig = document.createElement('figure');
         const img = new Image(); img.src = src; img.style.width = '100%'; img.style.borderRadius = '10px'; img.style.border = '1px solid var(--border)';
         fig.appendChild(img);
@@ -414,7 +452,7 @@
     if (del) { ev.stopPropagation(); deleteHistory(del.dataset.del); return; }
     const item = ev.target.closest('.hist'); if (item) openHistory(item.dataset.id);
   });
-  renderHistoryList();
+  renderHistoryList();   // 초기 빈 목록(로그인 후 fetchHistory 로 채움)
 
   // 입력 타입 탭 — 텍스트 벤치마킹 / 이미지 벤치마킹
   $('inputTabs').addEventListener('click', (e) => {
@@ -515,7 +553,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
       renderResult(data);
-      currentHistoryId = addHistoryEntry(data);   // 브라우저에 자동 저장
+      currentHistoryId = await addHistoryEntry(data);   // 서버에 자동 저장
     } catch (err) {
       $('loadingView').classList.add('hidden');
       $('inputView').classList.remove('hidden');
@@ -923,7 +961,7 @@
           t.getContext('2d').drawImage(cv, 0, 0, 256, 256);
           return t.toDataURL('image/jpeg', 0.7);
         });
-        updateHistThumbs(currentHistoryId, thumbs);
+        await updateHistThumbs(currentHistoryId, thumbs);
       }
 
       $('previewWrap').classList.remove('hidden');

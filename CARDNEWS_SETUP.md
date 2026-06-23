@@ -32,6 +32,27 @@ from public.profiles p join auth.users u on u.id = p.id
 where p.is_admin = true;
 ```
 
+### 히스토리 동기화 테이블 (기기 간 공유)
+
+카드뉴스 히스토리를 기기 상관없이 공유하려면 아래도 한 번 실행:
+
+```sql
+create table if not exists public.cardnews_history (
+  id text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text,
+  cards_count int default 0,
+  thumb0 text,
+  data jsonb,
+  thumbs jsonb,
+  created_at timestamptz default now()
+);
+create index if not exists cardnews_history_user_idx
+  on public.cardnews_history(user_id, created_at desc);
+alter table public.cardnews_history enable row level security;
+-- RLS 켜고 정책 없음 = anon/직접접근 차단. 서버 함수(service_role)만 사용.
+```
+
 ---
 
 ## 2) Vercel — 환경변수 추가
