@@ -112,6 +112,178 @@ function parseJsonLoose(text) {
   return JSON.parse(cleaned);
 }
 
+// ───────────────────────── 스레드 공장 (engine:'threads') ─────────────────────────
+// ★ Vercel Hobby 12함수 한계 때문에 별도 함수로 두지 않고 이 엔드포인트에 통합한다.
+//   admin-threads.html 이 { engine:'threads', source, inputType, purpose, intent } 로 호출.
+const THREADS_INPUT_TYPES = {
+  benchmark: '벤치마킹 스레드 글',
+  youtube: '유튜브 스크립트',
+  lecture: '내 강의 멘트',
+};
+const THREADS_INPUT_GUIDE = {
+  benchmark:
+    '[입력=벤치마킹 스레드 글] "왜 터졌는가"(논리·후킹 방식·감정 자극)만 추출하고 글은 100% 새로 쓴다. ' +
+    '원본의 단어·문장·비유·어순을 단 하나도 가져오지 않는다. 주제만 같고 표현은 완전히 다른 글이어야 한다. (규칙 8 엄격 적용)',
+  youtube:
+    '[입력=유튜브 스크립트] 주장·논리·사례를 추출해 스레드 문법(짧은 문단·후킹·CTA)으로 압축·재작성한다. ' +
+    '말투·문장은 그대로 옮기지 말고 스레드용으로 새로 쓴다. (규칙 8 적용)',
+  lecture:
+    '[입력=내 강의 멘트] 본인 콘텐츠이므로 재구성 규칙(규칙 8) 예외. 핵심 메시지를 살려 스레드 글로 다듬어 자산화한다. 의미를 바꾸지 말고 더 또렷하게 정리한다.',
+};
+const THREADS_PURPOSES = {
+  openchat: '오픈채팅방 모으기 — "직접 해보고 질문할 사람만 들어오세요" 식으로 선별형 CTA',
+  reaction_test: '반응 테스트 — 댓글·저장·공감을 유도해 어떤 떡밥이 먹히는지 본다(과한 판매 CTA 금지)',
+  prompt_bait: '프롬프트 떡밥 — 프롬프트/워크플로우에 관심 있는 사람을 끌어 "받아서 직접 해볼 사람"만 모은다',
+};
+
+const THREADS_SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 스레드 글 자동 생성 엔진(스레드 공장)이다.
+원재료(벤치마킹 글 / 유튜브 스크립트 / 내 강의 멘트)를 받아, 8개 포맷 중 가장 어울리는 2~3개를 골라 각각 완성된 스레드 글 + 이미지 프롬프트 2개를 써낸다.
+
+# 최우선 목적 (절대 잊지 말 것)
+판매가 아니라 "선별·수집"이다. 프롬프트·워크플로우에 관심 있는 사람 중, 받아서 직접 해보고 질문하는 "실행력 있는 사람"만 모은다. 어그로로 아무나 끌지 않는다.
+
+# 8개 포맷 (각 글은 이 중 하나의 모양을 따른다)
+1. 축하해줘 — 자랑·응원 유도 → 공감 댓글
+2. 사람을 찾습니다 — 1~5 타깃을 나열해 동질감 → 연결
+3. 이런거 관심 있으려나 — 호기심 떡밥 + 댓글 유도
+4. 결과물 공유형 — 전문용어 없이 간결하게, 만든 것 보여주기
+5. 프로세스 공유형 — 실패→개선→피드백 작업 로그
+6. 넘버링 컨텐츠 — 헤드카피 + 숫자 정렬 + 끝 CTA
+7. 레퍼런스 해부형 — "이게 왜 터졌는지 알아?" → 분석을 보여주며 배울 사람을 모음
+8. 가치 입증형 — 후킹 → 전문성/데이터로 입증 → 부연 (경력·신뢰 구축)
+
+# 포맷 선택 로직
+- 주제를 보고 8개 중 가장 잘 맞는 2~3개를 스스로 고른다.
+- 각 글마다 "왜 이 포맷인지" 한 줄 이유(why_format)를 쓴다.
+- 같은 주제라도 포맷에 따라 완전히 다른 글이 나와야 한다(나란히 비교해 채택할 수 있게).
+
+# 규칙집 (어떤 포맷을 쓰든 항상 전부 지킨다)
+규칙 1. 첫 문장 = "스크롤 멈추는 한 방". 한 문장. 20자 안쪽 권장 / 30자 권장 상한 / 60자 절대 한계. 설명 말고 후킹만.
+        후킹 3종 중 하나로: ① 타깃 콕 집기  ② 숫자·결과  ③ 호기심·긴장.
+규칙 2. 문단은 짧게 짧게. 길어지면 이탈. 의미 단위로 줄바꿈(\\n).
+규칙 3. 후킹 → 가치 입증 → 부연 설명 순서를 8개 포맷 전체에 항상 적용.
+규칙 4. 재미만 있는 글 금지. 반드시 가치를 전달해 사람을 모은다.
+규칙 5. 전문용어를 줄이고 보편적인 단어로 쓴다.
+규칙 6. 어그로로 아무나 끌지 않는다. 실행력 있는 사람만 선별한다.
+규칙 7. 숫자·1등 표현을 활용한다(좁혀서라도 1등: "발산동에서 가장 오래된" 식).
+규칙 8. [재구성 원칙 — 위반 시 폐기] 벤치마킹/유튜브 입력은 단어·문장·비유·어순을 하나도 가져오지 않는다.
+        완성 후 자가 점검: "원본과 나란히 놓으면 같은 글로 보이는가?" → 조금이라도 그렇다면 다시 쓴다.
+        (강의 멘트 입력은 본인 콘텐츠라 이 규칙 예외 — 다듬어 활용)
+
+# CTA (목적에 맞춰 설계)
+- 목표는 판매가 아니라 선별·수집이다.
+- ❌ "무료로 받아가세요"(아무나 옴)  ✅ "직접 해보고 질문할 사람만 들어오세요"(선별)
+- 사실정보(가격·일정·링크)는 지어내지 말고 [링크] [오픈채팅] 같은 자리표시자로 둔다.
+
+# 이미지 프롬프트 2개 (글마다 시작·끝 한 쌍)
+- 자연어 서술형으로 쓴다(ChatGPT/DALL·E·나노바나나/Gemini 공용). 미드저니식 키워드·파라미터(--ar 등) 금지.
+- 시작 프레임 → 끝 프레임이 자연스럽게 이어지는 before→after 흐름.
+- 시선을 멈추는 강렬한 색감, 특이한 구도를 반영한다. 한국어로 서술한다.
+
+# 분석 (analysis 로 화면에 보여준다)
+- 이 원재료의 주제(topic) 한 줄.
+- 이게 왜 먹히는지/터졌는지 이유(why_works) 3~5가지.
+- 누구에게 닿아야 하는지 타깃(audience) 한 줄.
+
+# 톤
+BCC 톤: 현실적·직설적·초보자 친화. 추임새·사담·반복은 버린다.
+
+반드시 지정된 JSON 스키마에 맞춰서만 출력한다. 설명·마크다운 없이 JSON 객체만 출력한다.`;
+
+const THREADS_SCHEMA = {
+  type: 'object',
+  properties: {
+    analysis: {
+      type: 'object',
+      properties: {
+        topic: { type: 'string' },
+        why_works: { type: 'array', items: { type: 'string' } },
+        audience: { type: 'string' },
+      },
+      required: ['topic', 'why_works', 'audience'],
+      additionalProperties: false,
+    },
+    meta: {
+      type: 'object',
+      properties: {
+        input_type: { type: 'string' },
+        purpose: { type: 'string' },
+      },
+      required: ['input_type', 'purpose'],
+      additionalProperties: false,
+    },
+    threads: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          format_no: { type: 'integer' },
+          format_name: { type: 'string' },
+          why_format: { type: 'string' },
+          hook: { type: 'string' },
+          text: { type: 'string' },
+          cta: { type: 'string' },
+          image_prompts: {
+            type: 'object',
+            properties: { start: { type: 'string' }, end: { type: 'string' } },
+            required: ['start', 'end'],
+            additionalProperties: false,
+          },
+        },
+        required: ['format_no', 'format_name', 'why_format', 'hook', 'text', 'cta', 'image_prompts'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['analysis', 'meta', 'threads'],
+  additionalProperties: false,
+};
+
+// 스레드 글 생성 — auth/admin 검증은 호출부(handler)에서 끝낸 뒤 들어온다.
+async function handleThreads(req, res, client) {
+  const { source, inputType, purpose, intent } = req.body || {};
+  if (!source || source.trim().length < 30) {
+    return res.status(400).json({ error: '원재료를 30자 이상 붙여넣어 주세요.' });
+  }
+  if (!inputType || !THREADS_INPUT_TYPES[inputType]) {
+    return res.status(400).json({ error: '원재료 종류를 선택해 주세요.' });
+  }
+  if (!purpose || !THREADS_PURPOSES[purpose]) {
+    return res.status(400).json({ error: '목적을 선택해 주세요.' });
+  }
+
+  const header =
+    `# 원재료 종류\n${THREADS_INPUT_TYPES[inputType]}\n${THREADS_INPUT_GUIDE[inputType]}\n\n` +
+    `# 목적/CTA 방향\n${THREADS_PURPOSES[purpose]}\n\n` +
+    `# 추가 의도(타깃 / 연결할 곳)\n${(intent || '').trim() || '(미입력 — 맥락에서 가장 적절한 선별형 CTA를 설계하되, 사실정보는 자리표시자로 둔다)'}\n\n` +
+    `# 원재료 본문\n${source.trim()}`;
+
+  const msg = await client.messages.create({
+    model: 'claude-opus-4-8',
+    max_tokens: 8000,
+    system: THREADS_SYSTEM_PROMPT,
+    output_config: { format: { type: 'json_schema', schema: THREADS_SCHEMA } },
+    messages: [{ role: 'user', content: header }],
+  });
+
+  if (msg.stop_reason === 'refusal') {
+    return res.status(422).json({ error: '이 콘텐츠는 생성이 거절되었습니다. 다른 원재료로 시도해 주세요.' });
+  }
+  const textBlock = msg.content.find((b) => b.type === 'text');
+  if (!textBlock) return res.status(502).json({ error: 'AI 응답이 비어 있습니다. 다시 시도해 주세요.' });
+
+  let result;
+  try {
+    result = parseJsonLoose(textBlock.text);
+  } catch (e) {
+    return res.status(502).json({ error: 'AI 응답 형식 오류. 다시 시도해 주세요.' });
+  }
+  if (Array.isArray(result.threads) && result.threads.length > 3) {
+    result.threads = result.threads.slice(0, 3);
+  }
+  return res.json(result);
+}
+
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
@@ -127,6 +299,21 @@ export default async function handler(req, res) {
   // 2) 관리자 검증 (profiles.is_admin)
   const { data: profile } = await db.from('profiles').select('is_admin').eq('id', user.id).single();
   if (!profile?.is_admin) return res.status(403).json({ error: '관리자만 사용할 수 있습니다.' });
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다.' });
+  }
+
+  // 2.5) 스레드 공장 분기 — engine:'threads' 이면 스레드 글 생성기로(같은 함수, 12함수 한계 회피)
+  if ((req.body?.engine) === 'threads') {
+    try {
+      return await handleThreads(req, res, new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
+    } catch (err) {
+      console.error('threads-generate error:', err?.message || err);
+      const status = err?.status === 429 ? 429 : 500;
+      return res.status(status).json({ error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '생성 중 오류가 발생했습니다.' });
+    }
+  }
 
   // 3) 입력 검증 (텍스트 벤치마킹 또는 이미지 벤치마킹)
   const { script, purpose, intent, images } = req.body || {};

@@ -71,6 +71,7 @@
         <button class="logout" id="logoutBtn">로그아웃</button>
       </div>
       <a id="adminLink" href="admin-cardnews.html" class="adminlink" style="display:none">🛠 카드뉴스 공장 열기</a>
+      <a id="threadsLink" href="admin-threads.html" class="adminlink" style="display:none">✍️ 스레드 공장 열기</a>
       <div id="enrList"></div>
     </div>
   </div>
@@ -106,7 +107,10 @@
 
     document.getElementById('userName').textContent = (data.profile?.name || '회원') + ' 님';
     // 관리자(is_admin)에게만 카드뉴스 공장 진입 버튼 노출
-    if (data.profile?.is_admin) document.getElementById('adminLink').style.display = 'block';
+    if (data.profile?.is_admin) {
+      document.getElementById('adminLink').style.display = 'block';
+      document.getElementById('threadsLink').style.display = 'block';
+    }
     const list = data.enrollments || [];
     const box = document.getElementById('enrList');
     if (!list.length) { box.innerHTML = '<div class="empty">아직 수강 이력이 없습니다.</div>'; }

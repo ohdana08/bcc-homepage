@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<title>스레드 공장 (관리자) | BCC</title>
+<!-- PWA (홈 화면 앱) -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="스레드 공장" />
+<link rel="apple-touch-icon" href="logo.png" />
+<script src="pay-config.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root{--bg:#0a0a0a;--surface:#16161a;--text:#f3f3f5;--text-dim:#9a9aa6;--text-mute:#6c6c78;--gold:#C9A84C;--gold-3:#e6c878;--border:#26262c;--lime:#EFFF5A;
+    --font-ko:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ko);line-height:1.6;padding:40px 16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px}
+  .logo img{height:34px;width:auto;background:#fff;border-radius:8px;padding:4px}
+  h1{font-size:22px;letter-spacing:-.5px;text-align:center}
+  .sub{color:var(--text-dim);font-size:14px;text-align:center;margin-bottom:22px}
+  .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:22px;margin-bottom:16px}
+  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .row label{font-size:13px;color:var(--text-dim)}
+  input,textarea{width:100%;padding:12px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:10px;font-size:15px;font-family:inherit;line-height:1.6}
+  textarea{resize:vertical}
+  input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  .btn{width:100%;padding:13px;font-size:15px;font-weight:700;background:var(--gold);color:#1a1407;border:none;border-radius:10px;cursor:pointer}
+  .btn:disabled{opacity:.55;cursor:default}
+  .btn.ghost{background:none;color:var(--text-dim);border:1px solid var(--border)}
+  .status{margin-top:10px;font-size:13px;min-height:18px;text-align:center}
+  .status.err{color:#ff8080}.status.ok{color:#5fd38b}
+  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .head .logout{font-size:13px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer}
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{flex:1;padding:9px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
+  .tab.active{color:#1a1407;background:var(--gold);border-color:var(--gold)}
+  .purpose{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .pbtn{flex:1;min-width:120px;padding:11px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
+  .pbtn.active{color:#1a1407;background:var(--gold-3);border-color:var(--gold-3)}
+  .step-label{font-size:12px;color:var(--gold-3);font-weight:700;letter-spacing:.4px;margin-bottom:8px}
+  .muted{color:var(--text-mute);font-size:12px;margin-top:4px}
+  /* 결과 — 분석 */
+  .analysis{background:rgba(239,255,90,.05);border:1px solid rgba(239,255,90,.22);border-radius:12px;padding:16px;margin-bottom:16px}
+  .analysis h3{font-size:14px;color:var(--lime);margin-bottom:8px}
+  .analysis .topic{font-size:15px;font-weight:700;margin-bottom:10px}
+  .analysis ul{margin:0 0 8px 18px}
+  .analysis li{font-size:13px;color:var(--text);margin-bottom:3px}
+  .analysis .aud{font-size:13px;color:var(--text-dim)}
+  /* 결과 — 포맷별 글 카드 */
+  .threadcard{border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;background:var(--surface)}
+  .threadcard .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:10px}
+  .threadcard .fmt{font-size:13px;font-weight:800;color:var(--gold-3)}
+  .threadcard .why{font-size:12px;color:var(--text-mute);margin-bottom:12px;line-height:1.5}
+  .threadtext{font-size:15px;white-space:pre-wrap;line-height:1.7;background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text)}
+  .copybtn{font-size:12px;font-weight:700;color:#1a1407;background:var(--gold-3);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;flex:none}
+  .copybtn.done{background:#5fd38b}
+  .cta{font-size:13px;color:var(--text-dim);margin-top:10px}
+  .cta strong{color:var(--gold-3)}
+  .imgp{margin-top:12px;border-top:1px dashed var(--border);padding-top:12px}
+  .imgp .ttl{font-size:12px;color:var(--text-mute);font-weight:700;margin-bottom:8px}
+  .imgp .frame{font-size:13px;color:var(--text-dim);line-height:1.6;margin-bottom:8px}
+  .imgp .frame b{color:var(--text);font-weight:700}
+  .imgp .copybtn{margin-left:8px;font-size:11px;padding:3px 9px}
+  .loading{text-align:center;color:var(--text-dim);font-size:14px;padding:30px 0}
+  .hidden{display:none}
+  a{color:var(--gold-3)}
+  /* 모바일 최적화 */
+  @media(max-width:560px){
+    body{padding:max(16px,env(safe-area-inset-top)) 12px 24px}
+    .card{padding:16px}
+    h1{font-size:20px}
+    .pbtn{min-width:0;flex:1 1 30%}
+    input,textarea,.btn,.tab,.pbtn{font-size:16px}  /* iOS 입력 시 자동 확대 방지 */
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><img src="logo.png?v=3" alt="BCC" /><strong>스레드 공장</strong></div>
+
+  <!-- 로그인 -->
+  <div id="loginView">
+    <h1>관리자 로그인</h1>
+    <p class="sub">관리자 계정으로만 접근할 수 있습니다.</p>
+    <div class="card">
+      <div class="tabs">
+        <button type="button" class="tab active" data-mode="email">이메일</button>
+        <button type="button" class="tab" data-mode="phone">전화번호</button>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="row" id="rowEmail"><label for="email">이메일</label><input id="email" type="email" autocomplete="email" /></div>
+        <div class="row hidden" id="rowPhone"><label for="phone">전화번호</label><input id="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000" /></div>
+        <div class="row"><label for="pw">비밀번호</label><input id="pw" type="password" autocomplete="current-password" /></div>
+        <button type="submit" class="btn" id="loginBtn">로그인</button>
+        <p id="loginStatus" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 도구 -->
+  <div id="appView" class="hidden">
+    <div class="head">
+      <h1 style="text-align:left;font-size:20px">스레드 글 만들기</h1>
+      <button class="logout" id="logoutBtn">로그아웃</button>
+    </div>
+
+    <!-- 입력 -->
+    <div id="inputView" class="card">
+      <div class="step-label">① 원재료 종류</div>
+      <div class="tabs" id="inputTabs" style="margin-bottom:8px">
+        <button type="button" class="tab active" data-input="benchmark">벤치마킹 글</button>
+        <button type="button" class="tab" data-input="youtube">유튜브 스크립트</button>
+        <button type="button" class="tab" data-input="lecture">내 강의 멘트</button>
+      </div>
+      <div class="muted" id="inputHint" style="margin-bottom:14px"></div>
+
+      <div class="step-label">② 원재료 붙여넣기</div>
+      <div class="row">
+        <textarea id="source" rows="9" placeholder="벤치마킹할 스레드 글 / 유튜브 스크립트 / 내 강의 멘트 중 하나를 붙여넣으세요. (30자 이상)"></textarea>
+      </div>
+
+      <div class="step-label" style="margin-top:6px">③ 이 글의 목적</div>
+      <div class="purpose" id="purposeBtns">
+        <button type="button" class="pbtn" data-purpose="openchat">오픈채팅 모으기</button>
+        <button type="button" class="pbtn" data-purpose="reaction_test">반응 테스트</button>
+        <button type="button" class="pbtn" data-purpose="prompt_bait">프롬프트 떡밥</button>
+      </div>
+
+      <div class="step-label" style="margin-top:6px">④ 추가 의도 (선택 · 타깃 / 연결할 곳)</div>
+      <div class="row">
+        <textarea id="intent" rows="2" placeholder="예) 바이브코딩에 관심 있는 직장인에게, 오픈채팅방으로 '직접 해보고 질문할 사람'만 모으고 싶어요."></textarea>
+      </div>
+
+      <button type="button" class="btn" id="genBtn">스레드 글 생성</button>
+      <p id="genStatus" class="status" role="status" aria-live="polite"></p>
+    </div>
+
+    <!-- 로딩 -->
+    <div id="loadingView" class="card hidden">
+      <div class="loading">AI가 원재료를 분석하고 어울리는 포맷으로 글을 쓰는 중입니다… (약 20~40초)</div>
+    </div>
+
+    <!-- 결과 -->
+    <div id="resultView" class="hidden">
+      <div class="analysis" id="analysisBox"></div>
+      <div id="threadsBox"></div>
+      <button type="button" class="btn ghost" id="againBtn" style="margin-top:4px">새 원재료로 다시 만들기</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+  const API = window.BCC_API_BASE;
+  const PHONE_DOMAIN = 'phone.bcc.kr';
+  const INPUT_HINTS = {
+    benchmark: '잘 터진 남의 스레드 글 → "왜 터졌는지"만 뽑아 표현은 100% 새로 씁니다. (저작권: 표현 0% 차용)',
+    youtube: '유튜브 스크립트 → 주장·논리·사례만 가져와 스레드 문법으로 압축·재작성합니다.',
+    lecture: '내 강의 멘트 → 본인 콘텐츠라 재구성이 아니라 다듬어 자산화합니다. (안전)',
+  };
+  let loginMode = 'email';
+  let supabase = null;
+  let selectedInput = 'benchmark';
+  let selectedPurpose = null;
+
+  const $ = (id) => document.getElementById(id);
+  const loginView = $('loginView'), appView = $('appView');
+  const setLoginStatus = (m, k) => { $('loginStatus').textContent = m; $('loginStatus').className = 'status' + (k ? ' ' + k : ''); };
+  const setGenStatus = (m, k) => { $('genStatus').textContent = m; $('genStatus').className = 'status' + (k ? ' ' + k : ''); };
+  const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  async function getClient() {
+    if (supabase) return supabase;
+    const c = await fetch(API + '/api/config').then((r) => r.json());
+    if (!c.supabaseUrl || !c.supabaseAnonKey) throw new Error('설정을 불러오지 못했습니다.');
+    supabase = createClient(c.supabaseUrl, c.supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage },
+    });
+    return supabase;
+  }
+
+  function showApp() {
+    loginView.classList.add('hidden'); appView.classList.remove('hidden');
+  }
+
+  // 이미 로그인된 세션이 있으면 바로 도구로
+  (async () => {
+    try {
+      const sb = await getClient();
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.access_token) showApp();
+    } catch (e) { /* 로그인 화면 유지 */ }
+  })();
+
+  async function authToken() {
+    const sb = await getClient();
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session?.access_token) throw new Error('로그인이 만료되었습니다. 새로고침 후 다시 로그인하세요.');
+    return session.access_token;
+  }
+
+  // 로그인 탭 전환 (로그인 영역 한정)
+  document.querySelectorAll('#loginView .tab').forEach((t) => t.addEventListener('click', () => {
+    loginMode = t.dataset.mode;
+    document.querySelectorAll('#loginView .tab').forEach((x) => x.classList.toggle('active', x === t));
+    $('rowEmail').classList.toggle('hidden', loginMode !== 'email');
+    $('rowPhone').classList.toggle('hidden', loginMode !== 'phone');
+    setLoginStatus('');
+  }));
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let email;
+    if (loginMode === 'phone') {
+      const digits = $('phone').value.replace(/\D/g, '');
+      if (digits.length < 10) { setLoginStatus('전화번호를 정확히 입력해 주세요.', 'err'); return; }
+      email = digits + '@' + PHONE_DOMAIN;
+    } else {
+      email = $('email').value.trim();
+    }
+    const pw = $('pw').value;
+    if (!email || !pw) { setLoginStatus('로그인 정보를 입력해 주세요.', 'err'); return; }
+    $('loginBtn').disabled = true; setLoginStatus('로그인 중…');
+    try {
+      const sb = await getClient();
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error || !data.session) throw new Error('이메일/전화번호 또는 비밀번호가 올바르지 않습니다.');
+      showApp();
+    } catch (err) {
+      setLoginStatus(err.message || '로그인에 실패했습니다.', 'err');
+      $('loginBtn').disabled = false;
+    }
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    try { const sb = await getClient(); await sb.auth.signOut(); } catch (e) {}
+    location.reload();
+  });
+
+  // 입력 종류 탭 (벤치마킹 / 유튜브 / 강의멘트)
+  $('inputHint').textContent = INPUT_HINTS[selectedInput];
+  $('inputTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    selectedInput = b.dataset.input;
+    document.querySelectorAll('#inputTabs .tab').forEach((x) => x.classList.toggle('active', x === b));
+    $('inputHint').textContent = INPUT_HINTS[selectedInput];
+    setGenStatus('');
+  });
+
+  // 목적 선택
+  $('purposeBtns').addEventListener('click', (e) => {
+    const b = e.target.closest('.pbtn'); if (!b) return;
+    selectedPurpose = b.dataset.purpose;
+    document.querySelectorAll('#purposeBtns .pbtn').forEach((x) => x.classList.toggle('active', x === b));
+    setGenStatus('');
+  });
+
+  // 생성
+  $('genBtn').addEventListener('click', async () => {
+    const source = $('source').value.trim();
+    const intent = $('intent').value.trim();
+    if (source.length < 30) { setGenStatus('원재료를 30자 이상 붙여넣어 주세요.', 'err'); return; }
+    if (!selectedPurpose) { setGenStatus('목적을 선택해 주세요.', 'err'); return; }
+
+    let token;
+    try { token = await authToken(); } catch (err) { setGenStatus(err.message, 'err'); return; }
+
+    $('inputView').classList.add('hidden');
+    $('loadingView').classList.remove('hidden');
+    $('resultView').classList.add('hidden');
+
+    try {
+      // ★ Vercel 12함수 한계 때문에 cardnews-generate 에 통합됨 → engine:'threads' 로 분기 호출
+      const res = await fetch(API + '/api/cardnews-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ engine: 'threads', source, inputType: selectedInput, purpose: selectedPurpose, intent }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
+      renderResult(data);
+    } catch (err) {
+      $('loadingView').classList.add('hidden');
+      $('inputView').classList.remove('hidden');
+      setGenStatus(err.message || '생성 중 오류가 발생했습니다.', 'err');
+    }
+  });
+
+  function renderResult(data) {
+    const a = data.analysis || {};
+    const why = (a.why_works || []).map((x) => '<li>' + esc(x) + '</li>').join('');
+    $('analysisBox').innerHTML =
+      '<div class="topic">📌 ' + esc(a.topic || '') + '</div>' +
+      '<h3>이게 왜 먹히는가</h3><ul>' + why + '</ul>' +
+      '<div class="aud"><strong>닿아야 할 타깃:</strong> ' + esc(a.audience || '') + '</div>';
+
+    const threads = data.threads || [];
+    $('threadsBox').innerHTML =
+      '<div class="step-label">추천 포맷 ' + threads.length + '개 · 나란히 비교해 채택하세요</div>' +
+      threads.map((t, i) => {
+        const ip = t.image_prompts || {};
+        return '<div class="threadcard">' +
+          '<div class="meta"><span class="fmt">#' + esc(t.format_no) + ' ' + esc(t.format_name) + '</span>' +
+            '<button type="button" class="copybtn" data-copy="t' + i + '">📋 글 복사</button></div>' +
+          '<div class="why">왜 이 포맷? ' + esc(t.why_format) + '</div>' +
+          '<div class="threadtext" id="t' + i + '">' + esc(t.text) + '</div>' +
+          (t.cta ? '<div class="cta"><strong>CTA:</strong> ' + esc(t.cta) + '</div>' : '') +
+          '<div class="imgp">' +
+            '<div class="ttl">📷 이미지 프롬프트 (시작 → 끝)' +
+              '<button type="button" class="copybtn" data-copy="ip' + i + '">복사</button></div>' +
+            '<div class="frame"><b>① 시작:</b> ' + esc(ip.start || '') + '</div>' +
+            '<div class="frame"><b>② 끝:</b> ' + esc(ip.end || '') + '</div>' +
+            '<textarea id="ip' + i + '" class="hidden">' + esc('시작: ' + (ip.start || '') + '\n끝: ' + (ip.end || '')) + '</textarea>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+    $('loadingView').classList.add('hidden');
+    $('resultView').classList.remove('hidden');
+    $('resultView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // 복사 버튼 (글 본문 / 이미지 프롬프트)
+  $('threadsBox').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    const el = $(b.dataset.copy); if (!el) return;
+    const text = el.value !== undefined && el.tagName === 'TEXTAREA' ? el.value : el.textContent;
+    try { await navigator.clipboard.writeText(text); }
+    catch (err) {
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+      ta.select(); try { document.execCommand('copy'); } catch (e2) {} ta.remove();
+    }
+    const orig = b.textContent; b.textContent = '✓ 복사됨'; b.classList.add('done');
+    setTimeout(() => { b.textContent = orig; b.classList.remove('done'); }, 1400);
+  });
+
+  $('againBtn').addEventListener('click', () => {
+    $('resultView').classList.add('hidden');
+    $('inputView').classList.remove('hidden');
+    setGenStatus('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
