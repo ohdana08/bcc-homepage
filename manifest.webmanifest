@@ -1,8 +1,8 @@
 {
-  "name": "카드뉴스 공장",
-  "short_name": "카드뉴스",
-  "description": "BCC 카드뉴스 자동 생성 도구",
-  "start_url": "./admin-cardnews.html",
+  "name": "BCC 공장",
+  "short_name": "BCC 공장",
+  "description": "BCC 관리자 도구 — 스레드 공장 / 카드뉴스 공장",
+  "start_url": "./admin.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
