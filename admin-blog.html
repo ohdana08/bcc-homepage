@@ -143,6 +143,15 @@
       </div>
     </div>
 
+    <!-- 기본 설정(한 번만 저장하면 계속 적용 · 세 공장 공유) -->
+    <div class="card" id="settingsCard" style="padding:14px 18px">
+      <div class="step-label" style="margin-bottom:8px">기본 설정 (브라우저에 저장 — 매번 입력 불필요)</div>
+      <div class="row" style="margin-bottom:0">
+        <label for="kakaoLink">카카오톡 링크 — 칼럼 끝 CTA에 '상담·문의' 링크로 자동 삽입 (비우면 없음)</label>
+        <input id="kakaoLink" type="url" placeholder="http://pf.kakao.com/..." />
+      </div>
+    </div>
+
     <!-- 입력 -->
     <div id="inputView" class="card">
       <div class="step-label">① 입력 방식</div>
@@ -213,6 +222,8 @@
 
   const API = window.BCC_API_BASE;
   const PHONE_DOMAIN = 'phone.bcc.kr';
+  const KAKAO_KEY = 'bcc_cta_kakao';                                  // localStorage 키(카드뉴스·스레드와 공유)
+  const DEFAULT_KAKAO = 'http://pf.kakao.com/_xbrxjxkxj/chat';        // 기본값(BCC 카톡 채널)
   const MODE_HINTS = {
     solo: '원료(벤치마킹 글/유튜브 스크립트/강의 멘트)에서 핵심 메시지만 추출 → 원문은 폐기하고 BCC 톤으로 칼럼을 새로 씁니다. (저작권 2단계 분리)',
     osmu: '이미 추출된 핵심 메시지 JSON 으로 바로 칼럼을 생성합니다. (추출 단계 생략 — OSMU 조립용)',
@@ -326,6 +337,12 @@
     try { const sb = await getClient(); await sb.auth.signOut(); } catch (e) {}
     location.reload();
   });
+
+  // 카카오 링크(기본 설정) — 브라우저에 저장, 세 공장 공유. 칼럼 끝 CTA로 삽입.
+  if (localStorage.getItem(KAKAO_KEY) === null) localStorage.setItem(KAKAO_KEY, DEFAULT_KAKAO);
+  $('kakaoLink').value = localStorage.getItem(KAKAO_KEY) || '';
+  $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
+  const ctaKakao = () => (localStorage.getItem(KAKAO_KEY) || '').trim();
 
   // 입력 방식 토글 (단독 / OSMU 부품)
   $('modeHint').textContent = MODE_HINTS[blogMode];
@@ -498,6 +515,9 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
+      // 카카오 링크가 있으면 칼럼 끝 CTA로 1회 삽입(렌더·저장 전 → 보관함 재열람 시 중복 없음)
+      const kk = ctaKakao();
+      if (kk && data.column) data.column.body = (data.column.body || '').trimEnd() + '\n\n상담·문의: ' + kk;
       renderResult(data);
       currentHistoryId = await addHistoryEntry(data, campaignId);   // 서버에 자동 저장
     } catch (err) {

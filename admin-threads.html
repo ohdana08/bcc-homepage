@@ -137,7 +137,17 @@
       <h1 style="text-align:left;font-size:20px">스레드 글 만들기</h1>
       <div style="display:flex;gap:8px;align-items:center">
         <a href="admin-cardnews.html" class="logout" style="text-decoration:none">🛠 카드뉴스 공장</a>
+        <a href="admin-blog.html" class="logout" style="text-decoration:none">📖 블로그 공장</a>
         <button class="logout" id="logoutBtn">로그아웃</button>
+      </div>
+    </div>
+
+    <!-- 기본 설정(한 번만 저장하면 계속 적용 · 세 공장 공유) -->
+    <div class="card" id="settingsCard" style="padding:14px 18px">
+      <div class="step-label" style="margin-bottom:8px">기본 설정 (브라우저에 저장 — 매번 입력 불필요)</div>
+      <div class="row" style="margin-bottom:0">
+        <label for="kakaoLink">카카오톡 링크 — 글 끝에 '상담·문의' 링크로 자동 삽입 (비우면 없음)</label>
+        <input id="kakaoLink" type="url" placeholder="http://pf.kakao.com/..." />
       </div>
     </div>
 
@@ -182,6 +192,8 @@
 
   const API = window.BCC_API_BASE;
   const PHONE_DOMAIN = 'phone.bcc.kr';
+  const KAKAO_KEY = 'bcc_cta_kakao';                                  // localStorage 키(카드뉴스·블로그와 공유)
+  const DEFAULT_KAKAO = 'http://pf.kakao.com/_xbrxjxkxj/chat';        // 기본값(BCC 카톡 채널)
   const INPUT_LABELS = { text: '텍스트', image: '이미지' };
   const PURPOSE_LABELS = { openchat: '오픈채팅', reaction_test: '반응테스트', prompt_bait: '프롬프트떡밥' };
   let loginMode = 'email';
@@ -274,6 +286,12 @@
   });
 
   // 입력 토글(텍스트/이미지)·이미지 첨부는 공통 입구 모듈(benchmark)이 담당.
+
+  // 카카오 링크(기본 설정) — 브라우저에 저장, 세 공장 공유. 글 끝 CTA로 삽입.
+  if (localStorage.getItem(KAKAO_KEY) === null) localStorage.setItem(KAKAO_KEY, DEFAULT_KAKAO);
+  $('kakaoLink').value = localStorage.getItem(KAKAO_KEY) || '';
+  $('kakaoLink').addEventListener('input', () => localStorage.setItem(KAKAO_KEY, $('kakaoLink').value.trim()));
+  const ctaKakao = () => (localStorage.getItem(KAKAO_KEY) || '').trim();
 
   // 목적 선택
   $('purposeBtns').addEventListener('click', (e) => {
@@ -430,6 +448,9 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
+      // 카카오 링크가 있으면 각 스레드 글 끝에 1회 삽입(렌더·저장 전 → 보관함 재열람 시 중복 없음)
+      const kk = ctaKakao();
+      if (kk && Array.isArray(data.threads)) data.threads.forEach((t) => { t.text = (t.text || '').trimEnd() + '\n\n상담·문의: ' + kk; });
       renderResult(data);
       currentHistoryId = await addHistoryEntry(data, bm.mode, selectedPurpose);   // 서버에 자동 저장
     } catch (err) {
