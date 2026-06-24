@@ -158,21 +158,8 @@
 
     <!-- 입력 -->
     <div id="inputView" class="card">
-      <div class="step-label">① 원본 콘텐츠</div>
-      <div class="tabs" id="inputTabs" style="margin-bottom:12px">
-        <button type="button" class="tab active" data-input="text">텍스트 벤치마킹</button>
-        <button type="button" class="tab" data-input="image">이미지 벤치마킹</button>
-      </div>
-      <div class="row" id="textRow">
-        <textarea id="script" rows="8" placeholder="① 워크플로우·프롬프트·노하우(보는 사람에게 방법 전달), 또는 ② 잘 터진 블로그·뉴스·스레드 글(참고용)을 붙여넣으세요."></textarea>
-        <div class="muted" id="scriptHint">내 방법(프롬프트/워크플로우)이면 따라 할 수 있게 살려서, 남의 글이면 저작권 맞춰 새로 써서 카드뉴스로 만들어요. (AI가 알아서 판별)</div>
-      </div>
-      <div class="row" id="imageRow" style="display:none">
-        <input id="imageFile" type="file" accept="image/*" multiple />
-        <div id="imageCount" class="muted" style="margin-top:6px"></div>
-        <img id="imagePreview" alt="" style="display:none;max-width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--border)" />
-        <div class="muted">워크플로우·프롬프트 캡처(방법 전달), 또는 잘 터진 게시글 캡처(참고용)를 올리세요. 여러 장 가능(최대 4장). AI가 읽고 방법 전달/재구성을 알아서 판별해요.</div>
-      </div>
+      <!-- 공통 입구(텍스트/이미지 벤치마킹) — shared/benchmark-input.js 가 렌더 -->
+      <div id="benchmarkMount"></div>
 
       <div class="step-label" style="margin-top:6px">② 이 카드뉴스의 목적</div>
       <div class="purpose" id="purposeBtns">
@@ -227,6 +214,7 @@
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  import { createBenchmarkInput, fileToScaledBase64 } from './shared/benchmark-input.js';
   // JSZip / QRCode 는 필요할 때만 동적 import (CDN 실패해도 페이지는 정상 로드)
 
   const API = window.BCC_API_BASE;
@@ -236,7 +224,8 @@
   let loginMode = 'email';
   let supabase = null;
   let selectedPurpose = null;
-  let selectedInput = 'text';  // 'text'(텍스트 벤치마킹) | 'image'(이미지 벤치마킹)
+  // 공통 입구(텍스트/이미지 벤치마킹) — shared/benchmark-input.js
+  const benchmark = createBenchmarkInput({ mount: 'benchmarkMount', stepLabel: '① 원본 콘텐츠', onChange: () => setGenStatus('') });
   let lastCards = [];          // 마지막 생성된 구성표
   let lastMeta = {};           // 마지막 구성표 메타(style_hint 등)
   let renderedCanvases = [];   // 렌더된 캔버스들
@@ -472,46 +461,8 @@
   });
   renderHistoryList();   // 초기 빈 목록(로그인 후 fetchHistory 로 채움)
 
-  // 입력 타입 탭 — 텍스트 벤치마킹 / 이미지 벤치마킹
-  $('inputTabs').addEventListener('click', (e) => {
-    const b = e.target.closest('.tab'); if (!b) return;
-    selectedInput = b.dataset.input;
-    document.querySelectorAll('#inputTabs .tab').forEach((x) => x.classList.toggle('active', x === b));
-    $('textRow').style.display = selectedInput === 'text' ? '' : 'none';
-    $('imageRow').style.display = selectedInput === 'image' ? '' : 'none';
-    setGenStatus('');
-  });
-  // 이미지 미리보기(첫 장) + 선택 개수
-  $('imageFile').addEventListener('change', () => {
-    const files = Array.from($('imageFile').files || []);
-    if (!files.length) { $('imagePreview').style.display = 'none'; $('imageCount').textContent = ''; return; }
-    $('imageCount').textContent = files.length + '장 선택됨' + (files.length > 4 ? ' (최대 4장까지 사용)' : '');
-    $('imagePreview').src = URL.createObjectURL(files[0]);
-    $('imagePreview').style.display = 'block';
-  });
-
-  // 업로드 이미지 → 긴 변 1568px 이하로 축소한 JPEG base64 (Claude 비전 권장 + 전송 경량화)
-  function fileToScaledBase64(file, maxEdge = 1568, quality = 0.85) {
-    return new Promise((resolve, reject) => {
-      const fr = new FileReader();
-      fr.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          let w = img.width, h = img.height;
-          const r = Math.min(1, maxEdge / Math.max(w, h));
-          w = Math.round(w * r); h = Math.round(h * r);
-          const c = document.createElement('canvas'); c.width = w; c.height = h;
-          c.getContext('2d').drawImage(img, 0, 0, w, h);
-          const dataUrl = c.toDataURL('image/jpeg', quality);
-          resolve({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg' });
-        };
-        img.onerror = reject;
-        img.src = fr.result;
-      };
-      fr.onerror = reject;
-      fr.readAsDataURL(file);
-    });
-  }
+  // 입력 토글(텍스트/이미지)·이미지 첨부·축소(fileToScaledBase64)는 공통 입구 모듈이 담당.
+  // 디자인 레퍼런스(2탄 화풍 참고)는 별개 입력이라 여기서 직접 처리한다.
 
   // 목적 선택
   $('purposeBtns').addEventListener('click', (e) => {
@@ -540,20 +491,16 @@
     const intent = $('intent').value.trim();
     if (!selectedPurpose) { setGenStatus('목적을 선택해 주세요.', 'err'); return; }
 
-    // 입력(텍스트/이미지)에 따라 요청 본문 구성
+    // 공통 입구에서 요청 본문 구성 (텍스트→script / 이미지→images)
+    const verr = benchmark.validate();
+    if (verr) { setGenStatus(verr, 'err'); return; }
     let body;
-    if (selectedInput === 'image') {
-      const files = Array.from($('imageFile').files || []);
-      if (!files.length) { setGenStatus('벤치마킹할 이미지를 올려주세요.', 'err'); return; }
-      try {
-        const images = await Promise.all(files.slice(0, 4).map((f) => fileToScaledBase64(f)));
-        body = { images, purpose: selectedPurpose, intent };
-      } catch (e) { setGenStatus('이미지를 읽지 못했습니다. 다른 파일로 시도해 주세요.', 'err'); return; }
-    } else {
-      const script = $('script').value.trim();
-      if (script.length < 30) { setGenStatus('텍스트를 30자 이상 붙여넣어 주세요.', 'err'); return; }
-      body = { script, purpose: selectedPurpose, intent };
-    }
+    try {
+      const bm = await benchmark.payload();
+      body = bm.mode === 'image'
+        ? { images: bm.images, purpose: selectedPurpose, intent }
+        : { script: bm.text, purpose: selectedPurpose, intent };
+    } catch (e) { setGenStatus('이미지를 읽지 못했습니다. 다른 파일로 시도해 주세요.', 'err'); return; }
 
     let token;
     try { token = await authToken(); } catch (err) { setGenStatus(err.message, 'err'); return; }

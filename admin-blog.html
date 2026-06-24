@@ -43,14 +43,7 @@
   .tab.active{color:#1a1407;background:var(--gold);border-color:var(--gold)}
   .step-label{font-size:12px;color:var(--gold-3);font-weight:700;letter-spacing:.4px;margin-bottom:8px}
   .muted{color:var(--text-mute);font-size:12px;margin-top:4px}
-  /* 이미지 첨부 (단독 모드) */
-  .imgattach{margin-bottom:14px}
-  .imgattach input[type=file]{font-size:13px;color:var(--text-dim)}
-  .thumbgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .thumb{position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#000}
-  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .thumb .rm{position:absolute;top:2px;right:2px;width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  .thumb .rm:hover{background:#ff5050}
+  /* 이미지 첨부(단독 모드 텍스트/이미지 토글)는 공통 입구 모듈이 스타일 주입 */
   /* 결과 — 공통 블록 */
   .block{border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;background:var(--surface)}
   .block .bhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
@@ -159,19 +152,9 @@
       </div>
       <div class="muted" id="modeHint" style="margin-bottom:14px"></div>
 
-      <!-- 단독 모드 -->
+      <!-- 단독 모드 — 공통 입구(텍스트/이미지 벤치마킹), shared/benchmark-input.js 가 렌더 -->
       <div id="soloPane">
-        <div class="step-label">② 무엇을 어떻게 쓸지 (자유 서술)</div>
-        <div class="row">
-          <textarea id="source" rows="7" placeholder="어떤 주제로, 어떤 형식으로, 무엇을 벤치마킹하고 싶은지 자유롭게 쓰세요.&#10;예) 1인 사업자가 AI로 시간 버는 법을 주제로, 경험 중심 칼럼으로 쓰고 싶어. 첨부 이미지의 구조를 참고하되 표현은 BCC 톤으로."></textarea>
-        </div>
-
-        <div class="step-label">②-2 벤치마킹 이미지 첨부 (선택)</div>
-        <div class="imgattach">
-          <input id="imageFile" type="file" accept="image/*" multiple />
-          <div class="muted" id="imageHint">벤치마킹할 글을 캡처해 넣거나, 캡처 후 이 영역에 붙여넣기(Ctrl/⌘+V) 하세요. 최대 4장. (이미지의 구조·논리만 읽고 표현은 새로 씁니다)</div>
-          <div class="thumbgrid" id="thumbGrid"></div>
-        </div>
+        <div id="benchmarkMount"></div>
       </div>
 
       <!-- OSMU 부품 모드 -->
@@ -226,6 +209,7 @@
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  import { createBenchmarkInput } from './shared/benchmark-input.js';
 
   const API = window.BCC_API_BASE;
   const PHONE_DOMAIN = 'phone.bcc.kr';
@@ -240,6 +224,13 @@
   let historyCache = [];          // 목록 메타 캐시
   let lastHistError = '';         // 마지막 오류(서랍 배너용)
   let lastResult = null;          // 현재 화면의 생성 결과(복사용)
+  // 단독 모드 공통 입구(텍스트/이미지 벤치마킹) — shared/benchmark-input.js
+  const benchmark = createBenchmarkInput({
+    mount: 'benchmarkMount',
+    stepLabel: '② 원본 콘텐츠 (텍스트 또는 이미지 벤치마킹)',
+    textPlaceholder: '벤치마킹할 글, 또는 내 강의 멘트·노하우를 붙여넣으세요. (30자 이상)\n핵심 메시지만 추출한 뒤, 원문은 보지 않고 BCC 톤으로 칼럼을 새로 씁니다.',
+    onChange: () => setGenStatus(''),
+  });
 
   const $ = (id) => document.getElementById(id);
   const loginView = $('loginView'), appView = $('appView');
@@ -348,65 +339,7 @@
     setGenStatus('');
   });
 
-  // ───────── 단독 모드 이미지 첨부 (파일 선택 + 클립보드 paste, 최대 4장) ─────────
-  let soloFiles = [];   // File 객체 배열(파일/붙여넣기 공통). 전송 직전 base64 로 변환.
-
-  // 업로드 이미지 → 긴 변 1568px 이하 JPEG base64 (Claude 비전 권장 + 전송 경량화). 카드뉴스 공장과 동일.
-  function fileToScaledBase64(file, maxEdge = 1568, quality = 0.85) {
-    return new Promise((resolve, reject) => {
-      const fr = new FileReader();
-      fr.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          let w = img.width, h = img.height;
-          const r = Math.min(1, maxEdge / Math.max(w, h));
-          w = Math.round(w * r); h = Math.round(h * r);
-          const c = document.createElement('canvas'); c.width = w; c.height = h;
-          c.getContext('2d').drawImage(img, 0, 0, w, h);
-          const dataUrl = c.toDataURL('image/jpeg', quality);
-          resolve({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg' });
-        };
-        img.onerror = reject;
-        img.src = fr.result;
-      };
-      fr.onerror = reject;
-      fr.readAsDataURL(file);
-    });
-  }
-  function renderThumbs() {
-    const grid = $('thumbGrid');
-    grid.innerHTML = '';
-    soloFiles.forEach((f, i) => {
-      const d = document.createElement('div'); d.className = 'thumb';
-      const im = document.createElement('img'); im.src = URL.createObjectURL(f); im.alt = '';
-      const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'rm'; rm.textContent = '✕'; rm.title = '제거';
-      rm.addEventListener('click', () => { soloFiles.splice(i, 1); renderThumbs(); });
-      d.appendChild(im); d.appendChild(rm); grid.appendChild(d);
-    });
-    $('imageHint').textContent = soloFiles.length
-      ? soloFiles.length + '장 첨부됨' + (soloFiles.length >= 4 ? ' (최대 4장)' : '') + ' — 구조·논리만 읽고 표현은 새로 씁니다.'
-      : '벤치마킹할 글을 캡처해 넣거나, 캡처 후 이 영역에 붙여넣기(Ctrl/⌘+V) 하세요. 최대 4장. (이미지의 구조·논리만 읽고 표현은 새로 씁니다)';
-  }
-  function addFiles(files) {
-    for (const f of files) {
-      if (!f || !f.type || !f.type.startsWith('image/')) continue;
-      if (soloFiles.length >= 4) { setGenStatus('이미지는 최대 4장까지 첨부할 수 있어요.', 'err'); break; }
-      soloFiles.push(f);
-    }
-    renderThumbs();
-  }
-  $('imageFile').addEventListener('change', () => {
-    addFiles(Array.from($('imageFile').files || []));
-    $('imageFile').value = '';   // 같은 파일 다시 선택 가능하게 초기화
-  });
-  // 클립보드 붙여넣기(캡처 이미지) — 단독 모드일 때만 받는다.
-  window.addEventListener('paste', (e) => {
-    if (blogMode !== 'solo') return;
-    const items = (e.clipboardData && e.clipboardData.items) || [];
-    const imgs = [];
-    for (const it of items) { if (it.kind === 'file' && it.type.startsWith('image/')) { const f = it.getAsFile(); if (f) imgs.push(f); } }
-    if (imgs.length) { e.preventDefault(); addFiles(imgs); }
-  });
+  // 단독 모드 이미지 첨부(토글/파일/붙여넣기/축소)는 공통 입구 모듈(benchmark)이 담당.
 
   // ───────── 보관함 (blog_results — 스레드/카드뉴스와 동일 패턴, 기기 간 동기화) ─────────
   function histTitle(data) {
@@ -531,16 +464,14 @@
     const payload = { engine: 'blog', mode: blogMode, campaignId };
 
     if (blogMode === 'solo') {
-      const source = $('source').value.trim();
-      if (source.length < 30 && soloFiles.length === 0) {
-        setGenStatus('자유 서술(30자 이상) 또는 벤치마킹 이미지를 넣어 주세요.', 'err'); return;
-      }
-      if (source) payload.source = source;
-      if (soloFiles.length) {
-        setGenStatus('이미지 처리 중…');
-        try { payload.images = await Promise.all(soloFiles.map((f) => fileToScaledBase64(f))); }
-        catch (e) { setGenStatus('이미지 처리에 실패했습니다. 다른 이미지로 시도해 주세요.', 'err'); return; }
-      }
+      const verr = benchmark.validate();
+      if (verr) { setGenStatus(verr, 'err'); return; }
+      setGenStatus('이미지 처리 중…');
+      try {
+        const bm = await benchmark.payload();
+        if (bm.mode === 'image') payload.images = bm.images; else payload.source = bm.text;
+      } catch (e) { setGenStatus('이미지 처리에 실패했습니다. 다른 이미지로 시도해 주세요.', 'err'); return; }
+      setGenStatus('');
     } else {
       let parsed;
       try { parsed = JSON.parse($('message').value.trim()); }

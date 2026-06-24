@@ -143,27 +143,17 @@
 
     <!-- 입력 -->
     <div id="inputView" class="card">
-      <div class="step-label">① 원재료 종류</div>
-      <div class="tabs" id="inputTabs" style="margin-bottom:8px">
-        <button type="button" class="tab active" data-input="benchmark">벤치마킹 글</button>
-        <button type="button" class="tab" data-input="youtube">유튜브 스크립트</button>
-        <button type="button" class="tab" data-input="lecture">내 강의 멘트</button>
-      </div>
-      <div class="muted" id="inputHint" style="margin-bottom:14px"></div>
+      <!-- 공통 입구(텍스트/이미지 벤치마킹) — shared/benchmark-input.js 가 렌더 -->
+      <div id="benchmarkMount"></div>
 
-      <div class="step-label">② 원재료 붙여넣기</div>
-      <div class="row">
-        <textarea id="source" rows="9" placeholder="벤치마킹할 스레드 글 / 유튜브 스크립트 / 내 강의 멘트 중 하나를 붙여넣으세요. (30자 이상)"></textarea>
-      </div>
-
-      <div class="step-label" style="margin-top:6px">③ 이 글의 목적</div>
+      <div class="step-label" style="margin-top:6px">② 이 글의 목적</div>
       <div class="purpose" id="purposeBtns">
         <button type="button" class="pbtn" data-purpose="openchat">오픈채팅 모으기</button>
         <button type="button" class="pbtn" data-purpose="reaction_test">반응 테스트</button>
         <button type="button" class="pbtn" data-purpose="prompt_bait">프롬프트 떡밥</button>
       </div>
 
-      <div class="step-label" style="margin-top:6px">④ 추가 의도 (선택 · 타깃 / 연결할 곳)</div>
+      <div class="step-label" style="margin-top:6px">③ 추가 의도 (선택 · 타깃 / 연결할 곳)</div>
       <div class="row">
         <textarea id="intent" rows="2" placeholder="예) 바이브코딩에 관심 있는 직장인에게, 오픈채팅방으로 '직접 해보고 질문할 사람'만 모으고 싶어요."></textarea>
       </div>
@@ -188,19 +178,21 @@
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  import { createBenchmarkInput } from './shared/benchmark-input.js';
 
   const API = window.BCC_API_BASE;
   const PHONE_DOMAIN = 'phone.bcc.kr';
-  const INPUT_HINTS = {
-    benchmark: '잘 터진 남의 스레드 글 → "왜 터졌는지"만 뽑아 표현은 100% 새로 씁니다. (저작권: 표현 0% 차용)',
-    youtube: '유튜브 스크립트 → 주장·논리·사례만 가져와 스레드 문법으로 압축·재작성합니다.',
-    lecture: '내 강의 멘트 → 본인 콘텐츠라 재구성이 아니라 다듬어 자산화합니다. (안전)',
-  };
-  const INPUT_LABELS = { benchmark: '벤치마킹', youtube: '유튜브', lecture: '강의멘트' };
+  const INPUT_LABELS = { text: '텍스트', image: '이미지' };
   const PURPOSE_LABELS = { openchat: '오픈채팅', reaction_test: '반응테스트', prompt_bait: '프롬프트떡밥' };
   let loginMode = 'email';
   let supabase = null;
-  let selectedInput = 'benchmark';
+  // 공통 입구(텍스트/이미지 벤치마킹) — shared/benchmark-input.js. 내것/남의것은 B판별이 자동 판단.
+  const benchmark = createBenchmarkInput({
+    mount: 'benchmarkMount',
+    stepLabel: '① 원재료 (텍스트 또는 이미지 벤치마킹)',
+    textPlaceholder: '벤치마킹할 스레드 글 / 유튜브 스크립트 / 내 강의 멘트, 또는 내 프롬프트·워크플로우를 붙여넣으세요. (30자 이상)',
+    onChange: () => setGenStatus(''),
+  });
   let selectedPurpose = null;
   let currentHistoryId = null;   // 현재 보고 있는 보관함 항목 id
   let historyCache = [];         // 목록 메타 캐시
@@ -281,15 +273,7 @@
     location.reload();
   });
 
-  // 입력 종류 탭 (벤치마킹 / 유튜브 / 강의멘트)
-  $('inputHint').textContent = INPUT_HINTS[selectedInput];
-  $('inputTabs').addEventListener('click', (e) => {
-    const b = e.target.closest('.tab'); if (!b) return;
-    selectedInput = b.dataset.input;
-    document.querySelectorAll('#inputTabs .tab').forEach((x) => x.classList.toggle('active', x === b));
-    $('inputHint').textContent = INPUT_HINTS[selectedInput];
-    setGenStatus('');
-  });
+  // 입력 토글(텍스트/이미지)·이미지 첨부는 공통 입구 모듈(benchmark)이 담당.
 
   // 목적 선택
   $('purposeBtns').addEventListener('click', (e) => {
@@ -359,11 +343,11 @@
     } catch (e) { historyCache = []; lastHistError = '네트워크 오류: ' + (e.message || e); }
     renderHistoryList();
   }
-  async function addHistoryEntry(data, inputType, purpose) {
+  async function addHistoryEntry(data, inputMode, purpose) {
     const id = 'th' + Date.now() + Math.floor(Math.random() * 1000);
     let saveErr = '';
     try {
-      const { ok, data: rd } = await apiHistPost({ op: 'save', id, title: histTitle(data), input_type: inputType, purpose, threads_count: (data.threads && data.threads.length) || 0, data });
+      const { ok, data: rd } = await apiHistPost({ op: 'save', id, title: histTitle(data), input_type: inputMode, purpose, threads_count: (data.threads && data.threads.length) || 0, data });
       if (!ok) saveErr = '저장 실패: ' + (rd.error || '서버 오류');
     } catch (e) { saveErr = '저장 실패: ' + (e.message || e); }
     await fetchHistory();
@@ -418,13 +402,17 @@
 
   // 생성
   $('genBtn').addEventListener('click', async () => {
-    const source = $('source').value.trim();
     const intent = $('intent').value.trim();
-    if (source.length < 30) { setGenStatus('원재료를 30자 이상 붙여넣어 주세요.', 'err'); return; }
+    const verr = benchmark.validate();
+    if (verr) { setGenStatus(verr, 'err'); return; }
     if (!selectedPurpose) { setGenStatus('목적을 선택해 주세요.', 'err'); return; }
 
     let token;
     try { token = await authToken(); } catch (err) { setGenStatus(err.message, 'err'); return; }
+
+    let bm;
+    try { bm = await benchmark.payload(); }
+    catch (e) { setGenStatus('이미지를 읽지 못했습니다. 다른 파일로 시도해 주세요.', 'err'); return; }
 
     $('inputView').classList.add('hidden');
     $('loadingView').classList.remove('hidden');
@@ -432,15 +420,18 @@
 
     try {
       // ★ Vercel 12함수 한계 때문에 cardnews-generate 에 통합됨 → engine:'threads' 로 분기 호출
+      const payload = bm.mode === 'image'
+        ? { engine: 'threads', mode: 'image', images: bm.images, purpose: selectedPurpose, intent }
+        : { engine: 'threads', mode: 'text', text: bm.text, purpose: selectedPurpose, intent };
       const res = await fetch(API + '/api/cardnews-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-        body: JSON.stringify({ engine: 'threads', source, inputType: selectedInput, purpose: selectedPurpose, intent }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
       renderResult(data);
-      currentHistoryId = await addHistoryEntry(data, selectedInput, selectedPurpose);   // 서버에 자동 저장
+      currentHistoryId = await addHistoryEntry(data, bm.mode, selectedPurpose);   // 서버에 자동 저장
     } catch (err) {
       $('loadingView').classList.add('hidden');
       $('inputView').classList.remove('hidden');

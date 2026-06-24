@@ -5,6 +5,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { supabaseAdmin } from '../lib/supabase.js';
 import { applyCors } from '../lib/cors.js';
+import { BENCHMARK_COPYRIGHT_BLOCK, COPYRIGHT_GUARDRAIL, normalizeImages, buildBenchmarkContent } from '../lib/benchmark.js';
 
 // Opus 호출이 길어질 수 있으므로 함수 타임아웃을 넉넉히 둔다(Vercel Hobby 최대 60s).
 export const maxDuration = 60;
@@ -31,11 +32,8 @@ const SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 카드뉴스 �
 - workflow / prompt: 최대 15장 (단계마다 한 장, 너무 빽빽하지 않게).
 - knowhow / general: 5~8장.
 
-# 저작권 (입력이 "남의 콘텐츠"일 때만 적용)
-- 표현을 100% 새로 쓴다: 순서·용어·단어·문장을 모두 바꿔 원문과 안 겹치게, 의미만 정확히 전달.
-- 영어는 반드시 한글로 바꾼다.
-- 단, 보는 사람이 그대로 복사해 써야 하는 프롬프트·코드·명령어는 예외 — 원문 보존(바꾸면 작동 안 함).
-- 출력 전, 각 문장이 원문 표현과 겹치지 않는지 스스로 점검한다.
+# 저작권 — 아래 공통 규칙(B판별 + 강제 안전장치)을 따른다
+${BENCHMARK_COPYRIGHT_BLOCK}
 
 # 분석 (analysis 로 화면에 보여준다)
 - 이 콘텐츠가 먹힌/유용한 이유 5가지
@@ -114,22 +112,8 @@ function parseJsonLoose(text) {
 
 // ───────────────────────── 스레드 공장 (engine:'threads') ─────────────────────────
 // ★ Vercel Hobby 12함수 한계 때문에 별도 함수로 두지 않고 이 엔드포인트에 통합한다.
-//   admin-threads.html 이 { engine:'threads', source, inputType, purpose, intent } 로 호출.
-const THREADS_INPUT_TYPES = {
-  benchmark: '벤치마킹 스레드 글',
-  youtube: '유튜브 스크립트',
-  lecture: '내 강의 멘트',
-};
-const THREADS_INPUT_GUIDE = {
-  benchmark:
-    '[입력=벤치마킹 스레드 글] "왜 터졌는가"(논리·후킹 방식·감정 자극)만 추출하고 글은 100% 새로 쓴다. ' +
-    '원본의 단어·문장·비유·어순을 단 하나도 가져오지 않는다. 주제만 같고 표현은 완전히 다른 글이어야 한다. (규칙 8 엄격 적용)',
-  youtube:
-    '[입력=유튜브 스크립트] 주장·논리·사례를 추출해 스레드 문법(짧은 문단·후킹·CTA)으로 압축·재작성한다. ' +
-    '말투·문장은 그대로 옮기지 말고 스레드용으로 새로 쓴다. (규칙 8 적용)',
-  lecture:
-    '[입력=내 강의 멘트] 본인 콘텐츠이므로 재구성 규칙(규칙 8) 예외. 핵심 메시지를 살려 스레드 글로 다듬어 자산화한다. 의미를 바꾸지 말고 더 또렷하게 정리한다.',
-};
+//   admin-threads.html 이 { engine:'threads', mode, text|source, images, purpose, intent } 로 호출.
+//   입구는 카드뉴스와 동일한 [텍스트/이미지] 공통 입구. 내것/남의것은 B판별이 자동 판단.
 const THREADS_PURPOSES = {
   openchat: '오픈채팅방 모으기 — "직접 해보고 질문할 사람만 들어오세요" 식으로 선별형 CTA',
   reaction_test: '반응 테스트 — 댓글·저장·공감을 유도해 어떤 떡밥이 먹히는지 본다(과한 판매 CTA 금지)',
@@ -137,7 +121,7 @@ const THREADS_PURPOSES = {
 };
 
 const THREADS_SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 스레드 글 자동 생성 엔진(스레드 공장)이다.
-원재료(벤치마킹 글 / 유튜브 스크립트 / 내 강의 멘트)를 받아, 8개 포맷 중 가장 어울리는 2~3개를 골라 각각 완성된 스레드 글 + 이미지 프롬프트 2개를 써낸다.
+원재료(텍스트 또는 첨부 이미지 — 내 방법/프롬프트/워크플로우, 또는 잘 터진 남의 글·게시물)를 받아, 8개 포맷 중 가장 어울리는 2~3개를 골라 각각 완성된 스레드 글 + 이미지 프롬프트 2개를 써낸다.
 
 # 최우선 목적 (절대 잊지 말 것)
 판매가 아니라 "선별·수집"이다. 프롬프트·워크플로우에 관심 있는 사람 중, 받아서 직접 해보고 질문하는 "실행력 있는 사람"만 모은다. 어그로로 아무나 끌지 않는다.
@@ -166,9 +150,10 @@ const THREADS_SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 스레�
 규칙 5. 전문용어를 줄이고 보편적인 단어로 쓴다.
 규칙 6. 어그로로 아무나 끌지 않는다. 실행력 있는 사람만 선별한다.
 규칙 7. 숫자·1등 표현을 활용한다(좁혀서라도 1등: "발산동에서 가장 오래된" 식).
-규칙 8. [재구성 원칙 — 위반 시 폐기] 벤치마킹/유튜브 입력은 단어·문장·비유·어순을 하나도 가져오지 않는다.
-        완성 후 자가 점검: "원본과 나란히 놓으면 같은 글로 보이는가?" → 조금이라도 그렇다면 다시 쓴다.
-        (강의 멘트 입력은 본인 콘텐츠라 이 규칙 예외 — 다듬어 활용)
+규칙 8. [저작권] 아래 [B판별]·[저작권 강제 안전장치]를 그대로 따른다(내 방법은 살려서, 남의 글은 전면 재구성).
+
+# 저작권 — 공통 규칙 (B판별 + 강제 안전장치)
+${BENCHMARK_COPYRIGHT_BLOCK}
 
 # CTA (목적에 맞춰 설계)
 - 목표는 판매가 아니라 선별·수집이다.
@@ -241,29 +226,36 @@ const THREADS_SCHEMA = {
 
 // 스레드 글 생성 — auth/admin 검증은 호출부(handler)에서 끝낸 뒤 들어온다.
 async function handleThreads(req, res, client) {
-  const { source, inputType, purpose, intent } = req.body || {};
-  if (!source || source.trim().length < 30) {
-    return res.status(400).json({ error: '원재료를 30자 이상 붙여넣어 주세요.' });
-  }
-  if (!inputType || !THREADS_INPUT_TYPES[inputType]) {
-    return res.status(400).json({ error: '원재료 종류를 선택해 주세요.' });
+  const { mode, source, text, purpose, intent, images } = req.body || {};
+  // 공통 입구: 텍스트(source/text) 또는 이미지. 내것/남의것은 B판별이 자동 판단.
+  const bodyText = (text || source || '').trim();
+  const imgs = normalizeImages(images);
+  const hasText = bodyText.length >= 30;
+  const hasImage = imgs.length > 0;
+  if (!hasText && !hasImage) {
+    return res.status(400).json({ error: '원재료 텍스트(30자 이상) 또는 이미지를 넣어 주세요.' });
   }
   if (!purpose || !THREADS_PURPOSES[purpose]) {
     return res.status(400).json({ error: '목적을 선택해 주세요.' });
   }
 
   const header =
-    `# 원재료 종류\n${THREADS_INPUT_TYPES[inputType]}\n${THREADS_INPUT_GUIDE[inputType]}\n\n` +
     `# 목적/CTA 방향\n${THREADS_PURPOSES[purpose]}\n\n` +
-    `# 추가 의도(타깃 / 연결할 곳)\n${(intent || '').trim() || '(미입력 — 맥락에서 가장 적절한 선별형 CTA를 설계하되, 사실정보는 자리표시자로 둔다)'}\n\n` +
-    `# 원재료 본문\n${source.trim()}`;
+    `# 추가 의도(타깃 / 연결할 곳)\n${(intent || '').trim() || '(미입력 — 맥락에서 가장 적절한 선별형 CTA를 설계하되, 사실정보는 자리표시자로 둔다)'}`;
+
+  const content = buildBenchmarkContent({
+    text: hasText ? bodyText : '',
+    images: imgs,
+    headerText: header,
+    imageRoleText: '첨부 이미지(들)가 원재료다(내 방법/프롬프트/워크플로우 캡처, 또는 잘 터진 남의 글·게시물 캡처). 이미지 속 내용을 읽고 위 [B판별]·[저작권 강제 안전장치]에 따라 스레드 글로 만들어라.',
+  });
 
   const msg = await client.messages.create({
     model: 'claude-opus-4-8',
     max_tokens: 8000,
     system: THREADS_SYSTEM_PROMPT,
     output_config: { format: { type: 'json_schema', schema: THREADS_SCHEMA } },
-    messages: [{ role: 'user', content: header }],
+    messages: [{ role: 'user', content }],
   });
 
   if (msg.stop_reason === 'refusal') {
@@ -310,10 +302,10 @@ const BLOG_MESSAGE_SCHEMA = {
 const BLOG_EXTRACT_SYSTEM_PROMPT = `너는 콘텐츠에서 "핵심 메시지의 뼈대"만 추출하는 엔진이다.
 입력된 원료에서 다음만 뽑는다.
 
-# 원료의 형태 (둘 중 하나 또는 둘 다)
-- 텍스트 지시: 사용자가 쓴 "어떤 주제로 / 어떤 형식으로 / 무엇을 벤치마킹할지"의 방향.
-- 첨부 이미지: 벤치마킹할 글의 캡처 등. 이미지 속 글은 "구조·논리"만 읽고 표현·문장은 절대 가져오지 않는다.
-- 텍스트 지시가 주제·각도를 정하고, 이미지는 참고할 구조·논리의 원료다. 둘 다 있으면 둘 다 반영한다.
+# 원료의 형태 (텍스트 / 첨부 이미지, 또는 둘 다)
+- 텍스트 벤치마킹: 사용자가 붙여넣은 글·지시(주제·형식·무엇을 벤치마킹할지의 방향).
+- 이미지 벤치마킹: 벤치마킹할 글의 캡처 등. 이미지 속 글은 "구조·논리"만 읽고 표현·문장은 절대 가져오지 않는다.
+- 둘 다 있으면 둘 다 반영한다.
 
 # 뽑을 것 (이것만)
 - topic: 이 글이 다루는 주제 한 줄.
@@ -322,10 +314,8 @@ const BLOG_EXTRACT_SYSTEM_PROMPT = `너는 콘텐츠에서 "핵심 메시지의 
 - evidence: 근거·사례의 "종류"만 3개 이내(예: "개인 경험담", "통계 수치", "비교 사례"). 원문 문장 복붙 금지.
 - cta: 원료가 독자에게 유도하려는 행동 한 줄.
 
-# 저작권 원칙 (반드시 지킴)
-- 원문의 표현·단어·문장·비유·어순을 단 하나도 가져오지 않는다. 의미·구조만 추상화한다.
-- 외국어(영어 등) 원료는 번역하지 않는다(번역물은 2차적저작물이라 위험). 영어 상태로 읽고 주장·논리만 한국어 뼈대로 추출한다.
-- 고유명사·수치는 사실이므로 evidence 종류 설명에 필요하면 언급 가능. 그 외 서술은 모두 추상화.
+# 저작권 — 공통 규칙 (B판별 + 강제 안전장치). 추출 단계에서도 원문 표현을 절대 가져오지 않는다.
+${BENCHMARK_COPYRIGHT_BLOCK}
 
 반드시 지정된 JSON 스키마에 맞춰서만 출력한다. 설명·마크다운 없이 JSON 객체만 출력한다.`;
 
@@ -343,10 +333,9 @@ const BLOG_GEN_SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 정보
 - 본문은 H2(##)·H3(###) 소제목으로 구획하고, 소제목에 검색 키워드가 자연스럽게 들어가게 한다.
 - body 는 마크다운으로 쓴다(## , ### , 문단, 필요시 - 목록).
 
-# 저작권 (생성 단계 규칙)
-- 뼈대(JSON)의 의미·논리 순서만 따르고, 표현·문장은 100% BCC 표현으로 새로 쓴다.
-- 동의어 치환(단어만 바꾸기)은 재작성이 아니다. 처음부터 BCC 문장으로 작성한다.
-- 고유명사·수치·인용은 사실이므로 유지. 그 외 서술은 전부 새 표현.
+# 저작권 (생성 단계 — 공통 강제 안전장치)
+- 뼈대(JSON)의 의미·논리 순서만 따르고, 표현·문장은 100% BCC 표현으로 처음부터 새로 쓴다.
+${COPYRIGHT_GUARDRAIL}
 
 # SEO (블로그만의 무기 — 반드시 함께 생성)
 - seo_title: 검색 키워드를 앞쪽에 배치한 제목. 60자 이내.
@@ -438,7 +427,7 @@ async function generateColumn(client, message, campaignId) {
 
 // 블로그 글 생성 — auth/admin 검증은 호출부(handler)에서 끝낸 뒤 들어온다.
 async function handleBlog(req, res, client) {
-  const { mode, source, message, campaignId, images } = req.body || {};
+  const { mode, source, text, message, campaignId, images } = req.body || {};
 
   // 입구2(OSMU 부품): 이미 추출된 핵심 메시지 JSON → 추출 건너뛰고 바로 생성.
   let coreMessage;
@@ -447,27 +436,22 @@ async function handleBlog(req, res, client) {
     const verr = validateMessage(coreMessage);
     if (verr) return res.status(400).json({ error: verr });
   } else {
-    // 입구1(단독): 원료(텍스트 지시 + 첨부 이미지) → 추출 → 핵심 메시지 JSON.
-    const imgs = Array.isArray(images) ? images.filter((im) => im && im.base64 && im.base64.length > 100).slice(0, 4) : [];
-    const hasText = source && source.trim().length >= 30;
+    // 입구1(단독): 공통 입구(텍스트 벤치마킹 또는 이미지 벤치마킹) → 추출 → 핵심 메시지 JSON.
+    const bodyText = (text || source || '').trim();
+    const imgs = normalizeImages(images);
+    const hasText = bodyText.length >= 30;
     const hasImage = imgs.length > 0;
     if (!hasText && !hasImage) {
       return res.status(400).json({ error: '원료 텍스트(30자 이상) 또는 이미지를 넣어 주세요.' });
     }
 
     // 추출(call1)만 멀티모달. 생성(call2)에는 이미지를 넘기지 않는다 → 원문 표현 차용 원천 차단.
-    const directionText = (source || '').trim();
-    const exHeader =
-      `# 사용자 지시(주제·형식·의도)\n${directionText || '(텍스트 지시 없음 — 첨부 이미지의 구조·논리만 보고 가장 적절한 주제·각도로 뼈대를 잡아라)'}\n\n` +
-      (hasImage
-        ? `# 첨부 이미지 = 벤치마킹 원료\n첨부 이미지(들)는 벤치마킹할 글의 캡처다. 이미지 속 글의 "구조·논리"만 읽어 뼈대로 추출하고, 표현·문장·단어는 단 하나도 가져오지 마라. 외국어면 번역하지 말고 영어 상태로 구조만 읽어라.`
-        : `# 원료 본문\n${directionText}`);
-    const exContent = hasImage
-      ? [
-          ...imgs.map((im) => ({ type: 'image', source: { type: 'base64', media_type: im.mediaType || 'image/jpeg', data: im.base64 } })),
-          { type: 'text', text: exHeader },
-        ]
-      : exHeader;
+    const exContent = buildBenchmarkContent({
+      text: hasText ? bodyText : '',
+      images: imgs,
+      headerText: '# 원료에서 핵심 메시지 뼈대만 추출하라 (위 [B판별]·[저작권 강제 안전장치] 적용)',
+      imageRoleText: '첨부 이미지(들)는 벤치마킹할 글의 캡처다. 이미지 속 글의 "구조·논리"만 읽어 뼈대로 추출하고, 표현·문장·단어는 단 하나도 가져오지 마라.',
+    });
 
     const ex = await client.messages.create({
       model: 'claude-sonnet-4-6',
@@ -537,9 +521,9 @@ export default async function handler(req, res) {
     }
   }
 
-  // 3) 입력 검증 (텍스트 벤치마킹 또는 이미지 벤치마킹)
+  // 3) 입력 검증 (텍스트 벤치마킹 또는 이미지 벤치마킹 — 공통 입구)
   const { script, purpose, intent, images } = req.body || {};
-  const imgs = Array.isArray(images) ? images.filter((im) => im && im.base64 && im.base64.length > 100).slice(0, 4) : [];
+  const imgs = normalizeImages(images);
   const hasText = script && script.trim().length >= 30;
   const hasImage = imgs.length > 0;
   if (!hasText && !hasImage) {
@@ -557,17 +541,14 @@ export default async function handler(req, res) {
 
   const header =
     `# 목적/CTA\n${PURPOSES[purpose]}\n\n` +
-    `# 의도(홍보 대상 / 연결할 BCC 프로그램)\n${(intent || '').trim() || '(미입력 — 맥락에서 가장 적절한 BCC 연결을 추론하되, 사실정보는 자리표시자로 둔다)'}\n\n`;
+    `# 의도(홍보 대상 / 연결할 BCC 프로그램)\n${(intent || '').trim() || '(미입력 — 맥락에서 가장 적절한 BCC 연결을 추론하되, 사실정보는 자리표시자로 둔다)'}`;
 
-  let userMessageContent;
-  if (hasImage) {
-    userMessageContent = [
-      ...imgs.map((im) => ({ type: 'image', source: { type: 'base64', media_type: im.mediaType || 'image/jpeg', data: im.base64 } })),
-      { type: 'text', text: header + '# 원본 콘텐츠\n첨부 이미지(들)는 원본 콘텐츠다(워크플로우·프롬프트·노하우 또는 참고 게시글). 이미지 속 내용을 읽고 위 [모드 판별]에 따라 BCC 카드뉴스로 만들어라.' },
-    ];
-  } else {
-    userMessageContent = header + '# 원본 콘텐츠(텍스트)\n' + script.trim();
-  }
+  const userMessageContent = buildBenchmarkContent({
+    text: hasText ? script : '',
+    images: imgs,
+    headerText: header,
+    imageRoleText: '첨부 이미지(들)는 원본 콘텐츠다(워크플로우·프롬프트·노하우 또는 참고 게시글). 이미지 속 내용을 읽고 위 [B판별]·[저작권 강제 안전장치]에 따라 BCC 카드뉴스로 만들어라.',
+  });
 
   try {
     const msg = await client.messages.create({
