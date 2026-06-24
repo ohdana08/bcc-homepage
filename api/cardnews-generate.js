@@ -308,7 +308,12 @@ const BLOG_MESSAGE_SCHEMA = {
 
 // [추출 단계] 원료에서 "뼈대"만 뽑는다 — 원문 표현·단어·문장은 전부 폐기.
 const BLOG_EXTRACT_SYSTEM_PROMPT = `너는 콘텐츠에서 "핵심 메시지의 뼈대"만 추출하는 엔진이다.
-입력된 원료(벤치마킹 글 / 유튜브 스크립트 / 내 강의 멘트)에서 다음만 뽑는다.
+입력된 원료에서 다음만 뽑는다.
+
+# 원료의 형태 (둘 중 하나 또는 둘 다)
+- 텍스트 지시: 사용자가 쓴 "어떤 주제로 / 어떤 형식으로 / 무엇을 벤치마킹할지"의 방향.
+- 첨부 이미지: 벤치마킹할 글의 캡처 등. 이미지 속 글은 "구조·논리"만 읽고 표현·문장은 절대 가져오지 않는다.
+- 텍스트 지시가 주제·각도를 정하고, 이미지는 참고할 구조·논리의 원료다. 둘 다 있으면 둘 다 반영한다.
 
 # 뽑을 것 (이것만)
 - topic: 이 글이 다루는 주제 한 줄.
@@ -433,7 +438,7 @@ async function generateColumn(client, message, campaignId) {
 
 // 블로그 글 생성 — auth/admin 검증은 호출부(handler)에서 끝낸 뒤 들어온다.
 async function handleBlog(req, res, client) {
-  const { mode, source, message, campaignId } = req.body || {};
+  const { mode, source, message, campaignId, images } = req.body || {};
 
   // 입구2(OSMU 부품): 이미 추출된 핵심 메시지 JSON → 추출 건너뛰고 바로 생성.
   let coreMessage;
@@ -442,16 +447,34 @@ async function handleBlog(req, res, client) {
     const verr = validateMessage(coreMessage);
     if (verr) return res.status(400).json({ error: verr });
   } else {
-    // 입구1(단독): 원료 → 추출 → 핵심 메시지 JSON.
-    if (!source || source.trim().length < 30) {
-      return res.status(400).json({ error: '원료를 30자 이상 붙여넣어 주세요.' });
+    // 입구1(단독): 원료(텍스트 지시 + 첨부 이미지) → 추출 → 핵심 메시지 JSON.
+    const imgs = Array.isArray(images) ? images.filter((im) => im && im.base64 && im.base64.length > 100).slice(0, 4) : [];
+    const hasText = source && source.trim().length >= 30;
+    const hasImage = imgs.length > 0;
+    if (!hasText && !hasImage) {
+      return res.status(400).json({ error: '원료 텍스트(30자 이상) 또는 이미지를 넣어 주세요.' });
     }
+
+    // 추출(call1)만 멀티모달. 생성(call2)에는 이미지를 넘기지 않는다 → 원문 표현 차용 원천 차단.
+    const directionText = (source || '').trim();
+    const exHeader =
+      `# 사용자 지시(주제·형식·의도)\n${directionText || '(텍스트 지시 없음 — 첨부 이미지의 구조·논리만 보고 가장 적절한 주제·각도로 뼈대를 잡아라)'}\n\n` +
+      (hasImage
+        ? `# 첨부 이미지 = 벤치마킹 원료\n첨부 이미지(들)는 벤치마킹할 글의 캡처다. 이미지 속 글의 "구조·논리"만 읽어 뼈대로 추출하고, 표현·문장·단어는 단 하나도 가져오지 마라. 외국어면 번역하지 말고 영어 상태로 구조만 읽어라.`
+        : `# 원료 본문\n${directionText}`);
+    const exContent = hasImage
+      ? [
+          ...imgs.map((im) => ({ type: 'image', source: { type: 'base64', media_type: im.mediaType || 'image/jpeg', data: im.base64 } })),
+          { type: 'text', text: exHeader },
+        ]
+      : exHeader;
+
     const ex = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1500,
       system: BLOG_EXTRACT_SYSTEM_PROMPT,
       output_config: { format: { type: 'json_schema', schema: BLOG_MESSAGE_SCHEMA } },
-      messages: [{ role: 'user', content: `# 원료 본문 (여기서 뼈대만 추출)\n${source.trim()}` }],
+      messages: [{ role: 'user', content: exContent }],
     });
     if (ex.stop_reason === 'refusal') {
       return res.status(422).json({ error: '이 원료는 추출이 거절되었습니다. 다른 원료로 시도해 주세요.' });
