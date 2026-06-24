@@ -284,6 +284,193 @@ async function handleThreads(req, res, client) {
   return res.json(result);
 }
 
+// ───────────────────────── 블로그 공장 (engine:'blog') ─────────────────────────
+// ★ Vercel Hobby 12함수 한계 때문에 별도 함수로 두지 않고 이 엔드포인트에 통합한다.
+//   OSMU 라인 세 번째 출구 — 같은 핵심 메시지를 "가장 길고 깊은 정보성 칼럼"으로 푼다.
+//   입구 2개가 같은 generateColumn() 으로 합류한다(저작권 2단계 분리 적용):
+//     [입구1 mode:'solo'] 원료 → (추출) 핵심메시지 JSON → (생성) 칼럼
+//     [입구2 mode:'osmu'] 이미 추출된 핵심메시지 JSON → (생성) 칼럼  (추출 건너뜀)
+//   추출된 JSON 은 폐기하지 않고 결과에 함께 돌려준다(재사용 가능한 OSMU 부품).
+
+// 핵심 메시지 JSON 스키마(입구2 입력 형식 = 지시서 고정). 두 입구 공통 인터페이스.
+const BLOG_MESSAGE_SCHEMA = {
+  type: 'object',
+  properties: {
+    topic: { type: 'string' },
+    claim: { type: 'string' },
+    logic: { type: 'array', items: { type: 'string' } },
+    evidence: { type: 'array', items: { type: 'string' } },
+    cta: { type: 'string' },
+  },
+  required: ['topic', 'claim', 'logic', 'evidence', 'cta'],
+  additionalProperties: false,
+};
+
+// [추출 단계] 원료에서 "뼈대"만 뽑는다 — 원문 표현·단어·문장은 전부 폐기.
+const BLOG_EXTRACT_SYSTEM_PROMPT = `너는 콘텐츠에서 "핵심 메시지의 뼈대"만 추출하는 엔진이다.
+입력된 원료(벤치마킹 글 / 유튜브 스크립트 / 내 강의 멘트)에서 다음만 뽑는다.
+
+# 뽑을 것 (이것만)
+- topic: 이 글이 다루는 주제 한 줄.
+- claim: 글이 밀고 가는 핵심 주장 한 줄.
+- logic: 주장을 펴는 논리 전개 순서 3~5개(각 한 줄). "무엇을 어떤 순서로 말하는가"의 뼈대만.
+- evidence: 근거·사례의 "종류"만 3개 이내(예: "개인 경험담", "통계 수치", "비교 사례"). 원문 문장 복붙 금지.
+- cta: 원료가 독자에게 유도하려는 행동 한 줄.
+
+# 저작권 원칙 (반드시 지킴)
+- 원문의 표현·단어·문장·비유·어순을 단 하나도 가져오지 않는다. 의미·구조만 추상화한다.
+- 외국어(영어 등) 원료는 번역하지 않는다(번역물은 2차적저작물이라 위험). 영어 상태로 읽고 주장·논리만 한국어 뼈대로 추출한다.
+- 고유명사·수치는 사실이므로 evidence 종류 설명에 필요하면 언급 가능. 그 외 서술은 모두 추상화.
+
+반드시 지정된 JSON 스키마에 맞춰서만 출력한다. 설명·마크다운 없이 JSON 객체만 출력한다.`;
+
+// [생성 단계] 뼈대(JSON)만 보고, 원문을 다시 보지 않고, BCC 톤으로 처음부터 칼럼을 쓴다.
+const BLOG_GEN_SYSTEM_PROMPT = `너는 BCC(Business Career Consulting)의 정보성 블로그 칼럼 생성 엔진(블로그 공장)이다.
+입력은 "핵심 메시지 뼈대(JSON)"뿐이다. 원문은 없다. 이 뼈대만 보고 칼럼을 처음부터 새로 쓴다.
+
+# 이 블로그의 성격 (절대 혼동 금지)
+- 정보제공 · 칼럼 · 인사이트. 일반 검색/SNS 독자 대상. 목표는 도달·구독.
+- ❌ 강의 후기 / 실적 자랑 / 영업 톤 절대 금지(그건 별개의 후기 블로그 소관). 정보·칼럼만.
+
+# 길이·구조
+- 본문 1500~2500자(한국어 기준). 스레드·카드뉴스와 같은 핵심 메시지를 "가장 깊고 길게" 푼 심화판.
+- 구조: 후킹 도입 → 문제 정의 → 핵심 인사이트(주장+근거) → 구체 적용/예시 → 정리 + CTA.
+- 본문은 H2(##)·H3(###) 소제목으로 구획하고, 소제목에 검색 키워드가 자연스럽게 들어가게 한다.
+- body 는 마크다운으로 쓴다(## , ### , 문단, 필요시 - 목록).
+
+# 저작권 (생성 단계 규칙)
+- 뼈대(JSON)의 의미·논리 순서만 따르고, 표현·문장은 100% BCC 표현으로 새로 쓴다.
+- 동의어 치환(단어만 바꾸기)은 재작성이 아니다. 처음부터 BCC 문장으로 작성한다.
+- 고유명사·수치·인용은 사실이므로 유지. 그 외 서술은 전부 새 표현.
+
+# SEO (블로그만의 무기 — 반드시 함께 생성)
+- seo_title: 검색 키워드를 앞쪽에 배치한 제목. 60자 이내.
+- meta_description: 검색결과에 노출될 요약. 150자 이내.
+- tags: 검색 키워드/태그 5~8개.
+- (UTM 은 서버가 조립하므로 너는 만들지 않는다.)
+
+# 톤
+BCC 톤: 현실적·직설적·초보자 친화. 추임새·사담·반복은 버린다. 사실정보(가격·일정·링크)는 지어내지 말고 [링크] [일정] 같은 자리표시자로 둔다.
+
+반드시 지정된 JSON 스키마에 맞춰서만 출력한다. 설명·마크다운 펜스 없이 JSON 객체만 출력한다.`;
+
+const BLOG_GEN_SCHEMA = {
+  type: 'object',
+  properties: {
+    column: {
+      type: 'object',
+      properties: {
+        title_h1: { type: 'string' },
+        body: { type: 'string' },
+      },
+      required: ['title_h1', 'body'],
+      additionalProperties: false,
+    },
+    seo: {
+      type: 'object',
+      properties: {
+        seo_title: { type: 'string' },
+        meta_description: { type: 'string' },
+        tags: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['seo_title', 'meta_description', 'tags'],
+      additionalProperties: false,
+    },
+  },
+  required: ['column', 'seo'],
+  additionalProperties: false,
+};
+
+// 원료 식별자(또는 주제)를 UTM campaign 으로 쓸 수 있게 안전한 슬러그로 변환.
+function toCampaignSlug(s) {
+  const base = String(s || '').trim().toLowerCase()
+    .replace(/[^a-z0-9가-힣]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+  return base || 'osmu';
+}
+
+// 핵심 메시지 JSON 검증(입구2 입력) — 필수 키·타입 확인.
+function validateMessage(m) {
+  if (!m || typeof m !== 'object') return '핵심 메시지 JSON 형식이 올바르지 않습니다.';
+  if (!m.topic || !m.claim) return 'topic/claim 은 필수입니다.';
+  if (!Array.isArray(m.logic) || m.logic.length === 0) return 'logic 배열이 비어 있습니다.';
+  if (!Array.isArray(m.evidence)) return 'evidence 는 배열이어야 합니다.';
+  if (!m.cta) return 'cta 는 필수입니다.';
+  return null;
+}
+
+// ★ 두 입구가 합류하는 공유 생성 함수 — 핵심 메시지 JSON 만 받아 칼럼 + SEO 를 만든다.
+async function generateColumn(client, message, campaignId) {
+  const skeleton =
+    `# 핵심 메시지 뼈대 (이것만 보고 칼럼을 처음부터 새로 써라)\n` +
+    `- 주제(topic): ${message.topic}\n` +
+    `- 핵심 주장(claim): ${message.claim}\n` +
+    `- 논리 전개(logic):\n${(message.logic || []).map((x, i) => `  ${i + 1}. ${x}`).join('\n')}\n` +
+    `- 근거/사례 종류(evidence):\n${(message.evidence || []).map((x) => `  - ${x}`).join('\n')}\n` +
+    `- 독자 행동 유도(cta): ${message.cta}`;
+
+  const msg = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 8000,
+    system: BLOG_GEN_SYSTEM_PROMPT,
+    output_config: { format: { type: 'json_schema', schema: BLOG_GEN_SCHEMA } },
+    messages: [{ role: 'user', content: skeleton }],
+  });
+  if (msg.stop_reason === 'refusal') {
+    const e = new Error('이 콘텐츠는 생성이 거절되었습니다. 다른 원료로 시도해 주세요.');
+    e.httpStatus = 422; throw e;
+  }
+  const textBlock = msg.content.find((b) => b.type === 'text');
+  if (!textBlock) { const e = new Error('AI 응답이 비어 있습니다. 다시 시도해 주세요.'); e.httpStatus = 502; throw e; }
+  let out;
+  try { out = parseJsonLoose(textBlock.text); }
+  catch (e2) { const e = new Error('AI 응답 형식 오류. 다시 시도해 주세요.'); e.httpStatus = 502; throw e; }
+
+  const campaign = toCampaignSlug(campaignId || message.topic);
+  out.seo = out.seo || {};
+  out.seo.utm = `utm_source=blog&utm_medium=organic&utm_campaign=${campaign}`;
+  return out;
+}
+
+// 블로그 글 생성 — auth/admin 검증은 호출부(handler)에서 끝낸 뒤 들어온다.
+async function handleBlog(req, res, client) {
+  const { mode, source, message, campaignId } = req.body || {};
+
+  // 입구2(OSMU 부품): 이미 추출된 핵심 메시지 JSON → 추출 건너뛰고 바로 생성.
+  let coreMessage;
+  if (mode === 'osmu' || message) {
+    coreMessage = message;
+    const verr = validateMessage(coreMessage);
+    if (verr) return res.status(400).json({ error: verr });
+  } else {
+    // 입구1(단독): 원료 → 추출 → 핵심 메시지 JSON.
+    if (!source || source.trim().length < 30) {
+      return res.status(400).json({ error: '원료를 30자 이상 붙여넣어 주세요.' });
+    }
+    const ex = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      system: BLOG_EXTRACT_SYSTEM_PROMPT,
+      output_config: { format: { type: 'json_schema', schema: BLOG_MESSAGE_SCHEMA } },
+      messages: [{ role: 'user', content: `# 원료 본문 (여기서 뼈대만 추출)\n${source.trim()}` }],
+    });
+    if (ex.stop_reason === 'refusal') {
+      return res.status(422).json({ error: '이 원료는 추출이 거절되었습니다. 다른 원료로 시도해 주세요.' });
+    }
+    const exBlock = ex.content.find((b) => b.type === 'text');
+    if (!exBlock) return res.status(502).json({ error: 'AI 추출 응답이 비어 있습니다. 다시 시도해 주세요.' });
+    try { coreMessage = parseJsonLoose(exBlock.text); }
+    catch (e) { return res.status(502).json({ error: '추출 응답 형식 오류. 다시 시도해 주세요.' }); }
+    const verr = validateMessage(coreMessage);
+    if (verr) return res.status(502).json({ error: '추출 결과가 불완전합니다: ' + verr });
+  }
+
+  // ★ 합류 지점 — 두 입구 모두 동일한 generateColumn 으로.
+  const generated = await generateColumn(client, coreMessage, campaignId);
+
+  // 추출된 핵심 메시지(OSMU 부품)는 폐기하지 않고 함께 반환한다.
+  return res.json({ message: coreMessage, column: generated.column, seo: generated.seo });
+}
+
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
@@ -310,6 +497,18 @@ export default async function handler(req, res) {
       return await handleThreads(req, res, new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
     } catch (err) {
       console.error('threads-generate error:', err?.message || err);
+      const status = err?.status === 429 ? 429 : 500;
+      return res.status(status).json({ error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '생성 중 오류가 발생했습니다.' });
+    }
+  }
+
+  // 2.6) 블로그 공장 분기 — engine:'blog' 이면 정보성 칼럼 생성기로(같은 함수, 12함수 한계 회피)
+  if ((req.body?.engine) === 'blog') {
+    try {
+      return await handleBlog(req, res, new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
+    } catch (err) {
+      if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
+      console.error('blog-generate error:', err?.message || err);
       const status = err?.status === 429 ? 429 : 500;
       return res.status(status).json({ error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '생성 중 오류가 발생했습니다.' });
     }

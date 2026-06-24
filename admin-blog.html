@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<title>블로그 공장 (관리자) | BCC</title>
+<!-- PWA (홈 화면 앱) -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="블로그 공장" />
+<link rel="apple-touch-icon" href="logo.png" />
+<script src="pay-config.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root{--bg:#0a0a0a;--surface:#16161a;--text:#f3f3f5;--text-dim:#9a9aa6;--text-mute:#6c6c78;--gold:#C9A84C;--gold-3:#e6c878;--border:#26262c;--lime:#EFFF5A;
+    --font-ko:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-ko);line-height:1.6;padding:40px 16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px}
+  .logo img{height:34px;width:auto;background:#fff;border-radius:8px;padding:4px}
+  h1{font-size:22px;letter-spacing:-.5px;text-align:center}
+  .sub{color:var(--text-dim);font-size:14px;text-align:center;margin-bottom:22px}
+  .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:22px;margin-bottom:16px}
+  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .row label{font-size:13px;color:var(--text-dim)}
+  input,textarea{width:100%;padding:12px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:10px;font-size:15px;font-family:inherit;line-height:1.6}
+  textarea{resize:vertical}
+  input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  .btn{width:100%;padding:13px;font-size:15px;font-weight:700;background:var(--gold);color:#1a1407;border:none;border-radius:10px;cursor:pointer}
+  .btn:disabled{opacity:.55;cursor:default}
+  .btn.ghost{background:none;color:var(--text-dim);border:1px solid var(--border)}
+  .status{margin-top:10px;font-size:13px;min-height:18px;text-align:center}
+  .status.err{color:#ff8080}.status.ok{color:#5fd38b}
+  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .head .logout{font-size:13px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer}
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{flex:1;padding:9px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
+  .tab.active{color:#1a1407;background:var(--gold);border-color:var(--gold)}
+  .step-label{font-size:12px;color:var(--gold-3);font-weight:700;letter-spacing:.4px;margin-bottom:8px}
+  .muted{color:var(--text-mute);font-size:12px;margin-top:4px}
+  /* 결과 — 공통 블록 */
+  .block{border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;background:var(--surface)}
+  .block .bhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
+  .block .btitle{font-size:14px;font-weight:800;color:var(--gold-3)}
+  .copybtn{font-size:12px;font-weight:700;color:#1a1407;background:var(--gold-3);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;flex:none}
+  .copybtn.done{background:#5fd38b}
+  /* 핵심메시지(OSMU 부품) */
+  .partbox{background:rgba(239,255,90,.05);border:1px solid rgba(239,255,90,.22)}
+  .partbox .btitle{color:var(--lime)}
+  pre.json{font-size:12.5px;white-space:pre-wrap;word-break:break-all;line-height:1.55;background:rgba(0,0,0,.32);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;max-height:260px;overflow:auto}
+  /* 칼럼 본문 렌더 */
+  .colbody{font-size:15px;line-height:1.8;background:rgba(0,0,0,.20);border:1px solid var(--border);border-radius:10px;padding:16px;color:var(--text)}
+  .colbody h2{font-size:18px;margin:18px 0 8px;color:#fff}
+  .colbody h3{font-size:16px;margin:14px 0 6px;color:var(--gold-3)}
+  .colbody h1{font-size:20px;margin:4px 0 10px;color:#fff}
+  .colbody p{margin:0 0 10px}
+  .colbody ul{margin:0 0 10px 18px}
+  .colbody li{margin-bottom:3px}
+  .colbody strong{color:#fff}
+  .charcount{font-size:12px;color:var(--text-mute);margin-top:8px}
+  /* SEO 메타 */
+  .seogrid{display:flex;flex-direction:column;gap:10px}
+  .seoitem{font-size:13px;line-height:1.6}
+  .seoitem .k{font-size:11px;color:var(--text-mute);font-weight:700;letter-spacing:.3px;display:block;margin-bottom:2px}
+  .seoitem .v{color:var(--text);word-break:break-all}
+  .tag{display:inline-block;font-size:12px;color:var(--gold-3);border:1px solid rgba(201,168,76,.4);border-radius:999px;padding:1px 9px;margin:2px 4px 2px 0}
+  .loading{text-align:center;color:var(--text-dim);font-size:14px;padding:30px 0}
+  /* 보관함 서랍(사이드바) — 스레드/카드뉴스 공장과 동일 패턴 */
+  #menuBtn{position:fixed;top:14px;left:14px;z-index:50;width:42px;height:42px;font-size:18px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;cursor:pointer}
+  #drawerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s}
+  #drawerOverlay.open{opacity:1;pointer-events:auto}
+  #drawer{position:fixed;top:0;left:0;height:100%;width:300px;max-width:86vw;background:#111114;border-right:1px solid var(--border);z-index:70;transform:translateX(-100%);transition:transform .22s ease;display:flex;flex-direction:column}
+  #drawer.open{transform:translateX(0)}
+  .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 14px;border-bottom:1px solid var(--border)}
+  .drawer-head strong{font-size:15px}
+  .drawer-close{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer}
+  #historyList{overflow-y:auto;padding:8px;flex:1}
+  .histgroup{font-size:11px;color:var(--text-mute);font-weight:700;letter-spacing:.3px;margin:12px 6px 4px}
+  .hist{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid transparent;border-radius:10px;margin-bottom:4px;cursor:pointer}
+  .hist:hover{background:var(--surface);border-color:var(--border)}
+  .histicon{width:40px;height:40px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.05)}
+  .histmeta{flex:1;min-width:0}
+  .histtitle{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .histsub{font-size:11px;color:var(--text-mute);margin-top:2px}
+  .histactions{display:flex;flex:none}
+  .histbtn{background:none;border:none;color:var(--text-mute);font-size:13px;cursor:pointer;padding:4px 5px}
+  .histbtn.histdel:hover{color:#ff8080}
+  .histrename{width:100%;padding:5px 8px;background:rgba(0,0,0,.4);border:1px solid var(--gold);border-radius:6px;color:#fff;font-size:14px;font-family:inherit}
+  .hidden{display:none}
+  a{color:var(--gold-3)}
+  /* 모바일 최적화 */
+  @media(max-width:560px){
+    body{padding:max(16px,env(safe-area-inset-top)) 12px 24px}
+    .card{padding:16px}
+    h1{font-size:20px}
+    input,textarea,.btn,.tab{font-size:16px}  /* iOS 입력 시 자동 확대 방지 */
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><img src="logo.png?v=3" alt="BCC" /><strong>블로그 공장</strong></div>
+
+  <!-- 로그인 -->
+  <div id="loginView">
+    <h1>관리자 로그인</h1>
+    <p class="sub">관리자 계정으로만 접근할 수 있습니다.</p>
+    <div class="card">
+      <div class="tabs">
+        <button type="button" class="tab active" data-mode="email">이메일</button>
+        <button type="button" class="tab" data-mode="phone">전화번호</button>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="row" id="rowEmail"><label for="email">이메일</label><input id="email" type="email" autocomplete="email" /></div>
+        <div class="row hidden" id="rowPhone"><label for="phone">전화번호</label><input id="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000" /></div>
+        <div class="row"><label for="pw">비밀번호</label><input id="pw" type="password" autocomplete="current-password" /></div>
+        <button type="submit" class="btn" id="loginBtn">로그인</button>
+        <p id="loginStatus" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 도구 -->
+  <div id="appView" class="hidden">
+    <button id="menuBtn" aria-label="내 블로그 보관함">☰</button>
+    <div id="drawerOverlay"></div>
+    <aside id="drawer">
+      <div class="drawer-head"><strong>📁 내 블로그 보관함</strong><button class="drawer-close" id="drawerClose" aria-label="닫기">✕</button></div>
+      <div id="historyList"></div>
+    </aside>
+    <div class="head">
+      <h1 style="text-align:left;font-size:20px">정보성 칼럼 만들기</h1>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a href="admin-threads.html" class="logout" style="text-decoration:none">✍️ 스레드 공장</a>
+        <a href="admin-cardnews.html" class="logout" style="text-decoration:none">🛠 카드뉴스 공장</a>
+        <button class="logout" id="logoutBtn">로그아웃</button>
+      </div>
+    </div>
+
+    <!-- 입력 -->
+    <div id="inputView" class="card">
+      <div class="step-label">① 입력 방식</div>
+      <div class="tabs" id="modeTabs" style="margin-bottom:8px">
+        <button type="button" class="tab active" data-blogmode="solo">단독 (원료 붙여넣기)</button>
+        <button type="button" class="tab" data-blogmode="osmu">OSMU 부품 (JSON)</button>
+      </div>
+      <div class="muted" id="modeHint" style="margin-bottom:14px"></div>
+
+      <!-- 단독 모드 -->
+      <div id="soloPane">
+        <div class="step-label">② 원료 붙여넣기</div>
+        <div class="row">
+          <textarea id="source" rows="9" placeholder="벤치마킹 글 / 유튜브 스크립트 / 내 강의 멘트 중 하나를 붙여넣으세요. (30자 이상)&#10;→ 핵심 메시지만 추출한 뒤, 원문은 보지 않고 BCC 톤으로 칼럼을 새로 씁니다."></textarea>
+        </div>
+      </div>
+
+      <!-- OSMU 부품 모드 -->
+      <div id="osmuPane" class="hidden">
+        <div class="step-label">② 핵심 메시지 JSON 붙여넣기</div>
+        <div class="row">
+          <textarea id="message" rows="11" placeholder='{&#10;  "topic": "글 주제",&#10;  "claim": "핵심 주장",&#10;  "logic": ["논리 전개 1", "2", "3"],&#10;  "evidence": ["근거/사례 종류 1", "2"],&#10;  "cta": "독자 행동 유도"&#10;}'></textarea>
+        </div>
+        <div class="muted">추출 단계를 건너뛰고 이 JSON 으로 바로 칼럼을 생성합니다. (OSMU 엔진이 꽂을 형식과 동일)</div>
+      </div>
+
+      <div class="step-label" style="margin-top:6px">③ 원료/캠페인 식별자 (선택 · UTM 용)</div>
+      <div class="row">
+        <input id="campaignId" type="text" placeholder="예) ai-blog-routine — 비우면 주제에서 자동 생성" />
+      </div>
+
+      <button type="button" class="btn" id="genBtn">칼럼 생성</button>
+      <p id="genStatus" class="status" role="status" aria-live="polite"></p>
+    </div>
+
+    <!-- 로딩 -->
+    <div id="loadingView" class="card hidden">
+      <div class="loading">AI가 핵심 메시지를 정리하고 긴 정보성 칼럼 + SEO 메타를 쓰는 중입니다… (약 20~40초)</div>
+    </div>
+
+    <!-- 결과 -->
+    <div id="resultView" class="hidden">
+      <!-- ① 핵심 메시지(OSMU 부품) -->
+      <div class="block partbox">
+        <div class="bhead"><span class="btitle">📦 핵심 메시지 (OSMU 부품)</span>
+          <button type="button" class="copybtn" id="copyJsonBtn">JSON 복사</button></div>
+        <pre class="json" id="msgJson"></pre>
+        <div class="muted">이 JSON 은 스레드·카드뉴스 공장 입구2에 그대로 재사용할 수 있는 자산입니다.</div>
+      </div>
+      <!-- ② 칼럼 본문 -->
+      <div class="block">
+        <div class="bhead"><span class="btitle">📰 칼럼 본문</span>
+          <button type="button" class="copybtn" id="copyBodyBtn">본문 복사</button></div>
+        <div class="colbody" id="colBody"></div>
+        <div class="charcount" id="charCount"></div>
+      </div>
+      <!-- ③ SEO 메타 -->
+      <div class="block">
+        <div class="bhead"><span class="btitle">🔎 SEO 메타</span>
+          <button type="button" class="copybtn" id="copySeoBtn">SEO 복사</button></div>
+        <div class="seogrid" id="seoGrid"></div>
+      </div>
+      <button type="button" class="btn ghost" id="againBtn" style="margin-top:4px">새로 만들기</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+  const API = window.BCC_API_BASE;
+  const PHONE_DOMAIN = 'phone.bcc.kr';
+  const MODE_HINTS = {
+    solo: '원료(벤치마킹 글/유튜브 스크립트/강의 멘트)에서 핵심 메시지만 추출 → 원문은 폐기하고 BCC 톤으로 칼럼을 새로 씁니다. (저작권 2단계 분리)',
+    osmu: '이미 추출된 핵심 메시지 JSON 으로 바로 칼럼을 생성합니다. (추출 단계 생략 — OSMU 조립용)',
+  };
+  let loginMode = 'email';
+  let supabase = null;
+  let blogMode = 'solo';          // 'solo' | 'osmu'
+  let currentHistoryId = null;    // 현재 보고 있는 보관함 항목 id
+  let historyCache = [];          // 목록 메타 캐시
+  let lastHistError = '';         // 마지막 오류(서랍 배너용)
+  let lastResult = null;          // 현재 화면의 생성 결과(복사용)
+
+  const $ = (id) => document.getElementById(id);
+  const loginView = $('loginView'), appView = $('appView');
+  const setLoginStatus = (m, k) => { $('loginStatus').textContent = m; $('loginStatus').className = 'status' + (k ? ' ' + k : ''); };
+  const setGenStatus = (m, k) => { $('genStatus').textContent = m; $('genStatus').className = 'status' + (k ? ' ' + k : ''); };
+  const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  // 칼럼 본문(마크다운)을 가벼운 HTML 로 렌더(표시용). 복사 버튼은 원본 마크다운을 복사한다.
+  function renderMarkdown(md) {
+    const lines = String(md || '').split('\n');
+    let html = '', inList = false;
+    const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
+    for (const raw of lines) {
+      const line = raw.trimEnd();
+      if (/^###\s+/.test(line)) { closeList(); html += '<h3>' + inline(line.replace(/^###\s+/, '')) + '</h3>'; }
+      else if (/^##\s+/.test(line)) { closeList(); html += '<h2>' + inline(line.replace(/^##\s+/, '')) + '</h2>'; }
+      else if (/^#\s+/.test(line)) { closeList(); html += '<h1>' + inline(line.replace(/^#\s+/, '')) + '</h1>'; }
+      else if (/^[-*]\s+/.test(line)) { if (!inList) { html += '<ul>'; inList = true; } html += '<li>' + inline(line.replace(/^[-*]\s+/, '')) + '</li>'; }
+      else if (line.trim() === '') { closeList(); }
+      else { closeList(); html += '<p>' + inline(line) + '</p>'; }
+    }
+    closeList();
+    return html;
+  }
+  const charLen = (s) => String(s || '').replace(/\s/g, '').length;  // 공백 제외 글자수(칼럼 길이 감)
+
+  async function getClient() {
+    if (supabase) return supabase;
+    const c = await fetch(API + '/api/config').then((r) => r.json());
+    if (!c.supabaseUrl || !c.supabaseAnonKey) throw new Error('설정을 불러오지 못했습니다.');
+    supabase = createClient(c.supabaseUrl, c.supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage },
+    });
+    return supabase;
+  }
+
+  function showApp() {
+    loginView.classList.add('hidden'); appView.classList.remove('hidden');
+    fetchHistory();   // 서버에서 보관함 불러오기(기기 간 동기화)
+  }
+
+  // 이미 로그인된 세션이 있으면 바로 도구로
+  (async () => {
+    try {
+      const sb = await getClient();
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.access_token) showApp();
+    } catch (e) { /* 로그인 화면 유지 */ }
+  })();
+
+  async function authToken() {
+    const sb = await getClient();
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session?.access_token) throw new Error('로그인이 만료되었습니다. 새로고침 후 다시 로그인하세요.');
+    return session.access_token;
+  }
+
+  // 로그인 탭 전환 (로그인 영역 한정)
+  document.querySelectorAll('#loginView .tab').forEach((t) => t.addEventListener('click', () => {
+    loginMode = t.dataset.mode;
+    document.querySelectorAll('#loginView .tab').forEach((x) => x.classList.toggle('active', x === t));
+    $('rowEmail').classList.toggle('hidden', loginMode !== 'email');
+    $('rowPhone').classList.toggle('hidden', loginMode !== 'phone');
+    setLoginStatus('');
+  }));
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let email;
+    if (loginMode === 'phone') {
+      const digits = $('phone').value.replace(/\D/g, '');
+      if (digits.length < 10) { setLoginStatus('전화번호를 정확히 입력해 주세요.', 'err'); return; }
+      email = digits + '@' + PHONE_DOMAIN;
+    } else {
+      email = $('email').value.trim();
+    }
+    const pw = $('pw').value;
+    if (!email || !pw) { setLoginStatus('로그인 정보를 입력해 주세요.', 'err'); return; }
+    $('loginBtn').disabled = true; setLoginStatus('로그인 중…');
+    try {
+      const sb = await getClient();
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error || !data.session) throw new Error('이메일/전화번호 또는 비밀번호가 올바르지 않습니다.');
+      showApp();
+    } catch (err) {
+      setLoginStatus(err.message || '로그인에 실패했습니다.', 'err');
+      $('loginBtn').disabled = false;
+    }
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    try { const sb = await getClient(); await sb.auth.signOut(); } catch (e) {}
+    location.reload();
+  });
+
+  // 입력 방식 토글 (단독 / OSMU 부품)
+  $('modeHint').textContent = MODE_HINTS[blogMode];
+  $('modeTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    blogMode = b.dataset.blogmode;
+    document.querySelectorAll('#modeTabs .tab').forEach((x) => x.classList.toggle('active', x === b));
+    $('modeHint').textContent = MODE_HINTS[blogMode];
+    $('soloPane').classList.toggle('hidden', blogMode !== 'solo');
+    $('osmuPane').classList.toggle('hidden', blogMode !== 'osmu');
+    setGenStatus('');
+  });
+
+  // ───────── 보관함 (blog_results — 스레드/카드뉴스와 동일 패턴, 기기 간 동기화) ─────────
+  function histTitle(data) {
+    const t = ((data && data.seo && data.seo.seo_title) ||
+      (data && data.column && data.column.title_h1) ||
+      (data && data.message && data.message.topic) || '').replace(/\n/g, ' ').trim();
+    return t.slice(0, 40) || '(제목 없음)';
+  }
+  function histDate(ts) { try { return new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  function dayLabel(ts) {
+    const d = new Date(ts), now = new Date();
+    const a = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const b = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const diff = Math.round((a - b) / 86400000);
+    if (diff <= 0) return '오늘';
+    if (diff === 1) return '어제';
+    if (diff < 7) return diff + '일 전';
+    return (d.getMonth() + 1) + '월 ' + d.getDate() + '일';
+  }
+  async function apiHistGet(id) {
+    const token = await authToken();
+    const qs = '?kind=blog' + (id ? '&id=' + encodeURIComponent(id) : '');
+    const r = await fetch(API + '/api/cardnews-history' + qs, { headers: { Authorization: 'Bearer ' + token } });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  }
+  async function apiHistPost(body) {
+    const token = await authToken();
+    const r = await fetch(API + '/api/cardnews-history', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ kind: 'blog', ...body }),
+    });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  }
+  function renderHistoryList() {
+    const box = $('historyList');
+    const errBanner = lastHistError ? '<div class="muted" style="padding:10px 8px;color:#ff8080;line-height:1.5">⚠ ' + esc(lastHistError) + '</div>' : '';
+    if (!historyCache.length) {
+      box.innerHTML = errBanner + '<div class="muted" style="padding:14px 8px;line-height:1.6">아직 저장된 칼럼이 없어요.<br>새로 생성하면 여기 쌓여요.</div>';
+      return;
+    }
+    let html = errBanner, lastDay = '';
+    for (const e of historyCache) {
+      const dl = dayLabel(e.created_at);
+      if (dl !== lastDay) { html += '<div class="histgroup">' + dl + '</div>'; lastDay = dl; }
+      html += '<div class="hist" data-id="' + e.id + '">'
+        + '<div class="histicon">📰</div>'
+        + '<div class="histmeta"><div class="histtitle">' + esc(e.title) + '</div>'
+        + '<div class="histsub">' + histDate(e.created_at) + (e.campaign_id ? ' · ' + esc(e.campaign_id) : '') + '</div></div>'
+        + '<div class="histactions"><button class="histbtn" data-rename="' + e.id + '" title="이름 바꾸기">✏️</button>'
+        + '<button class="histbtn histdel" data-del="' + e.id + '" title="삭제">✕</button></div>'
+        + '</div>';
+    }
+    box.innerHTML = html;
+  }
+  async function fetchHistory() {
+    try {
+      const { ok, data } = await apiHistGet();
+      if (ok && Array.isArray(data.items)) { historyCache = data.items; lastHistError = ''; }
+      else { historyCache = []; lastHistError = '불러오기 실패: ' + (data.error || '서버 오류'); }
+    } catch (e) { historyCache = []; lastHistError = '네트워크 오류: ' + (e.message || e); }
+    renderHistoryList();
+  }
+  async function addHistoryEntry(data, campaignId) {
+    const id = 'bl' + Date.now() + Math.floor(Math.random() * 1000);
+    let saveErr = '';
+    try {
+      const { ok, data: rd } = await apiHistPost({ op: 'save', id, title: histTitle(data), campaign_id: campaignId || '', data });
+      if (!ok) saveErr = '저장 실패: ' + (rd.error || '서버 오류');
+    } catch (e) { saveErr = '저장 실패: ' + (e.message || e); }
+    await fetchHistory();
+    if (saveErr) { lastHistError = saveErr; renderHistoryList(); }
+    return id;
+  }
+  async function deleteHistory(id) {
+    try { await apiHistPost({ op: 'delete', id }); } catch (e) {}
+    if (currentHistoryId === id) currentHistoryId = null;
+    await fetchHistory();
+  }
+  async function renameHistory(id, title) {
+    try { await apiHistPost({ op: 'rename', id, title }); } catch (e) {}
+    await fetchHistory();
+  }
+  function startRename(id) {
+    const e = historyCache.find((x) => x.id === id); if (!e) return;
+    const item = $('historyList').querySelector('.hist[data-id="' + id + '"]'); if (!item) return;
+    const titleEl = item.querySelector('.histtitle'); if (!titleEl) return;
+    const input = document.createElement('input'); input.type = 'text'; input.value = e.title; input.className = 'histrename';
+    input.addEventListener('click', (ev) => ev.stopPropagation());
+    titleEl.replaceWith(input); input.focus(); input.select();
+    let done = false;
+    const commit = () => { if (done) return; done = true; const v = input.value.trim(); if (v && v !== e.title) renameHistory(id, v); else renderHistoryList(); };
+    input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); commit(); } else if (ev.key === 'Escape') { done = true; renderHistoryList(); } });
+    input.addEventListener('blur', commit);
+  }
+  function openDrawer() { $('drawer').classList.add('open'); $('drawerOverlay').classList.add('open'); }
+  function closeDrawer() { $('drawer').classList.remove('open'); $('drawerOverlay').classList.remove('open'); }
+  async function openHistory(id) {
+    closeDrawer();
+    try {
+      const { ok, data } = await apiHistGet(id);
+      if (!ok || !data.data) return;
+      $('inputView').classList.add('hidden');
+      $('loadingView').classList.add('hidden');
+      renderResult(data.data);
+      currentHistoryId = id;
+    } catch (e) { /* 무시 */ }
+  }
+  $('menuBtn').addEventListener('click', openDrawer);
+  $('drawerClose').addEventListener('click', closeDrawer);
+  $('drawerOverlay').addEventListener('click', closeDrawer);
+  $('historyList').addEventListener('click', (ev) => {
+    const ren = ev.target.closest('[data-rename]');
+    if (ren) { ev.stopPropagation(); startRename(ren.dataset.rename); return; }
+    const del = ev.target.closest('[data-del]');
+    if (del) { ev.stopPropagation(); deleteHistory(del.dataset.del); return; }
+    const item = ev.target.closest('.hist'); if (item) openHistory(item.dataset.id);
+  });
+  renderHistoryList();   // 초기 빈 목록(로그인 후 fetchHistory 로 채움)
+
+  // 생성
+  $('genBtn').addEventListener('click', async () => {
+    const campaignId = $('campaignId').value.trim();
+    const payload = { engine: 'blog', mode: blogMode, campaignId };
+
+    if (blogMode === 'solo') {
+      const source = $('source').value.trim();
+      if (source.length < 30) { setGenStatus('원료를 30자 이상 붙여넣어 주세요.', 'err'); return; }
+      payload.source = source;
+    } else {
+      let parsed;
+      try { parsed = JSON.parse($('message').value.trim()); }
+      catch (e) { setGenStatus('핵심 메시지 JSON 형식이 올바르지 않습니다. (JSON 파싱 실패)', 'err'); return; }
+      if (!parsed.topic || !parsed.claim || !Array.isArray(parsed.logic) || !parsed.cta) {
+        setGenStatus('JSON 필수 키(topic·claim·logic·cta)가 빠졌습니다.', 'err'); return;
+      }
+      payload.message = parsed;
+    }
+
+    let token;
+    try { token = await authToken(); } catch (err) { setGenStatus(err.message, 'err'); return; }
+
+    $('inputView').classList.add('hidden');
+    $('loadingView').classList.remove('hidden');
+    $('resultView').classList.add('hidden');
+
+    try {
+      // ★ Vercel 12함수 한계 때문에 cardnews-generate 에 통합됨 → engine:'blog' 로 분기 호출
+      const res = await fetch(API + '/api/cardnews-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '생성에 실패했습니다.');
+      renderResult(data);
+      currentHistoryId = await addHistoryEntry(data, campaignId);   // 서버에 자동 저장
+    } catch (err) {
+      $('loadingView').classList.add('hidden');
+      $('inputView').classList.remove('hidden');
+      setGenStatus(err.message || '생성 중 오류가 발생했습니다.', 'err');
+    }
+  });
+
+  function renderResult(data) {
+    lastResult = data;
+    const message = data.message || {};
+    const column = data.column || {};
+    const seo = data.seo || {};
+
+    $('msgJson').textContent = JSON.stringify(message, null, 2);
+
+    const bodyMd = (column.title_h1 ? '# ' + column.title_h1 + '\n\n' : '') + (column.body || '');
+    $('colBody').innerHTML = renderMarkdown(bodyMd);
+    $('charCount').textContent = '본문 길이 약 ' + charLen(column.body) + '자 (공백 제외) · 목표 1500~2500자';
+
+    const tags = (seo.tags || []).map((t) => '<span class="tag">#' + esc(t) + '</span>').join('');
+    $('seoGrid').innerHTML =
+      '<div class="seoitem"><span class="k">SEO 제목 (' + (seo.seo_title || '').length + '자)</span><span class="v">' + esc(seo.seo_title || '') + '</span></div>' +
+      '<div class="seoitem"><span class="k">메타 설명 (' + (seo.meta_description || '').length + '자)</span><span class="v">' + esc(seo.meta_description || '') + '</span></div>' +
+      '<div class="seoitem"><span class="k">태그</span><span class="v">' + (tags || '—') + '</span></div>' +
+      '<div class="seoitem"><span class="k">UTM 파라미터</span><span class="v">' + esc(seo.utm || '') + '</span></div>';
+
+    $('loadingView').classList.add('hidden');
+    $('resultView').classList.remove('hidden');
+    $('resultView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function copyText(text, btn) {
+    try { await navigator.clipboard.writeText(text); }
+    catch (err) {
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+      ta.select(); try { document.execCommand('copy'); } catch (e2) {} ta.remove();
+    }
+    const orig = btn.textContent; btn.textContent = '✓ 복사됨'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('done'); }, 1400);
+  }
+
+  $('copyJsonBtn').addEventListener('click', (e) => {
+    if (!lastResult) return;
+    copyText(JSON.stringify(lastResult.message || {}, null, 2), e.currentTarget);
+  });
+  $('copyBodyBtn').addEventListener('click', (e) => {
+    if (!lastResult) return;
+    const c = lastResult.column || {};
+    const md = (c.title_h1 ? '# ' + c.title_h1 + '\n\n' : '') + (c.body || '');
+    copyText(md, e.currentTarget);
+  });
+  $('copySeoBtn').addEventListener('click', (e) => {
+    if (!lastResult) return;
+    const s = lastResult.seo || {};
+    const txt =
+      'SEO 제목: ' + (s.seo_title || '') + '\n' +
+      '메타 설명: ' + (s.meta_description || '') + '\n' +
+      '태그: ' + (s.tags || []).join(', ') + '\n' +
+      'UTM: ' + (s.utm || '');
+    copyText(txt, e.currentTarget);
+  });
+
+  $('againBtn').addEventListener('click', () => {
+    $('resultView').classList.add('hidden');
+    $('inputView').classList.remove('hidden');
+    currentHistoryId = null;
+    setGenStatus('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>

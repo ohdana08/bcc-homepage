@@ -21,9 +21,10 @@ export default async function handler(req, res) {
   if (!profile?.is_admin) return res.status(403).json({ error: '관리자만 사용할 수 있습니다.' });
   const uid = user.id;
 
-  // 스레드 공장 분기 — 카드뉴스와 동일한 구조를 별 테이블(threads_history)로 복제
+  // 스레드/블로그 공장 분기 — 카드뉴스와 동일한 구조를 별 테이블로 복제
   const kind = req.method === 'GET' ? req.query.kind : (req.body || {}).kind;
   if (kind === 'threads') return handleThreadsHistory(req, res, db, uid);
+  if (kind === 'blog') return handleBlogHistory(req, res, db, uid);
 
   try {
     if (req.method === 'GET') {
@@ -141,6 +142,63 @@ async function handleThreadsHistory(req, res, db, uid) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   } catch (err) {
     console.error('threads-history error:', err?.message || err);
+    return res.status(500).json({ error: '서버 예외: ' + (err?.message || String(err)) });
+  }
+}
+
+// ───────── 블로그 공장 히스토리 (blog_results) — 스레드 구조 그대로 복제 ─────────
+//   GET            → 목록(가벼운 메타: 제목·UTM 식별자)
+//   GET ?id=...    → 한 항목 상세(data = { message, column, seo })
+//   POST {op:...}  → save | rename | delete  (썸네일 없음)
+async function handleBlogHistory(req, res, db, uid) {
+  try {
+    if (req.method === 'GET') {
+      const id = req.query.id;
+      if (id) {
+        const { data, error } = await db.from('blog_results')
+          .select('id, data').eq('user_id', uid).eq('id', id).single();
+        if (error || !data) return res.status(404).json({ error: '항목을 찾을 수 없습니다.' });
+        return res.json({ id: data.id, data: data.data });
+      }
+      const { data, error } = await db.from('blog_results')
+        .select('id, title, campaign_id, created_at')
+        .eq('user_id', uid).order('created_at', { ascending: false }).limit(100);
+      if (error) return res.status(500).json({ error: '히스토리 조회 실패: ' + error.message });
+      return res.json({ items: data || [] });
+    }
+
+    if (req.method === 'POST') {
+      const body = req.body || {};
+      if (body.op === 'save') {
+        if (!body.id) return res.status(400).json({ error: 'id 누락' });
+        const row = {
+          id: body.id, user_id: uid,
+          title: String(body.title || '').slice(0, 200),
+          campaign_id: String(body.campaign_id || '').slice(0, 60) || null,
+          data: body.data || null,
+        };
+        if (body.created_at) { try { row.created_at = new Date(body.created_at).toISOString(); } catch (e) {} }
+        const { error } = await db.from('blog_results').upsert(row, { onConflict: 'id' });
+        if (error) return res.status(500).json({ error: '저장 실패: ' + error.message });
+        return res.json({ ok: true, id: body.id });
+      }
+      if (body.op === 'rename') {
+        const { error } = await db.from('blog_results')
+          .update({ title: String(body.title || '').slice(0, 200) }).eq('user_id', uid).eq('id', body.id);
+        if (error) return res.status(500).json({ error: '이름 변경 실패' });
+        return res.json({ ok: true });
+      }
+      if (body.op === 'delete') {
+        const { error } = await db.from('blog_results').delete().eq('user_id', uid).eq('id', body.id);
+        if (error) return res.status(500).json({ error: '삭제 실패' });
+        return res.json({ ok: true });
+      }
+      return res.status(400).json({ error: '알 수 없는 작업' });
+    }
+
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  } catch (err) {
+    console.error('blog-history error:', err?.message || err);
     return res.status(500).json({ error: '서버 예외: ' + (err?.message || String(err)) });
   }
 }

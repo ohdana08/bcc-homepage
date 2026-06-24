@@ -72,6 +72,7 @@
       </div>
       <a id="adminLink" href="admin-cardnews.html" class="adminlink" style="display:none">🛠 카드뉴스 공장 열기</a>
       <a id="threadsLink" href="admin-threads.html" class="adminlink" style="display:none">✍️ 스레드 공장 열기</a>
+      <a id="blogLink" href="admin-blog.html" class="adminlink" style="display:none">📰 블로그 공장 열기</a>
       <div id="enrList"></div>
     </div>
   </div>
@@ -110,6 +111,7 @@
     if (data.profile?.is_admin) {
       document.getElementById('adminLink').style.display = 'block';
       document.getElementById('threadsLink').style.display = 'block';
+      document.getElementById('blogLink').style.display = 'block';
     }
     const list = data.enrollments || [];
     const box = document.getElementById('enrList');
