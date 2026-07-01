@@ -358,6 +358,65 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .service-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
   .service-desc { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
 
+  /* AI 실험일지 (EXPERIMENT LOG) */
+  .explog { background: var(--bg-2); }
+  .explog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .explog-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .explog-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(201,168,76,0.4);
+    box-shadow: var(--shadow-sm);
+  }
+  .explog-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    font-family: var(--font-en);
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+  }
+  .explog-row { display: flex; flex-direction: column; gap: 6px; }
+  .explog-row-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+  }
+  .explog-row-text { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+  .explog-link {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .explog-link:hover { color: var(--gold-3); }
+  .explog-link.is-pending { color: var(--text-mute); pointer-events: none; }
+
   /* TOOLS HUB */
   .tools { background: var(--bg-2); }
   .tools-grid {
@@ -558,7 +617,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* ITSCHOOL (강의) — tool-card 패턴 재사용 + 강의 전용 요소 */
   .school-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 18px;
   }
   .course-card { min-height: 260px; }
@@ -605,6 +664,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     font-weight: 700;
     letter-spacing: 0.3px;
   }
+  /* 시리즈(과정) 카드 — 클릭 가능하지만 지금은 모집 전(회색) */
+  .tool-badge-upcoming {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-dim);
+    border: 1px solid rgba(255,255,255,0.16);
+  }
+  .course-card.is-series .tool-icon { filter: grayscale(0.55); opacity: 0.92; }
+  .course-series-status {
+    position: relative;
+    margin-top: 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-mute);
+  }
 
   /* RESPONSIVE */
   @media (max-width: 1000px) {
@@ -614,6 +687,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   @media (max-width: 900px) {
     .about-grid { grid-template-columns: 1fr; gap: 30px; }
     .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .explog-grid { grid-template-columns: repeat(2, 1fr); }
     .hero h1 { font-size: 38px; }
     .section-title { font-size: 28px; }
   }
@@ -625,6 +699,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     section { padding: 60px 18px; }
     .section-title { font-size: 24px; }
     .services-grid { grid-template-columns: 1fr; }
+    .explog-grid { grid-template-columns: 1fr; }
     .tools-grid { grid-template-columns: 1fr; }
     .school-grid { grid-template-columns: 1fr; }
     .profile-card { padding: 28px 22px; }
@@ -958,42 +1033,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
          ════════════════════════════════════════════════════════════════ -->
     <div class="school-grid">
 
-      <!-- 쇼츠 2기 (모집중) → apply.html?product=shorts2 / DB price 119000 -->
-      <a class="tool-card course-card is-active" data-course="shorts2"
-         style="--platform-color:#C9A84C; --platform-color-soft:rgba(201,168,76,0.15);"
-         href="apply.html?product=shorts2" target="_blank" rel="noopener">
-        <span class="tool-badge tool-badge-active">모집중</span>
+      <!-- ════════════════════════════════════════════════════════════════
+           잇스쿨 = "과정별" 카드 1장 (기수는 상세 페이지 안에서 관리)
+             · 숏츠   → shorts.html   (기수 목록: 1기·2기 …)
+             · 카드뉴스 → cardnews.html (기수 목록: 1기·2기·3기 …)
+           새 기수 여는 법:
+             1) 상세 페이지(shorts.html/cardnews.html) "기수 안내" 섹션에 기수 1줄 추가
+             2) products 테이블에 해당 기수 product INSERT + is_active=true
+             3) 모집중이면 아래 카드의 배지/문구/색을 '모집중'으로 교체
+           지금은 전 기수 마감 → 회색 + "다음 기수 준비중"
+           ════════════════════════════════════════════════════════════════ -->
+
+      <!-- 숏츠 크리에이터 과정 (시리즈) → shorts.html 안에서 1·2기 확인 -->
+      <a class="tool-card course-card is-series" data-course="shorts"
+         style="--platform-color:#8a8a95; --platform-color-soft:rgba(138,138,149,0.12);"
+         href="shorts.html">
+        <span class="tool-badge tool-badge-upcoming">다음 기수 준비중</span>
         <div class="tool-icon" aria-hidden="true">🎬</div>
-        <div class="tool-name">AI 숏츠 크리에이터 과정 2기</div>
+        <div class="tool-name">AI 숏츠 크리에이터 과정</div>
         <div class="tool-desc">AI로 숏폼 한 편을 30분 만에. 기획부터 자막까지 한 번에 끝냅니다.</div>
-        <div class="course-price">119,000<span>원</span></div>
-        <div class="course-recourse">재수강 30,000원</div>
-        <div class="tool-arrow">신청하기 →</div>
+        <div class="course-series-status">1기 · 2기 종료 — 다음 기수 준비 중</div>
+        <div class="tool-arrow">기수 보기 →</div>
       </a>
 
-      <!-- 카드뉴스공장장 (모집중) → apply.html?product=cardnews / DB price 119000 -->
-      <a class="tool-card course-card is-active" data-course="cardnews"
-         style="--platform-color:#5B8DEF; --platform-color-soft:rgba(91,141,239,0.14);"
-         href="apply.html?product=cardnews" target="_blank" rel="noopener">
-        <span class="tool-badge tool-badge-active">모집중</span>
+      <!-- 카드뉴스 공장 만들기 과정 (시리즈) → cardnews.html 안에서 1기 확인 -->
+      <a class="tool-card course-card is-series" data-course="cardnews"
+         style="--platform-color:#8a8a95; --platform-color-soft:rgba(138,138,149,0.12);"
+         href="cardnews.html">
+        <span class="tool-badge tool-badge-upcoming">다음 기수 준비중</span>
         <div class="tool-icon" aria-hidden="true">🗂️</div>
-        <div class="tool-name">AI 카드뉴스 공장 만들기 과정 1기</div>
+        <div class="tool-name">AI 카드뉴스 공장 만들기 과정</div>
         <div class="tool-desc">디자인 외주 비용 0원, 매일 10분 만에 쌓이는 '콘텐츠 공장' 만들기.</div>
-        <div class="course-price">119,000<span>원</span></div>
-        <div class="course-recourse">재수강 30,000원</div>
-        <div class="tool-arrow">신청하기 →</div>
+        <div class="course-series-status">1기 종료 — 다음 기수 준비 중</div>
+        <div class="tool-arrow">기수 보기 →</div>
       </a>
-
-      <!-- 쇼츠 1기 (수료·마감) — 신청 불가(div, 링크 아님). DB: products.shorts1 is_active=false -->
-      <div class="tool-card course-card is-disabled is-done" data-course="shorts1"
-           style="--platform-color:#6c6c78; --platform-color-soft:rgba(108,108,120,0.12);"
-           aria-disabled="true">
-        <span class="tool-badge tool-badge-done">1기 수료</span>
-        <div class="tool-icon" aria-hidden="true">🎬</div>
-        <div class="tool-name">AI 숏츠 크리에이터 과정 1기</div>
-        <div class="tool-desc">1기 수료 — 30분 만에 숏폼 한 편, 직접 해냈습니다.</div>
-        <div class="course-done-arrow">모집 마감</div>
-      </div>
 
     </div>
   </div>
@@ -1186,6 +1259,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- AI 실험일지 -->
+<section class="explog" id="explog">
+  <div class="section-inner">
+    <div class="section-label">EXPERIMENT LOG</div>
+    <h2 class="section-title">AI 실험일지</h2>
+    <p class="section-desc">
+      매일 AI 툴을 직접 써보며 기록하는 실험 노트. 잘된 것보다 삽질한 과정을 남깁니다.
+    </p>
+
+    <div class="explog-grid">
+      <div class="explog-card">
+        <span class="explog-date">📅 2026.06.25</span>
+        <div class="explog-row">
+          <div class="explog-row-label">오늘 한 것</div>
+          <div class="explog-row-text">옵시디언 vs 홈페이지 실험일지 고민</div>
+        </div>
+        <div class="explog-row">
+          <div class="explog-row-label">삽질 포인트</div>
+          <div class="explog-row-text">새 툴 배우려다 목적부터 명확히 함</div>
+        </div>
+        <a class="explog-link is-pending" aria-disabled="true">🔗 결과물 링크 추가 예정</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="brand">
@@ -1199,6 +1298,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
     <a href="#tools" data-nav="ittools-footer">잇툴즈</a>
+    <a href="#explog">실험일지</a>
     <a href="#contact">문의</a>
     <a href="privacy.html">개인정보처리방침</a>
     <a href="refund.html">환불정책</a>
@@ -1296,8 +1396,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   });
 
-  // ---- ITSCHOOL: 강의 카드 [신청하기] 클릭 (어느 강의인지 구분) ----
-  document.querySelectorAll('.course-card.is-active').forEach(function (card) {
+  // ---- ITSCHOOL: 과정 카드 클릭 (어느 과정인지 구분) ----
+  document.querySelectorAll('a.course-card').forEach(function (card) {
     card.addEventListener('click', function () {
       var courseId = card.getAttribute('data-course');
       var nameEl = card.querySelector('.tool-name');

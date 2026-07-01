@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 카드뉴스 공장 만들기 1기 | BCC 비즈니스커리어컨설팅</title>
+<meta name="description" content="카드뉴스 만드느라 사업할 시간 뺏기지 마세요. 원고만 넣으면 카드뉴스를 10분 만에 뽑아내는 나만의 '공장'을 5일 만에 만듭니다. 소상공인·1인기업 대상, 7월 6일 시작.">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI 카드뉴스 공장 만들기 1기">
+<meta property="og:description" content="원고만 넣으면 카드뉴스를 10분 만에 뽑아내는 '공장'을 5일 만에 만듭니다.">
+<meta property="og:image" content="https://ohdana08.github.io/bcc-homepage/og-image.png">
+<meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+<meta property="og:locale" content="ko_KR">
+
+<!-- Google tag (gtag.js) — 홈페이지 스트림 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5TN5XW0T2J');
+</script>
+
+<!-- Pretendard Variable -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-2: #0f0f10;
+    --surface: #16161a;
+    --surface-2: #1d1d22;
+    --border: #26262c;
+    --text: #f3f3f5;
+    --text-dim: #9a9aa6;
+    --text-mute: #6c6c78;
+    --gold: #C9A84C;
+    --gold-3: #e6c878;
+    --gradient: linear-gradient(135deg, #C9A84C 0%, #a88835 100%);
+    --shadow-gold: 0 8px 24px rgba(201,168,76,0.22);
+    --font-en: Georgia, "Times New Roman", serif;
+    --font-ko: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+               "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ko);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── 공통 레이아웃 (모바일 우선: 단일 컬럼) ── */
+  .wrap { max-width: 600px; margin: 0 auto; padding: 0 18px; }
+  .block { padding: 44px 0; border-top: 1px solid var(--border); }
+  .block:first-of-type { border-top: none; }
+  .label {
+    color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: 1.4px;
+    text-transform: uppercase; margin-bottom: 12px; font-family: var(--font-en);
+  }
+  h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.35; margin-bottom: 14px; }
+  h2 .accent { color: var(--gold-3); }
+  p { font-size: 16px; line-height: 1.7; color: var(--text-dim); }
+  p b { color: var(--text); }
+  .accent-text { color: var(--gold-3); }
+
+  /* ── 버튼 ── */
+  .btn {
+    display: block; width: 100%; text-align: center;
+    padding: 16px 22px; border-radius: 12px; font-weight: 700; font-size: 16px;
+    background: var(--gradient); color: #1a1300; box-shadow: var(--shadow-gold);
+    border: none; cursor: pointer; font-family: inherit;
+  }
+  .btn:active { transform: scale(0.99); }
+
+  /* ── 헤더(브랜드) ── */
+  .topbar { border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 600px; margin: 0 auto; padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
+  .topbar img { height: 30px; width: auto; background: #fff; border-radius: 6px; padding: 3px; }
+  .topbar .bn { font-family: var(--font-en); font-weight: 800; font-size: 14px; }
+  .topbar .bs { font-size: 10px; color: var(--text-dim); }
+
+  /* ── 1. 후킹 ── */
+  .hero { padding: 56px 0 48px; text-align: center; }
+  .hero .pill {
+    display: inline-block; background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-dim); padding: 6px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; margin-bottom: 20px;
+  }
+  .hero h1 { font-size: 30px; line-height: 1.3; letter-spacing: -1px; font-weight: 800; margin-bottom: 18px; }
+  .hero .lead { font-size: 16.5px; line-height: 1.7; margin-bottom: 28px; }
+  .hero .lead b { color: var(--gold-3); }
+  .hero .meta { margin-top: 18px; font-size: 13px; color: var(--text-mute); line-height: 1.6; }
+
+  /* ── 리스트 (문제공감) ── */
+  ul.checks { list-style: none; margin: 18px 0; display: flex; flex-direction: column; gap: 10px; }
+  ul.checks li {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px 14px 42px; position: relative; font-size: 15px; color: var(--text); line-height: 1.55;
+  }
+  ul.checks li::before { content: "✓"; position: absolute; left: 16px; top: 14px; color: var(--gold); font-weight: 800; }
+
+  /* 강조 박스 */
+  .note {
+    background: rgba(201,168,76,0.07); border: 1px solid rgba(201,168,76,0.28);
+    border-radius: 12px; padding: 18px 20px; margin-top: 16px;
+  }
+  .note p { color: var(--text); }
+  .note p + p { margin-top: 6px; }
+  .note b { color: var(--gold-3); }
+
+  /* ── 해결책 3단계 ── */
+  .steps { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+  .step {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+  }
+  .step .n {
+    flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gradient); color: #1a1300; font-weight: 800; font-family: var(--font-en);
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .step p { color: var(--text); font-size: 15px; line-height: 1.55; }
+  .step p b { color: var(--gold-3); }
+
+  /* ── 커리큘럼 표 ── */
+  .days { display: flex; flex-direction: column; gap: 9px; margin: 18px 0; }
+  .day {
+    display: grid; grid-template-columns: 54px 1fr auto; gap: 12px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 14px 16px;
+  }
+  .day .d { font-family: var(--font-en); font-weight: 800; color: var(--gold-3); font-size: 14px; }
+  .day .t { font-size: 14.5px; color: var(--text); line-height: 1.45; }
+  .day .m { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .m.live { background: rgba(201,168,76,0.16); color: var(--gold-3); border: 1px solid rgba(201,168,76,0.4); }
+  .m.mission { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* ── 신뢰 ── */
+  .stat { font-size: 26px; font-weight: 800; letter-spacing: -0.8px; color: var(--gold-3); margin-bottom: 18px; }
+  ul.cred { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+  ul.cred li { padding-left: 18px; position: relative; font-size: 15.5px; color: var(--text); }
+  ul.cred li::before { content: "—"; position: absolute; left: 0; color: var(--gold); }
+
+  /* ── 가격 ── */
+  .price {
+    background: var(--surface); border: 1px solid rgba(201,168,76,0.3); border-radius: 16px;
+    padding: 26px 22px; text-align: center; margin-bottom: 22px; box-shadow: var(--shadow-gold);
+  }
+  .price .e { font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+  .price .a { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+  .price .a span { font-size: 20px; font-weight: 700; color: var(--text-dim); }
+  .price .sub { font-size: 12px; color: var(--text-mute); margin-top: 6px; }
+
+  h3 { font-size: 15px; font-weight: 700; margin: 22px 0 10px; }
+  h3.honest { color: var(--gold-3); }
+  ul.fit { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  ul.fit li { padding-left: 22px; position: relative; font-size: 15px; color: var(--text-dim); line-height: 1.6; }
+  ul.fit li b { color: var(--text); }
+  ul.fit.yes li::before { content: "✓"; position: absolute; left: 2px; color: var(--gold); font-weight: 800; }
+  .honest-box {
+    background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.24);
+    border-radius: 12px; padding: 18px 20px; margin-top: 8px;
+  }
+  ul.fit.heads li::before { content: "!"; position: absolute; left: 4px; color: var(--gold-3); font-weight: 800; }
+
+  /* ── 신청 ── */
+  .apply-block { text-align: center; padding-bottom: 48px; }
+  .apply-block .pill {
+    display: inline-block; background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-dim); padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-bottom: 18px;
+  }
+  .apply-block h2 { margin-bottom: 18px; }
+  .apply-block .transform { font-size: 16.5px; line-height: 1.7; margin-bottom: 26px; }
+  .apply-block .transform b { color: var(--gold-3); }
+  .refund { margin-top: 16px; font-size: 12.5px; color: var(--text-mute); }
+  .refund a { color: var(--text-dim); text-decoration: underline; }
+
+  /* ── 푸터 ── */
+  footer { background: var(--bg-2); border-top: 1px solid var(--border); padding: 32px 18px; text-align: center; }
+  footer .links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; color: var(--text-dim); }
+  footer .links a:hover { color: var(--text); }
+  footer .copy { color: var(--text-mute); font-size: 12px; }
+
+  /* ── 하단 고정 신청 바 (모바일) ── */
+  .sticky { position: sticky; bottom: 0; z-index: 50; background: rgba(15,15,16,0.95);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border); padding: 10px 18px; }
+  .sticky .wrap { padding: 0; }
+
+  /* ── 데스크톱: 살짝 넓게 ── */
+  @media (min-width: 720px) {
+    h2 { font-size: 28px; }
+    .hero h1 { font-size: 38px; }
+    .stat { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 상단 브랜드바 -->
+<div class="topbar">
+  <a class="topbar-inner" href="index.html">
+    <img src="logo.png?v=3" alt="BCC 로고" />
+    <div>
+      <div class="bn">BCC</div>
+      <div class="bs">비즈니스커리어컨설팅</div>
+    </div>
+  </a>
+</div>
+
+<!-- ① 후킹 -->
+<header class="hero">
+  <div class="wrap">
+    <span class="pill">AI 카드뉴스 공장 만들기 · 1기</span>
+    <h1>카드뉴스 한 장 만드느라,<br><span class="accent-text">정작 사업할 시간이 없으세요?</span></h1>
+    <p class="lead">
+      원고만 넣으면 카드뉴스를 <b>10분 만에 뽑아내는</b><br>
+      나만의 <b>"카드뉴스 공장"</b>을 5일 만에 만듭니다.
+    </p>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn apply-link" data-cta="hero">다음 기수 알림받기</a>
+    <p class="meta">현재 모집 중인 기수가 없습니다 · 다음 기수 준비 중<br>오픈 시 카톡 채널로 가장 먼저 안내드립니다</p>
+  </div>
+</header>
+
+<!-- 스타일: 기수 안내 리스트 -->
+<style>
+  .cohorts { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; max-width:560px; }
+  .cohorts .cohort {
+    display:flex; align-items:center; gap:14px;
+    padding:14px 16px; border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .cohorts .c-round { font-weight:800; font-size:15px; min-width:34px; }
+  .cohorts .c-info { flex:1; font-size:13.5px; color:#c9c9d2; }
+  .cohorts .c-status {
+    font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px;
+    background:rgba(255,255,255,0.06); color:#9a9aa5; border:1px solid rgba(255,255,255,0.12);
+    white-space:nowrap;
+  }
+  .cohorts .cohort.is-closed { opacity:0.72; }
+  .cohorts .cohort.is-next { border-color:rgba(91,141,239,0.4); background:rgba(91,141,239,0.07); }
+  .cohorts .cohort.is-next .c-status { color:#8fb0f5; border-color:rgba(91,141,239,0.45); background:rgba(91,141,239,0.14); }
+</style>
+
+<!-- ①-b 기수 안내 (지난 기수 + 다음 기수) -->
+<section class="block" id="cohorts">
+  <div class="wrap">
+    <span class="pill">기수 안내</span>
+    <h2>지난 기수 &amp; 다음 기수</h2>
+    <p class="lead" style="margin-bottom:22px">
+      1기는 마감되었습니다.<br>
+      2기·3기는 계속 이어집니다 — 다음 기수 일정은 <b>카톡 채널</b>에서 가장 먼저 안내드립니다.
+    </p>
+    <ul class="cohorts">
+      <li class="cohort is-closed">
+        <span class="c-round">1기</span>
+        <span class="c-info">2026. 7. 6 ~ 7. 10 · 온라인(구글 미트)</span>
+        <span class="c-status">모집 마감</span>
+      </li>
+      <li class="cohort is-next">
+        <span class="c-round">2기</span>
+        <span class="c-info">일정 준비 중 — 오픈 시 카톡으로 안내</span>
+        <span class="c-status">준비중</span>
+      </li>
+    </ul>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn" data-cta="cohort-alert" style="margin-top:20px">다음 기수 알림받기</a>
+  </div>
+</section>
+
+<!-- ② 문제 공감 -->
+<section class="block">
+  <div class="wrap">
+    <div class="label">Problem</div>
+    <h2>혹시 이런 적, 없으세요?</h2>
+    <ul class="checks">
+      <li>인스타에 카드뉴스를 올려야 하는데, 어떻게 만들어야 할지 몰라 며칠째 미루고 있다</li>
+      <li>한 장 만드는 데 두 시간씩 붙잡고 있다가, 정작 사업할 시간을 다 써버린다</li>
+      <li>디자인 외주를 맡기자니 비싸고, 수정할 때마다 또 돈과 시간이 든다</li>
+      <li>어렵게 만들어도 매번 처음부터 다시 — 쌓이는 게 없다</li>
+    </ul>
+    <div class="note">
+      <p>카드뉴스는 <b>"콘텐츠"가 아니라 "반복 업무"</b>입니다.</p>
+      <p>반복 업무에 사장님의 시간을 계속 쓰는 건, 가장 비싼 낭비입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ③ 해결책 -->
+<section class="block">
+  <div class="wrap">
+    <div class="label">Solution</div>
+    <h2>카드뉴스 만드는 법은 기본입니다.<br><span class="accent">진짜는, 그걸 10분이면 뽑아내는 "공장"입니다.</span></h2>
+    <p>만드는 법만 배우면 → 매번 똑같이 2시간씩 듭니다.<br>
+       공장까지 만들면 → <b class="accent-text">원고만 넣으면 10분이면 카드뉴스가 완성됩니다.</b></p>
+    <p>(공장 = 한 번 만들면 계속 쓰는 나만의 제작 시스템)</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><p>챗봇과 대화하면 무슨 내용·어떤 디자인인지 <b>"설계도(md파일)"</b>가 나옵니다</p></div>
+      <div class="step"><div class="n">2</div><p>그 설계도를 <b>공장(Codex)</b>에 넣습니다</p></div>
+      <div class="step"><div class="n">3</div><p>카드뉴스를 <b>10분이면 완성</b>합니다</p></div>
+    </div>
+    <p>이 강의는 만드는 법에서 끝나지 않고,<br><b>한 번 만들면 계속 쓰는 공장</b>까지 데려다 줍니다.</p>
+  </div>
+</section>
+
+<!-- ④ 커리큘럼 -->
+<section class="block">
+  <div class="wrap">
+    <div class="label">Curriculum</div>
+    <h2>5일이면, <span class="accent">사장님도 공장을 가집니다.</span></h2>
+    <div class="days">
+      <div class="day"><div class="d">1일차</div><div class="t">왜 카드뉴스인가 + 공장 첫 시연 (세팅까지)</div><div class="m live">실시간</div></div>
+      <div class="day"><div class="d">2일차</div><div class="t">내 공장 기획하기 — 챗봇과 대화하면 설계도 완성</div><div class="m mission">미션</div></div>
+      <div class="day"><div class="d">3일차</div><div class="t">공장에 설계도 넣기</div><div class="m mission">미션</div></div>
+      <div class="day"><div class="d">4일차</div><div class="t">카드뉴스 자동 생성</div><div class="m mission">미션</div></div>
+      <div class="day"><div class="d">5일차</div><div class="t">공유회 — 결과물 나눔 + 만든 카드뉴스로 마케팅하는 법</div><div class="m live">실시간</div></div>
+    </div>
+    <div class="note">
+      <p>1·5일차만 실시간으로 모이고, 2·3·4일차는 각자 미션으로 진행합니다.</p>
+      <p>"따라오느라 시간 다 가는" 온라인 강의가 아니라, <b>매일 하나씩 완성해서 5일차엔 진짜 내 공장이 돌아갑니다.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 신뢰 -->
+<section class="block">
+  <div class="wrap">
+    <div class="label">Instructor</div>
+    <div class="stat">강사 오예림</div>
+    <ul class="cred">
+      <li>창업·마케팅 강의 13년차</li>
+      <li>지금까지 만난 수강생 15,000명</li>
+      <li>ChatGPT 활용서 3권 저자</li>
+      <li>Google 공인 Gemini Educator</li>
+    </ul>
+    <div class="note">
+      <p>한마디로, <b>사업에 AI 쓰는 데 미친 사람</b>입니다.</p>
+      <p>도구만 가르치지 않습니다. 실제로 쓰는 <b>시스템을 직접 만들어 굴리는 사람</b>입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ 가격·대상·조건 -->
+<section class="block">
+  <div class="wrap">
+    <div class="label">For You</div>
+    <h2>나한테 맞는 강의일까?</h2>
+    <div class="price">
+      <div class="e">수강료 · 1기</div>
+      <div class="a">119,000<span>원</span></div>
+      <div class="sub">온라인 5일 과정 (구글 미트)</div>
+    </div>
+    <h3>이런 분께 맞습니다</h3>
+    <ul class="fit yes">
+      <li>사업자등록증이 있고, <b>혼자 또는 소수로 사업을 운영</b>하는 분</li>
+      <li>카드뉴스를 직접 만들어야 하는데 <b>시간이 부족한</b> 분</li>
+      <li>한 번 배워서 <b>"계속 쓸 시스템"</b>을 갖고 싶은 분</li>
+    </ul>
+    <div class="honest-box">
+      <h3 class="honest" style="margin-top:0">먼저 알려드립니다 (정직하게)</h3>
+      <ul class="fit heads">
+        <li>이 강의는 <b>ChatGPT 유료 버전과 Codex 사용</b>을 전제로 합니다. (1일차에 다운로드·세팅을 함께 합니다. 어렵지 않습니다.)</li>
+        <li>"무료 도구만으로 대충"을 원하시면 맞지 않습니다. <b>제대로 된 공장을 만들려는 분</b>을 위한 강의입니다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ 신청 -->
+<section class="block apply-block">
+  <div class="wrap">
+    <span class="pill">다음 기수 준비 중</span>
+    <h2>지금, 사장님의 카드뉴스 공장을 시작하세요.</h2>
+    <p class="transform">
+      5일 뒤, 사장님은 "카드뉴스 만드는 사람"이 아니라<br>
+      <b>"카드뉴스 공장을 가진 사람"</b>이 됩니다.
+    </p>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn apply-link" data-cta="final">다음 기수 알림받기</a>
+    <p class="refund">다음 기수가 열리면 카톡 채널로 가장 먼저 안내드립니다.</p>
+  </div>
+</section>
+
+<!-- 푸터 -->
+<footer>
+  <div class="links">
+    <a href="index.html">홈</a>
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener">다음 기수 문의</a>
+    <a href="privacy.html">개인정보처리방침</a>
+    <a href="refund.html">환불정책</a>
+  </div>
+  <div class="copy">© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</div>
+</footer>
+
+<!-- 하단 고정 신청 바 -->
+<div class="sticky">
+  <div class="wrap">
+    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn apply-link" data-cta="sticky">다음 기수 알림받기</a>
+  </div>
+</div>
+
+<!-- GA4: 신청 클릭 + UTM 전달 -->
+<script>
+(function () {
+  function track(name, params) {
+    try { if (typeof gtag === 'function') gtag('event', name, params || {}); } catch (e) {}
+  }
+  // 유입 UTM을 apply.html 링크에 그대로 전달 (어디서 온 사람이 신청하나 추적)
+  var qs = window.location.search ? window.location.search.replace(/^\?/, '') : '';
+  [].forEach.call(document.querySelectorAll('a.apply-link'), function (a) {
+    if (qs) {
+      var href = a.getAttribute('href');
+      a.setAttribute('href', href + (href.indexOf('?') === -1 ? '?' : '&') + qs);
+    }
+    a.addEventListener('click', function () {
+      track('course_apply_clicked', {
+        course_id: 'cardnews',
+        course_name: 'AI 카드뉴스 공장 만들기 1기',
+        cta_location: a.getAttribute('data-cta') || 'unknown'
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

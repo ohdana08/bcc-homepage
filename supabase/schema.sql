@@ -90,9 +90,9 @@ create index if not exists idx_pending_orders_status_created
 -- ------------------------------------------------------------
 -- 5) 초기 상품 데이터 (이미 있으면 무시)
 -- ------------------------------------------------------------
-insert into products (id, name, price, recourse_price) values
-  ('shorts2',  'AI 숏츠 크리에이터 과정 2기',     119000, 30000),
-  ('cardnews', 'AI 카드뉴스 공장 만들기 과정 1기', 119000, 30000)
+insert into products (id, name, price, recourse_price, is_active) values
+  ('shorts2',  'AI 숏츠 크리에이터 과정 2기',     119000, 30000, false),
+  ('cardnews', 'AI 카드뉴스 공장 만들기 과정 1기', 119000, 30000, false)
 on conflict (id) do nothing;
 
 -- 지난 강의(판매중지): 신규 결제/목록에는 노출 안 됨(is_active=false).
@@ -100,6 +100,12 @@ on conflict (id) do nothing;
 insert into products (id, name, price, recourse_price, is_active) values
   ('shorts1', 'AI 숏츠 크리에이터 과정 1기', 119000, 30000, false)
 on conflict (id) do nothing;
+
+-- ★ 현재 모집 중인 기수 없음 → 전 기수 판매중지.
+--   (위 insert는 "이미 있으면 무시"라 기존 행은 안 바뀜 → 아래 update로 강제 반영)
+--   새 기수 오픈 시: 해당 product의 is_active=true 로 변경 + 잇스쿨/상세페이지 문구 교체.
+update products set is_active = false
+  where id in ('shorts1', 'shorts2', 'cardnews');
 
 -- ============================================================
 -- RLS (Row Level Security) — 보안 최대 포인트 (업무지시서 §3)
