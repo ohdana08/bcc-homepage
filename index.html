@@ -358,8 +358,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .service-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
   .service-desc { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
 
-  /* AI 실험일지 (EXPERIMENT LOG) */
+  /* AI 프로젝트 연구소 */
   .explog { background: var(--bg-2); }
+  .lab-intro {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .lab-statement, .lab-method {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+  }
+  .lab-statement strong { display: block; font-size: 22px; line-height: 1.45; margin-bottom: 10px; }
+  .lab-statement p, .lab-method p { color: var(--text-dim); font-size: 14px; line-height: 1.75; }
+  .lab-method-title { color: var(--gold); font-size: 12px; font-weight: 800; letter-spacing: .8px; margin-bottom: 10px; }
+  .lab-flow { color: var(--text); font-size: 14px; font-weight: 700; line-height: 1.8; }
   .explog-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -375,6 +391,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     flex-direction: column;
     gap: 18px;
   }
+  .explog-card.featured { border-color: rgba(201,168,76,0.42); }
+  .project-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .project-category { color: var(--text-mute); font-size: 12px; font-weight: 700; }
+  .project-title { font-size: 19px; line-height: 1.45; }
+  .project-summary { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+  .project-proof { display: flex; flex-wrap: wrap; gap: 7px; }
+  .project-proof span { background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; color: var(--text-dim); font-size: 11px; padding: 5px 9px; }
+  .lab-more { margin-top: 28px; text-align: center; }
   .explog-card:hover {
     transform: translateY(-4px);
     border-color: rgba(201,168,76,0.4);
@@ -688,6 +717,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .about-grid { grid-template-columns: 1fr; gap: 30px; }
     .services-grid { grid-template-columns: repeat(2, 1fr); }
     .explog-grid { grid-template-columns: repeat(2, 1fr); }
+    .lab-intro { grid-template-columns: 1fr; }
     .hero h1 { font-size: 38px; }
     .section-title { font-size: 28px; }
   }
@@ -800,6 +830,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#tools" data-nav="ittools">잇툴즈</a>
       <a href="#itschool" data-nav="itschool">잇스쿨</a>
       <a href="#reviews">강의 후기</a>
+      <a href="#explog">프로젝트 연구소</a>
       <a href="#contact">문의</a>
       <a href="#signup" class="nav-login nav-signup" data-nav="signup">회원가입</a>
       <a href="#login" class="nav-login" data-nav="login">로그인</a>
@@ -1364,29 +1395,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- AI 실험일지 -->
+<!-- AI 프로젝트 연구소 -->
 <section class="explog" id="explog">
   <div class="section-inner">
-    <div class="section-label">EXPERIMENT LOG</div>
-    <h2 class="section-title">AI 실험일지</h2>
+    <div class="section-label">AI PROJECT LAB</div>
+    <h2 class="section-title">AI 프로젝트 연구소</h2>
     <p class="section-desc">
-      매일 AI 툴을 직접 써보며 기록하는 실험 노트. 잘된 것보다 삽질한 과정을 남깁니다.
+      현장에서 발견한 문제를 AI 교육, 자동화 도구, 콘텐츠 시스템으로 바꾼 과정을 기록합니다.
     </p>
 
-    <div class="explog-grid">
-      <div class="explog-card">
-        <span class="explog-date">📅 2026.06.25</span>
-        <div class="explog-row">
-          <div class="explog-row-label">오늘 한 것</div>
-          <div class="explog-row-text">옵시디언 vs 홈페이지 실험일지 고민</div>
-        </div>
-        <div class="explog-row">
-          <div class="explog-row-label">삽질 포인트</div>
-          <div class="explog-row-text">새 툴 배우려다 목적부터 명확히 함</div>
-        </div>
-        <a class="explog-link is-pending" aria-disabled="true">🔗 결과물 링크 추가 예정</a>
+    <div class="lab-intro">
+      <div class="lab-statement">
+        <strong>도구를 소개하는 데서 멈추지 않고,<br>실제로 작동하는 결과물까지 만듭니다.</strong>
+        <p>완성품만 전시하지 않습니다. 문제를 정의한 기준, 도구를 선택한 이유, 막힌 지점과 개선 과정까지 공개해 기획력과 실행력을 함께 증명합니다.</p>
+      </div>
+      <div class="lab-method">
+        <div class="lab-method-title">PROJECT METHOD</div>
+        <div class="lab-flow">문제 발견 → 가설 → 설계 → 제작 → 검증 → 개선</div>
+        <p>모든 프로젝트를 같은 흐름으로 기록해 결과와 판단 과정을 한눈에 볼 수 있게 구성했습니다.</p>
       </div>
     </div>
+
+    <div class="explog-grid">
+      <article class="explog-card featured">
+        <div class="project-status"><span class="explog-date">완료 · 운영 중</span><span class="project-category">WEB · DATA</span></div>
+        <h3 class="project-title">315개 강의 후기를 탐색 가능한 포트폴리오로</h3>
+        <p class="project-summary">흩어진 후기 이미지를 기관과 일정별로 구조화하고 검색·확대·모바일 탐색이 가능한 게시판으로 만들었습니다.</p>
+        <div class="project-proof"><span>19개 기관</span><span>후기 315장</span><span>개인정보 보호</span></div>
+        <a class="explog-link" href="projects.html#review-board">사례 자세히 보기 →</a>
+      </article>
+      <article class="explog-card">
+        <div class="project-status"><span class="explog-date">개선 중</span><span class="project-category">AI SERVICE</span></div>
+        <h3 class="project-title">정부지원사업 도우미: 상담을 서비스 흐름으로</h3>
+        <p class="project-summary">예비창업자의 막막한 질문을 공고 추천, 자가진단, 사업계획서 초안으로 연결하는 AI 서비스 퍼널을 설계했습니다.</p>
+        <div class="project-proof"><span>대화형 진단</span><span>리드 수집</span><span>비용 최적화</span></div>
+        <a class="explog-link" href="projects.html#support-assistant">사례 자세히 보기 →</a>
+      </article>
+      <article class="explog-card">
+        <div class="project-status"><span class="explog-date">설계 완료</span><span class="project-category">AI EDUCATION</span></div>
+        <h3 class="project-title">기능 설명이 아닌 결과물 중심 AI 교육</h3>
+        <p class="project-summary">교육생이 자기 업무 소재를 찾고 보고서·포스터·문서 챗봇·맞춤 GPT까지 완성하는 실습 흐름을 설계했습니다.</p>
+        <div class="project-proof"><span>100% 실습</span><span>4종 결과물</span><span>현업 적용</span></div>
+        <a class="explog-link" href="projects.html#education-design">사례 자세히 보기 →</a>
+      </article>
+      <article class="explog-card">
+        <div class="project-status"><span class="explog-date">제작 중</span><span class="project-category">AUTOMATION</span></div>
+        <h3 class="project-title">하나의 원재료를 여러 채널로 바꾸는 OSMU 공장</h3>
+        <p class="project-summary">강의와 긴 글을 분석해 블로그·스레드·카드뉴스로 재조립하는 콘텐츠 생산 시스템을 기획했습니다.</p>
+        <div class="project-proof"><span>포맷 규칙화</span><span>재사용</span><span>콘텐츠 자동화</span></div>
+        <a class="explog-link" href="projects.html#osmu-factory">사례 자세히 보기 →</a>
+      </article>
+    </div>
+    <div class="lab-more"><a class="btn btn-primary" href="projects.html">프로젝트 전체 보기</a></div>
   </div>
 </section>
 
@@ -1404,7 +1464,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#services">서비스</a>
     <a href="#tools" data-nav="ittools-footer">잇툴즈</a>
     <a href="#reviews">강의 후기</a>
-    <a href="#explog">실험일지</a>
+    <a href="#explog">AI 프로젝트 연구소</a>
     <a href="#contact">문의</a>
     <a href="#signup">회원가입</a>
     <a href="#login">로그인</a>
