@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>강의 후기 | BCC 비즈니스커리어컨설팅</title>
+  <meta name="description" content="BCC 오예림 강사의 센터별·강의별 교육 후기 모음입니다.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    :root{--bg:#0a0a0a;--surface:#16161a;--surface2:#1d1d22;--line:#2a2a30;--text:#f3f3f5;--dim:#aaaab5;--gold:#c9a84c}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Pretendard Variable,Pretendard,sans-serif;line-height:1.6}
+    a{color:inherit;text-decoration:none}.nav{position:sticky;top:0;z-index:20;background:rgba(10,10,10,.9);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+    .nav-inner{max-width:1200px;margin:auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:12px;font-weight:800}.brand img{height:44px;background:#fff;border-radius:8px;padding:4px}.nav a:last-child{color:var(--gold)}
+    .hero{padding:86px 24px 56px;text-align:center;background:radial-gradient(circle at 50% 0%,rgba(201,168,76,.14),transparent 46%)}.eyebrow{color:var(--gold);font-size:13px;font-weight:800;letter-spacing:.16em}.hero h1{font-size:clamp(34px,6vw,58px);margin:12px 0}.hero p{color:var(--dim);margin:0}.stats{margin:28px auto 0;display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.stat{padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+    main{max-width:1200px;margin:auto;padding:42px 24px 100px}.toolbar{display:flex;gap:12px;margin-bottom:28px}.search{width:100%;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit}.search:focus{outline:2px solid var(--gold);outline-offset:2px}
+    .centers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.center-card{display:block;text-align:left;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;cursor:pointer;transition:.2s;font:inherit}.center-card:hover,.center-card.active{transform:translateY(-2px);border-color:var(--gold);background:var(--surface2)}.center-card strong{display:block;font-size:17px}.center-card span{color:var(--dim);font-size:14px}
+    .gallery{margin-top:46px}.gallery-head{display:flex;align-items:end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:18px}.gallery-head h2{margin:0;font-size:28px}.gallery-head span{color:var(--dim)}.schedule{margin-top:34px}.schedule h3{font-size:19px;margin:0 0 14px}.schedule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.photo{border:0;padding:0;background:var(--surface);border-radius:12px;overflow:hidden;aspect-ratio:4/5;cursor:zoom-in}.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:.25s}.photo:hover img{transform:scale(1.025)}
+    .empty{padding:60px 20px;text-align:center;color:var(--dim)}dialog{width:min(94vw,1000px);max-height:92vh;padding:0;border:1px solid var(--line);border-radius:16px;background:#070707;color:#fff}dialog::backdrop{background:rgba(0,0,0,.88)}dialog img{display:block;max-width:100%;max-height:86vh;margin:auto}.close{position:absolute;right:12px;top:12px;width:42px;height:42px;border:1px solid #555;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:24px;cursor:pointer}
+    footer{text-align:center;padding:28px;color:var(--dim);border-top:1px solid var(--line)}@media(max-width:640px){.hero{padding-top:58px}.nav-inner{padding:10px 16px}.nav .home-label{display:none}main{padding-inline:16px}.schedule-grid{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner"><a class="brand" href="index.html"><img src="logo.png?v=3" alt="BCC 로고"><span>BCC</span></a><a href="index.html"><span class="home-label">홈페이지로 돌아가기</span> →</a></div></nav>
+  <header class="hero"><div class="eyebrow">LECTURE REVIEWS</div><h1>현장의 목소리,<br>강의 후기</h1><p>센터와 강의 일정을 선택해 실제 교육 후기를 확인하세요.</p><div class="stats"><div class="stat"><strong id="centerCount">0</strong>개 센터</div><div class="stat"><strong id="imageCount">0</strong>개 후기</div></div></header>
+  <main>
+    <div class="toolbar"><input class="search" id="search" type="search" placeholder="센터명 또는 강의명 검색" aria-label="후기 검색"></div>
+    <section class="centers" id="centers" aria-label="센터 목록"></section>
+    <section class="gallery" id="gallery"><div class="empty">센터를 선택하면 강의별 후기가 표시됩니다.</div></section>
+  </main>
+  <dialog id="lightbox"><button class="close" type="button" aria-label="닫기">×</button><img id="lightboxImage" alt="확대된 강의 후기"></dialog>
+  <footer>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</footer>
+  <script src="reviews-data.js"></script>
+  <script>
+    const data = window.REVIEWS_DATA || [];
+    const centers = document.getElementById('centers');
+    const gallery = document.getElementById('gallery');
+    const search = document.getElementById('search');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    document.getElementById('centerCount').textContent = data.length;
+    document.getElementById('imageCount').textContent = data.reduce((sum, item) => sum + item.imageCount, 0);
+
+    function renderCenters(query = '') {
+      const keyword = query.trim().toLowerCase();
+      const filtered = data.filter(item => !keyword || item.center.toLowerCase().includes(keyword) || item.schedules.some(s => s.title.toLowerCase().includes(keyword)));
+      centers.innerHTML = filtered.map(item => `<button class="center-card" type="button" data-center="${escapeHtml(item.center)}"><strong>${escapeHtml(item.center)}</strong><span>${item.schedules.length}개 강의 · ${item.imageCount}개 후기</span></button>`).join('');
+      if (!filtered.length) centers.innerHTML = '<div class="empty">검색 결과가 없습니다.</div>';
+    }
+    function showCenter(name) {
+      const item = data.find(row => row.center === name); if (!item) return;
+      document.querySelectorAll('.center-card').forEach(card => card.classList.toggle('active', card.dataset.center === name));
+      gallery.innerHTML = `<div class="gallery-head"><h2>${escapeHtml(item.center)}</h2><span>${item.imageCount}개 후기</span></div>` + item.schedules.map(schedule => `<article class="schedule"><h3>${escapeHtml(schedule.title)} <small>(${schedule.images.length})</small></h3><div class="schedule-grid">${schedule.images.map(image => `<button class="photo" type="button" data-src="${image.src}" aria-label="${escapeHtml(item.center)} 후기 확대"><img src="${image.src}" alt="${escapeHtml(item.center)} ${escapeHtml(schedule.title)} 강의 후기" loading="lazy"></button>`).join('')}</div></article>`).join('');
+      gallery.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    function escapeHtml(value) { const node = document.createElement('div'); node.textContent = value; return node.innerHTML; }
+    centers.addEventListener('click', event => { const card = event.target.closest('.center-card'); if (card) showCenter(card.dataset.center); });
+    gallery.addEventListener('click', event => { const photo = event.target.closest('.photo'); if (!photo) return; lightboxImage.src = photo.dataset.src; lightbox.showModal(); });
+    lightbox.querySelector('.close').addEventListener('click', () => lightbox.close());
+    lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
+    search.addEventListener('input', event => renderCenters(event.target.value));
+    renderCenters();
+  </script>
+</body>
+</html>
