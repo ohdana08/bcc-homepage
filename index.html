@@ -758,6 +758,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .mobile-conversion-bar .join { border: 1px solid var(--gold); color: var(--gold); }
     .mobile-conversion-bar .ask { background: var(--gold); color: #171205; }
   }
+  .onepage-board { background: #0d0d0f; border-top: 1px solid var(--border); }
+  #reviews, #contact, #signup, #login { scroll-margin-top: 88px; }
+  .onepage-board:nth-of-type(even) { background: #101012; }
+  .onepage-frame-wrap {
+    margin-top: 28px; overflow: hidden; border: 1px solid var(--border);
+    border-radius: 18px; background: #0a0a0a;
+  }
+  .onepage-frame { display: block; width: 100%; height: 620px; border: 0; background: #0a0a0a; }
+  .account-board-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  .account-board-grid .onepage-frame-wrap { margin-top: 0; }
+  .account-board-title { margin-bottom: 18px; }
+  .account-board-title h3 { margin: 0 0 6px; font-size: 21px; }
+  .account-board-title p { margin: 0; color: var(--muted); font-size: 14px; }
+  @media (max-width: 760px) {
+    .account-board-grid { grid-template-columns: 1fr; }
+    .onepage-frame-wrap { border-radius: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -782,10 +799,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#services">서비스</a>
       <a href="#tools" data-nav="ittools">잇툴즈</a>
       <a href="#itschool" data-nav="itschool">잇스쿨</a>
-      <a href="reviews.html">강의 후기</a>
+      <a href="#reviews">강의 후기</a>
       <a href="#contact">문의</a>
-      <a href="signup.html" class="nav-login nav-signup" data-nav="signup">회원가입</a>
-      <a href="mypage.html" class="nav-login" data-nav="login">로그인</a>
+      <a href="#signup" class="nav-login nav-signup" data-nav="signup">회원가입</a>
+      <a href="#login" class="nav-login" data-nav="login">로그인</a>
     </div>
     <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
   </div>
@@ -804,7 +821,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#itschool" class="btn btn-primary" data-nav="itschool-hero">잇스쿨 강의 신청</a>
       <a href="#tools" class="btn btn-ghost" data-nav="ittools-hero">잇툴즈 사용하기</a>
       <a href="#about" class="btn btn-ghost">강사 소개 보기</a>
-      <a href="reviews.html" class="btn btn-ghost">강의 후기 보기</a>
+      <a href="#reviews" class="btn btn-ghost">강의 후기 보기</a>
       <a href="index.html?utm_source=homepage&utm_medium=hero&utm_campaign=always_on&utm_content=consult#contact" class="btn btn-ghost">가입·문의 바로가기</a>
     </div>
     <div class="trust-strip" aria-label="BCC 신뢰 정보">
@@ -1129,6 +1146,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- LECTURE REVIEWS: 메인 페이지 연속 스크롤 -->
+<section class="onepage-board" id="reviews">
+  <div class="section-inner">
+    <div class="section-label">LECTURE REVIEWS</div>
+    <h2 class="section-title">강의 후기</h2>
+    <p class="section-desc">센터와 강의 일정을 선택해 실제 교육 후기를 한 페이지에서 확인하세요.</p>
+    <div class="onepage-frame-wrap">
+      <iframe class="onepage-frame" data-embed="reviews" src="reviews.html?embed=1" title="BCC 강의 후기 게시판" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
 <!-- CONTACT -->
 <section id="contact">
   <div class="section-inner">
@@ -1316,6 +1345,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- ACCOUNT: 회원가입과 로그인을 메인 페이지 안에서 제공 -->
+<section class="onepage-board" id="account">
+  <div class="section-inner">
+    <div class="section-label">BCC ACCOUNT</div>
+    <h2 class="section-title">회원가입 · 로그인</h2>
+    <p class="section-desc">페이지를 벗어나지 않고 가입하거나 기존 계정으로 로그인하세요.</p>
+    <div class="account-board-grid">
+      <div id="signup">
+        <div class="account-board-title"><h3>회원가입</h3><p>수강 이력 확인을 위한 BCC 계정을 만듭니다.</p></div>
+        <div class="onepage-frame-wrap"><iframe class="onepage-frame" data-embed="account" src="signup.html?embed=1&utm_source=homepage&utm_medium=onepage&utm_campaign=always_on&utm_content=signup" title="BCC 회원가입" loading="lazy"></iframe></div>
+      </div>
+      <div id="login">
+        <div class="account-board-title"><h3>로그인</h3><p>기존 계정으로 마이페이지를 확인합니다.</p></div>
+        <div class="onepage-frame-wrap"><iframe class="onepage-frame" data-embed="account" src="mypage.html?embed=1&utm_source=homepage&utm_medium=onepage&utm_campaign=always_on&utm_content=login" title="BCC 로그인" loading="lazy"></iframe></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- AI 실험일지 -->
 <section class="explog" id="explog">
   <div class="section-inner">
@@ -1355,8 +1403,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
     <a href="#tools" data-nav="ittools-footer">잇툴즈</a>
+    <a href="#reviews">강의 후기</a>
     <a href="#explog">실험일지</a>
     <a href="#contact">문의</a>
+    <a href="#signup">회원가입</a>
+    <a href="#login">로그인</a>
     <a href="privacy.html">개인정보처리방침</a>
     <a href="refund.html">환불정책</a>
   </div>
@@ -1370,9 +1421,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 
 <div class="mobile-conversion-bar" aria-label="빠른 가입 및 문의">
-  <a class="join" href="signup.html?utm_source=homepage&utm_medium=mobile_sticky&utm_campaign=always_on&utm_content=signup">회원가입</a>
+  <a class="join" href="#signup">회원가입</a>
   <a class="ask" href="index.html?utm_source=homepage&utm_medium=mobile_sticky&utm_campaign=always_on&utm_content=consult#contact">가입·문의</a>
 </div>
+
+<script>
+/* 기존 독립 페이지의 기능은 그대로 두고 메인에서는 이음새 없는 섹션처럼 표시 */
+(function () {
+  document.querySelectorAll('.onepage-frame').forEach(function (frame) {
+    frame.addEventListener('load', function () {
+      try {
+        var doc = frame.contentDocument;
+        if (!doc) return;
+        var style = doc.createElement('style');
+        style.textContent = frame.dataset.embed === 'reviews'
+          ? '.nav,.hero,footer{display:none!important} main{padding-top:28px!important;padding-bottom:36px!important} body{background:#0a0a0a!important}'
+          : '.logo{display:none!important} body{padding-top:28px!important;padding-bottom:32px!important;background:#0a0a0a!important}';
+        doc.head.appendChild(style);
+        var resize = function () {
+          var height = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+          frame.style.height = Math.max(420, height) + 'px';
+        };
+        resize();
+        if (window.ResizeObserver) new ResizeObserver(resize).observe(doc.body);
+      } catch (e) { /* 같은 출처가 아닌 미리보기에서는 기본 높이 유지 */ }
+    });
+  });
+})();
+</script>
 
 <!-- GA4 custom events -->
 <script>
