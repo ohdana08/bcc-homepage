@@ -727,7 +727,36 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   .float-kakao:hover { transform: translateY(-2px); }
   @media (max-width: 600px) {
-    .float-kakao { bottom: 16px; right: 16px; padding: 12px 16px; font-size: 13px; }
+    .float-kakao { display: none; }
+  }
+
+  /* 2026 homepage refresh: trust-first quick paths + conversion rail */
+  .quick-paths { padding: 34px 0; background: #111; border-bottom: 1px solid var(--border); }
+  .quick-path-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .quick-path {
+    display: block; padding: 22px; border: 1px solid var(--border); border-radius: 14px;
+    background: var(--card); color: var(--text); transition: border-color .18s, transform .18s;
+  }
+  .quick-path:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .quick-path small { display: block; color: var(--gold); font-weight: 700; margin-bottom: 8px; }
+  .quick-path strong { display: block; font-size: 18px; margin-bottom: 6px; }
+  .quick-path span { color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .trust-strip { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; color: var(--muted); font-size: 13px; }
+  .trust-strip b { color: var(--text); }
+  .mobile-conversion-bar { display: none; }
+  @media (max-width: 760px) {
+    body { padding-bottom: 70px; }
+    .quick-path-grid { grid-template-columns: 1fr; }
+    .quick-paths { padding: 24px 0; }
+    .quick-path { padding: 18px; }
+    .mobile-conversion-bar {
+      position: fixed; display: grid; grid-template-columns: 1fr 1.35fr; gap: 8px;
+      left: 0; right: 0; bottom: 0; z-index: 90; padding: 10px 14px;
+      background: rgba(16,16,16,.96); border-top: 1px solid var(--border); backdrop-filter: blur(12px);
+    }
+    .mobile-conversion-bar a { text-align: center; padding: 12px 10px; border-radius: 9px; font-size: 14px; font-weight: 800; }
+    .mobile-conversion-bar .join { border: 1px solid var(--gold); color: var(--gold); }
+    .mobile-conversion-bar .ask { background: var(--gold); color: #171205; }
   }
 </style>
 </head>
@@ -776,6 +805,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#tools" class="btn btn-ghost" data-nav="ittools-hero">잇툴즈 사용하기</a>
       <a href="#about" class="btn btn-ghost">강사 소개 보기</a>
       <a href="reviews.html" class="btn btn-ghost">강의 후기 보기</a>
+      <a href="index.html?utm_source=homepage&utm_medium=hero&utm_campaign=always_on&utm_content=consult#contact" class="btn btn-ghost">가입·문의 바로가기</a>
+    </div>
+    <div class="trust-strip" aria-label="BCC 신뢰 정보">
+      <span><b>13년</b> 창업·마케팅 교육 경험</span>
+      <span><b>기업·기관</b> 맞춤 강의</span>
+      <span><b>24시간 이내</b> 문의 회신</span>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK PATHS: 방문 목적별 1클릭 진입 -->
+<section class="quick-paths" aria-labelledby="quick-path-title">
+  <div class="section-inner">
+    <div class="section-label">QUICK START</div>
+    <h2 class="section-title" id="quick-path-title">무엇을 도와드릴까요?</h2>
+    <p class="section-desc">목적을 선택하면 필요한 정보와 신청 창구로 바로 연결됩니다.</p>
+    <div class="quick-path-grid">
+      <a class="quick-path" href="#itschool">
+        <small>교육 참여자</small><strong>실전 강의 살펴보기 →</strong><span>잇스쿨 과정과 다음 기수 안내를 확인합니다.</span>
+      </a>
+      <a class="quick-path" href="#tools">
+        <small>실행이 필요한 분</small><strong>무료 잇툴즈 사용하기 →</strong><span>분석 도구와 무료 챗봇으로 바로 시작합니다.</span>
+      </a>
+      <a class="quick-path" href="index.html?utm_source=homepage&utm_medium=quick_path&utm_campaign=always_on&utm_content=b2b_consult#contact">
+        <small>기업·기관 담당자</small><strong>강의·컨설팅 문의하기 →</strong><span>기존 CRM 문의 폼에서 견적과 일정을 상담합니다.</span>
+      </a>
     </div>
   </div>
 </section>
@@ -1313,6 +1368,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <span class="kakao-icon">K</span>
   카톡 상담
 </a>
+
+<div class="mobile-conversion-bar" aria-label="빠른 가입 및 문의">
+  <a class="join" href="signup.html?utm_source=homepage&utm_medium=mobile_sticky&utm_campaign=always_on&utm_content=signup">회원가입</a>
+  <a class="ask" href="index.html?utm_source=homepage&utm_medium=mobile_sticky&utm_campaign=always_on&utm_content=consult#contact">가입·문의</a>
+</div>
 
 <!-- GA4 custom events -->
 <script>

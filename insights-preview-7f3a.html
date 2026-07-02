@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>BCC 운영 지표 미리보기</title>
+  <!-- Google tag (gtag.js) — 홈페이지와 동일 측정 ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-5TN5XW0T2J');
+  </script>
+  <style>
+    :root{--bg:#0e0f11;--card:#181a1f;--line:#2b2e36;--text:#f5f6f8;--muted:#9da3af;--gold:#d8b45b}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Pretendard",sans-serif}
+    main{width:min(1080px,calc(100% - 32px));margin:0 auto;padding:56px 0 80px}
+    .eyebrow{color:var(--gold);font-size:13px;font-weight:800;letter-spacing:.12em} h1{font-size:clamp(28px,5vw,44px);margin:10px 0}
+    .desc{color:var(--muted);margin:0 0 32px}.notice{padding:12px 14px;border:1px solid #554826;background:#201c13;border-radius:10px;color:#e8cc82;font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}.card{padding:22px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+    .label{color:var(--muted);font-size:14px}.value{display:block;font-size:28px;margin:18px 0 8px}.meta{color:#7fd6a6;font-size:12px}
+    footer{margin-top:36px;color:var(--muted);font-size:12px}.back{color:var(--gold)}
+    @media(max-width:760px){main{padding-top:32px}.grid{grid-template-columns:1fr 1fr}.card{padding:18px}.value{font-size:24px}}
+    @media(max-width:420px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">PRIVATE PREVIEW · DUMMY DATA</div>
+  <h1>운영 지표</h1>
+  <p class="desc">향후 실데이터 연동을 위한 카드 슬롯입니다.</p>
+  <div class="notice">표시된 수치는 모두 화면 확인용 더미 데이터이며 실제 운영 데이터가 아닙니다.</div>
+  <section class="grid" aria-label="운영 지표 카드">
+    <article class="card"><span class="label">월 매출</span><strong class="value">₩12,480,000</strong><span class="meta">예시 값</span></article>
+    <article class="card"><span class="label">API 비용</span><strong class="value">₩438,200</strong><span class="meta">예시 값</span></article>
+    <article class="card"><span class="label">리드 수</span><strong class="value">184</strong><span class="meta">예시 값</span></article>
+    <article class="card"><span class="label">전환율</span><strong class="value">7.8%</strong><span class="meta">예시 값</span></article>
+  </section>
+  <footer>실데이터 조회·API 호출·인증 코드는 포함하지 않았습니다. · <a class="back" href="index.html">홈으로</a></footer>
+</main>
+</body>
+</html>

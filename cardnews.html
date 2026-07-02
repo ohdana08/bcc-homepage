@@ -223,7 +223,7 @@
       원고만 넣으면 카드뉴스를 <b>10분 만에 뽑아내는</b><br>
       나만의 <b>"카드뉴스 공장"</b>을 5일 만에 만듭니다.
     </p>
-    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn apply-link" data-cta="hero">다음 기수 알림받기</a>
+    <a href="index.html?utm_source=course_cardnews&utm_medium=hero_cta&utm_campaign=cohort_waitlist&utm_content=consult#contact" class="btn apply-link" data-cta="hero">다음 기수 알림·문의</a>
     <p class="meta">현재 모집 중인 기수가 없습니다 · 다음 기수 준비 중<br>오픈 시 카톡 채널로 가장 먼저 안내드립니다</p>
   </div>
 </header>
@@ -270,7 +270,7 @@
         <span class="c-status">준비중</span>
       </li>
     </ul>
-    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn" data-cta="cohort-alert" style="margin-top:20px">다음 기수 알림받기</a>
+    <a href="index.html?utm_source=course_cardnews&utm_medium=section_cta&utm_campaign=cohort_waitlist&utm_content=consult#contact" class="btn apply-link" data-cta="cohort-alert" style="margin-top:20px">다음 기수 알림·문의</a>
   </div>
 </section>
 
@@ -381,7 +381,7 @@
       5일 뒤, 사장님은 "카드뉴스 만드는 사람"이 아니라<br>
       <b>"카드뉴스 공장을 가진 사람"</b>이 됩니다.
     </p>
-    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn apply-link" data-cta="final">다음 기수 알림받기</a>
+    <a href="index.html?utm_source=course_cardnews&utm_medium=final_cta&utm_campaign=cohort_waitlist&utm_content=consult#contact" class="btn apply-link" data-cta="final">다음 기수 알림·문의</a>
     <p class="refund">다음 기수가 열리면 카톡 채널로 가장 먼저 안내드립니다.</p>
   </div>
 </section>
@@ -400,7 +400,7 @@
 <!-- 하단 고정 신청 바 -->
 <div class="sticky">
   <div class="wrap">
-    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn apply-link" data-cta="sticky">다음 기수 알림받기</a>
+    <a href="index.html?utm_source=course_cardnews&utm_medium=mobile_sticky&utm_campaign=cohort_waitlist&utm_content=consult#contact" class="btn apply-link" data-cta="sticky">다음 기수 알림·문의</a>
   </div>
 </div>
 
@@ -414,8 +414,11 @@
   var qs = window.location.search ? window.location.search.replace(/^\?/, '') : '';
   [].forEach.call(document.querySelectorAll('a.apply-link'), function (a) {
     if (qs) {
-      var href = a.getAttribute('href');
-      a.setAttribute('href', href + (href.indexOf('?') === -1 ? '?' : '&') + qs);
+      var url = new URL(a.getAttribute('href'), window.location.href);
+      new URLSearchParams(qs).forEach(function (value, key) {
+        if (!url.searchParams.has(key)) url.searchParams.set(key, value);
+      });
+      a.setAttribute('href', url.pathname.split('/').pop() + url.search + url.hash);
     }
     a.addEventListener('click', function () {
       track('course_apply_clicked', {
