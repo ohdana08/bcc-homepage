@@ -674,6 +674,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     padding: 6px 12px !important;
     color: var(--text) !important;
   }
+  /* 로그인 상태 헤더: 이름 표기 + hidden 토글 보강 */
+  .nav-user { color: var(--gold-3); font-weight: 600; }
+  .nav-links a[hidden], .nav-links span[hidden] { display: none !important; }
   .nav-login:hover { border-color: var(--gold); color: var(--gold-3) !important; }
   /* 회원가입 — 1차 동선이라 골드 채움으로 강조 */
   .nav-signup {
@@ -873,8 +876,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#reviews">강의 후기</a>
       <a href="#explog">프로젝트 연구소</a>
       <a href="#contact">문의</a>
-      <a href="#signup" class="nav-login nav-signup" data-nav="signup">회원가입</a>
-      <a href="#login" class="nav-login" data-nav="login">로그인</a>
+      <a href="#signup" class="nav-login nav-signup" data-nav="signup" id="navSignup">회원가입</a>
+      <a href="#login" class="nav-login" data-nav="login" id="navLogin">로그인</a>
+      <!-- 로그인 상태 헤더 (JS가 세션에 따라 토글 — 기본은 숨김) -->
+      <a href="admin.html" class="nav-login" id="navAdmin" hidden>관리자</a>
+      <span class="nav-user" id="navUser" hidden></span>
+      <a href="#login" class="nav-login" id="navLogout" hidden>로그아웃</a>
     </div>
     <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
   </div>
@@ -1732,6 +1739,74 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
   });
 })();
+</script>
+
+<!-- 헤더 로그인 상태 반영 (2026-07-09)
+     본문 로그인 카드는 iframe(mypage.html)이라 부모 헤더가 세션을 몰랐던 버그 수정.
+     같은 출처(localStorage 공유)이므로 부모도 동일 Supabase 세션을 읽는다.
+     iframe에서 로그인/로그아웃하면 storage 이벤트로 즉시 감지 (새로고침 불필요). -->
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  const API = window.BCC_API_BASE || 'https://bcc-homepage.vercel.app';
+  const $ = (id) => document.getElementById(id);
+  let sb = null;
+  async function client() {
+    if (sb) return sb;
+    const c = await fetch(API + '/api/config').then((r) => r.json());
+    if (!c.supabaseUrl || !c.supabaseAnonKey) return null;
+    sb = createClient(c.supabaseUrl, c.supabaseAnonKey);
+    return sb;
+  }
+  function render(state) {
+    const on = !!state;
+    $('navSignup').hidden = on;
+    $('navLogin').hidden = on;
+    $('navUser').hidden = !on;
+    $('navLogout').hidden = !on;
+    $('navAdmin').hidden = !(on && state.isAdmin);
+    if (on) $('navUser').textContent = (state.name || '회원') + ' 님';
+  }
+  let refreshing = false;
+  async function refresh() {
+    if (refreshing) return;
+    refreshing = true;
+    try {
+      const c = await client();
+      if (!c) return;
+      const { data: { session } } = await c.auth.getSession();
+      if (!session) { render(null); return; }
+      let name = session.user?.user_metadata?.name || (session.user?.email || '').split('@')[0];
+      let isAdmin = false;
+      try {
+        // 이름·관리자 여부는 기존 my-enrollments 재사용 (새 서버 함수 없음 — 12함수 한계)
+        const r = await fetch(API + '/api/my-enrollments', {
+          headers: { Authorization: 'Bearer ' + session.access_token },
+        });
+        if (r.ok) {
+          const d = await r.json();
+          if (d.profile) { name = d.profile.name || name; isAdmin = !!d.profile.is_admin; }
+        }
+      } catch (e) { /* 프로필 조회 실패해도 이름 폴백으로 표시 */ }
+      render({ name, isAdmin });
+    } catch (e) {
+      /* 헤더 상태 갱신 실패는 기능에 영향 없음 */
+    } finally {
+      refreshing = false;
+    }
+  }
+  refresh(); // 최초 로드 시 getSession()으로 초기 상태 반영
+  client().then((c) => { if (c) c.auth.onAuthStateChange(() => refresh()); });
+  // 같은 탭 iframe(로그인/가입 카드)의 세션 변화는 storage 이벤트로 감지
+  window.addEventListener('storage', (e) => {
+    if (!e.key || e.key.includes('auth-token')) refresh();
+  });
+  $('navLogout').addEventListener('click', async (ev) => {
+    ev.preventDefault();
+    try { const c = await client(); if (c) await c.auth.signOut(); } catch (e) {}
+    render(null);
+    // 로그인/가입 iframe도 초기 화면으로 동기화 (새로고침 없이)
+    document.querySelectorAll('iframe[data-embed="account"]').forEach((f) => { f.src = f.src; });
+  });
 </script>
 
 </body>
