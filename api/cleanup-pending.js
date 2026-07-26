@@ -9,14 +9,17 @@ export const maxDuration = 60;
 
 export default async function handler(req, res) {
   // Cron 인증 (CRON_SECRET 설정 시에만 강제)
-  const secret = process.env.CRON_SECRET;
+  const isThreadsJob = req.query?.job === 'threads';
+  const secret = isThreadsJob
+    ? (process.env.THREADS_CRON_SECRET || process.env.CRON_SECRET)
+    : process.env.CRON_SECRET;
   if (secret) {
     const auth = req.headers.authorization || '';
     if (auth !== `Bearer ${secret}`) return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const db = supabaseAdmin();
-  if (req.query?.job === 'threads') {
+  if (isThreadsJob) {
     try {
       const result = await runThreadsAutopilot({ db });
       return res.json(result);

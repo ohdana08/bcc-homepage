@@ -21,10 +21,11 @@
 ```text
 THREADS_ACCESS_TOKEN=Threads 장기 사용자 토큰
 THREADS_AI_MODEL=claude-sonnet-4-6
+THREADS_CRON_SECRET=Threads 작업기 전용 임의 시크릿
 ```
 
 기존 `ANTHROPIC_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-`CRON_SECRET`도 필요하다. 토큰과 비밀키는 프론트 코드나 Supabase 테이블에 넣지 않는다.
+`CRON_SECRET`도 유지한다. 토큰과 비밀키는 프론트 코드나 Supabase 테이블에 넣지 않는다.
 
 Threads 토큰에 필요한 권한:
 
@@ -42,7 +43,7 @@ threads_keyword_search
 Repository Settings → Secrets and variables → Actions에 아래 시크릿을 추가한다.
 
 ```text
-THREADS_CRON_SECRET=<Vercel CRON_SECRET과 동일한 값>
+THREADS_CRON_SECRET=<Vercel THREADS_CRON_SECRET과 동일한 값>
 ```
 
 `.github/workflows/threads-autopilot.yml`이 5분 간격으로 Vercel 작업기를 호출한다.
@@ -70,4 +71,3 @@ update public.threads_autopilot_config
 set enabled = false, updated_at = now()
 where id = 'default';
 ```
-
