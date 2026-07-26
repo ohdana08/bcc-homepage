@@ -3,6 +3,9 @@
 //   - 결제 이력(enrollments) 없는 24h 초과 profiles.status='pending' 회원 정리(auth 포함 삭제)
 // Vercel Cron 은 Authorization: Bearer <CRON_SECRET> 헤더를 보낸다(설정 시).
 import { supabaseAdmin } from '../lib/supabase.js';
+import { runThreadsAutopilot } from '../lib/threads-autopilot.js';
+
+export const maxDuration = 60;
 
 export default async function handler(req, res) {
   // Cron 인증 (CRON_SECRET 설정 시에만 강제)
@@ -13,6 +16,16 @@ export default async function handler(req, res) {
   }
 
   const db = supabaseAdmin();
+  if (req.query?.job === 'threads') {
+    try {
+      const result = await runThreadsAutopilot({ db });
+      return res.json(result);
+    } catch (err) {
+      console.error('threads-autopilot error:', err?.message || err);
+      return res.status(500).json({ ok: false, error: err?.message || String(err) });
+    }
+  }
+
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   // 1) 만료 주문 처리

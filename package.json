@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "description": "BCC 챌린지 결제·회원 시스템 — Vercel 서버리스 함수(/api)",
+  "scripts": {
+    "test": "node --test"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.69.0",
     "@supabase/supabase-js": "^2.45.0"
