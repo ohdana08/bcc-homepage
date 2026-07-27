@@ -12,15 +12,28 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 70
     steps:
-      - name: Run Threads worker
+      - name: Run Threads worker every five minutes
         env:
           CRON_SECRET: ${{ secrets.THREADS_CRON_SECRET }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
-          curl --fail --silent --show-error \
-            --retry 2 --retry-all-errors \
-            --max-time 240 \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
-            "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads"
+          failures=0
+          for attempt in $(seq 1 13); do
+            if ! curl --fail --silent --show-error \
+              --retry 2 --retry-all-errors \
+              --max-time 240 \
+              -H "Authorization: Bearer ${CRON_SECRET}" \
+              "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads"; then
+              failures=$((failures + 1))
+            fi
+
+            if [ "$attempt" -lt 13 ]; then
+              sleep 300
+            fi
+          done
+
+          if [ "$failures" -gt 0 ]; then
+            exit 1
+          fi
