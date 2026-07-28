@@ -2,7 +2,11 @@ name: Threads autopilot
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    # Start away from the top of the hour, then poll through each publish or
+    # six-hour follow-up window. GitHub documents that scheduled runs can be
+    # delayed or dropped during high-load periods, especially on the hour.
+    - cron: '10 0,3,8,11,14,17,18,20,21 * * *'
+      timezone: 'Asia/Seoul'
   workflow_dispatch:
 
 concurrency:
@@ -12,15 +16,29 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 40
     steps:
-      - name: Run Threads worker
+      - name: Poll Threads worker through the active window
         env:
           CRON_SECRET: ${{ secrets.THREADS_CRON_SECRET }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
-          curl --fail --silent --show-error \
-            --retry 2 --retry-all-errors \
-            --max-time 240 \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
-            "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads"
+          failures=0
+          for attempt in $(seq 1 31); do
+            if ! curl --fail --silent --show-error \
+              --retry 1 --retry-all-errors \
+              --max-time 45 \
+              -H "Authorization: Bearer ${CRON_SECRET}" \
+              "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads"; then
+              failures=$((failures + 1))
+            fi
+
+            if [ "$attempt" -lt 31 ]; then
+              sleep 60
+            fi
+          done
+
+          if [ "$failures" -gt 0 ]; then
+            echo "${failures} Threads worker call(s) failed" >&2
+            exit 1
+          fi
