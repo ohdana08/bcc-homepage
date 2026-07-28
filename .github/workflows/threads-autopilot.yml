@@ -8,6 +8,12 @@ on:
     - cron: '10 0,3,8,11,14,17,18,20,21 * * *'
       timezone: 'Asia/Seoul'
   workflow_dispatch:
+    inputs:
+      poll_window:
+        description: 'Poll for the full 46-minute window'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: threads-autopilot
@@ -16,15 +22,21 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 55
     steps:
       - name: Poll Threads worker through the active window
         env:
           CRON_SECRET: ${{ secrets.THREADS_CRON_SECRET }}
+          RUN_WINDOW: ${{ github.event_name == 'schedule' || inputs.poll_window == true }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
+          attempts=1
+          if [ "$RUN_WINDOW" = "true" ]; then
+            attempts=46
+          fi
+
           failures=0
-          for attempt in $(seq 1 31); do
+          for attempt in $(seq 1 "$attempts"); do
             if ! curl --fail --silent --show-error \
               --retry 1 --retry-all-errors \
               --max-time 45 \
@@ -33,7 +45,7 @@ jobs:
               failures=$((failures + 1))
             fi
 
-            if [ "$attempt" -lt 31 ]; then
+            if [ "$attempt" -lt "$attempts" ]; then
               sleep 60
             fi
           done
