@@ -198,3 +198,26 @@ test('최근 실제 성과는 상위 글의 구조 신호로만 요약한다', (
   assert.match(context, /반응 28/);
   assert.ok(context.indexOf('tip') < context.indexOf('sale'));
 });
+
+
+test('딱지원핏은 반응형 번호 글 리듬을 별도로 검증한다', () => {
+  const posts = [
+    ['사업아이템부터 찾지 마세요.', '공고와 계획서가 막히는 지점부터 확인하세요.'],
+    ['공고문은 끝까지 읽어야 합니다.', '평가표를 본 뒤에 계획서를 시작하세요.'],
+    ['지원금은 먼저 받는 돈이 아닙니다.', '조건이 맞는지부터 냉정하게 보세요.'],
+    ['계획서 목차부터 쓰지 마세요.', '심사 기준을 먼저 옮겨 적으세요.'],
+    ['딱지원핏도 경험을 만들진 못합니다.', '맞는 공고를 고르는 시간만 줄입니다.'],
+  ].map(([hook, conclusion], index) => ({
+    content_type: DAILY_TYPES[index],
+    text: `${hook}\n\n1. 지원사업은 사업아이템보다 현재 단계가 먼저입니다.\n2. 같은 아이템도 매출과 업력에 따라 보는 공고가 달라집니다.\n3. 계획서는 공고 평가표부터 읽어야 방향이 잡힙니다.\n${conclusion}`,
+    self_comment_0: '지역과 업력부터 적습니다.\n그다음 모집 시기를 봅니다.\n마지막에 평가표를 확인합니다.',
+    self_comment_6h: '아이템보다 조건을 먼저 봅니다.\n조건이 맞아야 다음 단계가 열립니다.\n공고문은 끝까지 읽습니다.',
+  }));
+  assert.deepEqual(validateHumanVoiceBatch(posts, [/공고/, /계획서/, /막히/], {
+    maxLineLength: 60,
+    requireQuestionCta: false,
+    requireNumberedStructure: true,
+    minParagraphs: 2,
+    minZeroCommentLines: 3,
+  }), []);
+});
