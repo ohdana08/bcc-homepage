@@ -2,8 +2,8 @@ name: Threads autopilot
 
 on:
   schedule:
-    # Five-minute polling keeps inbound replies active for the full 24-hour
-    # monitoring window and also covers publish/follow-up due times.
+    # Trigger every five minutes for first-hour responsiveness. Per-post
+    # reply_due_at applies 5m / 30m / 3h adaptive checks through 24 hours.
     # Start at minute 2 to avoid the top-of-hour load spike.
     - cron: '2-57/5 * * * *'
       timezone: 'Asia/Seoul'

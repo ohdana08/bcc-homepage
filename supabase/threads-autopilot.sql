@@ -1,4 +1,4 @@
--- Threads 완전 자동 운영: 하루 5개 + 0분/5분/15분/6시간/24시간 루틴
+-- Threads 완전 자동 운영: 하루 5개 + 댓글 5분/30분/3시간 적응형 감시 + 6시간/24시간 루틴
 -- Supabase SQL Editor에서 한 번 실행한다.
 
 create extension if not exists pgcrypto;

@@ -10,6 +10,7 @@ import {
   formatBodyLines,
   ensureNumberedItems,
   normalizeShortLines,
+  replyCheckIntervalMinutes,
   validateHumanVoiceBatch,
   zonedDateTimeToUtc,
 } from '../lib/threads-autopilot.js';
@@ -67,6 +68,17 @@ test('외부 댓글은 권한 승인 전까지 기본 비활성화한다', () =>
   assert.equal(externalCommentsEnabled({ THREADS_EXTERNAL_COMMENTS_ENABLED: 'false' }), false);
   assert.equal(externalCommentsEnabled({ THREADS_EXTERNAL_COMMENTS_ENABLED: 'true' }), true);
   assert.equal(externalCommentsEnabled({ THREADS_EXTERNAL_COMMENTS_ENABLED: ' TRUE ' }), true);
+});
+
+test('발행 경과 시간에 따라 댓글 확인 주기를 5분, 30분, 3시간으로 늦춘다', () => {
+  const publishedAt = new Date('2026-07-30T00:00:00.000Z');
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-30T00:05:00.000Z')), 5);
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-30T00:59:59.000Z')), 5);
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-30T01:00:00.000Z')), 30);
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-30T05:59:59.000Z')), 30);
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-30T06:00:00.000Z')), 180);
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-30T23:59:59.000Z')), 180);
+  assert.equal(replyCheckIntervalMinutes(publishedAt, new Date('2026-07-31T00:00:00.000Z')), null);
 });
 
 test('일반 댓글은 자동 답변하고 민감 댓글은 보류한다', () => {
