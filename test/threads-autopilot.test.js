@@ -6,6 +6,7 @@ import {
   classifyInboundReply,
   dateKeyInTimeZone,
   externalCommentsEnabled,
+  shouldRegeneratePendingJiwonfit,
   formatBodyLines,
   ensureNumberedItems,
   normalizeShortLines,
@@ -220,4 +221,19 @@ test('딱지원핏은 반응형 번호 글 리듬을 별도로 검증한다', ()
     minParagraphs: 2,
     minZeroCommentLines: 3,
   }), []);
+});
+
+
+test('미발행 딱지원핏 구형 예약글만 새 리듬으로 교체한다', () => {
+  const queuedLegacy = Array.from({ length: 5 }, () => ({ status: 'queued', text: '구형 형식' }));
+  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'jiwonfit' }, queuedLegacy), true);
+  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'default' }, queuedLegacy), false);
+  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'jiwonfit' }, [
+    ...queuedLegacy.slice(0, 4),
+    { status: 'published', text: '1. 이미 발행됨' },
+  ]), false);
+  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'jiwonfit' }, Array.from(
+    { length: 5 },
+    () => ({ status: 'queued', text: '후크\n1. 번호 전개' }),
+  )), false);
 });
