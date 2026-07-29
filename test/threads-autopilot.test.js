@@ -46,6 +46,13 @@ test('긴 생성 문장을 단어 경계에서 10자 이하로 정리하고 마�
   assert.match(lines.at(-1), /[?？]$/);
 });
 
+test('가운뎃점으로 연결된 항목도 단어 중간을 자르지 않는다', () => {
+  const source = '성장·장점·단점·동기·포부';
+  const lines = normalizeShortLines([source]);
+  assert.ok(lines.every((line) => line.length <= 10));
+  assert.equal(lines.join(''), source);
+});
+
 test('저장형 댓글에 짧은 번호 항목을 최소 2개 만든다', () => {
   const lines = ensureNumberedItems(['공식 자료 확인', '회사 기준 확인', '내 경험 연결']);
   assert.equal(lines.filter((line) => /^\d+[.)]\s*/.test(line)).length, 2);
