@@ -4,6 +4,7 @@ import {
   buildPerformanceLearningContext,
   buildPerformanceComment,
   dateKeyInTimeZone,
+  formatBodyLines,
   validateHumanVoiceBatch,
   zonedDateTimeToUtc,
 } from '../lib/threads-autopilot.js';
@@ -19,6 +20,13 @@ test('서울 현지 발행 시각을 UTC로 바꾼다', () => {
   assert.equal(
     zonedDateTimeToUtc('2026-07-27', '08:30', 'Asia/Seoul').toISOString(),
     '2026-07-26T23:30:00.000Z',
+  );
+});
+
+test('구조화된 짧은 줄을 3문단 본문으로 바꾼다', () => {
+  assert.equal(
+    formatBodyLines(['후크다.', '상황이다.', '차이가 났다.', '행동을 바꿨다.', '넌 어디가 막혀?']),
+    '후크다.\n\n상황이다.\n차이가 났다.\n\n행동을 바꿨다.\n넌 어디가 막혀?',
   );
 });
 
