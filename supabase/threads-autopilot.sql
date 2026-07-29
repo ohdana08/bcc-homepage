@@ -10,7 +10,7 @@ create table if not exists public.threads_autopilot_config (
   timezone text not null default 'Asia/Seoul',
   publish_times jsonb not null default '["08:30","11:30","14:30","18:30","21:30"]'::jsonb,
   campaign_context text not null default
-    'AI 강사의 기관 수주 백스테이지. 기관 강의 제안, 커리큘럼, 견적, 운영 업무를 실제로 줄이는 실무 콘텐츠를 제공하고 필요한 사람에게 기관 AI 강의 제안·커리큘럼 실무팩을 연결한다.',
+    'AI 취업서류 실험실. 취업 준비생이 자기소개서에서 겪는 실제 오류, AI 결과 검증, 회사 조사, 개인정보 보호, 바로 쓰는 질문과 체크리스트를 가르치고 하루 1개 글에서 복붙 없이 완성하는 AI 자기소개서 상품을 자연스럽게 연결한다.',
   start_date date,
   next_sequence integer not null default 1,
   last_generated_date date,
@@ -107,4 +107,3 @@ grant usage, select on all sequences in schema public to service_role;
 -- update public.threads_autopilot_config
 -- set enabled = true, start_date = (now() at time zone 'Asia/Seoul')::date + 1
 -- where id = 'default';
-
