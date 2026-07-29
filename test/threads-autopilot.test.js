@@ -95,6 +95,22 @@ test('범용 카피와 고객 언어가 없는 배치를 거부한다', () => {
   assert.ok(problems.some((problem) => problem.includes('링크 또는 해시태그')));
 });
 
+test('캠페인별 고객 언어 패턴을 주입해 검증한다', () => {
+  const jiwonfitPatterns = [/몰라서/, /복붙/, /막히|막혔/];
+  const posts = [
+    validPost('problem', ['공고를 놓쳤다.', '언제 나오는지', '몰라서였다.', '알림을 걸었다.', '넌 어디서 봐?']),
+    validPost('tip', ['복붙이 문제다.', '기준이 달랐다.', '목차를 바꿨다.', '근거를 옮겼다.', '넌 뭘 바꾸겠어?'],
+      ['1. 목차 확인', '2. 근거 배치', '한 줄씩 본다.', '사실만 남긴다.', '다시 읽는다.']),
+    validPost('backstage', ['새벽에 고쳤다.', '가상 예시였다.', '순서를 바꿨다.', '판단이 변했다.', '넌 뭘 고치겠어?']),
+    validPost('template', ['목차가 먼저다.', '항목을 나눴다.', '근거를 붙였다.', '출처를 남겼다.', '넌 뭐부터 써?'],
+      ['1. 항목 정리', '2. 근거 연결', '날짜를 적는다.', '출처를 남긴다.', '추측은 뺀다.']),
+    validPost('sale', ['계획서가 막혔다.', '도구는 못 한다.', '순서만 줄인다.', '검증은 네 몫.', '넌 어디서 멈춰?']),
+  ];
+  assert.deepEqual(validateHumanVoiceBatch(posts, jiwonfitPatterns), []);
+  const problems = validateHumanVoiceBatch(posts);
+  assert.ok(problems.some((problem) => problem.includes('고객 언어')));
+});
+
 test('최근 실제 성과는 상위 글의 구조 신호로만 요약한다', () => {
   const context = buildPerformanceLearningContext([
     {

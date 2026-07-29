@@ -5,7 +5,7 @@
 import { supabaseAdmin } from '../lib/supabase.js';
 import { runThreadsAutopilot } from '../lib/threads-autopilot.js';
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export default async function handler(req, res) {
   // Cron 인증 (CRON_SECRET 설정 시에만 강제)
