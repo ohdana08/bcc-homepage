@@ -6,7 +6,7 @@ import {
   classifyInboundReply,
   dateKeyInTimeZone,
   externalCommentsEnabled,
-  shouldRegeneratePendingJiwonfit,
+  shouldRegeneratePendingCampaign,
   formatBodyLines,
   ensureNumberedItems,
   normalizeShortLines,
@@ -213,13 +213,13 @@ test('최근 실제 성과는 상위 글의 구조 신호로만 요약한다', (
 });
 
 
-test('딱지원핏은 반응형 번호 글 리듬을 별도로 검증한다', () => {
+test('두 캠페인은 반응형 번호 글과 전환 CTA를 함께 검증한다', () => {
   const posts = [
-    ['사업아이템부터 찾지 마세요.', '공고와 계획서가 막히는 지점부터 확인하세요.'],
-    ['공고문은 끝까지 읽어야 합니다.', '평가표를 본 뒤에 계획서를 시작하세요.'],
-    ['지원금은 먼저 받는 돈이 아닙니다.', '조건이 맞는지부터 냉정하게 보세요.'],
-    ['계획서 목차부터 쓰지 마세요.', '심사 기준을 먼저 옮겨 적으세요.'],
-    ['딱지원핏도 경험을 만들진 못합니다.', '맞는 공고를 고르는 시간만 줄입니다.'],
+    ['사업아이템부터 찾지 마세요.', '프로필 링크에서 내 단계 공고를 확인하세요.'],
+    ['공고문은 끝까지 읽어야 합니다.', '댓글에 지금 가장 막힌 기준을 남겨주세요.'],
+    ['지원금은 먼저 받는 돈이 아닙니다.', '프로필 링크에서 조건 진단을 시작하세요.'],
+    ['계획서 목차부터 쓰지 마세요.', '댓글에 공고명만 남겨도 다음 기준을 알려드릴게요.'],
+    ['딱지원핏도 경험을 만들진 못합니다.', '프로필 링크에서 맞는 공고를 찾아보세요.'],
   ].map(([hook, conclusion], index) => ({
     content_type: DAILY_TYPES[index],
     text: `${hook}\n\n1. 지원사업은 사업아이템보다 현재 단계가 먼저입니다.\n2. 같은 아이템도 매출과 업력에 따라 보는 공고가 달라집니다.\n3. 계획서는 공고 평가표부터 읽어야 방향이 잡힙니다.\n${conclusion}`,
@@ -232,19 +232,21 @@ test('딱지원핏은 반응형 번호 글 리듬을 별도로 검증한다', ()
     requireNumberedStructure: true,
     minParagraphs: 2,
     minZeroCommentLines: 3,
+    requireCta: true,
+    minProfileLinkCtas: 3,
   }), []);
 });
 
 
-test('미발행 딱지원핏 구형 예약글만 새 리듬으로 교체한다', () => {
+test('미발행 두 캠페인의 구형 예약글만 새 리듬으로 교체한다', () => {
   const queuedLegacy = Array.from({ length: 5 }, () => ({ status: 'queued', text: '구형 형식' }));
-  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'jiwonfit' }, queuedLegacy), true);
-  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'default' }, queuedLegacy), false);
-  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'jiwonfit' }, [
+  assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, queuedLegacy), true);
+  assert.equal(shouldRegeneratePendingCampaign({ id: 'default' }, queuedLegacy), true);
+  assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, [
     ...queuedLegacy.slice(0, 4),
     { status: 'published', text: '1. 이미 발행됨' },
   ]), false);
-  assert.equal(shouldRegeneratePendingJiwonfit({ id: 'jiwonfit' }, Array.from(
+  assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, Array.from(
     { length: 5 },
     () => ({ status: 'queued', text: '후크\n1. 번호 전개' }),
   )), false);
