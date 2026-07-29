@@ -23,7 +23,9 @@ on conflict (id) do nothing;
 
 create table if not exists public.threads_autopilot_posts (
   id uuid primary key default gen_random_uuid(),
-  sequence integer not null unique,
+  campaign_id text not null default 'default'
+    references public.threads_autopilot_config(id) on delete cascade,
+  sequence integer not null,
   schedule_date date not null,
   slot_index integer not null check (slot_index between 0 and 4),
   scheduled_at timestamptz not null,
@@ -57,7 +59,8 @@ create table if not exists public.threads_autopilot_posts (
   last_error text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (schedule_date, slot_index)
+  unique (campaign_id, schedule_date, slot_index),
+  unique (campaign_id, sequence)
 );
 
 create index if not exists threads_autopilot_posts_due_idx
