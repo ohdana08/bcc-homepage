@@ -5,6 +5,7 @@ import {
   buildPerformanceComment,
   dateKeyInTimeZone,
   formatBodyLines,
+  normalizeShortLines,
   validateHumanVoiceBatch,
   zonedDateTimeToUtc,
 } from '../lib/threads-autopilot.js';
@@ -28,6 +29,20 @@ test('구조화된 짧은 줄을 3문단 본문으로 바꾼다', () => {
     formatBodyLines(['후크다.', '상황이다.', '차이가 났다.', '행동을 바꿨다.', '넌 어디가 막혀?']),
     '후크다.\n\n상황이다.\n차이가 났다.\n\n행동을 바꿨다.\n넌 어디가 막혀?',
   );
+});
+
+test('긴 생성 문장을 단어 경계에서 10자 이하로 정리하고 마지막 질문만 남긴다', () => {
+  const lines = normalizeShortLines([
+    '내 얘기 같지 않았다.',
+    '회사 정보, 어디서?',
+    '공식 자료를 봤다.',
+    '판단을 바꿨다.',
+    '넌 어디서 찾니?',
+  ], { finalQuestion: true });
+  assert.ok(lines.length >= 5 && lines.length <= 10);
+  assert.ok(lines.every((line) => line.length <= 10));
+  assert.equal(lines.join('').match(/[?？]/g)?.length, 1);
+  assert.match(lines.at(-1), /[?？]$/);
 });
 
 test('24시간 성과에 다음 글을 연결한다', () => {
