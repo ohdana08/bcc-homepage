@@ -10,8 +10,9 @@
 - 하루 구성: 가치 제공 4개 + 판매 연결 1개. 자기소개서·취업서류 한 주제만 유지
 - 생성 전 최근 24시간 성과가 있는 글을 조회해 형식·주제 신호로만 쓰며, 성과 수치나 문장을 본문에 복제하지 않음
 - 0분: 내 게시물에 구체적인 셀프 댓글 1개
-- 5분: 같은 주제의 다른 작성자 게시물 5개에 개별 댓글
-- 15분: 내 글에 들어온 답글을 읽고 자동 응답
+- 5분: `threads_keyword_search` 승인 시 같은 주제의 다른 작성자 게시물 5개에 개별 댓글
+- 발행 5분 후부터 24시간: 5분마다 내 글의 새 답글을 읽고 자동 응답
+- 환불·법률·개인정보·가격 협상·공격적 댓글은 게시하지 않고 DB에 `자동답변 보류`로 기록
 - 6시간: 내 게시물에 실무 보충 셀프 댓글
 - 24시간: 실제 인사이트를 댓글로 공개하고 다음 날 같은 슬롯의 글을 이어서 발행
 - 하루 5개 기준 연결 순서: 1→6, 2→7, 3→8, 4→9, 5→10
@@ -28,6 +29,7 @@
 THREADS_ACCESS_TOKEN=Threads 장기 사용자 토큰
 THREADS_AI_MODEL=claude-sonnet-4-6
 THREADS_CRON_SECRET=Threads 작업기 전용 임의 시크릿
+THREADS_EXTERNAL_COMMENTS_ENABLED=false
 ```
 
 기존 `ANTHROPIC_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
@@ -44,6 +46,11 @@ threads_manage_insights
 threads_keyword_search
 ```
 
+`threads_keyword_search` 앱 검수와 새 토큰 발급이 끝난 뒤에만
+`THREADS_EXTERNAL_COMMENTS_ENABLED=true`로 변경한다. 기본값과 미설정 상태는
+모두 `false`이며, 권한이 없는 동안 기존 외부 댓글 오류도 자동으로 완료 처리해
+재시도하지 않는다.
+
 ## 3. GitHub Actions
 
 Repository Settings → Secrets and variables → Actions에 아래 시크릿을 추가한다.
@@ -52,7 +59,8 @@ Repository Settings → Secrets and variables → Actions에 아래 시크릿을
 THREADS_CRON_SECRET=<Vercel THREADS_CRON_SECRET과 동일한 값>
 ```
 
-`.github/workflows/threads-autopilot.yml`이 5분 간격으로 Vercel 작업기를 호출한다.
+`.github/workflows/threads-autopilot.yml`이 하루 종일 5분 간격으로 Vercel 작업기를
+호출한다. 각 글은 발행 5분 뒤부터 24시간 동안 새 댓글을 중복 없이 확인한다.
 
 ## 4. 연결 검증
 

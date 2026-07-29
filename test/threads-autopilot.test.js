@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   buildPerformanceLearningContext,
   buildPerformanceComment,
+  classifyInboundReply,
   dateKeyInTimeZone,
+  externalCommentsEnabled,
   formatBodyLines,
   ensureNumberedItems,
   normalizeShortLines,
@@ -57,6 +59,36 @@ test('저장형 댓글에 짧은 번호 항목을 최소 2개 만든다', () => 
   const lines = ensureNumberedItems(['공식 자료 확인', '회사 기준 확인', '내 경험 연결']);
   assert.equal(lines.filter((line) => /^\d+[.)]\s*/.test(line)).length, 2);
   assert.ok(lines.every((line) => line.length <= 10));
+});
+
+test('외부 댓글은 권한 승인 전까지 기본 비활성화한다', () => {
+  assert.equal(externalCommentsEnabled({}), false);
+  assert.equal(externalCommentsEnabled({ THREADS_EXTERNAL_COMMENTS_ENABLED: 'false' }), false);
+  assert.equal(externalCommentsEnabled({ THREADS_EXTERNAL_COMMENTS_ENABLED: 'true' }), true);
+  assert.equal(externalCommentsEnabled({ THREADS_EXTERNAL_COMMENTS_ENABLED: ' TRUE ' }), true);
+});
+
+test('일반 댓글은 자동 답변하고 민감 댓글은 보류한다', () => {
+  assert.deepEqual(
+    classifyInboundReply('가격은 얼마인가요? 구성도 궁금해요.'),
+    { autoReply: true, reason: null },
+  );
+  assert.deepEqual(
+    classifyInboundReply('결제했는데 환불하고 싶어요.'),
+    { autoReply: false, reason: '환불·취소' },
+  );
+  assert.deepEqual(
+    classifyInboundReply('할인 가능해요? 조금만 깎아주세요.'),
+    { autoReply: false, reason: '가격 협상' },
+  );
+  assert.deepEqual(
+    classifyInboundReply('제 전화번호와 계좌번호를 남길게요.'),
+    { autoReply: false, reason: '개인정보' },
+  );
+  assert.deepEqual(
+    classifyInboundReply('이건 법적으로 문제 없는 건가요?'),
+    { autoReply: false, reason: '법률·분쟁' },
+  );
 });
 
 test('24시간 성과에 다음 글을 연결한다', () => {
