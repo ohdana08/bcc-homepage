@@ -5,6 +5,7 @@ import {
   buildPerformanceComment,
   dateKeyInTimeZone,
   formatBodyLines,
+  ensureNumberedItems,
   normalizeShortLines,
   validateHumanVoiceBatch,
   zonedDateTimeToUtc,
@@ -43,6 +44,12 @@ test('긴 생성 문장을 단어 경계에서 10자 이하로 정리하고 마�
   assert.ok(lines.every((line) => line.length <= 10));
   assert.equal(lines.join('').match(/[?？]/g)?.length, 1);
   assert.match(lines.at(-1), /[?？]$/);
+});
+
+test('저장형 댓글에 짧은 번호 항목을 최소 2개 만든다', () => {
+  const lines = ensureNumberedItems(['공식 자료 확인', '회사 기준 확인', '내 경험 연결']);
+  assert.equal(lines.filter((line) => /^\d+[.)]\s*/.test(line)).length, 2);
+  assert.ok(lines.every((line) => line.length <= 10));
 });
 
 test('24시간 성과에 다음 글을 연결한다', () => {
