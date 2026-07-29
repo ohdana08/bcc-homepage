@@ -30,24 +30,39 @@ jobs:
           RUN_WINDOW: ${{ github.event_name == 'schedule' || inputs.poll_window == true }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
-          attempts=1
+          window_seconds=0
           if [ "$RUN_WINDOW" = "true" ]; then
-            attempts=46
+            window_seconds=2760
           fi
 
+          deadline=$((SECONDS + window_seconds))
           failures=0
-          for attempt in $(seq 1 "$attempts"); do
+          attempt=1
+          while true; do
+            echo "Threads worker attempt ${attempt}"
             if ! curl --fail --silent --show-error \
-              --retry 1 --retry-all-errors \
-              --max-time 45 \
+              --max-time 295 \
+              --write-out '\n' \
               -H "Authorization: Bearer ${CRON_SECRET}" \
               "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads"; then
               failures=$((failures + 1))
             fi
 
-            if [ "$attempt" -lt "$attempts" ]; then
-              sleep 60
+            if [ "$RUN_WINDOW" != "true" ] || [ "$SECONDS" -ge "$deadline" ]; then
+              break
             fi
+
+            remaining=$((deadline - SECONDS))
+            sleep_seconds=60
+            if [ "$remaining" -lt "$sleep_seconds" ]; then
+              sleep_seconds="$remaining"
+            fi
+            if [ "$sleep_seconds" -le 0 ]; then
+              break
+            fi
+
+            sleep "$sleep_seconds"
+            attempt=$((attempt + 1))
           done
 
           if [ "$failures" -gt 0 ]; then
