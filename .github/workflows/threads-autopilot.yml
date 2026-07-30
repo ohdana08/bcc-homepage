@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       poll_window:
-        description: 'Poll for the full 46-minute window'
+        description: 'Poll for a four-hour recovery window'
         required: false
         default: false
         type: boolean
@@ -34,7 +34,7 @@ jobs:
           if [ "$SCHEDULED_RUN" = "true" ]; then
             window_seconds=21300
           elif [ "$MANUAL_WINDOW" = "true" ]; then
-            window_seconds=2760
+            window_seconds=14400
           fi
 
           deadline=$((SECONDS + window_seconds))
