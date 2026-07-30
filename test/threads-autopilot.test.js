@@ -13,7 +13,6 @@ import {
   publishTimesForCampaign,
   replyCheckIntervalMinutes,
   sanitizeGeneratedLines,
-  shouldRegeneratePendingCampaign,
   validateCommentReady,
   validateHumanVoiceBatch,
   validatePublishReadyPost,
@@ -26,7 +25,6 @@ test('Asia/Seoul 날짜 키를 만든다', () => {
   const date = new Date('2026-07-26T15:30:00.000Z');
   assert.equal(dateKeyInTimeZone(date, 'Asia/Seoul'), '2026-07-27');
 });
-
 test('서울 현지 발행 시각을 UTC로 바꾼다', () => {
   assert.equal(
     zonedDateTimeToUtc('2026-07-27', '08:30', 'Asia/Seoul').toISOString(),
@@ -398,39 +396,4 @@ test('생성 결과의 근거 없는 사회적 증거와 댓글 CTA를 안전 �
     '공고 원문의 날짜를 다시 확인합니다.',
     safetyFallbacks[1],
   ]);
-});
-
-
-test('미발행 두 캠페인의 구형 예약글만 새 리듬으로 교체한다', () => {
-  const queuedLegacy = Array.from({ length: 5 }, () => ({ status: 'queued', text: '구형 형식' }));
-  assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, queuedLegacy), true);
-  assert.equal(shouldRegeneratePendingCampaign({ id: 'default' }, queuedLegacy), true);
-  assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, [
-    ...queuedLegacy.slice(0, 4),
-    { status: 'published', text: '1. 이미 발행됨' },
-  ]), false);
-  assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, Array.from(
-    { length: 5 },
-    () => ({ status: 'queued', text: '후크\n1. 번호 전개' }),
-  )), true);
-  const readyPosts = DAILY_TYPES.map((contentType, index) => {
-    const base = campaignReadyPost({ content_type: contentType });
-    return {
-      ...base,
-      text: base.text
-        .replace(
-          '사업아이템보다 현재 단계를 먼저 보세요.',
-          `${index + 1}번째 공고도 현재 단계를 먼저 보세요.`,
-        )
-        .replace(
-          '프로필 링크에서 내 조건에 맞는 공고를 확인하세요.',
-          `프로필 링크에서 ${index + 1}번째 조건의 공고를 확인하세요.`,
-        ),
-      status: 'queued',
-    };
-  });
-  assert.equal(shouldRegeneratePendingCampaign({
-    id: 'jiwonfit',
-    customer_language_patterns: ['공고'],
-  }, readyPosts), false);
 });
