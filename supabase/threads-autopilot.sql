@@ -1,4 +1,4 @@
--- Threads 완전 자동 운영: 하루 5개 + 댓글 5분/30분/3시간 적응형 감시 + 6시간/24시간 루틴
+-- Threads 완전 자동 운영: 캠페인별 하루 5개 + 댓글 적응형 감시 + 6시간/24시간 루틴
 -- Supabase SQL Editor에서 한 번 실행한다.
 
 create extension if not exists pgcrypto;
@@ -8,7 +8,7 @@ create table if not exists public.threads_autopilot_config (
   enabled boolean not null default false,
   profile_username text not null default 'ai_crazy_lab_1201',
   timezone text not null default 'Asia/Seoul',
-  publish_times jsonb not null default '["08:30","11:30","14:30","18:30","21:30"]'::jsonb,
+  publish_times jsonb not null default '["08:10","10:30","12:20","18:10","21:20"]'::jsonb,
   campaign_context text not null default
     'AI 취업서류 실험실. 취업 준비생이 자기소개서에서 겪는 실제 오류, AI 결과 검증, 회사 조사, 개인정보 보호, 바로 쓰는 질문과 체크리스트를 가르치고 하루 1개 글에서 복붙 없이 완성하는 AI 자기소개서 상품을 자연스럽게 연결한다.',
   start_date date,
@@ -35,7 +35,7 @@ create table if not exists public.threads_autopilot_posts (
   self_comment_6h text not null,
   search_queries jsonb not null default '[]'::jsonb,
   status text not null default 'queued'
-    check (status in ('queued', 'published', 'failed')),
+    check (status in ('queued', 'published', 'failed', 'skipped')),
   attempts integer not null default 0,
   thread_id text unique,
   permalink text,

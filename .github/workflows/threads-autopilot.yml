@@ -2,11 +2,10 @@ name: Threads autopilot
 
 on:
   schedule:
-    # Trigger every five minutes for first-hour responsiveness. Per-post
-    # reply_due_at applies 5m / 30m / 3h adaptive checks through 24 hours.
-    # Start at minute 2 to avoid the top-of-hour load spike.
-    - cron: '2-57/5 * * * *'
-      timezone: 'Asia/Seoul'
+    # GitHub's five-minute cron is best-effort and was observed skipping slots.
+    # Four overlapping six-hour polling windows keep the worker active every minute.
+    # UTC 02:55/08:55/14:55/20:55 = KST 11:55/17:55/23:55/05:55.
+    - cron: '55 2,8,14,20 * * *'
   workflow_dispatch:
     inputs:
       poll_window:
@@ -22,16 +21,19 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 358
     steps:
       - name: Poll Threads worker through the active window
         env:
           CRON_SECRET: ${{ secrets.THREADS_CRON_SECRET }}
-          RUN_WINDOW: ${{ github.event_name == 'workflow_dispatch' && inputs.poll_window == true }}
+          SCHEDULED_RUN: ${{ github.event_name == 'schedule' }}
+          MANUAL_WINDOW: ${{ github.event_name == 'workflow_dispatch' && inputs.poll_window == true }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
           window_seconds=0
-          if [ "$RUN_WINDOW" = "true" ]; then
+          if [ "$SCHEDULED_RUN" = "true" ]; then
+            window_seconds=21300
+          elif [ "$MANUAL_WINDOW" = "true" ]; then
             window_seconds=2760
           fi
 
@@ -48,7 +50,7 @@ jobs:
               failures=$((failures + 1))
             fi
 
-            if [ "$RUN_WINDOW" != "true" ] || [ "$SECONDS" -ge "$deadline" ]; then
+            if [ "$window_seconds" -eq 0 ] || [ "$SECONDS" -ge "$deadline" ]; then
               break
             fi
 

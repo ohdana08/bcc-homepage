@@ -1,18 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildNextPostText,
   buildPerformanceLearningContext,
-  buildPerformanceComment,
   classifyInboundReply,
   dateKeyInTimeZone,
   externalCommentsEnabled,
-  shouldRegeneratePendingCampaign,
   formatBodyLines,
   ensureNumberedItems,
   normalizeShortLines,
+  publishTimesForCampaign,
   replyCheckIntervalMinutes,
+  shouldRegeneratePendingCampaign,
+  validateCommentReady,
   validateHumanVoiceBatch,
+  validatePublishReadyPost,
   zonedDateTimeToUtc,
 } from '../lib/threads-autopilot.js';
 
@@ -102,33 +103,6 @@ test('일반 댓글은 자동 답변하고 민감 댓글은 보류한다', () =>
   assert.deepEqual(
     classifyInboundReply('이건 법적으로 문제 없는 건가요?'),
     { autoReply: false, reason: '법률·분쟁' },
-  );
-});
-
-test('24시간 성과에 다음 글을 연결한다', () => {
-  const text = buildPerformanceComment(
-    { views: 123, likes: 4, replies: 2, reposts: 1, quotes: 0, shares: 3 },
-    { text: '기관 담당자는 커리큘럼보다 이것을 먼저 봅니다.\n본문' },
-  );
-  assert.match(text, /조회 123/);
-  assert.match(text, /다음 글: 기관 담당자는/);
-});
-
-test('직전 글의 실제 반응을 다음 글 첫 문단에 붙인다', () => {
-  const text = buildNextPostText(
-    '다음 글 본문이다.\n\n질문으로 끝난다?',
-    { views: 321, likes: 7, replies: 2 },
-  );
-  assert.equal(
-    text,
-    '직전 글은 조회 321 · 좋아요 7 · 답글 2였어.\n\n다음 글 본문이다.\n\n질문으로 끝난다?',
-  );
-});
-
-test('직전 글 반응값이 없으면 추측하지 않고 0으로 표시한다', () => {
-  assert.equal(
-    buildNextPostText('다음 글이다.', {}),
-    '직전 글은 조회 0 · 좋아요 0 · 답글 0였어.\n\n다음 글이다.',
   );
 });
 
@@ -253,7 +227,77 @@ test('두 캠페인은 반응형 번호 글과 전환 CTA를 함께 검증한다
     minZeroCommentLines: 3,
     requireCta: true,
     minProfileLinkCtas: 3,
+    strictLineItems: true,
   }), []);
+});
+
+function campaignReadyPost(overrides = {}) {
+  return {
+    content_type: 'tip',
+    text: [
+      '사업아이템보다 현재 단계를 먼저 보세요.',
+      '',
+      '1. 업력과 매출에 따라 신청할 수 있는 공고가 달라집니다.',
+      '2. 모집 시기와 지역 조건을 함께 확인해야 합니다.',
+      '3. 계획서는 공고 평가표의 순서대로 근거를 배치합니다.',
+      '프로필 링크에서 내 조건에 맞는 공고를 확인하세요.',
+    ].join('\n'),
+    self_comment_0: [
+      '사업자등록일로 업력을 먼저 계산합니다.',
+      '최근 결산 자료에서 매출 구간을 확인합니다.',
+      '마지막으로 소재지 제한을 확인합니다.',
+    ].join('\n'),
+    self_comment_6h: [
+      '공고마다 업력 계산 기준일이 다를 수 있습니다.',
+      '신청 마감일이 기준인지 공고일이 기준인지 읽습니다.',
+      '모호한 조건은 담당 기관에 확인한 뒤 적습니다.',
+    ].join('\n'),
+    ...overrides,
+  };
+}
+
+test('두 캠페인의 확정 발행 시각을 분리한다', () => {
+  assert.deepEqual(
+    publishTimesForCampaign({ id: 'default' }),
+    ['08:10', '10:30', '12:20', '18:10', '21:20'],
+  );
+  assert.deepEqual(
+    publishTimesForCampaign({ id: 'jiwonfit' }),
+    ['08:30', '10:50', '12:40', '15:30', '18:30'],
+  );
+});
+
+test('완결된 번호형 본문과 구체적 CTA만 발행 준비로 인정한다', () => {
+  assert.deepEqual(validatePublishReadyPost(campaignReadyPost()), []);
+});
+
+test('일반 질문은 CTA로 인정하지 않는다', () => {
+  const post = campaignReadyPost({
+    text: campaignReadyPost().text.replace(
+      '프로필 링크에서 내 조건에 맞는 공고를 확인하세요.',
+      '내 조건도 확인해봤나요?',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(post)
+    .some((problem) => problem.includes('목적지와 행동이 분명한 CTA')));
+});
+
+test('중간에서 끊긴 셀프 댓글은 게시하지 않는다', () => {
+  const problems = validateCommentReady(
+    '사업 목표를 한 문장으로 적습니다.\n평가표와 근거를 대조합니다.\n3. 지금까지',
+  );
+  assert.ok(problems.some((problem) => problem.includes('미완성 문장')));
+});
+
+test('공개 본문과 댓글에 조회·반응 수치를 넣지 않는다', () => {
+  const post = campaignReadyPost({
+    text: campaignReadyPost().text.replace(
+      '사업아이템보다 현재 단계를 먼저 보세요.',
+      '직전 글은 조회 321 · 좋아요 7 · 답글 2였어.',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(post)
+    .some((problem) => problem.includes('조회·반응 수치')));
 });
 
 
@@ -268,5 +312,25 @@ test('미발행 두 캠페인의 구형 예약글만 새 리듬으로 교체한�
   assert.equal(shouldRegeneratePendingCampaign({ id: 'jiwonfit' }, Array.from(
     { length: 5 },
     () => ({ status: 'queued', text: '후크\n1. 번호 전개' }),
-  )), false);
+  )), true);
+  const readyPosts = DAILY_TYPES.map((contentType, index) => {
+    const base = campaignReadyPost({ content_type: contentType });
+    return {
+      ...base,
+      text: base.text
+        .replace(
+          '사업아이템보다 현재 단계를 먼저 보세요.',
+          `${index + 1}번째 공고도 현재 단계를 먼저 보세요.`,
+        )
+        .replace(
+          '프로필 링크에서 내 조건에 맞는 공고를 확인하세요.',
+          `프로필 링크에서 ${index + 1}번째 조건의 공고를 확인하세요.`,
+        ),
+      status: 'queued',
+    };
+  });
+  assert.equal(shouldRegeneratePendingCampaign({
+    id: 'jiwonfit',
+    customer_language_patterns: ['공고'],
+  }, readyPosts), false);
 });
