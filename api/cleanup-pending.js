@@ -21,7 +21,11 @@ export default async function handler(req, res) {
   const db = supabaseAdmin();
   if (isThreadsJob) {
     try {
-      const result = await runThreadsAutopilot({ db });
+      const campaignId = String(req.query?.campaign || '').trim() || null;
+      if (campaignId && !/^[a-z0-9_-]+$/i.test(campaignId)) {
+        return res.status(400).json({ ok: false, error: 'Invalid campaign' });
+      }
+      const result = await runThreadsAutopilot({ db, campaignId });
       return res.json(result);
     } catch (err) {
       console.error('threads-autopilot error:', err?.message || err);

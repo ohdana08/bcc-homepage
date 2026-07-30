@@ -41,14 +41,16 @@ jobs:
           failures=0
           attempt=1
           while true; do
-            echo "Threads worker attempt ${attempt}"
-            if ! curl --fail --silent --show-error \
-              --max-time 295 \
-              --write-out '\n' \
-              -H "Authorization: Bearer ${CRON_SECRET}" \
-              "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads"; then
-              failures=$((failures + 1))
-            fi
+            for campaign in default jiwonfit; do
+              echo "Threads worker attempt ${attempt}: ${campaign}"
+              if ! curl --fail --silent --show-error \
+                --max-time 295 \
+                --write-out '\n' \
+                -H "Authorization: Bearer ${CRON_SECRET}" \
+                "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads&campaign=${campaign}"; then
+                failures=$((failures + 1))
+              fi
+            done
 
             if [ "$window_seconds" -eq 0 ] || [ "$SECONDS" -ge "$deadline" ]; then
               break
