@@ -289,6 +289,14 @@ test('중간에서 끊긴 셀프 댓글은 게시하지 않는다', () => {
   assert.ok(problems.some((problem) => problem.includes('미완성 문장')));
 });
 
+test('마침표 뒤 인용부호로 끝난 문장은 완결 문장으로 인정한다', () => {
+  assert.deepEqual(validateCommentReady([
+    "직무 연결 선택 예시는 이렇다.",
+    "가상 예시는 '팀 과제에서 일정 관리를 맡았다.'",
+    '선택 이유와 행동을 함께 적습니다.',
+  ].join('\n')), []);
+});
+
 test('공개 본문과 댓글에 조회·반응 수치를 넣지 않는다', () => {
   const post = campaignReadyPost({
     text: campaignReadyPost().text.replace(
