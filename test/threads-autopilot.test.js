@@ -7,6 +7,7 @@ import {
   externalCommentsEnabled,
   formatBodyLines,
   ensureNumberedItems,
+  ensureThreeNumberedLogic,
   normalizeShortLines,
   publishTimesForCampaign,
   replyCheckIntervalMinutes,
@@ -63,6 +64,24 @@ test('저장형 댓글에 짧은 번호 항목을 최소 2개 만든다', () => 
   const lines = ensureNumberedItems(['공식 자료 확인', '회사 기준 확인', '내 경험 연결']);
   assert.equal(lines.filter((line) => /^\d+[.)]\s*/.test(line)).length, 2);
   assert.ok(lines.every((line) => line.length <= 10));
+});
+
+test('완전 자동 본문 중간 세 줄은 자르지 않고 1·2·3 번호를 확정한다', () => {
+  assert.deepEqual(ensureThreeNumberedLogic([
+    '후크입니다.',
+    '첫 번째 판단입니다.',
+    '기존 7. 번호도 다시 정리합니다.',
+    '세 번째 근거입니다.',
+    '추가 설명입니다.',
+    '프로필 링크에서 확인하세요.',
+  ]), [
+    '후크입니다.',
+    '1. 첫 번째 판단입니다.',
+    '2. 기존 7. 번호도 다시 정리합니다.',
+    '3. 세 번째 근거입니다.',
+    '추가 설명입니다.',
+    '프로필 링크에서 확인하세요.',
+  ]);
 });
 
 test('외부 댓글은 권한 승인 전까지 기본 비활성화한다', () => {
