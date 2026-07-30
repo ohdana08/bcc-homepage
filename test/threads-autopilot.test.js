@@ -308,6 +308,22 @@ test('공개 본문과 댓글에 조회·반응 수치를 넣지 않는다', () 
     .some((problem) => problem.includes('조회·반응 수치')));
 });
 
+test('근거 없는 경력 연수와 사용자 반응을 사회적 증거로 쓰지 않는다', () => {
+  const careerClaim = campaignReadyPost({
+    text: campaignReadyPost().text.replace(
+      '사업아이템보다 현재 단계를 먼저 보세요.',
+      '12년 교육 현장에서 이 질문을 수십 번 받았습니다.',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(careerClaim)
+    .some((problem) => problem.includes('근거가 확인되지 않은')));
+  assert.ok(validateCommentReady([
+    '지원핏 사용 후 가장 자주 나온 반응이 있습니다.',
+    '고객이 공고를 처음 알았다고 말했습니다.',
+    '이 반응을 다음 글에 반영했습니다.',
+  ].join('\n')).some((problem) => problem.includes('근거가 확인되지 않은')));
+});
+
 
 test('미발행 두 캠페인의 구형 예약글만 새 리듬으로 교체한다', () => {
   const queuedLegacy = Array.from({ length: 5 }, () => ({ status: 'queued', text: '구형 형식' }));
