@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildNextPostText,
   buildPerformanceLearningContext,
   buildPerformanceComment,
   classifyInboundReply,
@@ -111,6 +112,24 @@ test('24시간 성과에 다음 글을 연결한다', () => {
   );
   assert.match(text, /조회 123/);
   assert.match(text, /다음 글: 기관 담당자는/);
+});
+
+test('직전 글의 실제 반응을 다음 글 첫 문단에 붙인다', () => {
+  const text = buildNextPostText(
+    '다음 글 본문이다.\n\n질문으로 끝난다?',
+    { views: 321, likes: 7, replies: 2 },
+  );
+  assert.equal(
+    text,
+    '직전 글은 조회 321 · 좋아요 7 · 답글 2였어.\n\n다음 글 본문이다.\n\n질문으로 끝난다?',
+  );
+});
+
+test('직전 글 반응값이 없으면 추측하지 않고 0으로 표시한다', () => {
+  assert.equal(
+    buildNextPostText('다음 글이다.', {}),
+    '직전 글은 조회 0 · 좋아요 0 · 답글 0였어.\n\n다음 글이다.',
+  );
 });
 
 function validPost(contentType, lines, zeroLines = ['기준을 보자.', '사실만 쓴다.', '근거를 찾자.', '한 줄씩 본다.', '오늘 고친다.']) {
