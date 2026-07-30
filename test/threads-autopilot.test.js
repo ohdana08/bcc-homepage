@@ -337,10 +337,23 @@ test('근거 없는 경력 연수와 사용자 반응을 사회적 증거로 쓰
   });
   assert.ok(validatePublishReadyPost(careerClaim)
     .some((problem) => problem.includes('근거가 확인되지 않은')));
+  const variantClaim = campaignReadyPost({
+    text: campaignReadyPost().text.replace(
+      '사업아이템보다 현재 단계를 먼저 보세요.',
+      '12년 동안 교육 현장에서 확인한 패턴입니다.',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(variantClaim)
+    .some((problem) => problem.includes('근거가 확인되지 않은')));
   assert.ok(validateCommentReady([
     '지원핏 사용 후 가장 자주 나온 반응이 있습니다.',
     '고객이 공고를 처음 알았다고 말했습니다.',
     '이 반응을 다음 글에 반영했습니다.',
+  ].join('\n')).some((problem) => problem.includes('근거가 확인되지 않은')));
+  assert.ok(validateCommentReady([
+    '교육 현장에서 가장 자주 나오는 오해가 있습니다.',
+    '잘 썼는데 떨어진 경우를 보면 대부분 근거가 부족했습니다.',
+    '운영하면서 확인한 사실처럼 적었습니다.',
   ].join('\n')).some((problem) => problem.includes('근거가 확인되지 않은')));
 });
 
