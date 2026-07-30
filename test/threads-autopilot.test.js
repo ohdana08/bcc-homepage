@@ -361,9 +361,11 @@ test('생성 결과의 근거 없는 사회적 증거와 댓글 CTA를 안전 �
   assert.deepEqual(sanitizeGeneratedLines([
     '프로필 링크에서 전체 순서를 확인하세요.',
     '공고 원문의 날짜를 다시 확인합니다.',
+    "가상 예시: '이 회사는 고객 중심을 강조하는데, 나는 접수 창구에서 고객 불만을 받아 해결한 경험이 있다.'",
   ], { comments: true, safetyFallbacks }), [
     safetyFallbacks[0],
     '공고 원문의 날짜를 다시 확인합니다.',
+    safetyFallbacks[1],
   ]);
 });
 
