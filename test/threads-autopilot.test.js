@@ -11,6 +11,7 @@ import {
   normalizeShortLines,
   publishTimesForCampaign,
   replyCheckIntervalMinutes,
+  sanitizeGeneratedLines,
   shouldRegeneratePendingCampaign,
   validateCommentReady,
   validateHumanVoiceBatch,
@@ -341,6 +342,29 @@ test('근거 없는 경력 연수와 사용자 반응을 사회적 증거로 쓰
     '고객이 공고를 처음 알았다고 말했습니다.',
     '이 반응을 다음 글에 반영했습니다.',
   ].join('\n')).some((problem) => problem.includes('근거가 확인되지 않은')));
+});
+
+test('생성 결과의 근거 없는 사회적 증거와 댓글 CTA를 안전 문장으로 치환한다', () => {
+  const safetyFallbacks = [
+    '확인된 공고 원문과 보유 자료만 근거로 남깁니다.',
+    '검증되지 않은 선정 사례나 고객 반응은 쓰지 않습니다.',
+  ];
+  assert.deepEqual(sanitizeGeneratedLines([
+    '12년 교육 현장에서 이 질문을 수십 번 받았습니다.',
+    '공고 원문의 평가 항목을 확인합니다.',
+    '지원핏 사용 후 가장 자주 나온 반응이 있습니다.',
+  ], { safetyFallbacks }), [
+    safetyFallbacks[0],
+    '공고 원문의 평가 항목을 확인합니다.',
+    safetyFallbacks[1],
+  ]);
+  assert.deepEqual(sanitizeGeneratedLines([
+    '프로필 링크에서 전체 순서를 확인하세요.',
+    '공고 원문의 날짜를 다시 확인합니다.',
+  ], { comments: true, safetyFallbacks }), [
+    safetyFallbacks[0],
+    '공고 원문의 날짜를 다시 확인합니다.',
+  ]);
 });
 
 
