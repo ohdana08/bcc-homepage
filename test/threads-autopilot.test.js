@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildNextPostText,
   buildPerformanceLearningContext,
   classifyInboundReply,
   dateKeyInTimeZone,
@@ -31,23 +30,6 @@ test('서울 현지 발행 시각을 UTC로 바꾼다', () => {
   assert.equal(
     zonedDateTimeToUtc('2026-07-27', '08:30', 'Asia/Seoul').toISOString(),
     '2026-07-26T23:30:00.000Z',
-  );
-});
-
-test('직전 글의 실제 반응을 다음 글 첫 문단에 붙인다', () => {
-  assert.equal(
-    buildNextPostText(
-      '다음 글 본문이다.\n\n질문으로 끝난다?',
-      { views: 321, likes: 7, replies: 2 },
-    ),
-    '직전 글은 조회 321 · 좋아요 7 · 답글 2였어.\n\n다음 글 본문이다.\n\n질문으로 끝난다?',
-  );
-});
-
-test('직전 글 반응값이 없으면 추측하지 않고 0으로 표시한다', () => {
-  assert.equal(
-    buildNextPostText('다음 글이다.', {}),
-    '직전 글은 조회 0 · 좋아요 0 · 답글 0였어.\n\n다음 글이다.',
   );
 });
 
@@ -294,10 +276,10 @@ function campaignReadyPost(overrides = {}) {
   };
 }
 
-test('기본 캠페인의 확정 발행 시각을 유지한다', () => {
+test('두 캠페인의 확정 발행 시각을 분리한다', () => {
   assert.deepEqual(
     publishTimesForCampaign({ id: 'default' }),
-    ['08:30', '11:30', '14:30', '18:30', '21:30'],
+    ['08:10', '10:30', '12:20', '18:10', '21:20'],
   );
   assert.deepEqual(
     publishTimesForCampaign({ id: 'jiwonfit' }),
