@@ -276,10 +276,10 @@ function campaignReadyPost(overrides = {}) {
   };
 }
 
-test('두 캠페인의 확정 발행 시각을 분리한다', () => {
+test('기본 캠페인의 확정 발행 시각을 유지한다', () => {
   assert.deepEqual(
     publishTimesForCampaign({ id: 'default' }),
-    ['08:10', '10:30', '12:20', '18:10', '21:20'],
+    ['08:30', '11:30', '14:30', '18:30', '21:30'],
   );
   assert.deepEqual(
     publishTimesForCampaign({ id: 'jiwonfit' }),
