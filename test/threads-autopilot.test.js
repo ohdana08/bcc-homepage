@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   assertNoPublicPerformanceMetrics,
   buildPerformanceLearningContext,
+  campaignAutomation,
   classifyInboundReply,
   dateKeyInTimeZone,
   externalCommentsEnabled,
@@ -10,10 +11,13 @@ import {
   ensureNumberedItems,
   ensureThreeNumberedLogic,
   normalizeShortLines,
+  prepareCampaignReply,
   publishTimesForCampaign,
   replyCheckIntervalMinutes,
+  runThreadsAutopilot,
   sanitizeGeneratedLines,
   validateCommentReady,
+  validateApprovedQueuePost,
   validateHumanVoiceBatch,
   validatePublishReadyPost,
   zonedDateTimeToUtc,
@@ -142,6 +146,86 @@ test('일반 댓글은 자동 답변하고 민감 댓글은 보류한다', () =>
     classifyInboundReply('이건 법적으로 문제 없는 건가요?'),
     { autoReply: false, reason: '법률·분쟁' },
   );
+  assert.deepEqual(
+    classifyInboundReply('오늘은 그냥 사라지고 싶어요.'),
+    { autoReply: false, reason: '자해·극단 선택 암시' },
+  );
+});
+
+test('안보낸톡 자동답글은 짧은 수용·감사만 허용한다', () => {
+  const config = { id: 'unsent_talk' };
+  assert.equal(prepareCampaignReply('그 말도 맞는 것 같아요.', config), '그 말도 맞는 것 같아요.');
+  assert.equal(prepareCampaignReply('댓글 남겨줘서 고마워요.', config), '댓글 남겨줘서 고마워요.');
+  assert.equal(
+    prepareCampaignReply('그 말도 맞아요. 말해줘서 고마워요.', config),
+    '말해줘서 고마워요.',
+  );
+  assert.equal(prepareCampaignReply('저도 오늘 세 번 참았어요.', config), '말해줘서 고마워요.');
+  assert.equal(
+    prepareCampaignReply('지금 바로 연락해야 해요. 프로필 링크도 확인하세요.', config),
+    '말해줘서 고마워요.',
+  );
+  assert.equal(
+    prepareCampaignReply('일반 캠페인의 긴 답글입니다.', { id: 'default' }),
+    '일반 캠페인의 긴 답글입니다.',
+  );
+});
+
+test('비활성 캠페인도 verify_only에서는 게시 없이 토큰 계정을 확인한다', async () => {
+  const config = {
+    id: 'unsent_talk',
+    enabled: false,
+    profile_username: 'unsent_talk_7days_pause',
+    token_provider: 'threads_unsent',
+  };
+  const db = {
+    from(table) {
+      if (table === 'threads_autopilot_config') {
+        return {
+          select() { return this; },
+          eq() { return this; },
+          order: async () => ({ data: [config], error: null }),
+        };
+      }
+      if (table === 'credentials') {
+        return {
+          select() { return this; },
+          eq() { return this; },
+          maybeSingle: async () => ({
+            data: {
+              access_token: 'test-token-never-logged',
+              expires_at: '2026-09-30T00:00:00.000Z',
+            },
+            error: null,
+          }),
+        };
+      }
+      throw new Error(`unexpected table: ${table}`);
+    },
+  };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({ id: '12345', username: 'unsent_talk_7days_pause' }),
+  });
+  try {
+    const result = await runThreadsAutopilot({
+      db,
+      campaignId: 'unsent_talk',
+      verifyOnly: true,
+      env: {},
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.verifyOnly, true);
+    assert.deepEqual(result.campaigns.unsent_talk, {
+      ok: true,
+      enabled: false,
+      username: 'unsent_talk_7days_pause',
+      userId: '12345',
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 function validPost(contentType, lines, zeroLines = ['기준을 보자.', '사실만 쓴다.', '근거를 찾자.', '한 줄씩 본다.', '오늘 고친다.']) {
@@ -303,6 +387,50 @@ test('기본 캠페인의 확정 발행 시각을 유지한다', () => {
     publishTimesForCampaign({ id: 'jiwonfit' }),
     ['08:30', '10:50', '12:40', '15:30', '18:30'],
   );
+  assert.deepEqual(
+    publishTimesForCampaign({ id: 'unsent_talk', publish_times: ['22:00', '00:00'] }),
+    ['22:00', '00:00'],
+  );
+});
+
+test('안보낸톡 사전승인 큐는 셀프댓글을 끄고 자동답글만 켠다', () => {
+  assert.deepEqual(campaignAutomation({ content_mode: 'approved_queue', auto_replies: true }), {
+    approvedQueue: true,
+    selfComments: false,
+    replies: true,
+    externalComments: false,
+    metrics: true,
+  });
+  assert.deepEqual(campaignAutomation({ content_mode: 'generated' }), {
+    approvedQueue: false,
+    selfComments: true,
+    replies: true,
+    externalComments: true,
+    metrics: true,
+  });
+});
+
+test('안보낸톡 1~8줄 공감 글은 통과하고 판매·CTA는 차단한다', () => {
+  assert.deepEqual(validateApprovedQueuePost({
+    text: '프로필 사진만 보고 나왔다\n오늘은 이걸로 참은 걸로 치자',
+  }), []);
+  assert.deepEqual(validateApprovedQueuePost({
+    text: [
+      '카페에서 주문하다가 두 잔 시킬 뻔했다',
+      '너는 여름에도 뜨거운 것만 마셨다',
+      '사장님이 오늘은 한 잔이냐고 물어서',
+      '네, 하고 웃었는데',
+      '그 웃음이 잘 안 됐다',
+      '자리에 앉으니까 사장님이 괜히 미안한 얼굴을 했다',
+      '그 표정에서 다 들킨 기분이었다',
+    ].join('\n'),
+  }), []);
+  assert.ok(validateApprovedQueuePost({
+    text: '안보낸톡은 프로필 링크에서 구매하세요',
+  }).some((problem) => problem.includes('금지 표현')));
+  assert.ok(validateApprovedQueuePost({
+    text: Array.from({ length: 9 }, (_, index) => `${index + 1}번째 줄`).join('\n'),
+  }).some((problem) => problem.includes('1~8줄')));
 });
 
 test('완결된 번호형 본문과 구체적 CTA만 발행 준비로 인정한다', () => {

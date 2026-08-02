@@ -8,6 +8,21 @@ on:
     - cron: '55 2,8,14,20 * * *'
   workflow_dispatch:
     inputs:
+      campaign:
+        description: 'Run one campaign or all campaigns'
+        required: false
+        default: all
+        type: choice
+        options:
+          - all
+          - default
+          - jiwonfit
+          - unsent_talk
+      verify_only:
+        description: 'Verify the selected campaign token/account without publishing'
+        required: false
+        default: false
+        type: boolean
       poll_window:
         description: 'Poll for a four-hour recovery window'
         required: false
@@ -28,8 +43,23 @@ jobs:
           CRON_SECRET: ${{ secrets.THREADS_CRON_SECRET }}
           SCHEDULED_RUN: ${{ github.event_name == 'schedule' }}
           MANUAL_WINDOW: ${{ github.event_name == 'workflow_dispatch' && inputs.poll_window == true }}
+          MANUAL_CAMPAIGN: ${{ inputs.campaign || 'all' }}
+          VERIFY_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_only == true }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
+          if [ "$VERIFY_ONLY" = "true" ]; then
+            if [ "$MANUAL_CAMPAIGN" = "all" ]; then
+              echo "verify_only requires one campaign" >&2
+              exit 1
+            fi
+            curl --fail --silent --show-error \
+              --max-time 295 \
+              --write-out '\n' \
+              -H "Authorization: Bearer ${CRON_SECRET}" \
+              "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads&campaign=${MANUAL_CAMPAIGN}&verify_only=true"
+            exit 0
+          fi
+
           window_seconds=0
           if [ "$SCHEDULED_RUN" = "true" ]; then
             window_seconds=21300
@@ -40,8 +70,12 @@ jobs:
           deadline=$((SECONDS + window_seconds))
           failures=0
           attempt=1
+          campaigns="default jiwonfit unsent_talk"
+          if [ "$MANUAL_CAMPAIGN" != "all" ]; then
+            campaigns="$MANUAL_CAMPAIGN"
+          fi
           while true; do
-            for campaign in default jiwonfit; do
+            for campaign in $campaigns; do
               echo "Threads worker attempt ${attempt}: ${campaign}"
               if ! curl --fail --silent --show-error \
                 --max-time 295 \

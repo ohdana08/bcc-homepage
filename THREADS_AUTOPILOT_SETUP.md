@@ -94,3 +94,20 @@ update public.threads_autopilot_config
 set enabled = false, updated_at = now()
 where id = 'default';
 ```
+
+## 6. 안보낸톡 사전 승인 캠페인
+
+안보낸톡은 기존 5편 AI 생성 캠페인과 분리한다. 사진 없이 승인된 텍스트만
+22:00과 다음 날 00:00에 발행한다. 셀프 댓글은 쓰지 않되, 달린 댓글에는
+한 문장으로 의견을 수용하거나 감사하는 자동답글을 남긴다.
+
+1. Supabase SQL Editor에서 `supabase/threads-autopilot-unsent-talk.sql`을 실행한다.
+2. 장기 토큰을 `credentials(provider='threads_unsent')`에 등록한다.
+3. Actions 수동 실행에서 `campaign=unsent_talk`, `verify_only=true`로
+   `@unsent_talk_7days_pause` 계정 일치를 확인한다. 이 실행은 게시하지 않는다.
+4. 10편을 사람이 최종 확인하고 SQL 파일 하단의 `draft → approved` 문을 실행한다.
+5. 첫 게시 직전에만 `threads_autopilot_config.id='unsent_talk'`를 활성화한다.
+
+초기 운영 중 자동 생성, 사진, 셀프 댓글, 외부 글 댓글은 끈다. 들어온 댓글의
+자동답글만 켜고, 조언·판단·제품·CTA는 차단한다. 자해·극단선택 암시는 자동답글을
+멈추고 보류 기록으로 남긴다.

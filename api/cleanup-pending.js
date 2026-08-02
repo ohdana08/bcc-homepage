@@ -25,7 +25,11 @@ export default async function handler(req, res) {
       if (campaignId && !/^[a-z0-9_-]+$/i.test(campaignId)) {
         return res.status(400).json({ ok: false, error: 'Invalid campaign' });
       }
-      const result = await runThreadsAutopilot({ db, campaignId });
+      const verifyOnly = String(req.query?.verify_only || '').toLowerCase() === 'true';
+      if (verifyOnly && !campaignId) {
+        return res.status(400).json({ ok: false, error: 'verify_only requires campaign' });
+      }
+      const result = await runThreadsAutopilot({ db, campaignId, verifyOnly });
       return res.json(result);
     } catch (err) {
       console.error('threads-autopilot error:', err?.message || err);
