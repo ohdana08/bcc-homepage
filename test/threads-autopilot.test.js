@@ -309,6 +309,62 @@ test('완결된 번호형 본문과 구체적 CTA만 발행 준비로 인정한�
   assert.deepEqual(validatePublishReadyPost(campaignReadyPost()), []);
 });
 
+const SELF_INTRO_READY_OPTIONS = {
+  maxLineLength: 50,
+  commentMaxLineLength: 60,
+  minBodyLines: 5,
+  maxBodyLines: 5,
+  requireBlankLineAfterHook: false,
+  allowBlankLines: false,
+  requireNumberedPositions: true,
+  requireNumberedStructure: true,
+  requireCta: false,
+};
+
+function selfIntroReadyPost(overrides = {}) {
+  return campaignReadyPost({
+    text: [
+      'AI에게 전부 맡기면 자소서가 더 막힙니다.',
+      '1. 질문 순서가 없으면 답변의 방향이 흐려집니다.',
+      '2. 사실과 행동을 먼저 주면 문장이 구체적이 됩니다.',
+      '3. 다른 AI로 교차 검증해야 지어낸 정보를 줄입니다.',
+      '지금 가장 막힌 자기소개서 항목은 무엇인가요?',
+    ].join('\n'),
+    ...overrides,
+  });
+}
+
+test('자소서 계정 본문은 빈 줄 없이 정확히 5줄·50자를 적용한다', () => {
+  assert.deepEqual(
+    validatePublishReadyPost(selfIntroReadyPost(), SELF_INTRO_READY_OPTIONS),
+    [],
+  );
+
+  const sixLines = selfIntroReadyPost({
+    text: selfIntroReadyPost().text.replace(
+      '3. 다른 AI로 교차 검증해야 지어낸 정보를 줄입니다.',
+      '3. 다른 AI로 교차 검증해야 지어낸 정보를 줄입니다.\n추가 설명은 다음 글로 넘깁니다.',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(sixLines, SELF_INTRO_READY_OPTIONS)
+    .some((problem) => problem.includes('정확히 5줄')));
+
+  const blankLine = selfIntroReadyPost({
+    text: selfIntroReadyPost().text.replace('\n1.', '\n\n1.'),
+  });
+  assert.ok(validatePublishReadyPost(blankLine, SELF_INTRO_READY_OPTIONS)
+    .some((problem) => problem.includes('빈 줄')));
+
+  const longLine = selfIntroReadyPost({
+    text: selfIntroReadyPost().text.replace(
+      'AI에게 전부 맡기면 자소서가 더 막힙니다.',
+      `AI에게 전부 맡기면 자소서가 더 막힙니다${'아'.repeat(31)}.`,
+    ),
+  });
+  assert.ok(validatePublishReadyPost(longLine, SELF_INTRO_READY_OPTIONS)
+    .some((problem) => problem.includes('50자를 넘는 줄')));
+});
+
 test('일반 질문은 CTA로 인정하지 않는다', () => {
   const post = campaignReadyPost({
     text: campaignReadyPost().text.replace(
