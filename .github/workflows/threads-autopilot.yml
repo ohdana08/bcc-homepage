@@ -30,7 +30,7 @@ on:
         type: boolean
 
 concurrency:
-  group: threads-autopilot
+  group: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_only == true && 'threads-autopilot-verify' || 'threads-autopilot' }}
   cancel-in-progress: false
 
 jobs:
