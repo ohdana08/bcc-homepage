@@ -557,6 +557,32 @@ test('근거 없는 경력 연수와 사용자 반응을 사회적 증거로 쓰
     '잘 썼는데 떨어진 경우를 보면 대부분 근거가 부족했습니다.',
     '운영하면서 확인한 사실처럼 적었습니다.',
   ].join('\n')).some((problem) => problem.includes('근거가 확인되지 않은')));
+
+  const inventedTodayClaim = selfIntroReadyPost({
+    text: selfIntroReadyPost().text.replace(
+      'AI에게 전부 맡기면 자소서가 더 막힙니다.',
+      '오늘 작업실에서 단점 항목 열 개를 봤습니다.',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(inventedTodayClaim, SELF_INTRO_READY_OPTIONS)
+    .some((problem) => problem.includes('근거가 확인되지 않은')));
+});
+
+test('공포 후크와 셀프 댓글의 우회 프로필 홍보를 차단한다', () => {
+  const fearHook = selfIntroReadyPost({
+    text: selfIntroReadyPost().text.replace(
+      'AI에게 전부 맡기면 자소서가 더 막힙니다.',
+      '지원동기를 솔직히 쓰면 떨어질 수 있습니다.',
+    ),
+  });
+  assert.ok(validatePublishReadyPost(fearHook, SELF_INTRO_READY_OPTIONS)
+    .some((problem) => problem.includes('공포 마케팅')));
+
+  assert.ok(validateCommentReady([
+    '검증 순서는 본문에 정리했습니다.',
+    '프로필에 링크가 있습니다.',
+    '확인된 경험만 문장으로 연결합니다.',
+  ].join('\n')).some((problem) => problem.includes('프로필 또는 링크 홍보')));
 });
 
 test('생성 결과의 근거 없는 사회적 증거와 댓글 CTA를 안전 문장으로 치환한다', () => {
@@ -581,5 +607,21 @@ test('생성 결과의 근거 없는 사회적 증거와 댓글 CTA를 안전 �
     safetyFallbacks[0],
     '공고 원문의 날짜를 다시 확인합니다.',
     safetyFallbacks[1],
+  ]);
+  assert.deepEqual(sanitizeGeneratedLines([
+    '오늘 작업실에서 단점 항목 열 개를 봤습니다.',
+    '지원동기를 솔직히 쓰면 떨어질 수 있습니다.',
+    '공고 원문의 평가 항목을 확인합니다.',
+  ], { safetyFallbacks }), [
+    safetyFallbacks[0],
+    safetyFallbacks[1],
+    '공고 원문의 평가 항목을 확인합니다.',
+  ]);
+  assert.deepEqual(sanitizeGeneratedLines([
+    '프로필에 링크가 있습니다.',
+    '확인된 경험만 문장으로 연결합니다.',
+  ], { comments: true, safetyFallbacks }), [
+    safetyFallbacks[0],
+    '확인된 경험만 문장으로 연결합니다.',
   ]);
 });
