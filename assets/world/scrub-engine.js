@@ -164,7 +164,8 @@ function mountScrollWorld(container, config) {
     // 2nd beat: real-content cards that surface inside the scene mid-dive
     let aside = null;
     if (s.cards && s.cards.items && s.cards.items.length) {
-      aside = el('aside', 'sw-cards'); aside.style.setProperty('--sw-accent', s.accent || '');
+      aside = el('aside', 'sw-cards' + (s.cards.variant ? ' sw-cards--' + s.cards.variant : ''));
+      aside.style.setProperty('--sw-accent', s.accent || '');
       aside.innerHTML =
         (s.cards.title ? `<div class="sw-cards__head">${esc(s.cards.title)}</div>` : '') +
         s.cards.items.map(it =>
@@ -461,6 +462,13 @@ function injectCSS() {
   .sw-card__txt small{font-size:.76rem;color:var(--sw-ink-soft);line-height:1.35;}
   .sw-cards__more{align-self:flex-start;margin-top:2px;text-decoration:none;font-weight:700;font-size:.85rem;color:var(--sw-accent);padding:8px 2px;}
   .sw-cards__more:hover{text-decoration:underline;}
+  /* board 변형: 게시판(기관 그리드)을 축소해 그대로 옮긴 듯한 2열 타일 */
+  .sw-cards--board{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(42vw,560px);}
+  .sw-cards--board .sw-cards__head{grid-column:1/-1;margin-bottom:0;}
+  .sw-cards--board .sw-card{flex-direction:column;align-items:flex-start;gap:5px;padding:14px 16px;border-radius:12px;}
+  .sw-cards--board .sw-card strong{font-size:.98rem;}
+  .sw-cards--board .sw-card small{font-size:.78rem;color:var(--sw-ink-soft);}
+  .sw-cards--board .sw-cards__more{grid-column:1/-1;}
   .sw-copy__link{display:inline-block;margin-top:20px;text-decoration:none;font-weight:700;font-size:.92rem;color:var(--sw-accent);pointer-events:auto;}
   .sw-copy__link:hover{text-decoration:underline;}
   .sw-ticker{position:absolute;left:0;right:0;bottom:96px;overflow:hidden;opacity:0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
