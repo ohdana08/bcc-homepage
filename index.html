@@ -897,8 +897,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              --sw-font-body:'Pretendard Variable', Pretendard, sans-serif; }
   /* 다크 테마: 엔진 기본 CTA(ink 배경)는 밝은 잉크와 충돌 → 골드 배경 + 다크 텍스트로 오버라이드 */
   .sw-root .sw-btn--primary { background: var(--sw-accent); color: #1a1407; }
-  /* 한국어 카피는 단어 중간 줄바꿈("되/도록") 방지 */
+  /* 한국어 카피는 단어 중간 줄바꿈("되/도록") 방지 + 제목의 \n 을 실제 줄바꿈으로 */
   .sw-root .sw-copy__title, .sw-root .sw-copy__body { word-break: keep-all; }
+  .sw-root .sw-copy__title { white-space: pre-line; }
+  /* 씬1 비전 두 줄("일의 주인이 되도록")이 3.5rem에서 460px 폭을 넘어 감김 → 첫 카피만 폭 확장 */
+  .sw-root .sw-copylayer .sw-copy:first-child { width: min(48vw, 600px); }
 </style>
 <div id="world"></div>
 <script src="assets/world/scrub-engine.js"></script>
@@ -913,7 +916,7 @@ mountScrollWorld(document.getElementById('world'), {
     { id:'w-intro', label:'BCC', still:'assets/world/bg_1.jpg',
       accent:'#C9A84C', scroll:1.7,
       eyebrow:'비즈니스커리어컨설팅',
-      title:'일하는 모든 사람이 자기 일의 주인이 되도록' },
+      title:'AI와 함께\n일의 주인이 되도록' },
     { id:'w-lecture', label:'잇스쿨', still:'assets/world/bg_2.jpg',
       accent:'#C9A84C',
       eyebrow:'잇스쿨 · 기업강의',
