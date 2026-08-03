@@ -897,6 +897,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              --sw-font-body:'Pretendard Variable', Pretendard, sans-serif; }
   /* 다크 테마: 엔진 기본 CTA(ink 배경)는 밝은 잉크와 충돌 → 골드 배경 + 다크 텍스트로 오버라이드 */
   .sw-root .sw-btn--primary { background: var(--sw-accent); color: #1a1407; }
+  /* 한국어 카피는 단어 중간 줄바꿈("되/도록") 방지 */
+  .sw-root .sw-copy__title, .sw-root .sw-copy__body { word-break: keep-all; }
 </style>
 <div id="world"></div>
 <script src="assets/world/scrub-engine.js"></script>
