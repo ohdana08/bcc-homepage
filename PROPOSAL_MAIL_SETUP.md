@@ -1,11 +1,12 @@
 # BCC 기관 제안 작업메일 자동화
 
-전용 Gmail에 들어온 작업 메일을 5분마다 확인하고, 기관 메일과 첨부파일을 BCC 제안 엔진으로 처리한 뒤 서버에 고정된 결과 수신 이메일로만 보낸다.
+주 사용 Gmail에서 지정한 Daum 주소가 전달한 메일만 5분마다 확인해 `강메일_작업함` 라벨을 붙이고, 기관 메일과 첨부파일을 BCC 제안 엔진으로 처리한 뒤 서버에 고정된 결과 수신 이메일로만 보낸다.
 
 ## 고정 안전 규칙
 
 - 원발신자에게 자동 회신하지 않는다.
 - CC/BCC를 사용하지 않는다.
+- 전체 받은편지함을 읽지 않고 `BCC_FORWARDER_EMAIL`에서 전달된 메일만 검색한다.
 - 결과 수신자는 요청 본문이 아니라 Vercel의 `PROPOSAL_RESULT_EMAIL`에서만 결정한다.
 - Gmail·Google·ChatGPT 비밀번호를 Vercel이나 코드에 저장하지 않는다.
 - 메일 본문과 추출된 첨부 텍스트는 제안 사례로 Supabase에 저장되고, 초안 생성을 위해 Anthropic API로 처리된다.
@@ -22,17 +23,19 @@
 
 1. 작업용 Gmail 계정으로 `https://script.google.com`에 접속한다.
 2. 새 프로젝트를 만들고 `gas/proposal-mail-worker.gs`의 내용을 붙여넣는다.
-3. 프로젝트 설정 → 스크립트 속성에 아래 두 값을 추가한다.
+3. 프로젝트 설정 → 스크립트 속성에 아래 세 값을 추가한다.
    - `BCC_MAIL_SECRET`: Vercel과 동일한 비밀값
    - `BCC_RESULT_EMAIL`: Vercel의 `PROPOSAL_RESULT_EMAIL`과 동일한 결과 수신 주소
+   - `BCC_FORWARDER_EMAIL`: 기관 메일을 전달하는 Daum 주소
 4. `setupBccProposalMailbox`를 한 번 실행하고 Gmail 및 외부 요청 권한을 승인한다.
 5. 이후 `processBccProposalInbox`가 5분마다 자동 실행된다.
 
 ## 3. 처리 상태
 
-- `BCC_PROCESSED`: 결과 전달 완료
-- `BCC_PROCESSING`: 현재 처리 중
-- `BCC_ERROR`: 처리 실패. 다음 실행에서 다시 시도한다.
+- `강메일_작업함`: 지정한 Daum 주소에서 전달돼 처리 대상이 된 메일
+- `강메일_처리중`: 현재 처리 중
+- `강메일_처리완료`: 결과 전달 완료
+- `강메일_오류`: 처리 실패. 다음 실행에서 다시 시도한다.
 
 중복 실행 시 Gmail 메시지 ID와 Supabase `source=gmail:<message id>`를 기준으로 기존 결과를 재사용한다.
 
