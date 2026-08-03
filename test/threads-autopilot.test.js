@@ -16,6 +16,7 @@ import {
   publishTimesForCampaign,
   replyCheckIntervalMinutes,
   runThreadsAutopilot,
+  threadsAutopilotPaused,
   sanitizeGeneratedLines,
   validateCommentReady,
   validateApprovedQueuePost,
@@ -25,6 +26,17 @@ import {
 } from '../lib/threads-autopilot.js';
 
 const DAILY_TYPES = ['problem', 'tip', 'backstage', 'template', 'sale'];
+
+
+test('운영자 일시중지 스위치가 두 캠페인의 자동화를 전부 막는다', async () => {
+  assert.equal(threadsAutopilotPaused({ THREADS_AUTOPILOT_PAUSED: 'true' }), true);
+  assert.equal(threadsAutopilotPaused({ THREADS_AUTOPILOT_PAUSED: 'false' }), false);
+  const result = await runThreadsAutopilot({
+    db: { from: () => { throw new Error('일시중지 중에는 DB를 읽지 않아야 합니다.'); } },
+    env: { THREADS_AUTOPILOT_PAUSED: 'true' },
+  });
+  assert.deepEqual(result, { ok: true, enabled: false, reason: 'paused_by_operator' });
+});
 
 test('Asia/Seoul 날짜 키를 만든다', () => {
   const date = new Date('2026-07-26T15:30:00.000Z');
