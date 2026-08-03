@@ -127,13 +127,14 @@ function mountScrollWorld(container, config) {
 
   const stage = el('div', 'sw-stage');
   const copylayer = el('div', 'sw-copylayer');
+  const cardlayer = el('div', 'sw-cardlayer');
   const route = el('div', 'sw-route');
   const hint = el('div', 'sw-hint');
   const hintText = el('span'); hintText.textContent = config.hint || 'scroll'; hint.appendChild(hintText);
   hint.appendChild(el('i'));
   const track = el('div', 'sw-track');
 
-  [sky, scrollbar, topbar, stage, copylayer, route, hint, track].forEach(n => container.appendChild(n));
+  [sky, scrollbar, topbar, stage, copylayer, cardlayer, route, hint, track].forEach(n => container.appendChild(n));
 
   // segment scenes
   SEGMENTS.forEach(s => {
@@ -146,8 +147,8 @@ function mountScrollWorld(container, config) {
     s.loading = false; s.ready = false; s.cur = 0; s.target = 0; s.visible = false;
   });
 
-  // per-section copy / route / nav
-  const copies = [], dots = [];
+  // per-section copy / cards / route / nav
+  const copies = [], dots = [], cardEls = [], tickEls = [];
   SECTIONS.forEach((s, i) => {
     const c = el('article', 'sw-copy'); c.style.setProperty('--sw-accent', s.accent || '');
     c.innerHTML =
@@ -156,8 +157,36 @@ function mountScrollWorld(container, config) {
       (s.title ? `<h2 class="sw-copy__title">${esc(s.title)}</h2>` : '') +
       (s.body ? `<p class="sw-copy__body">${esc(s.body)}</p>` : '') +
       (s.tags && s.tags.length ? `<ul class="sw-copy__tags">${s.tags.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
+      (s.link ? `<a class="sw-copy__link" href="${esc(s.link.href || '#')}">${esc(s.link.label)} →</a>` : '') +
       (s.cta ? `<div class="sw-copy__cta">${ctaBtns(s.cta)}</div>` : '');
     copylayer.appendChild(c); copies.push(c);
+
+    // 2nd beat: real-content cards that surface inside the scene mid-dive
+    let aside = null;
+    if (s.cards && s.cards.items && s.cards.items.length) {
+      aside = el('aside', 'sw-cards'); aside.style.setProperty('--sw-accent', s.accent || '');
+      aside.innerHTML =
+        (s.cards.title ? `<div class="sw-cards__head">${esc(s.cards.title)}</div>` : '') +
+        s.cards.items.map(it =>
+          `<a class="sw-card" href="${esc(it.href || '#')}"${/^https?:/.test(it.href || '') ? ' target="_blank" rel="noopener"' : ''}>` +
+          (it.img ? `<img src="${esc(it.img)}" alt="" loading="lazy" decoding="async">`
+                  : (it.emoji ? `<span class="sw-card__emoji">${esc(it.emoji)}</span>` : '')) +
+          `<span class="sw-card__txt"><strong>${esc(it.label)}</strong>` +
+          (it.meta ? `<small>${esc(it.meta)}</small>` : '') + `</span></a>`).join('') +
+        (s.cards.more ? `<a class="sw-cards__more" href="${esc(s.cards.more.href || '#')}">${esc(s.cards.more.label)} →</a>` : '');
+      cardlayer.appendChild(aside);
+    }
+    cardEls.push(aside);
+
+    // marquee of real client names (used on the intro scene)
+    let tick = null;
+    if (s.ticker && s.ticker.length) {
+      tick = el('div', 'sw-ticker');
+      const row = s.ticker.map(t => `<span>${esc(t)}</span>`).join('<i>·</i>');
+      tick.innerHTML = `<div class="sw-ticker__track">${row}<i>·</i>${row}<i>·</i></div>`;
+      cardlayer.appendChild(tick);
+    }
+    tickEls.push(tick);
 
     const dot = el('button', 'sw-route__dot'); dot.style.setProperty('--sw-accent', s.accent || '');
     dot.innerHTML = `<span class="sw-route__label">${esc(s.label || '')}</span><i></i>`;
@@ -253,7 +282,30 @@ function mountScrollWorld(container, config) {
       c.style.opacity = cop;
       c.style.transform = reduce ? 'none' : `translateY(${(0.5 - pr) * 4}vh)`;
       c.style.pointerEvents = cop > 0.5 ? 'auto' : 'none';
+
+      // cards are the scene's 2nd beat: they rise once the copy has landed (~45% in)
+      const aside = cardEls[i];
+      if (aside) {
+        const rise = smooth(clamp((pr - 0.45) / 0.25));
+        const fall = (i === N - 1) ? 1 : smooth(clamp((1 - pr) / 0.12));
+        const cop2 = (before || after) ? 0 : rise * Math.min(1, fall);
+        aside.style.opacity = cop2;
+        aside.style.transform = reduce ? 'translateY(-50%)' : `translateY(calc(-50% + ${(1 - cop2) * 3}vh))`;
+        aside.style.pointerEvents = cop2 > 0.5 ? 'auto' : 'none';
+      }
+      const tk = tickEls[i];
+      if (tk) tk.style.opacity = cop;
     }
+
+    // Past the last dive the page's own sections take over — release every piece of
+    // fixed world chrome so it can't sit on top of the content below (the copylayer
+    // used to hold the finale CTA forever).
+    const release = smooth(clamp((y - totalW * vh) / (0.6 * vh)));
+    [copylayer, cardlayer, route, scrollbar].forEach(n => {
+      n.style.opacity = String(1 - release);
+      n.style.visibility = release >= 1 ? 'hidden' : 'visible';
+    });
+    route.style.pointerEvents = release > 0.5 ? 'none' : '';
 
     const cur = SEGMENTS[ci];
     const near = clamp(cur.kind === 'dive' ? cur.si
@@ -397,6 +449,25 @@ function injectCSS() {
   .sw-btn{text-decoration:none;font-weight:600;font-size:.95rem;padding:13px 24px;border-radius:999px;transition:transform .2s;}
   .sw-btn--primary{color:#fff;background:var(--sw-ink);} .sw-btn--primary:hover{transform:translateY(-2px);}
   .sw-btn--ghost{color:var(--sw-ink);border:1.5px solid color-mix(in srgb,var(--sw-ink) 25%,transparent);} .sw-btn--ghost:hover{transform:translateY(-2px);}
+  .sw-cardlayer{position:fixed;inset:0;z-index:22;pointer-events:none;}
+  .sw-cards{position:absolute;right:clamp(56px,6vw,110px);top:50%;transform:translateY(-50%);width:min(30vw,360px);display:flex;flex-direction:column;gap:12px;opacity:0;will-change:opacity,transform;}
+  .sw-cards__head{font-family:var(--sw-font-display);font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sw-accent);margin-bottom:2px;}
+  .sw-card{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--sw-ink);background:color-mix(in srgb,var(--sw-bg) 74%,transparent);border:1px solid color-mix(in srgb,var(--sw-accent) 28%,transparent);border-radius:14px;padding:10px 14px 10px 10px;backdrop-filter:blur(8px);transition:transform .25s,border-color .25s;}
+  .sw-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--sw-accent) 60%,transparent);}
+  .sw-card img{width:86px;height:60px;object-fit:cover;object-position:center top;border-radius:9px;flex:none;background:#191512;}
+  .sw-card__emoji{width:52px;height:52px;flex:none;display:grid;place-items:center;font-size:1.5rem;border-radius:12px;background:color-mix(in srgb,var(--sw-accent) 14%,transparent);}
+  .sw-card__txt{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .sw-card__txt strong{font-size:.92rem;font-weight:700;line-height:1.3;}
+  .sw-card__txt small{font-size:.76rem;color:var(--sw-ink-soft);line-height:1.35;}
+  .sw-cards__more{align-self:flex-start;margin-top:2px;text-decoration:none;font-weight:700;font-size:.85rem;color:var(--sw-accent);padding:8px 2px;}
+  .sw-cards__more:hover{text-decoration:underline;}
+  .sw-copy__link{display:inline-block;margin-top:20px;text-decoration:none;font-weight:700;font-size:.92rem;color:var(--sw-accent);pointer-events:auto;}
+  .sw-copy__link:hover{text-decoration:underline;}
+  .sw-ticker{position:absolute;left:0;right:0;bottom:96px;overflow:hidden;opacity:0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
+  .sw-ticker__track{display:inline-flex;align-items:center;gap:26px;white-space:nowrap;padding-left:26px;animation:sw-tick 46s linear infinite;will-change:transform;}
+  .sw-ticker__track span{font-size:.84rem;letter-spacing:.06em;color:color-mix(in srgb,var(--sw-ink) 60%,var(--sw-ink-soft));}
+  .sw-ticker__track i{font-style:normal;color:var(--sw-accent);opacity:.6;}
+  @keyframes sw-tick{to{transform:translateX(-50%);}}
   .sw-route{position:fixed;right:clamp(14px,2.4vw,30px);top:50%;z-index:40;transform:translateY(-50%);display:flex;flex-direction:column;gap:22px;padding:18px 10px;}
   .sw-route::before{content:"";position:absolute;left:50%;top:22px;bottom:22px;width:2px;transform:translateX(-50%);background:var(--sw-accent);opacity:.28;}
   .sw-route__dot{position:relative;border:0;background:transparent;cursor:pointer;width:14px;height:14px;display:grid;place-items:center;}
@@ -410,8 +481,14 @@ function injectCSS() {
   .sw-hint i::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:7px;border-radius:2px;background:var(--sw-accent);transform:translateX(-50%);animation:sw-wheel 1.7s ease-in-out infinite;}
   @keyframes sw-wheel{0%{opacity:0;top:6px}40%{opacity:1}100%{opacity:0;top:17px}}
   .sw-track{position:relative;z-index:1;width:100%;pointer-events:none;}
+  @media (max-width:1200px){
+    .sw-cards{width:min(34vw,330px);}
+    .sw-card img{width:70px;height:52px;}
+  }
   @media (max-width:860px){
     .sw-nav{display:none;}
+    .sw-cards{display:none;}
+    .sw-ticker{display:none;}
     .sw-copylayer::before{width:100%;height:60%;top:auto;bottom:0;background:linear-gradient(0deg,var(--sw-bg) 8%,color-mix(in srgb,var(--sw-bg) 70%,transparent) 46%,transparent 100%);}
     /* Anchor copy to the bottom, clear of the home indicator / collapsing URL bar.
        dvh + env() are progressive: browsers that lack them keep the vh fallback line. */
@@ -433,7 +510,7 @@ function injectCSS() {
     .sw-route__dot{width:28px;height:28px;}
     .sw-btn{padding:15px 26px;}
   }
-  @media (prefers-reduced-motion:reduce){ .sw-hint i::after{animation:none;} .sw-pt{display:none;} }
+  @media (prefers-reduced-motion:reduce){ .sw-hint i::after{animation:none;} .sw-pt{display:none;} .sw-ticker__track{animation:none;} }
   `;
   // Wrap in a cascade layer so the page's own theme tokens (unlayered
   // :root / .sw-root { --sw-bg / --sw-ink / --sw-accent … }) always win over
