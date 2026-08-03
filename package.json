@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.69.0",
+    "@ssabrojs/hwpxjs": "^0.4.0",
     "@supabase/supabase-js": "^2.45.0"
   }
 }

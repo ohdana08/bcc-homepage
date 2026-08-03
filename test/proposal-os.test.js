@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { __test } from '../lib/proposal-os.js';
+import { __test as mailTest } from '../lib/proposal-mail-intake.js';
 
 test('기관 문의 입력은 허용된 필드만 정리한다', () => {
   const row = __test.compactCaseInput({
@@ -45,4 +46,25 @@ test('전사본이 포함된 통합 문의는 충분한 길이까지 보존한�
   const row = __test.compactCaseInput({ institution_name: '기관', inquiry_text: transcript });
   assert.ok(row.inquiry_text.length > 30000);
   assert.ok(row.inquiry_text.length <= 80000);
+});
+
+test('전달된 메일에서 원 기관 발신자와 제목을 우선 추출한다', () => {
+  const body = `보낸 사람: 동래여성인력개발센터 <center@example.org>\n제목: [동래여성인력개발센터] AI 리터러시 강의 요청\n\n강의계획서를 요청드립니다.`;
+  const envelope = mailTest.extractForwardedEnvelope(body, 'BCC <worker@example.com>', 'Fwd: 문의');
+  assert.equal(envelope.from.email, 'center@example.org');
+  assert.equal(envelope.subject, '[동래여성인력개발센터] AI 리터러시 강의 요청');
+  assert.equal(mailTest.inferInstitutionName(envelope.subject, envelope.from.name, envelope.from.email), '동래여성인력개발센터');
+});
+
+test('메일 첨부파일 용량과 개수를 제한한다', () => {
+  const normalized = mailTest.normalizeAttachments([{ filename: '요청.txt', mime_type: 'text/plain', data_base64: Buffer.from('요청 내용').toString('base64') }]);
+  assert.equal(normalized.length, 1);
+  assert.equal(normalized[0].filename, '요청.txt');
+  assert.throws(() => mailTest.normalizeAttachments([{ filename: 'large.bin', data_base64: Buffer.alloc(2_000_001).toString('base64') }]), /너무 큽니다/);
+});
+
+test('작업메일 공유 비밀값은 길이와 내용이 모두 같아야 한다', () => {
+  assert.equal(mailTest.safeEqual('abcdefghijklmnopqrstuvwxyz', 'abcdefghijklmnopqrstuvwxyz'), true);
+  assert.equal(mailTest.safeEqual('abcdefghijklmnopqrstuvwxyz', 'abcdefghijklmnopqrstuvwxyZ'), false);
+  assert.equal(mailTest.safeEqual('short', 'longer'), false);
 });

@@ -7,6 +7,7 @@ import { supabaseAdmin } from '../lib/supabase.js';
 import { applyCors } from '../lib/cors.js';
 import { BENCHMARK_COPYRIGHT_BLOCK, COPYRIGHT_GUARDRAIL, normalizeImages, buildBenchmarkContent } from '../lib/benchmark.js';
 import { handleProposal } from '../lib/proposal-os.js';
+import { handleProposalMailIntake } from '../lib/proposal-mail-intake.js';
 
 // Opus 호출이 길어질 수 있으므로 함수 타임아웃을 넉넉히 둔다(Vercel Hobby 최대 60s).
 export const maxDuration = 60;
@@ -482,6 +483,22 @@ async function handleBlog(req, res, client) {
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
+
+  // 전용 작업 Gmail → BCC 제안 자동화. 사용자 로그인 대신 서버 간 공유 비밀값으로만 허용한다.
+  // 결과 수신자는 요청값을 받지 않고 PROPOSAL_RESULT_EMAIL 환경변수 한 곳으로 고정한다.
+  if ((req.body?.engine) === 'proposal_mail_intake') {
+    try {
+      if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'AI 처리 환경변수가 설정되지 않았습니다.' });
+      return await handleProposalMailIntake(req, res, {
+        db: supabaseAdmin(),
+        client: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+      });
+    } catch (err) {
+      if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
+      console.error('proposal-mail-intake error:', err?.message || err);
+      return res.status(500).json({ error: '작업 메일 처리 중 오류가 발생했습니다.' });
+    }
+  }
 
   // 1) 로그인 토큰 검증
   const token = req.headers.authorization?.replace('Bearer ', '');
