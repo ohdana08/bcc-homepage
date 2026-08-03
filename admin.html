@@ -34,6 +34,8 @@
   .btn:disabled{opacity:.55;cursor:default}
   .status{margin-top:10px;font-size:13px;min-height:18px;text-align:center}
   .status.err{color:#ff8080}.status.ok{color:#5fd38b}
+  .forgot{display:block;margin:12px auto 0;padding:2px 4px;border:0;background:none;color:var(--text-dim);font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+  .forgot:hover{color:var(--gold-3)}
   .tabs{display:flex;gap:8px;margin-bottom:16px}
   .tab{flex:1;padding:9px;font-size:14px;font-weight:600;background:none;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit}
   .tab.active{color:#1a1407;background:var(--gold);border-color:var(--gold)}
@@ -72,6 +74,7 @@
         <div class="row hidden" id="rowPhone"><label for="phone">전화번호</label><input id="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000" /></div>
         <div class="row"><label for="pw">비밀번호</label><input id="pw" type="password" autocomplete="current-password" /></div>
         <button type="submit" class="btn" id="loginBtn">로그인</button>
+        <button type="button" class="forgot" id="forgotBtn">비밀번호를 잊으셨나요?</button>
         <p id="loginStatus" class="status" role="status" aria-live="polite"></p>
       </form>
     </div>
@@ -185,6 +188,31 @@
     } catch (err) {
       setLoginStatus(err.message || '로그인에 실패했습니다.', 'err');
       $('loginBtn').disabled = false;
+    }
+  });
+
+  $('forgotBtn').addEventListener('click', async () => {
+    if (loginMode !== 'email') {
+      setLoginStatus('이메일 탭에서 관리자 이메일을 입력해 주세요.', 'err');
+      return;
+    }
+    const email = $('email').value.trim();
+    if (!email) {
+      setLoginStatus('재설정 메일을 받을 이메일을 입력해 주세요.', 'err');
+      $('email').focus();
+      return;
+    }
+    $('forgotBtn').disabled = true;
+    setLoginStatus('재설정 메일을 보내는 중…');
+    try {
+      const sb = await getClient();
+      const redirectTo = new URL('admin-reset-password.html', location.href).href;
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+      setLoginStatus('재설정 메일을 보냈습니다. 60분 안에 링크를 열어 주세요.', 'ok');
+    } catch (err) {
+      setLoginStatus('재설정 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.', 'err');
+      $('forgotBtn').disabled = false;
     }
   });
 
