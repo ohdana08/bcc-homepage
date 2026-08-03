@@ -98,6 +98,11 @@
       <span><span class="t">블로그 공장</span><span class="d">정보성 칼럼 자동 생성 (SEO + 보관함)</span></span>
       <span class="arrow">›</span>
     </a>
+    <a class="tool" href="admin-proposals.html">
+      <span class="emoji">🏛️</span>
+      <span><span class="t">기관 제안 운영실</span><span class="d">기관 문의 → 요구분석 → 제안서·커리큘럼 → 후속관리</span></span>
+      <span class="arrow">›</span>
+    </a>
   </div>
 </div>
 
@@ -127,12 +132,22 @@
     $('hubView').classList.remove('hidden');
   }
 
+  async function requireAdmin(session) {
+    if (!session?.access_token) return false;
+    const response = await fetch(API + '/api/my-enrollments', {
+      headers: { Authorization: 'Bearer ' + session.access_token },
+    });
+    if (!response.ok) return false;
+    const data = await response.json();
+    return !!data.profile?.is_admin;
+  }
+
   // 이미 로그인된 세션이 있으면 바로 허브로 (다른 공장 페이지와 세션 공유)
   (async () => {
     try {
       const sb = await getClient();
       const { data: { session } } = await sb.auth.getSession();
-      if (session?.access_token) showHub();
+      if (await requireAdmin(session)) showHub();
     } catch (e) { /* 로그인 화면 유지 */ }
   })();
 
@@ -162,6 +177,10 @@
       const sb = await getClient();
       const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
       if (error || !data.session) throw new Error('이메일/전화번호 또는 비밀번호가 올바르지 않습니다.');
+      if (!(await requireAdmin(data.session))) {
+        await sb.auth.signOut();
+        throw new Error('관리자 계정만 사용할 수 있습니다.');
+      }
       showHub();
     } catch (err) {
       setLoginStatus(err.message || '로그인에 실패했습니다.', 'err');

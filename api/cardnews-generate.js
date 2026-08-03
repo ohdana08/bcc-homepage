@@ -6,6 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { supabaseAdmin } from '../lib/supabase.js';
 import { applyCors } from '../lib/cors.js';
 import { BENCHMARK_COPYRIGHT_BLOCK, COPYRIGHT_GUARDRAIL, normalizeImages, buildBenchmarkContent } from '../lib/benchmark.js';
+import { handleProposal } from '../lib/proposal-os.js';
 
 // Opus 호출이 길어질 수 있으므로 함수 타임아웃을 넉넉히 둔다(Vercel Hobby 최대 60s).
 export const maxDuration = 60;
@@ -496,6 +497,24 @@ export default async function handler(req, res) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다.' });
+  }
+
+  // 2.4) 기관 제안 운영실 — Vercel 함수 수를 늘리지 않고 기존 관리자 생성 엔진에 통합한다.
+  if ((req.body?.engine) === 'proposal') {
+    try {
+      return await handleProposal(req, res, {
+        db,
+        user,
+        client: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+      });
+    } catch (err) {
+      if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
+      console.error('proposal-os error:', err?.message || err);
+      const status = err?.status === 429 ? 429 : 500;
+      return res.status(status).json({
+        error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '기관 제안 처리 중 오류가 발생했습니다.',
+      });
+    }
   }
 
   // 2.5) 스레드 공장 분기 — engine:'threads' 이면 스레드 글 생성기로(같은 함수, 12함수 한계 회피)
