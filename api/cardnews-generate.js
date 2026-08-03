@@ -8,6 +8,7 @@ import { applyCors } from '../lib/cors.js';
 import { BENCHMARK_COPYRIGHT_BLOCK, COPYRIGHT_GUARDRAIL, normalizeImages, buildBenchmarkContent } from '../lib/benchmark.js';
 import { handleProposal } from '../lib/proposal-os.js';
 import { handleProposalMailIntake } from '../lib/proposal-mail-intake.js';
+import { handleTrainingNeedsAdmin, handleTrainingNeedsPublic } from '../lib/training-needs.js';
 
 // Opus 호출이 길어질 수 있으므로 함수 타임아웃을 넉넉히 둔다(Vercel Hobby 최대 60s).
 export const maxDuration = 60;
@@ -500,6 +501,17 @@ export default async function handler(req, res) {
     }
   }
 
+  // 교육생 니즈분석 공개 입구. 개인정보를 받지 않고 참여코드와 응답만 검증한다.
+  if ((req.body?.engine) === 'training_needs_public') {
+    try {
+      return await handleTrainingNeedsPublic(req, res, { db: supabaseAdmin() });
+    } catch (err) {
+      if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
+      console.error('training-needs-public error:', err?.message || err);
+      return res.status(500).json({ error: '수요조사를 처리하지 못했습니다.' });
+    }
+  }
+
   // 1) 로그인 토큰 검증
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: '인증이 필요합니다.' });
@@ -531,6 +543,21 @@ export default async function handler(req, res) {
       return res.status(status).json({
         error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '기관 제안 처리 중 오류가 발생했습니다.',
       });
+    }
+  }
+
+  // 교육생 니즈분석 관리자 입구 — 수요조사 생성·집계·강의준비 일괄분석.
+  if ((req.body?.engine) === 'training_needs_admin') {
+    try {
+      return await handleTrainingNeedsAdmin(req, res, {
+        db,
+        client: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+      });
+    } catch (err) {
+      if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
+      console.error('training-needs-admin error:', err?.message || err);
+      const status = err?.status === 429 ? 429 : 500;
+      return res.status(status).json({ error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '교육생 니즈분석 처리 중 오류가 발생했습니다.' });
     }
   }
 
