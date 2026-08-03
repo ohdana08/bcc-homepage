@@ -163,7 +163,20 @@ function mountScrollWorld(container, config) {
 
     // 2nd beat: real-content cards that surface inside the scene mid-dive
     let aside = null;
-    if (s.cards && s.cards.items && s.cards.items.length) {
+    if (s.sign) {
+      // signboard: 큰 숫자 하나 + 보조 행 몇 줄 + CTA 하나짜리 단일 카드
+      aside = el('aside', 'sw-cards sw-sign'); aside.style.setProperty('--sw-accent', s.accent || '');
+      aside.innerHTML =
+        `<a class="sw-sign__card" href="${esc(s.sign.href || '#')}">` +
+        (s.sign.eyebrow ? `<span class="sw-sign__eyebrow">${esc(s.sign.eyebrow)}</span>` : '') +
+        `<strong class="sw-sign__stat">${esc(s.sign.stat)}</strong>` +
+        (s.sign.desc ? `<span class="sw-sign__desc">${esc(s.sign.desc)}</span>` : '') +
+        (s.sign.rows && s.sign.rows.length
+          ? `<ul class="sw-sign__rows">${s.sign.rows.map(r => `<li><span>${esc(r.label)}</span><b>${esc(r.value)}</b></li>`).join('')}</ul>` : '') +
+        (s.sign.cta ? `<span class="sw-sign__cta">${esc(s.sign.cta)} →</span>` : '') +
+        `</a>`;
+      cardlayer.appendChild(aside);
+    } else if (s.cards && s.cards.items && s.cards.items.length) {
       aside = el('aside', 'sw-cards' + (s.cards.variant ? ' sw-cards--' + s.cards.variant : ''));
       aside.style.setProperty('--sw-accent', s.accent || '');
       aside.innerHTML =
@@ -469,6 +482,17 @@ function injectCSS() {
   .sw-cards--board .sw-card strong{font-size:.98rem;}
   .sw-cards--board .sw-card small{font-size:.78rem;color:var(--sw-ink-soft);}
   .sw-cards--board .sw-cards__more{grid-column:1/-1;}
+  /* signboard 변형: 정거장 표지판 — 숫자 하나·행 몇 줄·CTA 하나 */
+  .sw-sign{width:min(30vw,380px);display:block;}
+  .sw-sign__card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:var(--sw-ink);background:color-mix(in srgb,var(--sw-bg) 84%,transparent);border:1px solid color-mix(in srgb,var(--sw-accent) 36%,transparent);border-radius:18px;padding:30px 32px;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s;}
+  .sw-sign__card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--sw-accent) 65%,transparent);}
+  .sw-sign__eyebrow{font-family:var(--sw-font-display);font-weight:700;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sw-accent);}
+  .sw-sign__stat{font-family:var(--sw-font-display);font-weight:800;font-size:clamp(2.6rem,4.4vw,3.6rem);line-height:1.05;color:var(--sw-ink);letter-spacing:-.01em;}
+  .sw-sign__desc{font-size:.92rem;color:var(--sw-ink-soft);}
+  .sw-sign__rows{list-style:none;margin:10px 0 0;padding:14px 0 0;border-top:1px solid color-mix(in srgb,var(--sw-accent) 22%,transparent);display:flex;flex-direction:column;gap:9px;}
+  .sw-sign__rows li{display:flex;justify-content:space-between;gap:12px;font-size:.88rem;color:color-mix(in srgb,var(--sw-ink) 75%,var(--sw-ink-soft));}
+  .sw-sign__rows b{color:var(--sw-accent);font-weight:700;}
+  .sw-sign__cta{margin-top:12px;font-weight:700;font-size:.94rem;color:var(--sw-accent);}
   .sw-copy__link{display:inline-block;margin-top:20px;text-decoration:none;font-weight:700;font-size:.92rem;color:var(--sw-accent);pointer-events:auto;}
   .sw-copy__link:hover{text-decoration:underline;}
   .sw-ticker{position:absolute;left:0;right:0;bottom:96px;overflow:hidden;opacity:0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
