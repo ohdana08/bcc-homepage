@@ -5,6 +5,7 @@ import {
   buildPerformanceLearningContext,
   campaignAutomation,
   classifyInboundReply,
+  contentTypeOrderForDate,
   dateKeyInTimeZone,
   externalCommentsEnabled,
   formatBodyLines,
@@ -312,19 +313,40 @@ test('최근 실제 성과는 상위 글의 구조 신호로만 요약한다', (
   const context = buildPerformanceLearningContext([
     {
       content_type: 'tip',
+      slot_index: 0,
+      reply_count: 2,
       text: '공고부터 봤다.\n\n본문',
       metrics: { views: 900, likes: 20, replies: 3, reposts: 1, quotes: 0, shares: 4 },
     },
     {
       content_type: 'sale',
+      slot_index: 4,
+      reply_count: 0,
       text: '도구도 못 한다.\n\n본문',
       metrics: { views: 300, likes: 5, replies: 1, reposts: 0, quotes: 0, shares: 1 },
     },
   ]);
   assert.match(context, /tip/);
+  assert.match(context, /슬롯 0/);
   assert.match(context, /조회 900/);
-  assert.match(context, /반응 28/);
+  assert.match(context, /독자 반응 25/);
+  assert.match(context, /실제 댓글 2/);
+  assert.doesNotMatch(context, /반응 28/);
   assert.ok(context.indexOf('tip') < context.indexOf('sale'));
+});
+
+test('자소서 판매글은 닷새 동안 다섯 발행 슬롯을 한 번씩 순환한다', () => {
+  const dates = ['2026-08-04', '2026-08-05', '2026-08-06', '2026-08-07', '2026-08-08'];
+  const saleSlots = dates.map((dateKey) => contentTypeOrderForDate(dateKey, 'default').indexOf('sale'));
+  assert.deepEqual(saleSlots, [0, 1, 2, 3, 4]);
+  dates.forEach((dateKey) => {
+    assert.deepEqual([...contentTypeOrderForDate(dateKey, 'default')].sort(), [...DAILY_TYPES].sort());
+  });
+});
+
+test('다른 캠페인의 콘텐츠 순서는 기존대로 유지한다', () => {
+  assert.deepEqual(contentTypeOrderForDate('2026-08-04', 'jiwonfit'), DAILY_TYPES);
+  assert.deepEqual(contentTypeOrderForDate('invalid', 'default'), DAILY_TYPES);
 });
 
 
