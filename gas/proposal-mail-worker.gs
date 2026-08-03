@@ -2,7 +2,7 @@
 // 지정된 Daum 발신 메일만 자동 라벨 → BCC 서버 처리 → 지정한 Daum 주소 한 곳으로만 결과 전달
 // 원발신자에게 답장하거나 CC/BCC를 추가하지 않는다.
 
-var BCC_PROPOSAL_ENDPOINT = 'https://bcc-homepage.vercel.app/api/cardnews-generate';
+var BCC_PROPOSAL_ENDPOINT = 'https://bccconsulting.kr/api/cardnews-generate';
 var BCC_TASK_LABEL = '강메일_작업함';
 var BCC_PROCESSED_LABEL = '강메일_처리완료';
 var BCC_PROCESSING_LABEL = '강메일_처리중';
