@@ -26,3 +26,23 @@ test('기관 문의와 관련된 옵시디언 기록을 먼저 선택한다', ()
   });
   assert.equal(selected[0].title, '경남교육청 사서교육');
 });
+
+test('무료 도구 제약도 지식 검색어에 반영한다', () => {
+  const rows = [
+    { title: '유료 API 자동화', content: 'API 키와 유료 모델을 사용한다', synced_at: '2026-01-02' },
+    { title: '무료 AI 리터러시', content: 'NotebookLM 무료 계정과 Claude 무료 계정 실습', synced_at: '2026-01-01' },
+  ];
+  const selected = __test.selectKnowledge(rows, {
+    institution_name: '교육기관',
+    inquiry_text: 'AI 리터러시',
+    constraints: 'NotebookLM과 Claude 모두 무료 계정만 사용',
+  });
+  assert.equal(selected[0].title, '무료 AI 리터러시');
+});
+
+test('전사본이 포함된 통합 문의는 충분한 길이까지 보존한다', () => {
+  const transcript = '통화 내용 '.repeat(6000);
+  const row = __test.compactCaseInput({ institution_name: '기관', inquiry_text: transcript });
+  assert.ok(row.inquiry_text.length > 30000);
+  assert.ok(row.inquiry_text.length <= 80000);
+});
