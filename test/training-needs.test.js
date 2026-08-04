@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  TRAINING_NEED_QUESTIONS,
   normalizeAnswers,
   summarizeResponses,
   isSurveyOpen,
@@ -9,16 +10,17 @@ import {
 
 function completeAnswers(overrides = {}) {
   return {
-    current_context: 'office_admin',
+    current_context: ['office_admin'],
     ai_experience: 'simple_questions',
-    ai_tools: ['chatgpt'],
+    free_ai_tools: ['chatgpt'],
+    paid_ai_tools: ['none'],
     work_tasks: ['documents', 'research_summary'],
     pain_points: ['what_to_ask'],
     desired_topics: ['prompt_basics', 'document_writing'],
     desired_outputs: ['work_document'],
     learning_methods: ['step_by_step'],
-    practice_environment: ['own_laptop', 'free_account'],
-    data_security: 'sample_only',
+    practice_environment: ['own_laptop'],
+    data_security: ['sample_only'],
     open_question: '실제 보고서를 잘 쓰고 싶어요.',
     others: {},
     ...overrides,
@@ -27,10 +29,10 @@ function completeAnswers(overrides = {}) {
 
 test('필수 선택값과 기타 내용을 정규화한다', () => {
   const result = normalizeAnswers(completeAnswers({
-    current_context: 'other',
+    current_context: ['other'],
     others: { current_context: '  문화 기획\n업무  ' },
   }));
-  assert.equal(result.current_context, 'other');
+  assert.deepEqual(result.current_context, ['other']);
   assert.equal(result.others.current_context, '문화 기획 업무');
   assert.equal(result.open_question, '실제 보고서를 잘 쓰고 싶어요.');
 });
@@ -45,8 +47,27 @@ test('복수선택 최대 개수를 검증한다', () => {
   })), /2개까지/);
 });
 
-test('사용 도구 없음과 다른 도구를 함께 선택할 수 없다', () => {
-  assert.throws(() => normalizeAnswers(completeAnswers({ ai_tools: ['none', 'chatgpt'] })), /함께 선택/);
+test('해당 없음과 다른 항목을 함께 선택할 수 없다', () => {
+  assert.throws(() => normalizeAnswers(completeAnswers({ paid_ai_tools: ['none', 'chatgpt'] })), /함께 선택/);
+});
+
+test('하는 일을 두 가지 이상 선택할 수 있다', () => {
+  const result = normalizeAnswers(completeAnswers({ current_context: ['office_admin', 'marketing_content'] }));
+  assert.deepEqual(result.current_context, ['office_admin', 'marketing_content']);
+});
+
+test('무료와 유료 도구를 따로 받고 개발·이미지·영상 도구를 제공한다', () => {
+  const free = TRAINING_NEED_QUESTIONS.find((question) => question.id === 'free_ai_tools');
+  const paid = TRAINING_NEED_QUESTIONS.find((question) => question.id === 'paid_ai_tools');
+  const labels = free.options.map((option) => option[1]);
+  assert.ok(paid);
+  assert.ok(labels.includes('Codex'));
+  assert.ok(labels.includes('Claude Code'));
+  assert.ok(labels.includes('Hermes'));
+  assert.ok(labels.includes('터미널·명령어 도구'));
+  assert.ok(labels.includes('Midjourney'));
+  assert.ok(labels.includes('Sora'));
+  assert.equal(JSON.stringify(TRAINING_NEED_QUESTIONS).includes('엑셀'), false);
 });
 
 test('응답을 빈도와 백분율로 집계한다', () => {

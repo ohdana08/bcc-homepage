@@ -65,7 +65,7 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
   const API=window.BCC_API_BASE||'https://bcc-homepage.vercel.app'; const $=(id)=>document.getElementById(id); const esc=(v='')=>String(v).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const LABELS={current_context:'교육생 역할',ai_experience:'AI 활용 수준',ai_tools:'사용 도구',work_tasks:'도움받고 싶은 일',pain_points:'막히는 지점',desired_topics:'희망 학습내용',desired_outputs:'희망 결과물',learning_methods:'선호 학습방식',practice_environment:'실습 환경',data_security:'실습자료·보안'};
+  const LABELS={current_context:'현재 하는 일',ai_experience:'AI 사용 경험',free_ai_tools:'무료로 쓰는 AI 도구',paid_ai_tools:'유료로 쓰는 AI 도구',work_tasks:'AI로 편하게 하고 싶은 일',pain_points:'AI를 쓸 때 막히는 점',desired_topics:'수업에서 배우고 싶은 것',desired_outputs:'직접 만들고 싶은 결과물',learning_methods:'잘 맞는 학습 방식',practice_environment:'실습 기기·환경',data_security:'실습 자료·회사 규정'};
   const state={surveys:[],cases:[],selected:null,bundle:null,session:null};
   function toast(message){$('toast').textContent=message;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),2600)}
   function openModal(id){$(id).classList.remove('hidden')} function closeModal(id){$(id).classList.add('hidden')}
