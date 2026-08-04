@@ -12,7 +12,7 @@ function completeAnswers(overrides = {}) {
   return {
     current_context: ['office_admin'],
     ai_experience: 'simple_questions',
-    ai_tool_access: ['chatgpt:free', 'codex:paid', 'terminal_cli:used'],
+    ai_tool_access: ['chatgpt:free', 'codex:free', 'terminal_cli:used'],
     work_tasks: ['documents', 'research_summary'],
     pain_points: ['what_to_ask'],
     desired_topics: ['prompt_basics', 'document_writing'],
@@ -61,14 +61,27 @@ test('도구별 무료·유료 버튼을 제공하고 유료 전용 도구는 �
   assert.equal(question.type, 'tool_tiers');
   assert.ok(values.includes('chatgpt:free'));
   assert.ok(values.includes('chatgpt:paid'));
+  assert.ok(values.includes('grok:free'));
+  assert.ok(values.includes('grok:paid'));
+  assert.ok(values.includes('notebooklm:free'));
+  assert.ok(values.includes('notebooklm:paid'));
+  assert.ok(values.includes('codex:free'));
   assert.ok(values.includes('codex:paid'));
-  assert.ok(!values.includes('codex:free'));
   assert.ok(values.includes('claude_code:paid'));
   assert.ok(!values.includes('claude_code:free'));
   assert.ok(values.includes('hermes:paid'));
   assert.ok(!values.includes('hermes:free'));
   assert.ok(values.includes('terminal_cli:used'));
-  assert.ok(values.includes('midjourney:free'));
+  assert.ok(values.includes('midjourney:paid'));
+  assert.ok(!values.includes('midjourney:free'));
+  assert.ok(values.includes('veo:paid'));
+  assert.ok(!values.includes('veo:free'));
+  assert.ok(values.includes('kling:free'));
+  assert.ok(values.includes('kling:paid'));
+  assert.ok(values.includes('capcut:free'));
+  assert.ok(values.includes('vrew:free'));
+  assert.equal(values.some((value) => value.startsWith('kling_veo:')), false);
+  assert.equal(values.some((value) => value.startsWith('capcut_vrew:')), false);
   assert.equal(values.some((value) => value.startsWith('sora:')), false);
   assert.equal(JSON.stringify(TRAINING_NEED_QUESTIONS).includes('엑셀'), false);
 });
@@ -98,7 +111,7 @@ test('응답을 빈도와 백분율로 집계한다', () => {
   assert.equal(summary.distributions.desired_topics[0].value, 'prompt_basics');
   assert.equal(summary.distributions.desired_topics[0].count, 3);
   assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'chatgpt:free').count, 3);
-  assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'codex:paid').label, 'Codex · 유료');
+  assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'codex:free').label, 'Codex · 무료');
   assert.equal(summary.open_questions.length, 3);
 });
 
