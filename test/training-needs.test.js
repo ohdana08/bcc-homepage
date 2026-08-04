@@ -12,8 +12,7 @@ function completeAnswers(overrides = {}) {
   return {
     current_context: ['office_admin'],
     ai_experience: 'simple_questions',
-    free_ai_tools: ['chatgpt'],
-    paid_ai_tools: ['none'],
+    ai_tool_access: ['chatgpt:free', 'codex:paid', 'terminal_cli:used'],
     work_tasks: ['documents', 'research_summary'],
     pain_points: ['what_to_ask'],
     desired_topics: ['prompt_basics', 'document_writing'],
@@ -48,7 +47,7 @@ test('복수선택 최대 개수를 검증한다', () => {
 });
 
 test('해당 없음과 다른 항목을 함께 선택할 수 없다', () => {
-  assert.throws(() => normalizeAnswers(completeAnswers({ paid_ai_tools: ['none', 'chatgpt'] })), /함께 선택/);
+  assert.throws(() => normalizeAnswers(completeAnswers({ ai_tool_access: ['none', 'chatgpt:free'] })), /함께 선택/);
 });
 
 test('하는 일을 두 가지 이상 선택할 수 있다', () => {
@@ -56,18 +55,33 @@ test('하는 일을 두 가지 이상 선택할 수 있다', () => {
   assert.deepEqual(result.current_context, ['office_admin', 'marketing_content']);
 });
 
-test('무료와 유료 도구를 따로 받고 개발·이미지·영상 도구를 제공한다', () => {
-  const free = TRAINING_NEED_QUESTIONS.find((question) => question.id === 'free_ai_tools');
-  const paid = TRAINING_NEED_QUESTIONS.find((question) => question.id === 'paid_ai_tools');
-  const labels = free.options.map((option) => option[1]);
-  assert.ok(paid);
-  assert.ok(labels.includes('Codex'));
-  assert.ok(labels.includes('Claude Code'));
-  assert.ok(labels.includes('Hermes'));
-  assert.ok(labels.includes('터미널·명령어 도구'));
-  assert.ok(labels.includes('Midjourney'));
-  assert.ok(labels.includes('Sora'));
+test('도구별 무료·유료 버튼을 제공하고 유료 전용 도구는 무료 버튼을 숨긴다', () => {
+  const question = TRAINING_NEED_QUESTIONS.find((item) => item.id === 'ai_tool_access');
+  const values = question.options.map((option) => option[0]);
+  assert.equal(question.type, 'tool_tiers');
+  assert.ok(values.includes('chatgpt:free'));
+  assert.ok(values.includes('chatgpt:paid'));
+  assert.ok(values.includes('codex:paid'));
+  assert.ok(!values.includes('codex:free'));
+  assert.ok(values.includes('claude_code:paid'));
+  assert.ok(!values.includes('claude_code:free'));
+  assert.ok(values.includes('hermes:paid'));
+  assert.ok(!values.includes('hermes:free'));
+  assert.ok(values.includes('terminal_cli:used'));
+  assert.ok(values.includes('midjourney:free'));
+  assert.equal(values.some((value) => value.startsWith('sora:')), false);
   assert.equal(JSON.stringify(TRAINING_NEED_QUESTIONS).includes('엑셀'), false);
+});
+
+test('Gemini 유료를 선택해도 NotebookLM 사용으로 자동 처리하지 않는다', () => {
+  const result = normalizeAnswers(completeAnswers({ ai_tool_access: ['gemini:paid'] }));
+  assert.deepEqual(result.ai_tool_access, ['gemini:paid']);
+});
+
+test('한 도구에서 무료와 유료를 동시에 선택할 수 없다', () => {
+  assert.throws(() => normalizeAnswers(completeAnswers({
+    ai_tool_access: ['chatgpt:free', 'chatgpt:paid'],
+  })), /하나만 선택/);
 });
 
 test('응답을 빈도와 백분율로 집계한다', () => {
@@ -83,6 +97,8 @@ test('응답을 빈도와 백분율로 집계한다', () => {
   });
   assert.equal(summary.distributions.desired_topics[0].value, 'prompt_basics');
   assert.equal(summary.distributions.desired_topics[0].count, 3);
+  assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'chatgpt:free').count, 3);
+  assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'codex:paid').label, 'Codex · 유료');
   assert.equal(summary.open_questions.length, 3);
 });
 
