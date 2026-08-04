@@ -12,14 +12,12 @@ function completeAnswers(overrides = {}) {
   return {
     current_context: ['office_admin'],
     ai_experience: 'simple_questions',
-    ai_tool_access: ['chatgpt:free', 'codex:free', 'terminal_cli:used'],
+    ai_tool_access: ['chatgpt:free', 'codex:paid', 'terminal_cli:used'],
     work_tasks: ['documents', 'research_summary'],
     pain_points: ['what_to_ask'],
     desired_topics: ['prompt_basics', 'document_writing'],
     desired_outputs: ['work_document'],
     learning_methods: ['step_by_step'],
-    practice_environment: ['own_laptop'],
-    data_security: ['sample_only'],
     open_question: '실제 보고서를 잘 쓰고 싶어요.',
     others: {},
     ...overrides,
@@ -65,8 +63,8 @@ test('도구별 무료·유료 버튼을 제공하고 유료 전용 도구는 �
   assert.ok(values.includes('grok:paid'));
   assert.ok(values.includes('notebooklm:free'));
   assert.ok(values.includes('notebooklm:paid'));
-  assert.ok(values.includes('codex:free'));
   assert.ok(values.includes('codex:paid'));
+  assert.ok(!values.includes('codex:free'));
   assert.ok(values.includes('claude_code:paid'));
   assert.ok(!values.includes('claude_code:free'));
   assert.ok(values.includes('hermes:paid'));
@@ -80,15 +78,34 @@ test('도구별 무료·유료 버튼을 제공하고 유료 전용 도구는 �
   assert.ok(values.includes('kling:paid'));
   assert.ok(values.includes('capcut:free'));
   assert.ok(values.includes('vrew:free'));
+  assert.equal(values.some((value) => value.startsWith('adobe_firefly:')), false);
+  assert.ok(values.includes('other:used'));
+  assert.ok(!values.includes('other:free'));
+  assert.ok(!values.includes('other:paid'));
   assert.equal(values.some((value) => value.startsWith('kling_veo:')), false);
   assert.equal(values.some((value) => value.startsWith('capcut_vrew:')), false);
   assert.equal(values.some((value) => value.startsWith('sora:')), false);
   assert.equal(JSON.stringify(TRAINING_NEED_QUESTIONS).includes('엑셀'), false);
 });
 
+test('교육생이 답하지 않아도 되는 실습 기기와 자료 문항은 제외한다', () => {
+  const ids = TRAINING_NEED_QUESTIONS.map((question) => question.id);
+  assert.equal(ids.includes('practice_environment'), false);
+  assert.equal(ids.includes('data_security'), false);
+});
+
 test('Gemini 유료를 선택해도 NotebookLM 사용으로 자동 처리하지 않는다', () => {
   const result = normalizeAnswers(completeAnswers({ ai_tool_access: ['gemini:paid'] }));
   assert.deepEqual(result.ai_tool_access, ['gemini:paid']);
+});
+
+test('기타 도구는 유무료 구분 없이 주관식 이름으로 저장한다', () => {
+  const result = normalizeAnswers(completeAnswers({
+    ai_tool_access: ['other:used'],
+    others: { ai_tool_access: '  Gamma  ' },
+  }));
+  assert.deepEqual(result.ai_tool_access, ['other:used']);
+  assert.equal(result.others.ai_tool_access, 'Gamma');
 });
 
 test('한 도구에서 무료와 유료를 동시에 선택할 수 없다', () => {
@@ -111,7 +128,7 @@ test('응답을 빈도와 백분율로 집계한다', () => {
   assert.equal(summary.distributions.desired_topics[0].value, 'prompt_basics');
   assert.equal(summary.distributions.desired_topics[0].count, 3);
   assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'chatgpt:free').count, 3);
-  assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'codex:free').label, 'Codex · 무료');
+  assert.equal(summary.distributions.ai_tool_access.find((item) => item.value === 'codex:paid').label, 'Codex · 유료');
   assert.equal(summary.open_questions.length, 3);
 });
 
