@@ -23,6 +23,11 @@ on:
         required: false
         default: false
         type: boolean
+      verify_search_only:
+        description: 'Verify keyword_search permission without publishing or commenting'
+        required: false
+        default: false
+        type: boolean
       poll_window:
         description: 'Poll for a four-hour recovery window'
         required: false
@@ -30,7 +35,7 @@ on:
         type: boolean
 
 concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_only == true && 'threads-autopilot-verify' || 'threads-autopilot' }}
+  group: ${{ github.event_name == 'workflow_dispatch' && (inputs.verify_only == true || inputs.verify_search_only == true) && 'threads-autopilot-verify' || 'threads-autopilot' }}
   cancel-in-progress: false
 
 jobs:
@@ -45,6 +50,7 @@ jobs:
           MANUAL_WINDOW: ${{ github.event_name == 'workflow_dispatch' && inputs.poll_window == true }}
           MANUAL_CAMPAIGN: ${{ inputs.campaign || 'all' }}
           VERIFY_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_only == true }}
+          VERIFY_SEARCH_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_search_only == true }}
         if: ${{ env.CRON_SECRET != '' }}
         run: |
           if [ "$VERIFY_ONLY" = "true" ]; then
@@ -52,11 +58,24 @@ jobs:
               echo "verify_only requires one campaign" >&2
               exit 1
             fi
-            curl --fail --silent --show-error \
+            curl --fail-with-body --silent --show-error \
               --max-time 295 \
               --write-out '\n' \
               -H "Authorization: Bearer ${CRON_SECRET}" \
               "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads&campaign=${MANUAL_CAMPAIGN}&verify_only=true"
+            exit 0
+          fi
+
+          if [ "$VERIFY_SEARCH_ONLY" = "true" ]; then
+            if [ "$MANUAL_CAMPAIGN" = "all" ]; then
+              echo "verify_search_only requires one campaign" >&2
+              exit 1
+            fi
+            curl --fail-with-body --silent --show-error \
+              --max-time 295 \
+              --write-out '\n' \
+              -H "Authorization: Bearer ${CRON_SECRET}" \
+              "https://bcc-homepage.vercel.app/api/cleanup-pending?job=threads&campaign=${MANUAL_CAMPAIGN}&verify_search_only=true"
             exit 0
           fi
 
