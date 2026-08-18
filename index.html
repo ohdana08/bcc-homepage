@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+<script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);return;}if(location.hash==="#login"){location.replace("mypage.html"+location.search);}else if(location.hash==="#signup"){location.replace("signup.html"+location.search);}})();</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>비즈니스커리어컨설팅 BCC | AI 시대 창업·커리어 컨설팅 (오예림)</title>
 <meta name="description" content="13년 경력 380개 기관 출강. 비즈니스커리어컨설팅 BCC는 AI 활용 창업·취업·마케팅 컨설팅 및 무료 분석도구를 제공합니다. 대표 오예림.">
-<meta name="keywords" content="비즈니스커리어컨설팅, BCC, 오예림, 부산 창업컨설팅, AI 강사, 부산 AI 강사, 창업 교육, 유튜브 분석기">
+<meta name="keywords" content="비즈니스커리어컨설팅, BCC, 오예림, 딱지원핏, 정부지원사업, 정부지원사업 도우미, 부산 창업컨설팅, AI 강사, 부산 AI 강사, 창업 교육, 유튜브 분석기">
 <meta name="author" content="오예림">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://bccconsulting.kr/">
@@ -158,6 +158,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     font-size: 13px;
     white-space: nowrap;
   }
+  .nav-actions { display: flex; align-items: center; gap: 8px; }
+  .nav-account-cta {
+    color: var(--text); border: 1px solid rgba(255,255,255,.22); font-weight: 700;
+    padding: 8px 13px; border-radius: 8px; font-size: 13px; white-space: nowrap;
+  }
+  .nav-account-cta:hover { border-color: var(--gold); color: var(--gold); }
 
   /* HERO */
   .hero {
@@ -755,6 +761,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* RESPONSIVE */
   @media (max-width: 1000px) {
+    .nav-links { display: none; }
     .tools-grid { grid-template-columns: repeat(2, 1fr); }
     .school-grid { grid-template-columns: repeat(2, 1fr); }
   }
@@ -807,7 +814,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* 2026 homepage refresh: trust-first quick paths + conversion rail */
   .quick-paths { padding: 34px 0; background: #111; border-bottom: 1px solid var(--border); }
-  .quick-path-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .quick-path-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .quick-path {
     display: block; padding: 22px; border: 1px solid var(--border); border-radius: 14px;
     background: var(--card); color: var(--text); transition: border-color .18s, transform .18s;
@@ -819,17 +826,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .trust-strip { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; color: var(--muted); font-size: 13px; }
   .trust-strip b { color: var(--text); }
   .mobile-conversion-bar { display: none; }
+  @media (max-width: 1000px) {
+    .quick-path-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 760px) {
     body { padding-bottom: 70px; }
     .quick-path-grid { grid-template-columns: 1fr; }
     .quick-paths { padding: 24px 0; }
     .quick-path { padding: 18px; }
     .mobile-conversion-bar {
-      position: fixed; display: grid; grid-template-columns: 1fr 1.35fr; gap: 8px;
+      position: fixed; display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px;
       left: 0; right: 0; bottom: 0; z-index: 90; padding: 10px 14px;
       background: rgba(16,16,16,.96); border-top: 1px solid var(--border); backdrop-filter: blur(12px);
     }
     .mobile-conversion-bar a { text-align: center; padding: 12px 10px; border-radius: 9px; font-size: 14px; font-weight: 800; }
+    .mobile-conversion-bar .login { border: 1px solid rgba(255,255,255,.28); color: var(--text); }
     .mobile-conversion-bar .join { border: 1px solid var(--gold); color: var(--gold); }
     .mobile-conversion-bar .ask { background: var(--gold); color: #171205; }
   }
@@ -873,118 +884,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#about">소개</a>
       <a href="#services">서비스</a>
       <a href="#tools" data-nav="ittools">잇툴즈</a>
+      <a href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=nav&amp;utm_campaign=brand_hub" data-nav="ddakfit">딱지원핏</a>
       <a href="#itschool" data-nav="itschool">잇스쿨</a>
       <a href="#reviews">강의 후기</a>
       <a href="#explog">프로젝트 연구소</a>
       <a href="#contact">문의</a>
-      <a href="#signup" class="nav-login nav-signup" data-nav="signup" id="navSignup">회원가입</a>
-      <a href="#login" class="nav-login" data-nav="login" id="navLogin">로그인</a>
+      <a href="signup.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login nav-signup" data-nav="signup" id="navSignup">회원가입</a>
+      <a href="mypage.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login" data-nav="login" id="navLogin">로그인</a>
       <!-- 로그인 상태 헤더 (JS가 세션에 따라 토글 — 기본은 숨김) -->
       <a href="admin.html" class="nav-login" id="navAdmin" hidden>관리자</a>
       <span class="nav-user" id="navUser" hidden></span>
-      <a href="#login" class="nav-login" id="navLogout" hidden>로그아웃</a>
+      <a href="#" class="nav-login" id="navLogout" hidden>로그아웃</a>
     </div>
-    <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
+    <div class="nav-actions">
+      <a href="mypage.html?utm_source=homepage&amp;utm_medium=header_button&amp;utm_campaign=always_on" class="nav-account-cta">로그인</a>
+      <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
+    </div>
   </div>
 </nav>
 
-<!-- HERO: SCROLL WORLD (scroll-world 몰입형 원테이크 — 2026-07-28, 백업: index.backup-20260728-scrollworld.html) -->
-<span id="top" aria-hidden="true"></span>
-<h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">비즈니스커리어컨설팅 BCC — 당신의 커리어와 채널, 데이터로 설계합니다</h1>
-<style>
-  .sw-root { --sw-bg:#0a0a0a; --sw-ink:#f3f3f5; --sw-ink-soft:#9a9aa6; --sw-accent:#C9A84C;
-             --sw-font-display:'Pretendard Variable', Pretendard, sans-serif;
-             --sw-font-body:'Pretendard Variable', Pretendard, sans-serif; }
-  /* 다크 테마: 엔진 기본 CTA(ink 배경)는 밝은 잉크와 충돌 → 골드 배경 + 다크 텍스트로 오버라이드 */
-  .sw-root .sw-btn--primary { background: var(--sw-accent); color: #1a1407; }
-  /* 한국어 카피는 단어 중간 줄바꿈("되/도록") 방지 + 제목의 \n 을 실제 줄바꿈으로 */
-  .sw-root .sw-copy__title, .sw-root .sw-copy__body { word-break: keep-all; }
-  .sw-root .sw-copy__title { white-space: pre-line; }
-  /* 씬1 비전 두 줄이 기본 3.5rem·460px 폭에서 감김 → 첫 카피만 폭 확장 + 제목 축소로 2줄 고정 */
-  .sw-root .sw-copylayer .sw-copy:first-child { width: min(52vw, 640px); }
-  .sw-root .sw-copylayer .sw-copy:first-child .sw-copy__title { font-size: clamp(1.9rem, 3.9vw, 3.1rem); }
-</style>
-<div id="world"></div>
-<script src="assets/world/scrub-engine.js"></script>
-<script>
-mountScrollWorld(document.getElementById('world'), {
-  hint: '스크롤로 여행을 시작하세요',
-  nav: false,
-  diveScroll: 1.5,
-  connScroll: 0.9,
-  crossfade: 0.08,
-  sections: [
-    { id:'w-intro', label:'BCC', still:'assets/world/bg_1.jpg',
-      accent:'#C9A84C', scroll:1.7,
-      eyebrow:'비즈니스커리어컨설팅',
-      title:'AI와 함께 시간을 단축하는\n비즈니스의 주인이 되도록' },
-    { id:'w-lecture', label:'잇스쿨', still:'assets/world/bg_2.jpg',
-      accent:'#C9A84C',
-      eyebrow:'잇스쿨 · 기업강의',
-      title:'현장에서 통하는 강의',
-      body:'기업·대학·기관 맞춤형 AI·커리어·콘텐츠 강의를 설계하고 진행합니다.',
-      tags:['AI 활용','창업·취업','맞춤 설계'],
-      link:{ label:'강의 후기 게시판', href:'reviews.html' },
-      sign:{ eyebrow:'강의 후기 게시판', stat:'후기 315장',
-        desc:'19개 기관, 실제 수강생이 남긴 기록',
-        rows:[
-          { label:'동래여성인력개발센터', value:'83' },
-          { label:'김해여성인력개발센터', value:'49' },
-          { label:'중장년내일센터', value:'26' } ],
-        cta:'후기 게시판 보기', href:'reviews.html' } },
-    { id:'w-consult', label:'컨설팅', still:'assets/world/bg_3.jpg',
-      accent:'#C9A84C',
-      eyebrow:'1:1 컨설팅',
-      title:'다음 스텝을 함께 설계합니다',
-      body:'시장 데이터와 직무 분석을 바탕으로 이직·전직·창업 로드맵을 그립니다.',
-      tags:['커리어 로드맵','채널 전략'],
-      link:{ label:'컨설팅 문의하기', href:'#contact' },
-      cards:{ title:'컨설팅 프로그램',
-        items:[
-          { emoji:'🧭', label:'커리어 컨설팅', meta:'이직·전직·창업 로드맵 1:1 설계', href:'#services' },
-          { emoji:'📈', label:'유튜브 채널 컨설팅', meta:'데이터 기반 채널 성장 전략', href:'#services' },
-          { emoji:'💡', label:'비즈니스 코칭', meta:'수익화 모델·가격·고객 확보', href:'#services' } ],
-        more:{ label:'서비스 전체 보기', href:'#services' } } },
-    { id:'w-tools', label:'잇툴즈', still:'assets/world/bg_4.jpg',
-      accent:'#C9A84C',
-      eyebrow:'잇툴즈',
-      title:'감이 아니라 데이터로',
-      body:'유튜브 분석기를 비롯한 무료 도구로 내 채널의 현재를 정확히 봅니다.',
-      tags:['무료 도구 4종','유튜브 분석'],
-      link:{ label:'무료 도구 바로 쓰기', href:'tools/' },
-      cards:{ title:'지금 바로 쓰는 도구',
-        items:[
-          { img:'assets/world/thumb_tool_finder.jpg', label:'잘 나가는 영상 찾기', meta:'키워드로 인기 영상·바이럴 지수', href:'https://ohdana08.github.io/bcc-youtube-analyzer/finder/' },
-          { img:'assets/world/thumb_tool_video.jpg', label:'영상 분석', meta:'URL 하나로 성과·후킹 진단', href:'https://ohdana08.github.io/bcc-youtube-analyzer/video-analyzer/' },
-          { img:'assets/world/thumb_tool_keyword.jpg', label:'황금키워드 발견', meta:'검색량·경쟁도·트렌드 한 번에', href:'https://ohdana08.github.io/bcc-youtube-analyzer/keyword-finder/' },
-          { img:'assets/world/thumb_tool_competitor.jpg', label:'경쟁채널 분석', meta:'운영 패턴·TOP5 영상 진단', href:'https://ohdana08.github.io/bcc-youtube-analyzer/competitor-analyzer/' } ],
-        more:{ label:'잇툴즈 전체 보기', href:'tools/' } } },
-    { id:'w-lab', label:'AI LAB', still:'assets/world/bg_5.jpg',
-      accent:'#C9A84C',
-      eyebrow:'AI LAB',
-      title:'AI로 굴러가는 실행 시스템',
-      body:'콘텐츠 자동화부터 AI 워크플로까지, 직접 만들어 검증한 것만 가르칩니다.',
-      tags:['자동화','실험일지'],
-      link:{ label:'AI LAB 실험일지 보기', href:'projects.html' },
-      cards:{ title:'실제 프로젝트 기록',
-        items:[
-          { emoji:'📊', label:'315개의 후기를 신뢰 자산으로', meta:'강의 후기 게시판 구축기', href:'projects.html#review-board' },
-          { emoji:'🤝', label:'막막한 창업 질문에 24시간 도우미', meta:'정부지원사업 도우미', href:'projects.html#support-assistant' },
-          { emoji:'🏭', label:'한 번 만든 지식을 여러 채널로', meta:'OSMU 콘텐츠 공장', href:'projects.html#osmu-factory' } ],
-        more:{ label:'실험일지 전체 보기', href:'projects.html' } } },
-    { id:'w-finale', label:'문의', still:'assets/world/bg_6.jpg',
-      accent:'#C9A84C', scroll:1.9, linger:0.45,
-      eyebrow:'CONTACT',
-      title:'이제, 당신의 차례입니다',
-      body:'카카오톡 채널로 문의를 남기면 24시간 이내에 답합니다.',
-      tags:[],
-      cta:{ primary:{ label:'카톡 상담하기', href:'https://pf.kakao.com/_xbrxjxkxj/chat' },
-            secondary:{ label:'서비스 둘러보기', href:'#services' } } },
-  ],
-  connectors: [],
-});
-</script>
-<!-- /HERO: SCROLL WORLD -->
+<!-- HERO: 정적 화면 — 자동 재생·스크롤 모션 없음 -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="pill">BUSINESS · CAREER · CONSULTING</div>
+    <h1>당신의 커리어와 비즈니스,<br /><span class="accent">AI와 데이터로 설계합니다.</span></h1>
+    <p>
+      BCC 비즈니스커리어컨설팅은 기업·기관과 1인 사업자를 위한<br />
+      AI 교육 · 창업 · 커리어 컨설팅 전문 브랜드입니다.
+    </p>
+    <div class="hero-actions">
+      <a href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=hero&amp;utm_campaign=brand_hub" class="btn btn-primary" data-nav="ddakfit-hero">딱지원핏 시작하기</a>
+      <a href="#itschool" class="btn btn-ghost" data-nav="itschool-hero">잇스쿨 강의 보기</a>
+      <a href="#tools" class="btn btn-ghost" data-nav="ittools-hero">잇툴즈 사용하기</a>
+      <a href="#reviews" class="btn btn-ghost">강의 후기 보기</a>
+      <a href="index.html?utm_source=homepage&amp;utm_medium=hero&amp;utm_campaign=always_on&amp;utm_content=consult#contact" class="btn btn-ghost">강의·컨설팅 문의</a>
+    </div>
+    <div class="trust-strip" aria-label="BCC 신뢰 정보">
+      <span><b>13년</b> 창업·마케팅 교육 경험</span>
+      <span><b>380개 기관</b> 출강 경험</span>
+      <span><b>24시간 이내</b> 문의 회신</span>
+    </div>
+  </div>
+</section>
 
 <!-- QUICK PATHS: 방문 목적별 1클릭 진입 -->
 <section class="quick-paths" aria-labelledby="quick-path-title">
@@ -998,6 +939,9 @@ mountScrollWorld(document.getElementById('world'), {
       </a>
       <a class="quick-path" href="#tools">
         <small>실행이 필요한 분</small><strong>무료 잇툴즈 사용하기 →</strong><span>분석 도구와 무료 챗봇으로 바로 시작합니다.</span>
+      </a>
+      <a class="quick-path" href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=quick_path&amp;utm_campaign=brand_hub">
+        <small>정부지원사업을 찾는 분</small><strong>딱지원핏 무료로 시작하기 →</strong><span>내 조건에 맞는 공고와 신청 준비 상태를 확인합니다.</span>
       </a>
       <a class="quick-path" href="index.html?utm_source=homepage&utm_medium=quick_path&utm_campaign=always_on&utm_content=b2b_consult#contact">
         <small>기업·기관 담당자</small><strong>강의·컨설팅 문의하기 →</strong><span>기존 CRM 문의 폼에서 견적과 일정을 상담합니다.</span>
@@ -1154,24 +1098,7 @@ mountScrollWorld(document.getElementById('world'), {
         <div class="tool-arrow">바로 가기 →</div>
       </a>
 
-      <!-- 2. 정부지원사업 도우미 -->
-      <a
-        class="tool-card is-active"
-        data-tool="govplan"
-        data-tool-name="정부지원사업 도우미"
-        style="--platform-color: #2563EB; --platform-color-soft: rgba(37,99,235,0.14);"
-        href="https://ddakfit.bccconsulting.kr"
-        target="_blank"
-        rel="noopener"
-      >
-        <span class="tool-badge tool-badge-active">Active</span>
-        <div class="tool-icon" aria-hidden="true">📋</div>
-        <div class="tool-name">정부지원사업 도우미</div>
-        <div class="tool-desc">나에게 맞는 지원사업 추천 + 사업계획서 작성</div>
-        <div class="tool-arrow">바로 가기 →</div>
-      </a>
-
-      <!-- 3. 무료챗봇 (GPTs 라이브러리) -->
+      <!-- 2. 무료챗봇 (GPTs 라이브러리) -->
       <a
         class="tool-card is-active"
         data-tool="free-chatbot"
@@ -1261,7 +1188,7 @@ mountScrollWorld(document.getElementById('world'), {
   <div class="section-inner">
     <div class="section-label">ITSCHOOL</div>
     <h2 class="section-title">잇스쿨</h2>
-    <p class="section-desc">실전 온라인 강의 — 골라서 바로 수강 신청</p>
+    <p class="section-desc">실전 과정과 무료 실습자료 — 필요한 방식으로 바로 시작</p>
 
     <!-- ════════════════════════════════════════════════════════════════
          ⚠️ 강의 카드는 정적(static)입니다. 가격은 "두 곳"을 손으로 맞춰야 함:
@@ -1311,6 +1238,18 @@ mountScrollWorld(document.getElementById('world'), {
         <div class="tool-arrow">기수 보기 →</div>
       </a>
 
+      <!-- Claude 101 무료 실습자료실 → 영상 없이 상시 열람 -->
+      <a class="tool-card course-card" data-course="claude101-library"
+         style="--platform-color:#EB9D6E; --platform-color-soft:rgba(235,157,110,0.12);"
+         href="claude101.html">
+        <span class="tool-badge tool-badge-active">무료 · 상시 열람</span>
+        <div class="tool-icon" aria-hidden="true">✦</div>
+        <div class="tool-name">Claude 101 무료 실습자료실</div>
+        <div class="tool-desc">읽고 따라 하며 오늘 한 가지 업무를 끝내는 Claude 실습 18개.</div>
+        <div class="course-series-status">1 / 18 공개 — 자료 순차 추가</div>
+        <div class="tool-arrow">실습자료 보기 →</div>
+      </a>
+
     </div>
   </div>
 </section>
@@ -1340,6 +1279,7 @@ mountScrollWorld(document.getElementById('world'), {
         <span class="kakao-icon">K</span>
         카카오톡 채널로 상담하기
       </a>
+      <a href="inquiries.html" class="btn btn-ghost" style="margin-top:10px">AI 문의게시판에 남기기</a>
     </div>
 
     <!-- ===== BCC 견적/문의 폼 (Vercel /api/lead 연동) ===== -->
@@ -1563,9 +1503,9 @@ mountScrollWorld(document.getElementById('world'), {
         <a class="explog-link" href="projects.html#review-board">사례 자세히 보기 →</a>
       </article>
       <article class="explog-card">
-        <div class="project-status"><span class="explog-date">개선 중</span><span class="project-category">AI SERVICE</span></div>
-        <h3 class="project-title">정부지원사업 도우미: 상담을 서비스 흐름으로</h3>
-        <p class="project-summary">예비창업자의 막막한 질문을 공고 추천, 자가진단, 사업계획서 초안으로 연결하는 AI 서비스 퍼널을 설계했습니다.</p>
+        <div class="project-status"><span class="explog-date">완료 · 운영 중</span><span class="project-category">AI SERVICE</span></div>
+        <h3 class="project-title">딱지원핏: 정부지원사업 찾기부터 준비 진단까지</h3>
+        <p class="project-summary">예비창업자의 막막한 질문을 공고 추천, 신청 준비 진단, 사업계획서 첫 번째 버전으로 연결하는 AI 서비스를 운영합니다.</p>
         <div class="project-proof"><span>대화형 진단</span><span>리드 수집</span><span>비용 최적화</span></div>
         <a class="explog-link" href="projects.html#support-assistant">사례 자세히 보기 →</a>
       </article>
@@ -1637,12 +1577,13 @@ mountScrollWorld(document.getElementById('world'), {
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
     <a href="#tools" data-nav="ittools-footer">잇툴즈</a>
+    <a href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=footer&amp;utm_campaign=brand_hub">딱지원핏</a>
     <a href="#reviews">강의 후기</a>
     <a href="#explog">AI 프로젝트 연구소</a>
     <a href="#faq">FAQ</a>
     <a href="#contact">문의</a>
-    <a href="#signup">회원가입</a>
-    <a href="#login">로그인</a>
+    <a href="signup.html?utm_source=homepage&amp;utm_medium=footer&amp;utm_campaign=always_on">회원가입</a>
+    <a href="mypage.html?utm_source=homepage&amp;utm_medium=footer&amp;utm_campaign=always_on">로그인</a>
     <a href="privacy.html">개인정보처리방침</a>
     <a href="refund.html">환불정책</a>
   </div>
@@ -1655,9 +1596,10 @@ mountScrollWorld(document.getElementById('world'), {
   카톡 상담
 </a>
 
-<div class="mobile-conversion-bar" aria-label="빠른 가입 및 문의">
-  <a class="join" href="#signup">회원가입</a>
-  <a class="ask" href="index.html?utm_source=homepage&utm_medium=mobile_sticky&utm_campaign=always_on&utm_content=consult#contact">가입·문의</a>
+<div class="mobile-conversion-bar" aria-label="빠른 로그인, 가입 및 문의">
+  <a class="login" href="mypage.html?utm_source=homepage&amp;utm_medium=mobile_sticky&amp;utm_campaign=always_on&amp;utm_content=login">로그인</a>
+  <a class="join" href="signup.html?utm_source=homepage&amp;utm_medium=mobile_sticky&amp;utm_campaign=always_on&amp;utm_content=signup">회원가입</a>
+  <a class="ask" href="index.html?utm_source=homepage&amp;utm_medium=mobile_sticky&amp;utm_campaign=always_on&amp;utm_content=consult#contact">문의하기</a>
 </div>
 
 <script>
