@@ -5,8 +5,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>비즈니스커리어컨설팅 BCC | AI 시대 창업·커리어 컨설팅 (오예림)</title>
-<meta name="description" content="13년 경력 380개 기관 출강. 비즈니스커리어컨설팅 BCC는 AI 활용 창업·취업·마케팅 컨설팅 및 무료 분석도구를 제공합니다. 대표 오예림.">
-<meta name="keywords" content="비즈니스커리어컨설팅, BCC, 오예림, 딱지원핏, 정부지원사업, 정부지원사업 도우미, 부산 창업컨설팅, AI 강사, 부산 AI 강사, 창업 교육, 유튜브 분석기">
+<meta name="description" content="2014년 3월부터 현재까지 380개 기관 출강. 비즈니스커리어컨설팅 BCC는 AI 활용 창업·취업·마케팅 컨설팅 및 무료 분석도구를 제공합니다. 대표 오예림.">
+<meta name="keywords" content="비즈니스커리어컨설팅, BCC, 오예림, 부산 창업컨설팅, AI 강사, 부산 AI 강사, 창업 교육, 유튜브 분석기">
 <meta name="author" content="오예림">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://bccconsulting.kr/">
@@ -14,7 +14,7 @@
 <!-- Open Graph (SNS 공유 시) -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="비즈니스커리어컨설팅 BCC | AI 시대 창업·커리어 컨설팅">
-<meta property="og:description" content="13년 경력 380개 기관 출강. AI 시대 실행 시스템 설계자 오예림이 운영하는 BCC.">
+<meta property="og:description" content="2014년 3월부터 현재까지 380개 기관 출강. AI 시대 실행 시스템 설계자 오예림이 운영하는 BCC.">
 <meta property="og:url" content="https://bccconsulting.kr/">
 <meta property="og:image" content="https://bccconsulting.kr/og-image.png">
 <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
@@ -108,8 +108,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* NAV */
   .nav {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -140,7 +142,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .brand-sub { font-size: 11px; color: var(--text-dim); font-weight: 500; letter-spacing: 0.4px; }
   .nav-links {
     display: flex;
-    gap: 22px;
+    gap: 18px;
     font-size: 14px;
     color: var(--text-dim);
   }
@@ -758,6 +760,50 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     font-weight: 600;
     color: var(--text-mute);
   }
+  .itschool-portfolio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin: -14px 0 26px;
+    padding: 20px 22px;
+    background: #fff;
+    border: 2px solid #2563eb;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, .08);
+  }
+  .itschool-portfolio-copy small {
+    display: block;
+    margin-bottom: 4px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .itschool-portfolio-copy strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #1d1b18;
+    font-size: 18px;
+  }
+  .itschool-portfolio-copy span {
+    color: #625e56;
+    font-size: 13px;
+  }
+  .itschool-portfolio-link {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 11px 16px;
+    color: #fff !important;
+    background: #2563eb;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 900;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, .2);
+  }
+  .itschool-portfolio-link:hover { background: #174ec1; }
 
   /* RESPONSIVE */
   @media (max-width: 1000px) {
@@ -814,7 +860,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* 2026 homepage refresh: trust-first quick paths + conversion rail */
   .quick-paths { padding: 34px 0; background: #111; border-bottom: 1px solid var(--border); }
-  .quick-path-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .quick-path-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .quick-path {
     display: block; padding: 22px; border: 1px solid var(--border); border-radius: 14px;
     background: var(--card); color: var(--text); transition: border-color .18s, transform .18s;
@@ -826,9 +872,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .trust-strip { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; color: var(--muted); font-size: 13px; }
   .trust-strip b { color: var(--text); }
   .mobile-conversion-bar { display: none; }
-  @media (max-width: 1000px) {
-    .quick-path-grid { grid-template-columns: repeat(2, 1fr); }
-  }
   @media (max-width: 760px) {
     body { padding-bottom: 70px; }
     .quick-path-grid { grid-template-columns: 1fr; }
@@ -861,6 +904,590 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .account-board-grid { grid-template-columns: 1fr; }
     .onepage-frame-wrap { border-radius: 13px; }
   }
+
+  /* 2026-08-10 readable single-page redesign */
+  #journey-content {
+    --bg: #f7f4ed;
+    --bg-2: #eee9df;
+    --surface: #ffffff;
+    --surface-2: #f3efe7;
+    --border: #d9d2c4;
+    --text: #1d1b18;
+    --text-dim: #625e56;
+    --text-mute: #817b70;
+    display: flex;
+    flex-direction: column;
+    padding-top: 76px;
+    background: var(--bg);
+    color: var(--text);
+  }
+  #top { position: absolute; top: 0; }
+  #about, #services, #reviews, #tools, #osmu, #osmu-system, #itschool, #explog, #process, #faq, #contact, #account { scroll-margin-top: 76px; }
+  #journey-content > section { position: relative; overflow: hidden; }
+  #journey-content > section::after {
+    content: "";
+    position: absolute;
+    right: -180px;
+    top: -180px;
+    width: 420px;
+    height: 420px;
+    border: 1px solid rgba(201,168,76,.12);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  #journey-content .section-inner { max-width: 1120px; }
+  #journey-content .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 16px;
+    color: #9b7622;
+    font-family: var(--font-ko);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .14em;
+  }
+  #journey-content .section-label::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 5px rgba(201,168,76,.14);
+  }
+  #journey-content .section-title {
+    max-width: 760px;
+    margin-bottom: 18px;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.12;
+    letter-spacing: -.045em;
+    word-break: keep-all;
+  }
+  #journey-content .section-desc {
+    max-width: 700px;
+    margin-bottom: 44px;
+    color: var(--text-dim);
+    font-size: 17px;
+    line-height: 1.75;
+    word-break: keep-all;
+  }
+  #journey-content > .quick-paths { order: 1; }
+  #journey-content > #about { order: 2; }
+  #journey-content > #tools { order: 3; }
+  #journey-content > #osmu { order: 4; }
+  #journey-content > #reviews { order: 5; }
+  #journey-content > .itschool-section { order: 6; }
+  #journey-content > #services { order: 7; }
+  #journey-content > #explog { order: 8; }
+  #journey-content > #faq { order: 9; }
+  #journey-content > .process-section { order: 10; }
+  #journey-content > #contact { order: 11; }
+  #journey-content > #account { order: 12; }
+
+  /* Arrival / proof station */
+  #journey-content .quick-paths {
+    padding: 92px 20px 82px;
+    background: #fff;
+    border: 0;
+  }
+  .proof-intro {
+    margin-bottom: 44px;
+  }
+  .proof-intro .section-title { margin-bottom: 0 !important; }
+  .proof-intro p { color: var(--text-dim); font-size: 16px; line-height: 1.8; word-break: keep-all; }
+  .proof-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .proof-metric { padding: 30px 22px; border-right: 1px solid var(--border); }
+  .proof-metric:last-child { border-right: 0; }
+  .proof-metric strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #182334;
+    font-size: clamp(30px, 3.3vw, 46px);
+    line-height: 1;
+    letter-spacing: -.04em;
+  }
+  .proof-metric strong.career-period {
+    font-size: clamp(21px, 2.4vw, 32px);
+    line-height: 1.15;
+    letter-spacing: -.045em;
+    white-space: nowrap;
+  }
+  .proof-metric span { color: var(--text-dim); font-size: 13px; }
+  .client-rail {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    margin-top: 24px;
+    color: var(--text-mute);
+    font-size: 13px;
+    overflow: hidden;
+  }
+  .client-rail b {
+    position: relative;
+    z-index: 2;
+    color: #9b7622;
+    font-size: 12px;
+    letter-spacing: .08em;
+    white-space: nowrap;
+  }
+  .client-rail-streams {
+    display: grid;
+    min-width: 0;
+    gap: 9px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+  }
+  .client-rail-window {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .client-rail-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+  .client-rail-group {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 20px;
+    padding-right: 20px;
+    white-space: nowrap;
+  }
+  .client-rail-group em { color: var(--text-mute); font-style: normal; }
+  .client-rail i { color: var(--gold); font-style: normal; }
+  .client-rail-track-forward { animation: client-rail-forward 46s linear infinite; }
+  .client-rail-track-reverse { animation: client-rail-reverse 44s linear infinite; }
+  .client-rail:hover .client-rail-track { animation-play-state: paused; }
+  @keyframes client-rail-forward { to { transform: translateX(-50%); } }
+  @keyframes client-rail-reverse {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .client-rail-track { animation: none !important; transform: none !important; }
+    .client-rail-window:nth-child(2) { display: none; }
+  }
+  .journey-gateway {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 38px;
+  }
+  .journey-gateway .quick-path {
+    position: relative;
+    min-height: 228px;
+    padding: 24px 24px 26px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--route-soft), #fff 52%);
+    border: 2px solid var(--route-color);
+    border-radius: 20px;
+    box-shadow: 0 14px 34px rgba(31, 38, 50, .07);
+  }
+  .journey-gateway .quick-path::after {
+    content: "";
+    position: absolute;
+    right: -42px;
+    top: -52px;
+    width: 138px;
+    height: 138px;
+    border-radius: 50%;
+    background: var(--route-color);
+    opacity: .07;
+    pointer-events: none;
+  }
+  .journey-gateway .quick-path:hover {
+    border-color: var(--route-color);
+    background: #fff;
+    transform: translateY(-5px);
+    box-shadow: 0 20px 42px rgba(31, 38, 50, .13);
+  }
+  .quick-path-icon {
+    position: relative;
+    z-index: 1;
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 22px;
+    color: #fff;
+    background: var(--route-color);
+    border-radius: 17px;
+    box-shadow: 0 9px 20px var(--route-shadow);
+    transition: transform .2s ease;
+  }
+  .quick-path:hover .quick-path-icon { transform: rotate(-4deg) scale(1.06); }
+  .quick-path-icon svg { width: 29px; height: 29px; display: block; }
+  .journey-gateway .quick-path .quick-path-icon { color: #fff; }
+  .journey-gateway .quick-path small { color: var(--route-color); }
+  .journey-gateway .quick-path strong { color: var(--text); font-size: 20px; }
+  .journey-gateway .quick-path strong b { color: var(--route-color); font-size: 22px; }
+  .journey-gateway .quick-path span { color: var(--text-dim); }
+  .quick-path-primary {
+    display: block;
+    color: inherit;
+  }
+  .quick-path-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .quick-path-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 9px 12px;
+    border: 1px solid color-mix(in srgb, var(--route-color) 28%, transparent);
+    border-radius: 999px;
+    color: var(--route-color);
+    background: rgba(255, 255, 255, .82);
+    font-size: 12px;
+    font-weight: 800;
+    transition: color .18s, background .18s, transform .18s;
+  }
+  .quick-path-actions a:first-child {
+    color: #fff;
+    background: var(--route-color);
+  }
+  .quick-path-actions a:hover {
+    transform: translateY(-2px);
+  }
+  .quick-path-actions a:focus-visible,
+  .quick-path-primary:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--route-color) 32%, transparent);
+    outline-offset: 3px;
+  }
+
+  /* About: a strong point of view instead of a generic profile card */
+  #about { background: #eee9df; }
+  #about .about-grid { grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: stretch; }
+  #about .profile-card {
+    min-height: 420px;
+    padding: 30px;
+    color: #f8f5ee;
+    text-align: left;
+    background: #182334;
+    border: 0;
+    border-radius: 22px;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 22px;
+  }
+  #about .profile-card::before {
+    top: auto;
+    right: -50px;
+    bottom: -100px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(201,168,76,.28), transparent 68%);
+  }
+  .profile-index { position: relative; color: var(--gold-3); font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+  .profile-photo {
+    position: relative;
+    width: 100%;
+    height: clamp(220px, 24vw, 300px);
+    object-fit: cover;
+    object-position: 68% 34%;
+    border-radius: 17px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.28);
+  }
+  .profile-quote { position: relative; max-width: 18ch; font-size: clamp(28px, 3vw, 40px); font-weight: 800; line-height: 1.2; letter-spacing: -.045em; word-break: keep-all; }
+  #about .profile-name { position: relative; margin: 20px 0 2px; font-size: 21px; }
+  #about .profile-role { position: relative; margin: 0; color: #d6c389; }
+  #about .profile-caption { position: relative; margin: 12px 0 0; color: #c8ccd3; font-size: 13px; line-height: 1.65; word-break: keep-all; }
+  #about .credentials { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  #about .credential-item {
+    min-height: 92px;
+    padding: 19px 20px;
+    background: rgba(255,255,255,.72);
+    border-color: rgba(29,27,24,.09);
+  }
+  #about .credential-icon { color: #9b7622; background: #f2ead6; font-size: 16px; font-weight: 900; }
+  #about .credential-text strong { color: var(--text); }
+  #about .credential-text span { color: var(--text-dim); line-height: 1.55; }
+
+  /* Three clear service pillars */
+  #services { background: #f7f4ed; }
+  #services .services-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  #services .service-card {
+    min-height: 390px;
+    padding: 32px;
+    background: #fff;
+    border-color: #ded8cc;
+    border-radius: 18px;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+  }
+  #services .service-card:hover { border-color: var(--gold); box-shadow: 0 18px 46px rgba(52,43,25,.08); }
+  .service-number { color: #a9822d; font-size: 12px; font-weight: 900; letter-spacing: .16em; }
+  #services .service-icon { margin: 28px 0 20px; color: #172235; background: #f2ead6; font-size: 21px; }
+  #services .service-title { color: var(--text); font-size: 24px; letter-spacing: -.03em; }
+  #services .service-desc { color: var(--text-dim); }
+  .service-points { display: grid; gap: 9px; margin: 24px 0 28px; padding: 20px 0 0; border-top: 1px solid var(--border); list-style: none; }
+  .service-points li { color: #4f4b44; font-size: 13px; }
+  .service-points li::before { content: "✓"; margin-right: 8px; color: #a9822d; font-weight: 900; }
+  .service-link { margin-top: auto; color: #8c6819; font-size: 14px; font-weight: 800; }
+  .service-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px 16px; }
+  .service-actions .service-link { margin-top: 0; }
+
+  /* Evidence station */
+  #journey-content #reviews {
+    --text: #f7f4ed;
+    --text-dim: #b9b7b2;
+    --border: #343b48;
+    color: var(--text);
+    background: #182334;
+    border: 0;
+  }
+  #reviews::before {
+    content: "315";
+    position: absolute;
+    right: 5vw;
+    top: 20px;
+    color: rgba(255,255,255,.035);
+    font-size: clamp(150px, 25vw, 360px);
+    font-weight: 900;
+    line-height: 1;
+  }
+  #reviews .section-label { color: #d6bd72; }
+  #reviews .section-title { color: #fff; }
+  #reviews .onepage-frame-wrap { position: relative; background: #0a0a0a; border-color: #3b4351; }
+
+  /* Tools and school become supporting stations on the same light canvas */
+  #journey-content .tools { background: #eee9df; }
+  #journey-content .tool-card {
+    background: #fff;
+    color: var(--text);
+    border-width: 1px;
+    border-top-width: 4px;
+    box-shadow: 0 10px 30px rgba(52,43,25,.045);
+  }
+  #journey-content .tool-card::before { opacity: .16; }
+  #journey-content .tool-desc { color: var(--text-dim); }
+  #journey-content .tool-badge-soon,
+  #journey-content .tool-badge-upcoming { color: #6f6b63; background: #f1eee7; border-color: #dad4c8; }
+  #journey-content .tool-card[data-tool="instagram"] {
+    background: linear-gradient(#fff,#fff) padding-box,
+                linear-gradient(45deg,#833AB4,#FD1D1D,#FCB045) border-box;
+  }
+  .itschool-section { background: #f7f4ed; }
+
+  /* Project cases */
+  #journey-content .explog { background: #fff; }
+  #journey-content .lab-statement,
+  #journey-content .lab-method,
+  #journey-content .explog-card { background: #f7f4ed; border-color: #ded8cc; }
+  #journey-content .project-title,
+  #journey-content .lab-statement strong,
+  #journey-content .lab-flow { color: var(--text); }
+  #journey-content .project-summary,
+  #journey-content .lab-statement p,
+  #journey-content .lab-method p,
+  #journey-content .explog-row-text { color: var(--text-dim); }
+  #journey-content .explog-card.osmu-showcase {
+    grid-column: 1 / -1;
+    padding: 34px;
+    color: #f7f4ed;
+    background: #182334;
+    border-color: #29364a;
+  }
+  #journey-content .osmu-showcase:hover { border-color: #c9a84c; }
+  #journey-content #osmu { background: #fff; }
+  #osmu .section-title { max-width: 920px; }
+  #osmu .osmu-slot { margin-top: 34px; }
+  .osmu-showcase .project-category { color: #d6bd72; }
+  .osmu-showcase .project-title { max-width: 760px; color: #fff !important; font-size: 26px; }
+  #journey-content .osmu-showcase .project-summary { max-width: 800px; color: #c9cdd5; }
+  .osmu-owner {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    width: fit-content;
+    padding: 7px 11px;
+    color: #f1d98e;
+    background: rgba(201,168,76,.12);
+    border: 1px solid rgba(201,168,76,.32);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .osmu-factory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .osmu-factory {
+    min-height: 172px;
+    padding: 20px;
+    background: rgba(255,255,255,.065);
+    border: 1px solid rgba(255,255,255,.13);
+    border-top: 3px solid var(--factory-color);
+    border-radius: 15px;
+  }
+  .osmu-factory-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 17px;
+    background: var(--factory-color);
+    border-radius: 12px;
+    font-size: 21px;
+  }
+  .osmu-factory strong { display: block; margin-bottom: 7px; color: #fff; font-size: 17px; }
+  .osmu-factory span { display: block; color: #bfc4ce; font-size: 13px; line-height: 1.6; }
+  .osmu-private-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #aeb4bf;
+    font-size: 12px;
+  }
+  .osmu-showcase .explog-link { color: #e2c66f; }
+
+  /* Process: borrowed information rhythm, expressed as a route */
+  .process-section { background: #eee9df; }
+  .process-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; align-items: start; }
+  .process-intro { position: sticky; top: 110px; }
+  .process-intro .section-desc { margin-bottom: 0 !important; }
+  .process-list { position: relative; display: grid; gap: 0; list-style: none; }
+  .process-list::before { content: ""; position: absolute; left: 25px; top: 28px; bottom: 28px; width: 1px; background: #c8b77d; }
+  .process-step { position: relative; display: grid; grid-template-columns: 52px 1fr; gap: 22px; padding: 0 0 36px; }
+  .process-step:last-child { padding-bottom: 0; }
+  .process-num {
+    position: relative;
+    z-index: 1;
+    width: 52px;
+    height: 52px;
+    border: 1px solid #b4923f;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #8c6819;
+    background: #eee9df;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .process-copy { padding: 7px 0 0; }
+  .process-copy h3 { margin-bottom: 7px; color: var(--text); font-size: 20px; }
+  .process-copy p { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+
+  /* FAQ then a dark, decisive contact destination */
+  #journey-content .faq { background: #f7f4ed; }
+  #journey-content .faq-item { background: #fff; border-color: #ded8cc; }
+  #journey-content .faq-question { color: var(--text); }
+  #journey-content .faq-answer,
+  #journey-content .faq-cta { color: var(--text-dim); }
+  #journey-content #contact {
+    --text: #f7f4ed;
+    --text-dim: #c4c3bf;
+    color: var(--text);
+    background: #101b2e;
+  }
+  #contact::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 85% 15%, rgba(201,168,76,.16), transparent 34%);
+    pointer-events: none;
+  }
+  #contact .contact-card { position: relative; border: 0; padding: 24px 0 34px; background: transparent; text-align: left; }
+  #contact .contact-card h3 { max-width: 680px; font-size: clamp(34px, 4.8vw, 58px); line-height: 1.12; letter-spacing: -.045em; }
+  #contact .contact-card p { color: var(--text-dim); }
+  #contact .btn-ghost,
+  #contact .btn-ghost:visited {
+    color: #fff !important;
+    background: #202c40;
+    border-color: #8290a7;
+  }
+  #contact .btn-ghost:hover {
+    color: #101b2e !important;
+    background: #fff;
+    border-color: #fff;
+  }
+  #contact .lead-form-card {
+    position: relative;
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    column-gap: 42px;
+    padding: 34px;
+    border-color: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.055);
+  }
+  #contact .lead-form-card h3,
+  #contact .lead-form-sub { grid-column: 1; }
+  #contact .lead-form-card form { grid-column: 2; grid-row: 1 / span 3; }
+  #journey-content #account { background: #0c1422; color: #f7f4ed; border: 0; }
+  #account .section-title { color: #fff; }
+  #account .section-desc,
+  #account .account-board-title p { color: #aaaeb6; }
+  #account .onepage-frame-wrap { border-color: #303746; }
+
+  @media (max-width: 1050px) {
+    .nav-links { display: none; }
+  }
+  @media (max-width: 900px) {
+    .process-layout { grid-template-columns: 1fr; gap: 28px; }
+    .proof-metrics { grid-template-columns: repeat(3, 1fr); }
+    #about .about-grid { grid-template-columns: 1fr; }
+    #services .services-grid { grid-template-columns: 1fr; }
+    #services .service-card { min-height: 0; }
+    .process-intro { position: static; }
+    #contact .lead-form-card { grid-template-columns: 1fr; }
+    #contact .lead-form-card h3,
+    #contact .lead-form-sub,
+    #contact .lead-form-card form { grid-column: 1; grid-row: auto; }
+  }
+  @media (max-width: 760px) {
+    #journey-content > section { padding: 70px 18px; }
+    #journey-content .section-title { font-size: 31px; }
+    #journey-content .section-desc { margin-bottom: 32px; font-size: 15px; }
+    .proof-intro { margin-bottom: 32px; }
+    .proof-metrics { grid-template-columns: 1fr; }
+    .proof-metric { padding: 22px 14px; }
+    .proof-metric { border-right: 0; border-bottom: 1px solid var(--border); }
+    .proof-metric:last-child { border-bottom: 0; }
+    .proof-metric strong { font-size: 31px; }
+    .proof-metric strong.career-period { font-size: 19px; }
+    .journey-gateway { grid-template-columns: 1fr; }
+    .journey-gateway .quick-path { min-height: 0; }
+    .itschool-portfolio { align-items: flex-start; flex-direction: column; gap: 14px; margin-top: -8px; }
+    .itschool-portfolio-link { width: 100%; }
+    .client-rail { grid-template-columns: 1fr; gap: 12px; }
+    .client-rail-streams { margin-inline: -4px; }
+    .client-rail-group { gap: 16px; padding-right: 16px; }
+    .client-rail-track-forward { animation-duration: 38s; }
+    .client-rail-track-reverse { animation-duration: 36s; }
+    #about .profile-card { min-height: 0; padding: 24px; }
+    .profile-photo { height: 240px; }
+    .profile-quote { font-size: 32px; }
+    #services .service-card { padding: 26px; }
+    #reviews .onepage-frame { height: 680px; }
+    .process-step { grid-template-columns: 44px 1fr; gap: 16px; padding-bottom: 28px; }
+    .process-list::before { left: 21px; }
+    .process-num { width: 44px; height: 44px; }
+    #contact .contact-card { padding-top: 0; }
+    #contact .lead-form-card { padding: 24px 18px; }
+    .mobile-conversion-bar { grid-template-columns: 1fr 1fr 1.2fr; }
+    #journey-content .explog-card.osmu-showcase { padding: 26px 20px; }
+    .osmu-factory-grid { grid-template-columns: 1fr; }
+    .osmu-factory { min-height: 0; }
+  }
 </style>
 </head>
 <body>
@@ -883,10 +1510,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="nav-links">
       <a href="#about">소개</a>
       <a href="#services">서비스</a>
+      <a href="#reviews">사례·후기</a>
       <a href="#tools" data-nav="ittools">잇툴즈</a>
-      <a href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=nav&amp;utm_campaign=brand_hub" data-nav="ddakfit">딱지원핏</a>
-      <a href="#itschool" data-nav="itschool">잇스쿨</a>
-      <a href="#reviews">강의 후기</a>
       <a href="#explog">프로젝트 연구소</a>
       <a href="#contact">문의</a>
       <a href="signup.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login nav-signup" data-nav="signup" id="navSignup">회원가입</a>
@@ -903,49 +1528,72 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </nav>
 
-<!-- HERO: 정적 화면 — 자동 재생·스크롤 모션 없음 -->
-<section class="hero" id="top">
-  <div class="hero-inner">
-    <div class="pill">BUSINESS · CAREER · CONSULTING</div>
-    <h1>당신의 커리어와 비즈니스,<br /><span class="accent">AI와 데이터로 설계합니다.</span></h1>
-    <p>
-      BCC 비즈니스커리어컨설팅은 기업·기관과 1인 사업자를 위한<br />
-      AI 교육 · 창업 · 커리어 컨설팅 전문 브랜드입니다.
-    </p>
-    <div class="hero-actions">
-      <a href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=hero&amp;utm_campaign=brand_hub" class="btn btn-primary" data-nav="ddakfit-hero">딱지원핏 시작하기</a>
-      <a href="#itschool" class="btn btn-ghost" data-nav="itschool-hero">잇스쿨 강의 보기</a>
-      <a href="#tools" class="btn btn-ghost" data-nav="ittools-hero">잇툴즈 사용하기</a>
-      <a href="#reviews" class="btn btn-ghost">강의 후기 보기</a>
-      <a href="index.html?utm_source=homepage&amp;utm_medium=hero&amp;utm_campaign=always_on&amp;utm_content=consult#contact" class="btn btn-ghost">강의·컨설팅 문의</a>
-    </div>
-    <div class="trust-strip" aria-label="BCC 신뢰 정보">
-      <span><b>13년</b> 창업·마케팅 교육 경험</span>
-      <span><b>380개 기관</b> 출강 경험</span>
-      <span><b>24시간 이내</b> 문의 회신</span>
-    </div>
-  </div>
-</section>
+<span id="top" aria-hidden="true"></span>
 
-<!-- QUICK PATHS: 방문 목적별 1클릭 진입 -->
+<main id="journey-content">
+
+<!-- PRIMARY: trust proof + next routes -->
 <section class="quick-paths" aria-labelledby="quick-path-title">
   <div class="section-inner">
-    <div class="section-label">QUICK START</div>
-    <h2 class="section-title" id="quick-path-title">무엇을 도와드릴까요?</h2>
-    <p class="section-desc">목적을 선택하면 필요한 정보와 신청 창구로 바로 연결됩니다.</p>
-    <div class="quick-path-grid">
-      <a class="quick-path" href="#itschool">
-        <small>교육 참여자</small><strong>실전 강의 살펴보기 →</strong><span>잇스쿨 과정과 다음 기수 안내를 확인합니다.</span>
-      </a>
-      <a class="quick-path" href="#tools">
-        <small>실행이 필요한 분</small><strong>무료 잇툴즈 사용하기 →</strong><span>분석 도구와 무료 챗봇으로 바로 시작합니다.</span>
-      </a>
-      <a class="quick-path" href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=quick_path&amp;utm_campaign=brand_hub">
-        <small>정부지원사업을 찾는 분</small><strong>딱지원핏 무료로 시작하기 →</strong><span>내 조건에 맞는 공고와 신청 준비 상태를 확인합니다.</span>
-      </a>
-      <a class="quick-path" href="index.html?utm_source=homepage&utm_medium=quick_path&utm_campaign=always_on&utm_content=b2b_consult#contact">
-        <small>기업·기관 담당자</small><strong>강의·컨설팅 문의하기 →</strong><span>기존 CRM 문의 폼에서 견적과 일정을 상담합니다.</span>
-      </a>
+    <div class="proof-intro">
+      <div>
+        <div class="section-label">BCC · 검증된 현장</div>
+        <h1 class="section-title" id="quick-path-title">비즈니스커리어컨설팅</h1>
+      </div>
+    </div>
+    <div class="proof-metrics" aria-label="BCC 주요 실적">
+      <div class="proof-metric"><strong>380+</strong><span>함께한 기업·기관</span></div>
+      <div class="proof-metric"><strong>15,000+</strong><span>누적 교육 참여자</span></div>
+      <div class="proof-metric"><strong>315</strong><span>확인 가능한 실제 후기</span></div>
+    </div>
+    <div class="client-rail" aria-label="2014년 3월부터 함께한 교육 기관">
+      <b>2014.03~ 함께한 현장</b>
+      <div class="client-rail-streams">
+        <div class="client-rail-window">
+          <div class="client-rail-track client-rail-track-forward">
+            <span class="client-rail-group"><em>동래여성인력개발센터</em><i>•</i><em>김해여성인력개발센터</em><i>•</i><em>사상구 여성인력개발센터</em><i>•</i><em>서구새일센터</em><i>•</i><em>여성문화회관 여성인력개발센터</em><i>•</i><em>중장년내일센터</em><i>•</i><em>울주군 창업지원센터</em><i>•</i><em>해운대비즈니스센터</em><i>•</i><em>부산경영자총협회</em><i>•</i><em>경남투자경제진흥원</em><i>•</i><em>부산신용보증재단</em><i>•</i><em>울산농협</em><i>•</i><em>한국항공우주산업(KAI)</em><i>•</i><em>사천해양경찰서</em><i>•</i><em>성모병원</em><i>•</i></span>
+            <span class="client-rail-group" aria-hidden="true"><em>동래여성인력개발센터</em><i>•</i><em>김해여성인력개발센터</em><i>•</i><em>사상구 여성인력개발센터</em><i>•</i><em>서구새일센터</em><i>•</i><em>여성문화회관 여성인력개발센터</em><i>•</i><em>중장년내일센터</em><i>•</i><em>울주군 창업지원센터</em><i>•</i><em>해운대비즈니스센터</em><i>•</i><em>부산경영자총협회</em><i>•</i><em>경남투자경제진흥원</em><i>•</i><em>부산신용보증재단</em><i>•</i><em>울산농협</em><i>•</i><em>한국항공우주산업(KAI)</em><i>•</i><em>사천해양경찰서</em><i>•</i><em>성모병원</em><i>•</i></span>
+          </div>
+        </div>
+        <div class="client-rail-window">
+          <div class="client-rail-track client-rail-track-reverse">
+            <span class="client-rail-group"><em>서구청</em><i>•</i><em>경남교육청</em><i>•</i><em>가야대학교</em><i>•</i><em>가톨릭대학교</em><i>•</i><em>인제대학교</em><i>•</i><em>김해대학교</em><i>•</i><em>동의대학교</em><i>•</i><em>대양고등학교</em><i>•</i><em>부산시 그룹홈(아동청소년 공동생활가정)</em><i>•</i><em>좋은일자리(주)</em><i>•</i><em>경남경영자총협회</em><i>•</i><em>Eni교육센터</em><i>•</i></span>
+            <span class="client-rail-group" aria-hidden="true"><em>서구청</em><i>•</i><em>경남교육청</em><i>•</i><em>가야대학교</em><i>•</i><em>가톨릭대학교</em><i>•</i><em>인제대학교</em><i>•</i><em>김해대학교</em><i>•</i><em>동의대학교</em><i>•</i><em>대양고등학교</em><i>•</i><em>부산시 그룹홈(아동청소년 공동생활가정)</em><i>•</i><em>좋은일자리(주)</em><i>•</i><em>경남경영자총협회</em><i>•</i><em>Eni교육센터</em><i>•</i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="journey-gateway">
+      <article class="quick-path" style="--route-color:#2563EB;--route-soft:#EFF5FF;--route-shadow:rgba(37,99,235,.24);">
+        <a class="quick-path-primary" href="#itschool">
+          <span class="quick-path-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-5 9 5-9 5-9-5Z"/><path d="M7 12.5V17c2.8 2 7.2 2 10 0v-4.5"/><path d="M21 10v6"/></svg></span>
+          <small>개인 교육 참여자</small><strong>실전 강의 살펴보기 <b aria-hidden="true">→</b></strong><span>잇스쿨 과정과 다음 기수 안내를 확인합니다.</span>
+        </a>
+        <div class="quick-path-actions" aria-label="강의 보기 선택">
+          <a href="#itschool">실전 강의 보기</a>
+          <a href="https://repeated-grill-0a3.notion.site/AI-3b86536264068102bce5f9b405623939" target="_blank" rel="noopener noreferrer">노션 포트폴리오 ↗</a>
+        </div>
+      </article>
+      <article class="quick-path" style="--route-color:#00B86B;--route-soft:#ECFFF6;--route-shadow:rgba(0,184,107,.24);">
+        <a class="quick-path-primary" href="#tools">
+          <span class="quick-path-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 4-9 9 5.5 5.5 9-9L14.5 4Z"/><path d="m12 6.5 5.5 5.5"/><path d="M5 4v3M3.5 5.5h3M19 16v4M17 18h4"/></svg></span>
+          <small>지금 바로 실행할 분</small><strong>무료 잇툴즈 사용하기 <b aria-hidden="true">→</b></strong><span>분석 도구와 무료 챗봇으로 가볍게 시작합니다.</span>
+        </a>
+        <div class="quick-path-actions" aria-label="잇툴즈 실행 선택">
+          <a href="#tools">잇툴즈 보기</a>
+          <a href="ittools-gpts.html">무료 챗봇 보기</a>
+        </div>
+      </article>
+      <article class="quick-path" style="--route-color:#FF3B30;--route-soft:#FFF1F0;--route-shadow:rgba(255,59,48,.22);">
+        <a class="quick-path-primary" href="#contact">
+          <span class="quick-path-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-5h6v5M8 9h.01M12 9h.01M16 9h.01M8 13h.01M12 13h.01M16 13h.01"/></svg></span>
+          <small>기업·기관 담당자</small><strong>강의·컨설팅 문의하기 <b aria-hidden="true">→</b></strong><span>원하시는 견적과 일정 상담받아보세요</span>
+        </a>
+        <div class="quick-path-actions" aria-label="강의 문의 방법 선택">
+          <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" data-kakao="quick-path">카톡 상담</a>
+          <a href="inquiries.html">문의게시판</a>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -953,52 +1601,51 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ABOUT -->
 <section class="about" id="about">
   <div class="section-inner">
-    <div class="section-label">ABOUT</div>
-    <h2 class="section-title">오예림 강사</h2>
+    <div class="section-label">STATION 01 · 사람</div>
+    <h2 class="section-title">도구보다 먼저,<br>일의 맥락을 봅니다</h2>
     <p class="section-desc">
-      현장과 데이터를 동시에 보는 커리어·콘텐츠 컨설턴트.
-      구독자가 아닌 "성과"를 만드는 채널 운영을 코칭합니다.
+      유행하는 AI 기능을 많이 보여주는 것보다, 참여자가 자기 업무에서 무엇을 바꿀 수 있는지를 먼저 묻습니다.
     </p>
 
     <div class="about-grid">
       <div class="profile-card">
-        <img src="logo.png?v=3" alt="BCC 로고" style="width: 180px; height: auto; margin: 0 auto 20px; display: block;" />
-        <div class="profile-name">오예림</div>
-        <div class="profile-role">대표 컨설턴트 · BCC</div>
-        <div class="profile-bio">
-          비즈니스 커리어 컨설팅 전문가로서<br />
-          1:1 맞춤형 컨설팅을 통해 수많은 분들의<br />
-          커리어 전환과 채널 성장을 함께해왔습니다.
+        <div class="profile-index">BCC PRINCIPLE</div>
+        <img class="profile-photo" src="assets/profile-oh-yerim.jpeg" alt="현장에서 교육을 진행하는 오예림 강사" />
+        <div>
+          <div class="profile-quote">직접 만들고 검증한 것만 가르칩니다.</div>
+          <div class="profile-name">오예림</div>
+          <div class="profile-role">비즈니스커리어컨설팅 BCC 대표</div>
+          <p class="profile-caption">현장에서 직접 만들고 운영한 경험을 강의로 전합니다.</p>
         </div>
       </div>
 
       <div class="credentials">
         <div class="credential-item">
-          <div class="credential-icon">🎯</div>
+          <div class="credential-icon">01</div>
           <div class="credential-text">
-            <strong>1:1 맞춤형 컨설팅</strong>
-            <span>개인의 강점과 시장 데이터를 결합한 커리어 로드맵 설계</span>
+            <strong>현장부터 이해합니다</strong>
+            <span>교육 대상, 업무 환경, 보안 조건과 원하는 결과를 먼저 확인합니다.</span>
           </div>
         </div>
         <div class="credential-item">
-          <div class="credential-icon">📊</div>
+          <div class="credential-icon">02</div>
           <div class="credential-text">
-            <strong>채널 분석 · 콘텐츠 전략</strong>
-            <span>유튜브 알고리즘과 키워드 데이터 기반 채널 컨설팅</span>
+            <strong>결과물로 설계합니다</strong>
+            <span>기능 나열 대신 보고서, 콘텐츠, 자동화 흐름처럼 손에 남는 결과를 만듭니다.</span>
           </div>
         </div>
         <div class="credential-item">
-          <div class="credential-icon">💼</div>
+          <div class="credential-icon">03</div>
           <div class="credential-text">
-            <strong>비즈니스 브랜딩</strong>
-            <span>1인 브랜드 구축부터 수익화 모델 설계까지</span>
+            <strong>직접 운영해봅니다</strong>
+            <span>AI 서비스와 콘텐츠 자동화를 실제로 만들고 운영하며 생긴 기준을 공유합니다.</span>
           </div>
         </div>
         <div class="credential-item">
-          <div class="credential-icon">🎓</div>
+          <div class="credential-icon">04</div>
           <div class="credential-text">
-            <strong>강의 · 교육</strong>
-            <span>기업·기관 대상 커리어 및 콘텐츠 강의 다수 진행</span>
+            <strong>다음 행동까지 연결합니다</strong>
+            <span>수업이나 상담이 끝난 뒤 혼자서 이어갈 수 있는 실행 순서를 남깁니다.</span>
           </div>
         </div>
       </div>
@@ -1009,59 +1656,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- SERVICES -->
 <section id="services">
   <div class="section-inner">
-    <div class="section-label">SERVICES</div>
-    <h2 class="section-title">BCC가 제공하는 서비스</h2>
+    <div class="section-label">STATION 06 · 서비스</div>
+    <h2 class="section-title">배우고, 설계하고,<br>실제로 굴러가게</h2>
     <p class="section-desc">
-      막연한 조언이 아닌, 실행 가능한 솔루션을 제공합니다.
+      BCC의 서비스는 세 갈래지만 목적은 하나입니다. AI가 내 일의 속도와 품질을 실제로 바꾸게 만드는 것.
     </p>
 
     <div class="services-grid">
       <div class="service-card">
-        <div class="service-icon">🚀</div>
-        <div class="service-title">커리어 컨설팅</div>
-        <div class="service-desc">
-          이직, 전직, 창업 — 당신의 다음 스텝을 1:1로 설계합니다.
-          시장 데이터와 직무 분석을 기반으로 한 맞춤형 로드맵.
-        </div>
+        <div class="service-number">SERVICE 01</div>
+        <div class="service-icon">교육</div>
+        <div class="service-title">기업·기관 AI 교육</div>
+        <div class="service-desc">참여자와 기관의 목표에 맞춰 현업 결과물 중심의 실습 교육을 설계합니다.</div>
+        <ul class="service-points"><li>생성형 AI 업무 활용</li><li>창업·취업·콘텐츠 실습</li><li>기관 맞춤 교안과 결과물</li></ul>
+        <a class="service-link" href="#reviews">실제 강의 후기 보기 →</a>
       </div>
       <div class="service-card">
-        <div class="service-icon">🎬</div>
-        <div class="service-title">유튜브 채널 컨설팅</div>
-        <div class="service-desc">
-          채널 컨셉, 키워드 전략, 썸네일·제목 최적화까지.
-          데이터 기반으로 채널 성장을 가속화합니다.
-        </div>
+        <div class="service-number">SERVICE 02</div>
+        <div class="service-icon">설계</div>
+        <div class="service-title">비즈니스·커리어 컨설팅</div>
+        <div class="service-desc">막연한 고민을 시장 데이터와 현재 자원에 맞는 다음 행동으로 바꿉니다.</div>
+        <ul class="service-points"><li>커리어·창업 로드맵</li><li>채널·콘텐츠 전략</li><li>1인 비즈니스 실행 설계</li></ul>
+        <a class="service-link" href="#itschool">실전 온라인 강의 보기 →</a>
       </div>
       <div class="service-card">
-        <div class="service-icon">🔍</div>
-        <div class="service-title">채널 분석 리포트</div>
-        <div class="service-desc">
-          내 채널과 경쟁 채널을 비교 분석하고,
-          개선 포인트를 명확히 짚어드립니다.
-        </div>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">✨</div>
-        <div class="service-title">1인 브랜딩</div>
-        <div class="service-desc">
-          나만의 강점을 발견하고, 시장에서 통하는
-          개인 브랜드로 포지셔닝합니다.
-        </div>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">💡</div>
-        <div class="service-title">비즈니스 코칭</div>
-        <div class="service-desc">
-          수익화 모델, 가격 전략, 고객 확보까지.
-          1인 비즈니스의 실전 운영 노하우를 전달합니다.
-        </div>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">🎤</div>
-        <div class="service-title">기업 강의 · 워크숍</div>
-        <div class="service-desc">
-          기업, 기관, 단체 대상 맞춤형 커리어·콘텐츠 강의를
-          기획하고 진행합니다.
+        <div class="service-number">SERVICE 03</div>
+        <div class="service-icon">실행</div>
+        <div class="service-title">AI 솔루션·도구</div>
+        <div class="service-desc">반복되는 업무와 질문을 누구나 사용할 수 있는 도구와 서비스 흐름으로 만듭니다.</div>
+        <ul class="service-points"><li>업무 자동화 프로토타입</li><li>AI 분석·상담 도구</li><li>콘텐츠 운영 시스템</li></ul>
+        <div class="service-actions">
+          <a class="service-link" href="#tools">무료 잇툴즈 보기 →</a>
+          <a class="service-link" href="#osmu-system">OSMU 공장 보기 →</a>
         </div>
       </div>
     </div>
@@ -1069,13 +1695,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- ITTOOLS HUB -->
-<span id="ittools" aria-hidden="true" style="display:block; position:relative; top:-72px;"></span>
 <section class="tools" id="tools">
+  <span id="ittools" aria-hidden="true"></span>
   <div class="section-inner">
-    <div class="section-label">ITTOOLS</div>
-    <h2 class="section-title">잇툴즈</h2>
+    <div class="section-label">STATION 02 · 바로 쓰는 도구</div>
+    <h2 class="section-title">설명보다 먼저,<br>한번 써보세요</h2>
     <p class="section-desc">
-      AI 시대 콘텐츠·마케팅 분석 도구 모음
+      BCC가 직접 만들어 운영하는 분석 도구와 AI 서비스를 무료로 경험할 수 있습니다.
     </p>
 
     <div class="tools-grid">
@@ -1098,7 +1724,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="tool-arrow">바로 가기 →</div>
       </a>
 
-      <!-- 2. 무료챗봇 (GPTs 라이브러리) -->
+      <!-- 2. 정부지원사업 도우미 -->
+      <a
+        class="tool-card is-active"
+        data-tool="govplan"
+        data-tool-name="정부지원사업 도우미"
+        style="--platform-color: #2563EB; --platform-color-soft: rgba(37,99,235,0.14);"
+        href="https://ddakfit.bccconsulting.kr"
+        target="_blank"
+        rel="noopener"
+      >
+        <span class="tool-badge tool-badge-active">Active</span>
+        <div class="tool-icon" aria-hidden="true">📋</div>
+        <div class="tool-name">정부지원사업 도우미</div>
+        <div class="tool-desc">나에게 맞는 지원사업 추천 + 사업계획서 작성</div>
+        <div class="tool-arrow">바로 가기 →</div>
+      </a>
+
+      <!-- 3. 무료챗봇 (GPTs 라이브러리) -->
       <a
         class="tool-card is-active"
         data-tool="free-chatbot"
@@ -1182,13 +1825,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- ITSCHOOL HUB (강의) -->
-<span id="itschool" aria-hidden="true" style="display:block; position:relative; top:-72px;"></span>
-<section>
+<!-- BCC 전용 OSMU 콘텐츠 공장 -->
+<section class="osmu-section" id="osmu">
   <div class="section-inner">
-    <div class="section-label">ITSCHOOL</div>
-    <h2 class="section-title">잇스쿨</h2>
-    <p class="section-desc">실전 과정과 무료 실습자료 — 필요한 방식으로 바로 시작</p>
+    <div class="section-label">STATION 03 · 콘텐츠 공장</div>
+    <h2 class="section-title">비즈니스커리어컨설팅에서는<br>이렇게 콘텐츠공장을 운영합니다</h2>
+    <div class="osmu-slot" id="osmu-showcase-slot"></div>
+  </div>
+</section>
+
+<!-- ITSCHOOL HUB (강의) -->
+<section class="itschool-section" id="itschool">
+  <div class="section-inner">
+    <div class="section-label">STATION 05 · 개인 과정</div>
+    <h2 class="section-title">혼자서도 이어갈 수 있는<br>실전 온라인 강의</h2>
+    <p class="section-desc">기능을 구경하는 강의가 아니라, 내 콘텐츠와 업무 결과물을 직접 완성하는 과정입니다.</p>
+
+    <div class="itschool-portfolio">
+      <div class="itschool-portfolio-copy">
+        <small>오예림 강사 강의 포트폴리오</small>
+        <strong>AI 강의 증명 포트폴리오</strong>
+        <span>기관·날짜·AI 활용 주제·수업 결과와 후기를 노션에서 한눈에 확인하세요.</span>
+      </div>
+      <a class="itschool-portfolio-link" href="https://repeated-grill-0a3.notion.site/AI-3b86536264068102bce5f9b405623939" target="_blank" rel="noopener noreferrer">노션 포트폴리오 보기 ↗</a>
+    </div>
 
     <!-- ════════════════════════════════════════════════════════════════
          ⚠️ 강의 카드는 정적(static)입니다. 가격은 "두 곳"을 손으로 맞춰야 함:
@@ -1246,7 +1906,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="tool-icon" aria-hidden="true">✦</div>
         <div class="tool-name">Claude 101 무료 실습자료실</div>
         <div class="tool-desc">읽고 따라 하며 오늘 한 가지 업무를 끝내는 Claude 실습 18개.</div>
-        <div class="course-series-status">1 / 18 공개 — 자료 순차 추가</div>
+        <div class="course-series-status">18 / 18 전체 공개</div>
         <div class="tool-arrow">실습자료 보기 →</div>
       </a>
 
@@ -1269,9 +1929,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- LECTURE REVIEWS: 메인 페이지 연속 스크롤 -->
 <section class="onepage-board" id="reviews">
   <div class="section-inner">
-    <div class="section-label">LECTURE REVIEWS</div>
-    <h2 class="section-title">강의 후기</h2>
-    <p class="section-desc">센터와 강의 일정을 선택해 실제 교육 후기를 한 페이지에서 확인하세요.</p>
+    <div class="section-label">STATION 04 · 강의 후기</div>
+    <h2 class="section-title">좋았다는 말보다,<br>어떻게 달라졌는지</h2>
+    <p class="section-desc">기관명만 나열하지 않고, 실제 강의일·강의안·교육생 후기를 하나의 기록으로 보여드립니다.</p>
     <div class="onepage-frame-wrap">
       <iframe class="onepage-frame" data-embed="reviews" src="reviews.html?embed=1" title="BCC 강의 후기 게시판" loading="lazy"></iframe>
     </div>
@@ -1282,10 +1942,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section id="contact">
   <div class="section-inner">
     <div class="contact-card">
-      <h3>지금 1:1 컨설팅 상담받기</h3>
+      <h3>문의하기</h3>
       <p>
-        카카오톡 채널로 편하게 문의하세요.<br />
-        영업일 기준 24시간 이내 답변드립니다.
+        필요한 교육이나 해결하고 싶은 업무를 알려주세요.<br />
+        영업일 기준 24시간 이내에 가능한 방향을 답변드립니다.
       </p>
       <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn btn-kakao" data-kakao="contact">
         <span class="kakao-icon">K</span>
@@ -1488,25 +2148,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- AI 프로젝트 연구소 -->
 <section class="explog" id="explog">
   <div class="section-inner">
-    <div class="section-label">AI PROJECT LAB</div>
-    <h2 class="section-title">AI 프로젝트 연구소</h2>
-    <p class="section-desc">
-      현장에서 발견한 문제를 AI 교육, 자동화 도구, 콘텐츠 시스템으로 바꾼 과정을 기록합니다.
-    </p>
-
-    <div class="lab-intro">
-      <div class="lab-statement">
-        <strong>도구를 소개하는 데서 멈추지 않고,<br>실제로 작동하는 결과물까지 만듭니다.</strong>
-        <p>완성품만 전시하지 않습니다. 문제를 정의한 기준, 도구를 선택한 이유, 막힌 지점과 개선 과정까지 공개해 기획력과 실행력을 함께 증명합니다.</p>
-      </div>
-      <div class="lab-method">
-        <div class="lab-method-title">PROJECT METHOD</div>
-        <div class="lab-flow">문제 발견 → 가설 → 설계 → 제작 → 검증 → 개선</div>
-        <p>모든 프로젝트를 같은 흐름으로 기록해 결과와 판단 과정을 한눈에 볼 수 있게 구성했습니다.</p>
-      </div>
-    </div>
+    <div class="section-label">STATION 07 · 프로젝트 사례</div>
+    <h2 class="section-title">직접 만들고 운영한<br>프로젝트</h2>
 
     <div class="explog-grid">
+      <article class="explog-card osmu-showcase" id="osmu-system">
+        <div class="project-status"><span class="explog-date">완료 · 실제 운영 중</span><span class="project-category">INTERNAL OSMU SYSTEM</span></div>
+        <h3 class="project-title">하나의 원재료를 세 채널의 콘텐츠로 바꾸는 BCC OSMU 공장</h3>
+        <p class="project-summary">강의·연구 자료를 한 번 정리한 뒤 각 채널의 문법에 맞게 재가공합니다. 소개용 시안이 아니라, 오예림 강사가 BCC 콘텐츠 업무에 실제 사용하는 관리자 전용 시스템입니다.</p>
+        <div class="osmu-owner"><span aria-hidden="true">🔐</span> 공장장 오예림 · 내부 운영 전용</div>
+        <div class="osmu-factory-grid" aria-label="BCC OSMU 내부 공장 3종">
+          <div class="osmu-factory" style="--factory-color:#2563EB;">
+            <div class="osmu-factory-icon" aria-hidden="true">📖</div>
+            <strong>블로그 공장</strong>
+            <span>정보성 칼럼 자동 생성<br>SEO 구조 + 보관함</span>
+          </div>
+          <div class="osmu-factory" style="--factory-color:#FF3B30;">
+            <div class="osmu-factory-icon" aria-hidden="true">🗂</div>
+            <strong>카드뉴스 공장</strong>
+            <span>인스타그램 카드뉴스<br>채널형 콘텐츠 자동 생성</span>
+          </div>
+          <div class="osmu-factory" style="--factory-color:#00B86B;">
+            <div class="osmu-factory-icon" aria-hidden="true">✍️</div>
+            <strong>스레드 공장</strong>
+            <span>스레드 글 자동 생성<br>8가지 포맷 + 보관함</span>
+          </div>
+        </div>
+        <div class="osmu-private-note"><span aria-hidden="true">●</span> 홈페이지에는 운영 구조만 공개하며, 실제 공장 조작은 관리자 인증을 받은 오예림 강사만 가능합니다.</div>
+        <a class="explog-link" href="projects.html#osmu-factory">OSMU 시스템 사례 보기 →</a>
+      </article>
       <article class="explog-card featured">
         <div class="project-status"><span class="explog-date">완료 · 운영 중</span><span class="project-category">WEB · DATA</span></div>
         <h3 class="project-title">315개 강의 후기를 탐색 가능한 포트폴리오로</h3>
@@ -1515,9 +2185,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a class="explog-link" href="projects.html#review-board">사례 자세히 보기 →</a>
       </article>
       <article class="explog-card">
-        <div class="project-status"><span class="explog-date">완료 · 운영 중</span><span class="project-category">AI SERVICE</span></div>
-        <h3 class="project-title">딱지원핏: 정부지원사업 찾기부터 준비 진단까지</h3>
-        <p class="project-summary">예비창업자의 막막한 질문을 공고 추천, 신청 준비 진단, 사업계획서 첫 번째 버전으로 연결하는 AI 서비스를 운영합니다.</p>
+        <div class="project-status"><span class="explog-date">개선 중</span><span class="project-category">AI SERVICE</span></div>
+        <h3 class="project-title">정부지원사업 도우미: 상담을 서비스 흐름으로</h3>
+        <p class="project-summary">예비창업자의 막막한 질문을 공고 추천, 자가진단, 사업계획서 초안으로 연결하는 AI 서비스 퍼널을 설계했습니다.</p>
         <div class="project-proof"><span>대화형 진단</span><span>리드 수집</span><span>비용 최적화</span></div>
         <a class="explog-link" href="projects.html#support-assistant">사례 자세히 보기 →</a>
       </article>
@@ -1528,23 +2198,45 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="project-proof"><span>100% 실습</span><span>4종 결과물</span><span>현업 적용</span></div>
         <a class="explog-link" href="projects.html#education-design">사례 자세히 보기 →</a>
       </article>
-      <article class="explog-card">
-        <div class="project-status"><span class="explog-date">제작 중</span><span class="project-category">AUTOMATION</span></div>
-        <h3 class="project-title">하나의 원재료를 여러 채널로 바꾸는 OSMU 공장</h3>
-        <p class="project-summary">강의와 긴 글을 분석해 블로그·스레드·카드뉴스로 재조립하는 콘텐츠 생산 시스템을 기획했습니다.</p>
-        <div class="project-proof"><span>포맷 규칙화</span><span>재사용</span><span>콘텐츠 자동화</span></div>
-        <a class="explog-link" href="projects.html#osmu-factory">사례 자세히 보기 →</a>
-      </article>
     </div>
     <div class="lab-more"><a class="btn btn-primary" href="projects.html">프로젝트 전체 보기</a></div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="section-inner process-layout">
+    <div class="process-intro">
+      <div class="section-label">STATION 09 · 진행 방식</div>
+      <h2 class="section-title">문의부터 실행까지,<br>길을 잃지 않도록</h2>
+      <p class="section-desc">정해진 상품을 밀어 넣지 않습니다. 상황과 목표를 확인하고 필요한 범위만 제안합니다.</p>
+    </div>
+    <ol class="process-list">
+      <li class="process-step">
+        <div class="process-num">01</div>
+        <div class="process-copy"><h3>문의·상황 확인</h3><p>대상, 인원, 일정, 현재 문제와 원하는 결과를 간단히 확인합니다.</p></div>
+      </li>
+      <li class="process-step">
+        <div class="process-num">02</div>
+        <div class="process-copy"><h3>범위와 담당 방식 제안</h3><p>강의, 컨설팅, 도구 제작 중 어떤 방식이 적합한지 범위와 준비사항을 안내합니다.</p></div>
+      </li>
+      <li class="process-step">
+        <div class="process-num">03</div>
+        <div class="process-copy"><h3>맞춤 설계·사전 준비</h3><p>현장 자료와 참여자 수준을 반영해 사례, 실습, 결과물의 난이도를 조정합니다.</p></div>
+      </li>
+      <li class="process-step">
+        <div class="process-num">04</div>
+        <div class="process-copy"><h3>실행·다음 행동 전달</h3><p>교육이나 프로젝트를 진행하고, 이후에도 혼자 이어갈 수 있는 실행 순서를 남깁니다.</p></div>
+      </li>
+    </ol>
   </div>
 </section>
 
 <!-- FAQ -->
 <section class="faq" id="faq">
   <div class="section-inner faq-wrap">
-    <div class="section-label">FAQ</div>
-    <h2 class="section-title">강의 전, 많이 물어보시는 내용</h2>
+    <div class="section-label">STATION 08 · FAQ</div>
+    <h2 class="section-title">결정하기 전에<br>많이 묻는 질문</h2>
     <p class="section-desc">기업·기관 교육을 준비할 때 필요한 내용만 간단히 정리했습니다.</p>
     <div class="faq-list">
       <details class="faq-item">
@@ -1576,6 +2268,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+</main>
+
+<script>
+/* Keep keyboard and screen-reader traversal in the same order as the visual journey. */
+(function () {
+  var journey = document.getElementById('journey-content');
+  if (!journey) return;
+  var osmuShowcase = journey.querySelector('#explog .osmu-showcase');
+  var osmuSlot = journey.querySelector('#osmu-showcase-slot');
+  if (osmuShowcase && osmuSlot) osmuSlot.appendChild(osmuShowcase);
+  [
+    '.quick-paths', '#about', '#tools', '#osmu', '#reviews', '#itschool',
+    '#services', '#explog', '#faq', '#process', '#contact', '#account'
+  ].forEach(function (selector) {
+    var station = journey.querySelector(selector);
+    if (station) journey.appendChild(station);
+  });
+})();
+</script>
+
 <!-- FOOTER -->
 <footer>
   <div class="brand">
@@ -1589,7 +2301,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#about">소개</a>
     <a href="#services">서비스</a>
     <a href="#tools" data-nav="ittools-footer">잇툴즈</a>
-    <a href="https://ddakfit.bccconsulting.kr/?utm_source=bcc_homepage&amp;utm_medium=footer&amp;utm_campaign=brand_hub">딱지원핏</a>
     <a href="#reviews">강의 후기</a>
     <a href="#explog">AI 프로젝트 연구소</a>
     <a href="#faq">FAQ</a>
@@ -1783,6 +2494,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
   });
 })();
+</script>
+
+<script>
+  // 고정 높이 iframe과 flex 순서가 적용된 뒤에도 해시 링크가 정확한 섹션을 가리키게 보정합니다.
+  (function () {
+    function alignHashTarget() {
+      if (!window.location.hash) return;
+      var target;
+      try { target = document.querySelector(window.location.hash); } catch (e) { return; }
+      if (!target) return;
+      var root = document.documentElement;
+      var previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      root.style.scrollBehavior = previousBehavior;
+    }
+    window.addEventListener('load', function () {
+      window.requestAnimationFrame(alignHashTarget);
+      window.setTimeout(alignHashTarget, 350);
+    });
+    window.addEventListener('hashchange', function () {
+      window.requestAnimationFrame(alignHashTarget);
+    });
+  })();
 </script>
 
 <!-- 헤더 로그인 상태 반영 (2026-07-09)
