@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     return res.redirect(302, '/api/threads-review?status=oauth_denied');
   }
   try {
-    const tokenUrl = new URL('https://graph.threads.net/oauth/access_token');
+    const tokenUrl = new URL('https://graph.threads.com/oauth/access_token');
     const body = new URLSearchParams({
       client_id: config.appId,
       client_secret: config.appSecret,
@@ -40,8 +40,13 @@ export default async function handler(req, res) {
     const response = await fetch(tokenUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
     const tokenData = await response.json().catch(() => ({}));
     if (!response.ok || !tokenData.access_token) throw new Error(tokenData?.error_message || 'OAuth 토큰 교환 실패');
-    const permissions = await threadsFetch('/me/permissions', { token: tokenData.access_token });
-    const session = sealSession({ token: tokenData.access_token, permissions: permissions.data || [], createdAt: Date.now() }, config.sessionSecret);
+    const tokenDebug = await threadsFetch('/debug_token', {
+      token: tokenData.access_token,
+      params: { input_token: tokenData.access_token },
+    });
+    if (!tokenDebug?.data?.is_valid) throw new Error('OAuth 토큰 검증 실패');
+    const permissions = (tokenDebug.data.scopes || []).map((permission) => ({ permission, status: 'granted' }));
+    const session = sealSession({ token: tokenData.access_token, permissions, createdAt: Date.now() }, config.sessionSecret);
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Set-Cookie', [
       `threads_review_session=${session}; HttpOnly; Secure; SameSite=Lax; Path=/api/threads-review; Max-Age=3600`,
