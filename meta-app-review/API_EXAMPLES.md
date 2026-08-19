@@ -51,3 +51,29 @@ Authorization: Bearer <REDACTED>
 ```
 
 앱의 브라우저 응답에는 위 공개 결과 필드와 안전하게 정리한 오류만 표시됩니다. 액세스 토큰, 앱 시크릿, OAuth code는 표시하지 않습니다.
+
+
+## 4. 계정 연결 해제·데이터 삭제 콜백
+
+Meta가 전송한 `signed_request`는 Threads 앱 시크릿으로 HMAC-SHA256 검증한 뒤 처리합니다. 심사용 데모는 검색 결과를 저장하지 않으므로 연결 해제는 성공 응답만 반환하며, 삭제 요청은 확인 코드와 상태 URL을 반환합니다.
+
+```http
+POST https://<VERCEL_DOMAIN>/api/threads-oauth-callback?action=deauthorize
+Content-Type: application/x-www-form-urlencoded
+
+signed_request=<META_SIGNED_REQUEST>
+```
+
+```http
+POST https://<VERCEL_DOMAIN>/api/threads-oauth-callback?action=delete
+Content-Type: application/x-www-form-urlencoded
+
+signed_request=<META_SIGNED_REQUEST>
+```
+
+```json
+{
+  "url": "https://<VERCEL_DOMAIN>/api/threads-review?deletion=<CONFIRMATION_CODE>",
+  "confirmation_code": "<CONFIRMATION_CODE>"
+}
+```
