@@ -1,8 +1,25 @@
-import { parseCookies, reviewConfig, sealSession, threadsFetch, verifyState } from '../../../lib/threads-review.js';
+import { deletionConfirmation, parseCookies, parseSignedRequest, reviewConfig, sealSession, threadsFetch, verifyState } from '../../../lib/threads-review.js';
+
+function signedRequestFrom(req) {
+  if (typeof req.body === 'string') return new URLSearchParams(req.body).get('signed_request') || '';
+  if (Buffer.isBuffer(req.body)) return new URLSearchParams(req.body.toString()).get('signed_request') || '';
+  return String(req.body?.signed_request || '');
+}
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'GET 요청만 허용됩니다.' });
   const config = reviewConfig();
+  const action = String(req.query?.action || '');
+  if (req.method === 'POST' && (action === 'deauthorize' || action === 'delete')) {
+    const payload = parseSignedRequest(signedRequestFrom(req), config.appSecret);
+    if (!payload?.user_id) return res.status(400).json({ error: '유효하지 않은 signed_request입니다.' });
+    res.setHeader('Cache-Control', 'no-store');
+    if (action === 'deauthorize') return res.status(200).json({ success: true });
+    const code = deletionConfirmation(payload.user_id, config.appSecret);
+    const statusUrl = new URL('/api/threads-review', config.redirectUri);
+    statusUrl.searchParams.set('deletion', code);
+    return res.status(200).json({ url: statusUrl.toString(), confirmation_code: code });
+  }
+  if (req.method !== 'GET') return res.status(405).json({ error: '허용되지 않은 요청입니다.' });
   const cookies = parseCookies(req.headers.cookie);
   const state = String(req.query?.state || '');
   if (!verifyState(state, config.sessionSecret) || state !== cookies.threads_review_state) {
