@@ -1,4 +1,4 @@
-import { deletionConfirmation, parseCookies, parseSignedRequest, reviewConfig, sealSession, threadsFetch, verifyState } from '../../../lib/threads-review.js';
+import { REVIEW_SCOPES, deletionConfirmation, parseCookies, parseSignedRequest, reviewConfig, sealSession, threadsFetch, verifyState } from '../../../lib/threads-review.js';
 
 function signedRequestFrom(req) {
   if (typeof req.body === 'string') return new URLSearchParams(req.body).get('signed_request') || '';
@@ -45,7 +45,9 @@ export default async function handler(req, res) {
       params: { input_token: tokenData.access_token },
     });
     if (!tokenDebug?.data?.is_valid) throw new Error('OAuth 토큰 검증 실패');
-    const permissions = (tokenDebug.data.scopes || []).map((permission) => ({ permission, status: 'granted' }));
+    const grantedScopes = new Set(tokenDebug.data.scopes || []);
+    const permissions = REVIEW_SCOPES.filter((permission) => grantedScopes.has(permission))
+      .map((permission) => ({ permission, status: 'granted' }));
     const session = sealSession({ token: tokenData.access_token, permissions, createdAt: Date.now() }, config.sessionSecret);
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Set-Cookie', [
