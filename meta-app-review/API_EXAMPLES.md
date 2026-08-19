@@ -5,7 +5,7 @@
 ## 1. OAuth 승인
 
 ```http
-GET https://threads.net/oauth/authorize
+GET https://threads.com/oauth/authorize
   ?client_id=<APP_ID>
   &redirect_uri=https%3A%2F%2F<VERCEL_DOMAIN>%2Fapi%2Fthreads-oauth-callback
   &scope=threads_basic%2Cthreads_keyword_search
@@ -16,7 +16,7 @@ GET https://threads.net/oauth/authorize
 ## 2. 권한 확인
 
 ```http
-GET https://graph.threads.net/v1.0/me/permissions
+GET https://graph.threads.com/v1.0/debug_token?input_token=<REDACTED>
 Authorization: Bearer <REDACTED>
 ```
 
@@ -32,7 +32,7 @@ Authorization: Bearer <REDACTED>
 ## 3. 키워드 검색
 
 ```http
-GET https://graph.threads.net/v1.0/keyword_search?q=AI&search_type=TOP&limit=10&fields=id,username,text,timestamp,permalink
+GET https://graph.threads.com/v1.0/keyword_search?q=AI&search_type=TOP&limit=10&fields=id,username,text,timestamp,permalink
 Authorization: Bearer <REDACTED>
 ```
 
