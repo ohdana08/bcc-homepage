@@ -14,10 +14,11 @@
 
 ## 제출 전 체크리스트
 
-1. Vercel 환경변수를 Production에 등록합니다.
+1. Vercel 환경변수를 실제 심사에 사용할 환경에 등록합니다.
 2. `THREADS_REVIEW_REDIRECT_URI`와 Meta 앱의 Valid OAuth Redirect URI가 완전히 같은지 확인합니다.
-3. Meta 앱에 테스트 사용자 또는 검수 가능한 계정을 구성합니다.
-4. 데모 URL에서 OAuth → 권한 표시 → 검색 성공을 직접 확인합니다.
-5. `TEST_STEPS.md`를 검수 단계 설명란에 붙여넣고 `SCREEN_RECORDING_SCRIPT.md`대로 녹화합니다.
+3. Meta Threads 설정에 연결 해제 콜백 `?action=deauthorize`와 데이터 삭제 콜백 `?action=delete`를 등록합니다.
+4. Meta 앱에 테스트 사용자 또는 검수 가능한 계정을 구성합니다.
+5. 데모 URL에서 OAuth → 권한 표시 → 검색 성공을 직접 확인합니다.
+6. `TEST_STEPS.md`를 검수 단계 설명란에 붙여넣고 `SCREEN_RECORDING_SCRIPT.md`대로 녹화합니다.
 
 자세한 요청·응답은 `API_EXAMPLES.md`, 환경 설정은 `VERCEL_ENV.md`를 참고합니다.
