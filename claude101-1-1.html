@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude 첫날, 내 업무 하나를 끝내는 15분 실습 | Claude 101</title>
+  <meta name="description" content="정리되지 않은 회의 메모를 Claude로 담당자별 업무 실행 목록으로 바꾸는 무료 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-1-1.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude 첫날, 내 업무 하나를 끝내는 15분 실습">
+  <meta property="og:description" content="회의 메모를 실행 목록으로 바꾸며 Claude의 기본 사용 흐름을 익힙니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-1-1.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지">
+        <img src="logo.png?v=3" alt="BCC 로고">
+        <div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div>
+      </a>
+      <nav class="header-nav" aria-label="실습자료 메뉴">
+        <a href="claude101.html">전체 실습</a>
+        <a class="home-link" href="index.html#itschool">잇스쿨</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>1-1</span></nav>
+
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 1 · 15분 실습</span>
+      <h1>Claude 첫날,<br>내 업무 하나를 끝내기</h1>
+      <p>정리되지 않은 회의 메모를 다음 회의 전에 사용할 수 있는 업무 실행 목록으로 바꿉니다. 기능을 외우기보다 요청하고, 수정하고, 검토하는 기본 흐름을 익혀보세요.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 실행 목록</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong>
+        <a href="#result">완성할 것</a>
+        <a href="#prepare">실습 전 준비</a>
+        <a href="#concept">핵심 개념</a>
+        <a href="#practice">단계별 실습</a>
+        <a href="#prompt">복사 프롬프트</a>
+        <a href="#review">결과 검수</a>
+        <a href="#mission">내 업무 미션</a>
+        <a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>업무 실행 목록</strong><p>해야 할 일, 담당자, 기한, 아직 확인해야 할 내용을 한눈에 볼 수 있는 표를 만듭니다.</p></div>
+          <p style="margin-top:16px">회의가 끝난 뒤 메모를 정리하거나, 메신저에 흩어진 요청을 목록으로 만들거나, 문서 초안을 쓰기 전에 빠진 정보를 찾을 때 사용할 수 있습니다.</p>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>Claude 웹 또는 앱에서 새 대화를 엽니다.</li><li>아래의 연습용 회의 메모를 사용합니다.</li><li>실제 고객명, 연락처, 계약내용, 비밀번호 같은 민감정보는 입력하지 않습니다.</li></ol>
+          <div class="sample-note"><pre>8월 12일 뉴스레터 발송 예정
+초안 담당은 이수진, 8월 8일까지
+대표 이미지는 아직 결정하지 못함
+박도현이 이미지 후보를 확인하기로 함
+메일 제목 후보 3개 필요
+고객 명단이 최신 버전인지 확인 필요
+발송 전 팀장 승인 필요</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <p>Claude에게 일을 맡길 때는 네 가지를 함께 적습니다.</p>
+          <div class="formula">업무 + 참고자료 + 결과 형식 + 검증 기준</div>
+          <ul><li><strong>업무</strong> · 무엇을 해달라는 것인지 씁니다.</li><li><strong>참고자료</strong> · Claude가 근거로 사용할 내용을 제공합니다.</li><li><strong>결과 형식</strong> · 표, 목록, 초안처럼 원하는 모양을 지정합니다.</li><li><strong>검증 기준</strong> · 없는 정보는 추측하지 않도록 하고 원문과 대조합니다.</li></ul>
+          <p style="margin-top:18px">처음부터 긴 프롬프트를 완성하려고 하지 마세요. 짧게 시작하고 결과를 보면서 조건을 추가하는 편이 쉽습니다.</p>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 짧은 요청으로 시작합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-short">프롬프트 복사</button><pre id="prompt-short">아래 회의 메모를 업무 실행 목록으로 정리해주세요.</pre></div>
+          <p style="margin-top:14px">첫 결과에서 담당자가 빠진 일, 기한이 없는 일, 결정된 일과 미정인 일이 구분됐는지 확인합니다.</p>
+
+          <h3>2단계 · 원하는 결과 형식을 추가합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-detail">프롬프트 복사</button><pre id="prompt-detail">다음 회의 전에 담당자별 할 일을 확인하려고 합니다.
+
+표의 열을 업무, 담당자, 기한, 확정 여부로 구성해주세요.
+메모에 없는 정보는 추측하지 말고 '확인 필요'라고 적어주세요.
+표 아래에는 추가로 확인할 질문 3개를 적어주세요.</pre></div>
+
+          <h3>3단계 · 원문과 대조합니다</h3>
+          <ol><li>날짜와 이름이 원문과 같은지 확인합니다.</li><li>원문에 없는 담당자나 기한이 추가되지 않았는지 확인합니다.</li><li>미정인 대표 이미지가 확정된 것처럼 적히지 않았는지 확인합니다.</li><li>추가 질문이 실제로 부족한 정보를 묻는지 확인합니다.</li></ol>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-template">프롬프트 복사</button><pre id="prompt-template">아래 [자료 종류]를 [사용 목적]에 맞게 정리해주세요.
+
+[자료 붙여넣기]
+
+결과 형식:
+- [원하는 표 또는 목록 구조]
+- [길이 또는 문체]
+
+검증 규칙:
+- 자료에 없는 정보는 추측하지 말고 '확인 필요'라고 표시합니다.
+- 날짜, 숫자, 이름은 원문과 대조할 수 있게 그대로 표시합니다.
+- 마지막에 사람이 추가로 확인할 질문 3개를 적습니다.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-1-1-checks">
+            <label class="check-item"><input type="checkbox"><span>원문에 있던 할 일이 빠지지 않았다.</span></label>
+            <label class="check-item"><input type="checkbox"><span>담당자와 기한을 임의로 만들지 않았다.</span></label>
+            <label class="check-item"><input type="checkbox"><span>확정된 내용과 확인할 내용이 구분됐다.</span></label>
+            <label class="check-item"><input type="checkbox"><span>원문과 대조하기 쉬운 형식으로 정리됐다.</span></label>
+            <label class="check-item"><input type="checkbox"><span>결과물을 내가 다시 읽고 수정했다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>최근에 작성한 메모 중 민감정보가 없는 자료 하나를 고릅니다.</li><li>이름과 고객정보를 가상의 값으로 바꿉니다.</li><li>프롬프트의 자료 종류, 사용 목적, 결과 형식을 내 업무에 맞게 바꿉니다.</li><li>결과를 원문과 비교한 뒤 다음에도 쓸 프롬프트만 따로 저장합니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>답변이 너무 일반적입니다</h3><p>업무 목적과 결과 형식을 한 문장씩 추가합니다. 비슷한 예시가 있다면 개인정보를 제거한 뒤 구조만 보여주세요.</p>
+          <h3>없는 담당자나 기한을 만들었습니다</h3><p>자료에 없는 정보는 `확인 필요`라고 표시하도록 요청하고 최종 결과를 원문과 대조합니다.</p>
+          <h3>대화가 길어지면서 답이 엉뚱해졌습니다</h3><p>필요한 자료와 확정된 조건만 정리해 새 대화를 시작합니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 회사 자료를 넣기 전에</strong><p>개인정보, 비밀번호, 금융정보, 건강정보, 계약상 비밀, 공개되지 않은 내부 문서는 그대로 입력하지 않습니다. 조직의 보안정책과 허용 범위를 먼저 확인하세요.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links">
+            <a href="https://support.claude.com/en/articles/8114491-get-started-with-claude" target="_blank" rel="noopener">Claude 시작하기 · Anthropic 공식 도움말 →</a>
+            <a href="https://support.claude.com/en/articles/8525154-claude-is-providing-incorrect-or-misleading-responses-what-s-going-on" target="_blank" rel="noopener">부정확하거나 오해를 부르는 답변 · Anthropic 공식 도움말 →</a>
+            <a href="https://support.claude.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-my-chats-with-claude-who-can-view-my-conversations" target="_blank" rel="noopener">민감정보 입력 시 주의사항 · Anthropic 공식 도움말 →</a>
+          </div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><span></span><a class="lesson-next" href="claude101-1-2.html"><span>다음 실습</span><strong>1-2 · 좋은 답보다 좋은 작업 지시 만들기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용 한도에 덜 막히는 작업법 | Claude 101</title>
+  <meta name="description" content="긴 대화를 목적별로 나누고 필요한 맥락만 새 대화에 옮기는 대화 분할 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-3-2.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="사용 한도에 덜 막히는 작업법">
+  <meta property="og:description" content="긴 대화를 목적별로 나누고 필요한 맥락만 새 대화에 옮기는 대화 분할 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-3-2.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>3-2</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 3 · 20분 실습</span>
+      <h1>사용 한도에 덜 막히는 작업법</h1>
+      <p>사용량 제한과 대화 길이 제한은 같은 문제가 아닙니다. 긴 대화를 무조건 이어가기보다 조사·구성·작성·검수를 나누고 단계 사이에 짧은 인수인계 메모를 만듭니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 대화 분할 계획</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>대화 분할 계획</strong><p>긴 대화를 목적별로 나누고 필요한 맥락만 새 대화에 옮기는 대화 분할 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>한 대화에서 계속 수정하다 답이 흔들릴 때</li><li>큰 파일을 여러 번 다시 읽히고 있을 때</li><li>깊은 사고가 필요 없는 작업에도 비용이 커질 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>길게 이어진 업무 대화 하나를 떠올립니다.</li><li>업무를 ‘월간 보고서 작성’으로 가정합니다.</li><li>실제 사용량과 제공 모델은 계정 화면에서 직접 확인합니다.</li></ol>
+          <div class="sample-note"><pre>현재 대화에 섞인 일
+- 지난달 자료 요약
+- 이번 달 숫자 비교
+- 보고서 목차 설계
+- 본문 초안
+- 문장 다듬기
+- 이메일 작성</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">업무 분리 + 필요한 자료만 + 단계별 완료 기준 + 인수인계 메모</div>
+          <ul><li><strong>사용량과 길이</strong> · 기능, 모델, 대화 길이와 복잡도는 사용량에 영향을 줄 수 있습니다.</li><li><strong>단계별 대화</strong> · 조사와 문장 다듬기처럼 목적이 다른 작업을 분리합니다.</li><li><strong>인수인계 메모</strong> · 확정된 사실과 다음 단계에 필요한 내용만 짧게 옮깁니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 한 대화에 섞인 일을 분리합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-2-step-1">프롬프트 복사</button><pre id="prompt-3-2-step-1">다음 업무 목록을 목적이 같은 작업끼리 묶어주세요.
+각 묶음이 별도 대화가 되어야 하는 이유와 필요한 입력자료, 완료 기준을 표로 정리해주세요.</pre></div>
+          <h3>2단계 · 단계 사이 인수인계 메모를 만듭니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-2-step-2">프롬프트 복사</button><pre id="prompt-3-2-step-2">현재 단계가 끝났다고 가정하고 새 대화에 붙여넣을 인수인계 메모를 작성해주세요.
+목표, 확정된 사실, 승인된 결정, 남은 질문, 다음 단계, 참고할 자료만 포함하고 500자 이내로 작성해주세요.</pre></div>
+          <h3>3단계 · 긴 대화를 닫을 조건을 정합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-2-step-3">프롬프트 복사</button><pre id="prompt-3-2-step-3">이 작업에서 새 대화를 시작해야 할 신호를 5개 이내로 정해주세요.
+목적 변경, 답변 반복, 자료 범위 변경, 단계 완료, 오류 누적을 기준으로 사람이 판단할 수 있게 작성해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-2-template">프롬프트 복사</button><pre id="prompt-3-2-template">다음 큰 업무를 여러 대화로 나눠주세요.
+
+업무: [큰 업무]
+세부 작업: [목록]
+사용할 자료: [파일 또는 정보]
+최종 결과: [결과물]
+
+각 대화의 목적, 필요한 입력, 완료 기준, 다음 대화로 넘길 인수인계 메모 형식을 제안해주세요. 목적이 다른 작업은 분리하고, 모든 원본을 매번 다시 넣지 않도록 해주세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-3-2-checks">
+            <label class="check-item"><input type="checkbox"><span>목적이 다른 작업이 별도 대화로 분리됐다.</span></label><label class="check-item"><input type="checkbox"><span>각 단계에 필요한 자료만 정해졌다.</span></label><label class="check-item"><input type="checkbox"><span>단계별 완료 기준이 있다.</span></label><label class="check-item"><input type="checkbox"><span>인수인계 메모가 500자 이내다.</span></label><label class="check-item"><input type="checkbox"><span>최신 계정 화면에서 실제 사용량 조건을 확인했다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>현재 긴 대화 하나를 고릅니다.</li><li>이미 끝난 단계와 남은 단계를 나눕니다.</li><li>인수인계 메모를 만든 뒤 새 대화에서 다음 단계만 진행합니다.</li><li>결과 품질과 수정 횟수가 달라졌는지 비교합니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>메시지를 무조건 짧게만 줄입니다</h3><p>길이보다 목적과 자료 범위를 분명히 하는 것이 먼저입니다.</p><h3>새 대화에서 중요한 결정이 사라집니다</h3><p>확정된 사실·승인된 결정·남은 질문을 인수인계 메모에 남깁니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>사용량 절약을 위해 원본을 외부 서비스로 옮기거나 보안 수준이 낮은 계정에 넣지 않습니다. 계정별 한도와 기능은 변경될 수 있으므로 공식 도움말과 현재 화면을 확인하세요.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/11647753-how-do-usage-and-length-limits-work" target="_blank" rel="noopener">사용량과 대화 길이 제한 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/9517075-what-are-projects" target="_blank" rel="noopener">Claude Projects 안내 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-3-1.html"><span>이전 실습</span><strong>← 3-1 · Claude가 내 말투를 참고하게 만들기</strong></a><a class="lesson-next" href="claude101-3-3.html"><span>다음 실습</span><strong>3-3 · 한 번의 프롬프트보다 작업 흐름 만들기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

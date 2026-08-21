@@ -35,6 +35,10 @@
   .enr{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
   .enr .t{font-weight:600;display:flex;justify-content:space-between}
   .enr .m{font-size:12px;color:var(--text-mute);margin-top:4px}
+  .enr-actions{display:flex;justify-content:flex-end;margin-top:12px}
+  .course-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-size:13px;font-weight:800;background:var(--gold);color:#1a1407;border-radius:9px;padding:9px 13px}
+  .course-link:hover{background:var(--gold-3)}
+  .course-link:focus-visible{outline:2px solid var(--gold-3);outline-offset:3px}
   .badge{font-size:11px;color:var(--gold-3);border:1px solid rgba(201,168,76,.4);border-radius:999px;padding:1px 8px;margin-left:6px}
   .empty{color:var(--text-dim);font-size:14px;text-align:center;padding:18px 0}
   .adminlink{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:15px;background:var(--gold);color:#1a1407;border-radius:10px;padding:13px;margin-bottom:16px}
@@ -93,6 +97,9 @@
   const won = (n) => Number(n).toLocaleString('ko-KR') + '원';
   const fmtDate = (s) => { try { return new Date(s).toLocaleDateString('ko-KR'); } catch(e){ return s; } };
   const setStatus = (m,k) => { loginStatus.textContent = m; loginStatus.className = 'status' + (k?' '+k:''); };
+  const COURSE_LINKS = {
+    'claude101-pro': 'course-claude101-pro.html',
+  };
 
   async function getClient(){
     if (supabase) return supabase;
@@ -118,11 +125,15 @@
     const box = document.getElementById('enrList');
     if (!list.length) { box.innerHTML = '<div class="empty">아직 수강 이력이 없습니다.</div>'; }
     else {
-      box.innerHTML = list.map(e =>
-        '<div class="enr"><div class="t"><span>' + (e.products?.name || e.product_id) +
-        (e.is_recourse ? '<span class="badge">재수강</span>' : '') + '</span><span>' + won(e.paid_amount) + '</span></div>' +
-        '<div class="m">결제일 ' + fmtDate(e.paid_at) + '</div></div>'
-      ).join('');
+      box.innerHTML = list.map(e => {
+        const courseLink = COURSE_LINKS[e.product_id];
+        const action = courseLink
+          ? '<div class="enr-actions"><a class="course-link" href="' + courseLink + '">수강실 바로가기 →</a></div>'
+          : '';
+        return '<div class="enr"><div class="t"><span>' + (e.products?.name || e.product_id) +
+          (e.is_recourse ? '<span class="badge">재수강</span>' : '') + '</span><span>' + won(e.paid_amount) + '</span></div>' +
+          '<div class="m">결제일 ' + fmtDate(e.paid_at) + '</div>' + action + '</div>';
+      }).join('');
     }
     loginView.style.display = 'none';
     dashView.style.display = 'block';

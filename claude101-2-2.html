@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>팀에서 함께 쓰기 전 정할 것 | Claude 101</title>
+  <meta name="description" content="팀원 모두가 같은 기준으로 시험할 수 있도록 작은 AI 파일럿 운영 규칙을 만드는 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-2-2.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="팀에서 함께 쓰기 전 정할 것">
+  <meta property="og:description" content="팀원 모두가 같은 기준으로 시험할 수 있도록 작은 AI 파일럿 운영 규칙을 만드는 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-2-2.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>2-2</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 2 · 25분 실습</span>
+      <h1>팀에서 함께 쓰기 전 정할 것</h1>
+      <p>도구를 전사에 소개하기 전에 하나의 반복 업무와 작은 참여자 그룹을 정합니다. 무엇을 넣어도 되는지, 누가 결과를 검수하는지, 성공을 어떻게 판단할지를 한 장으로 합의합니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 팀 AI 파일럿 운영 규칙</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>팀 AI 파일럿 운영 규칙</strong><p>팀원 모두가 같은 기준으로 시험할 수 있도록 작은 AI 파일럿 운영 규칙을 만드는 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>팀에 Claude 도입을 제안하기 전</li><li>구성원마다 사용 방식이 달라 혼란스러울 때</li><li>보안과 품질 기준을 먼저 합의해야 할 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>가상의 3인 운영팀을 기준으로 실습합니다.</li><li>시험 업무로 ‘주간 고객문의 요약’을 선택합니다.</li><li>실제 사내 정책과 계정 제공 여부는 담당 부서에 별도로 확인합니다.</li></ol>
+          <div class="sample-note"><pre>파일럿 기간: 2주
+참여자: 운영 담당 2명, 검수 담당 1명
+시험 업무: 익명화된 고객문의 10건 요약
+금지 자료: 이름, 연락처, 결제정보, 계약정보
+최종 승인: 운영팀장</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">작은 업무 + 승인된 자료 + 공통 절차 + 검수 책임 + 회고</div>
+          <ul><li><strong>작은 파일럿</strong> · 도구 전체를 평가하기보다 반복 빈도가 높은 업무 하나를 시험합니다.</li><li><strong>공통 입력</strong> · 같은 샘플과 같은 기준을 사용해야 결과를 비교할 수 있습니다.</li><li><strong>책임 분리</strong> · AI 사용자는 초안을 만들고 지정된 사람이 정확성과 공개 여부를 승인합니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 파일럿 범위를 좁힙니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-2-step-1">프롬프트 복사</button><pre id="prompt-2-2-step-1">3인 운영팀이 2주 동안 Claude를 시험하려고 합니다.
+후보 업무는 고객문의 요약, 회의록 정리, 공지 초안입니다.
+민감정보 위험, 반복 빈도, 결과 검수 난이도를 기준으로 첫 업무 하나를 추천하고 이유를 표로 정리해주세요.</pre></div>
+          <h3>2단계 · 역할과 중지 조건을 정합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-2-step-2">프롬프트 복사</button><pre id="prompt-2-2-step-2">선택한 업무의 역할을 사용자, 검수자, 승인자로 나눠주세요.
+AI가 추측한 사실, 개인정보 발견, 원문과 숫자 불일치가 있으면 작업을 중지하도록 규칙을 작성해주세요.</pre></div>
+          <h3>3단계 · 한 장 운영 규칙으로 묶습니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-2-step-3">프롬프트 복사</button><pre id="prompt-2-2-step-3">파일럿 운영 규칙을 목적, 기간, 참여자, 허용 업무, 금지 자료, 공통 작업 절차, 검수 항목, 성공 기준, 회고 질문 순서로 한 장 분량으로 작성해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-2-template">프롬프트 복사</button><pre id="prompt-2-2-template">다음 팀 AI 파일럿의 운영 규칙을 작성해주세요.
+
+기간: [기간]
+참여자와 역할: [사용자/검수자/승인자]
+시험할 업무: [업무 하나]
+허용 자료: [승인된 자료]
+금지 자료: [민감정보와 내부자료]
+
+공통 절차, 결과 검수 기준, 작업 중지 조건, 성공 기준 3개, 종료 후 회고 질문 3개를 포함해주세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-2-2-checks">
+            <label class="check-item"><input type="checkbox"><span>시험 업무가 하나로 좁혀졌다.</span></label><label class="check-item"><input type="checkbox"><span>허용 자료와 금지 자료가 구분됐다.</span></label><label class="check-item"><input type="checkbox"><span>사용자·검수자·승인자가 정해졌다.</span></label><label class="check-item"><input type="checkbox"><span>오류 발생 시 중지 조건이 있다.</span></label><label class="check-item"><input type="checkbox"><span>속도뿐 아니라 정확성과 재작업도 측정한다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>내 팀에서 가장 반복적인 문서 업무를 하나 고릅니다.</li><li>실제 정책 담당자에게 허용 범위를 확인할 질문을 작성합니다.</li><li>가상 자료로 공통 테스트를 진행합니다.</li><li>전면 도입이 아니라 다음 실험 여부만 결정합니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>처음부터 전 업무에 적용하려고 합니다</h3><p>2주 동안 한 가지 업무만 시험해 비교 가능한 기록을 남깁니다.</p><h3>시간 절감만 성공 기준으로 둡니다</h3><p>정확성, 수정 횟수, 위험 발견 건수도 함께 봅니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>팀원의 개인 계정을 회사 업무에 사용하도록 전제하지 않습니다. 조직이 승인한 계정·도구·보관 정책을 확인한 뒤 허용된 범위에서만 실행하세요.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/9517075-what-are-projects" target="_blank" rel="noopener">Claude Projects 안내 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-my-chats-with-claude-who-can-view-my-conversations" target="_blank" rel="noopener">민감정보 입력 시 주의사항 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8525154-claude-is-providing-incorrect-or-misleading-responses-what-s-going-on" target="_blank" rel="noopener">부정확하거나 오해를 부르는 답변 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-2-1.html"><span>이전 실습</span><strong>← 2-1 · Claude Cowork로 반복 업무 설계하기</strong></a><a class="lesson-next" href="claude101-2-3.html"><span>다음 실습</span><strong>2-3 · Claude Design으로 시안 만들기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

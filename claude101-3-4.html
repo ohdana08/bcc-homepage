@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내가 하던 일을 재현하는 Skill 만들기 | Claude 101</title>
+  <meta name="description" content="내 판단 기준을 단계와 예외까지 포함한 업무 Skill 초안으로 구체화하는 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-3-4.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="내가 하던 일을 재현하는 Skill 만들기">
+  <meta property="og:description" content="내 판단 기준을 단계와 예외까지 포함한 업무 Skill 초안으로 구체화하는 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-3-4.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>3-4</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 3 · 30분 실습</span>
+      <h1>내가 하던 일을 재현하는 Skill 만들기</h1>
+      <p>2-6에서 Skill의 범위를 정했다면 이번에는 실제 업무 판단을 재현합니다. 잘된 사례와 실패 사례를 비교하고, 애매한 상황에서 질문하도록 만드는 실행 지침 초안을 완성합니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 업무 Skill 초안</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>업무 Skill 초안</strong><p>내 판단 기준을 단계와 예외까지 포함한 업무 Skill 초안으로 구체화하는 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>내가 검수하던 일을 팀원과 공유할 때</li><li>품질 기준이 사람 머릿속에만 있을 때</li><li>반복 업무의 예외 상황이 많을 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>업무로 ‘제안서 첫 페이지 검수’를 선택합니다.</li><li>좋은 예시와 아쉬운 예시의 특징을 각각 세 개 적습니다.</li><li>Skill 파일 업로드는 초안 검수 이후 선택적으로 진행합니다.</li></ol>
+          <div class="sample-note"><pre>좋은 결과
+- 고객 문제가 첫 문장에 보임
+- 제안 범위와 제외 범위가 구분됨
+- 다음 단계가 한 문장으로 명확함
+
+실패 결과
+- 회사 소개로 시작함
+- 근거 없는 효과를 약속함
+- 수정이 필요한데도 완성본처럼 표시함</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">전문가 판단 → 단계 → 예외 → 질문 → 평가 사례</div>
+          <ul><li><strong>판단의 언어화</strong> · “좋아 보인다”를 고객 문제, 근거, 다음 행동처럼 관찰 가능한 기준으로 바꿉니다.</li><li><strong>예외 처리</strong> · 필수 입력이 없거나 사실이 충돌하면 질문하고 멈추게 합니다.</li><li><strong>평가 사례</strong> · 좋은 결과와 실패 결과를 함께 제시해 기준의 차이를 확인합니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 전문가의 판단을 질문으로 꺼냅니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-4-step-1">프롬프트 복사</button><pre id="prompt-3-4-step-1">제안서 첫 페이지를 검수하는 제 판단 방식을 Skill로 만들려고 합니다.
+좋은 예시와 실패 예시를 비교해 제가 중요하게 보는 기준, 허용 가능한 예외, 반드시 다시 물어야 할 상황을 한 번에 하나씩 질문해주세요.</pre></div>
+          <h3>2단계 · 실행 지침 초안을 만듭니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-4-step-2">프롬프트 복사</button><pre id="prompt-3-4-step-2">답변을 바탕으로 업무 Skill 초안을 작성해주세요.
+작업 시작 조건, 필수 입력 확인, 단계별 검수, 수정 원칙, 질문하고 멈출 조건, 출력 형식, 최종 사람 승인 순서로 구성해주세요.</pre></div>
+          <h3>3단계 · 경계 사례로 평가합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-4-step-3">프롬프트 복사</button><pre id="prompt-3-4-step-3">다음 세 상황으로 Skill 초안을 평가해주세요.
+1. 고객 문제가 명확하지만 수치 근거가 없음
+2. 모든 정보가 있지만 다음 행동이 두 개임
+3. 고객 자료에 개인정보가 포함됨
+기대 행동과 현재 지침의 부족한 점을 표로 보여주고 수정안을 제안해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-4-template">프롬프트 복사</button><pre id="prompt-3-4-template">다음 업무를 제가 하던 방식대로 재현하는 Skill 초안을 작성해주세요.
+
+업무: [업무]
+좋은 결과 특징: [특징]
+실패 결과 특징: [특징]
+제가 중요하게 보는 판단: [기준]
+
+작업 시작 조건, 필수 입력, 단계별 판단, 수정 원칙, 예외 처리, 질문하고 멈출 조건, 출력 형식, 최종 사람 승인을 포함해주세요. 정상 사례 1개와 경계 사례 2개로 평가까지 진행해주세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-3-4-checks">
+            <label class="check-item"><input type="checkbox"><span>전문가 판단이 관찰 가능한 기준으로 바뀌었다.</span></label><label class="check-item"><input type="checkbox"><span>필수 입력이 없을 때 질문한다.</span></label><label class="check-item"><input type="checkbox"><span>예외와 중지 조건이 있다.</span></label><label class="check-item"><input type="checkbox"><span>정상·경계·위험 사례를 시험했다.</span></label><label class="check-item"><input type="checkbox"><span>최종 승인 책임이 사람에게 남아 있다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>내가 자주 검수하는 결과물 하나를 고릅니다.</li><li>좋은 결과와 실패 결과를 비교합니다.</li><li>애매한 사례 두 개로 Skill을 시험합니다.</li><li>초안이 안정된 뒤에만 실제 Skill 파일화를 검토합니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>내 경험을 전부 넣으려 합니다</h3><p>한 결과물을 평가하는 데 실제로 쓰는 기준만 남깁니다.</p><h3>Skill이 자신 있게 잘못 처리합니다</h3><p>불확실하거나 민감한 상황에서는 질문하고 멈추는 규칙을 강화합니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>Skill이 사용자의 판단을 재현하더라도 법률·인사·계약·안전 결정을 대신하게 해서는 안 됩니다. 고위험 판단은 검토 자료만 만들고 승인 권한은 사람에게 둡니다.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/12512180-use-skills-in-claude" target="_blank" rel="noopener">Claude Skills 사용하기 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8525154-claude-is-providing-incorrect-or-misleading-responses-what-s-going-on" target="_blank" rel="noopener">부정확하거나 오해를 부르는 답변 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-my-chats-with-claude-who-can-view-my-conversations" target="_blank" rel="noopener">민감정보 입력 시 주의사항 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-3-3.html"><span>이전 실습</span><strong>← 3-3 · 한 번의 프롬프트보다 작업 흐름 만들기</strong></a><a class="lesson-next" href="claude101-3-5.html"><span>다음 실습</span><strong>3-5 · AI 티가 덜 나는 문장으로 고치기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

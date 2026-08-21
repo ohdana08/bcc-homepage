@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회사에서 개인 계정을 쓰기 전 확인할 것 | Claude 101</title>
+  <meta name="description" content="조직 정책, 계정 구분, 민감정보, 임시 대화의 한계를 확인하는 안전 사용 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-4-3.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="회사에서 개인 계정을 쓰기 전 확인할 것">
+  <meta property="og:description" content="조직 정책, 계정 구분, 민감정보, 임시 대화의 한계를 확인하는 안전 사용 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-4-3.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>4-3</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 4 · 20분 실습</span>
+      <h1>회사에서 개인 계정을 쓰기 전 확인할 것</h1>
+      <p>개인 AI 계정으로 회사 일을 할 수 있는지는 편의가 아니라 조직 정책과 계약, 데이터 종류가 결정합니다. 허용 여부가 불분명하면 입력하지 않고 공식 계정과 담당자를 먼저 확인합니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 안전 사용 체크리스트</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>안전 사용 체크리스트</strong><p>조직 정책, 계정 구분, 민감정보, 임시 대화의 한계를 확인하는 안전 사용 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>회사 자료를 개인 Claude에 넣으려 할 때</li><li>업무용 계정이 제공되지 않은 상황</li><li>Incognito Chat이면 안전하다고 오해하기 쉬울 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>실제 회사자료를 열거나 붙여넣지 않습니다.</li><li>아래 가상 업무 사례만 사용합니다.</li><li>조직의 AI·보안·개인정보 정책을 확인할 담당자를 떠올립니다.</li></ol>
+          <div class="sample-note"><pre>상황: 개인 Claude 계정으로 회의록을 요약하려 함
+회의록 내용: 고객 이름, 계약 금액, 출시 전 일정 포함
+회사 정책: 확인하지 않음
+업무용 AI 계정: 제공 여부 모름
+결론을 내리기 전 질문: 누가 허용하며 어떤 자료까지 가능한가?</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">조직 승인 → 승인된 계정 → 데이터 분류 → 최소화·비식별화 → 사람 검수</div>
+          <ul><li><strong>정책 우선</strong> · 개인 설정을 바꾸는 것보다 회사가 허용한 도구와 계정을 확인하는 것이 먼저입니다.</li><li><strong>임시 대화의 한계</strong> · Incognito Chat은 기록과 메모리 사용 방식이 다르지만 기밀정보 입력 허가를 뜻하지 않습니다.</li><li><strong>비식별화의 한계</strong> · 이름을 바꿔도 맥락과 숫자로 다시 알아볼 수 있다면 안전하지 않습니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 입력 전 멈춤 질문을 만듭니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-4-3-step-1">프롬프트 복사</button><pre id="prompt-4-3-step-1">회사 업무자료를 개인 AI 계정에 입력하기 전에 확인해야 할 질문을 작성해주세요.
+조직 승인, 계정 종류, 데이터 분류, 계약상 비밀, 개인정보, 보관, Connector 권한, 결과 공유를 포함하고 예/아니오로 답하게 해주세요.</pre></div>
+          <h3>2단계 · 가상 사례를 판단합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-4-3-step-2">프롬프트 복사</button><pre id="prompt-4-3-step-2">다음 사례를 안전 사용 체크리스트로 검토해주세요.
+개인 Claude 계정, 고객 이름과 계약 금액이 포함된 회의록, 회사 정책 미확인, Incognito Chat 사용 예정.
+진행/중지/담당자 확인으로 나누고, 기술 설정과 무관하게 입력하면 안 되는 이유를 설명해주세요.</pre></div>
+          <h3>3단계 · 안전한 대안을 찾습니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-4-3-step-3">프롬프트 복사</button><pre id="prompt-4-3-step-3">원문을 개인 AI에 입력하지 않고도 업무를 진행할 대안을 제안해주세요.
+회사 승인 계정 확인, 빈 템플릿 작성, 가상 데이터로 절차 시험, 내부 담당자 문의, 로컬 수작업을 우선순위대로 정리해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-4-3-template">프롬프트 복사</button><pre id="prompt-4-3-template">다음 업무자료를 AI에 입력하기 전 안전 여부를 검토해주세요. 실제 원문은 제공하지 않습니다.
+
+자료 종류: [회의록/계약서/고객목록 등]
+포함될 수 있는 정보: [정보 범주]
+사용 계정: [개인/회사 승인 계정]
+조직 정책 확인 여부: [확인/미확인]
+연결된 앱: [없음/목록]
+
+조직 승인, 데이터 분류, 개인정보, 계약상 비밀, 계정, 보관, Connector 권한, 외부 공유를 확인하고 진행/중지/담당자 확인으로 판단해주세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-4-3-checks">
+            <label class="check-item"><input type="checkbox"><span>조직 정책과 승인 담당자를 확인했다.</span></label><label class="check-item"><input type="checkbox"><span>개인 계정과 회사 승인 계정을 구분했다.</span></label><label class="check-item"><input type="checkbox"><span>원문을 붙여넣기 전에 데이터 종류를 분류했다.</span></label><label class="check-item"><input type="checkbox"><span>Incognito Chat을 입력 허가로 오해하지 않는다.</span></label><label class="check-item"><input type="checkbox"><span>불분명하면 입력하지 않고 담당자에게 확인한다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>회사 자료를 열지 않은 상태에서 정책 질문 목록을 만듭니다.</li><li>업무용 AI 계정과 승인 담당자를 확인합니다.</li><li>가상 데이터로 동일한 작업 절차를 시험합니다.</li><li>승인 범위를 문서로 확인하기 전 실제 자료를 입력하지 않습니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>이름만 가리면 안전하다고 생각합니다</h3><p>날짜·금액·직함·사건 조합으로 재식별될 가능성도 확인합니다.</p><h3>Incognito Chat이면 무엇이든 넣어도 된다고 생각합니다</h3><p>기록 방식과 조직의 입력 허가는 다른 문제입니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>Incognito Chat은 대화 기록과 메모리, 학습 사용 방식이 일반 대화와 다르지만 일정 기간 보관될 수 있습니다. 어떤 기술 설정도 회사의 보안정책과 계약상 의무를 대신하지 않습니다.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/12260368-use-incognito-chats" target="_blank" rel="noopener">Incognito Chat 사용하기 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-my-chats-with-claude-who-can-view-my-conversations" target="_blank" rel="noopener">민감정보 입력 시 주의사항 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities" target="_blank" rel="noopener">Claude Connectors 사용하기 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-4-2.html"><span>이전 실습</span><strong>← 4-2 · 비개발자를 위한 Claude Code 첫 작업</strong></a><a class="lesson-next" href="claude101.html"><span>학습 완료</span><strong>18개 전체 실습 보기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

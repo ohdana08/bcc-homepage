@@ -18,6 +18,7 @@ export default async function handler(req, res) {
     .from('enrollments')
     .select('id, product_id, paid_amount, is_recourse, order_id, paid_at, products(name)')
     .eq('user_id', user.id)
+    .eq('status', 'active')
     .order('paid_at', { ascending: false });
 
   if (error) return res.status(500).json({ error: '수강이력 조회에 실패했습니다.' });

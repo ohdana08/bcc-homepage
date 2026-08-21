@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Design으로 시안 만들기 | Claude 101</title>
+  <meta name="description" content="코드를 작성하기 전에 목적과 정보 구조가 담긴 시안 제작 브리프를 만들고 첫 화면을 검수하는 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-2-3.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude Design으로 시안 만들기">
+  <meta property="og:description" content="코드를 작성하기 전에 목적과 정보 구조가 담긴 시안 제작 브리프를 만들고 첫 화면을 검수하는 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-2-3.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>2-3</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 2 · 20분 실습</span>
+      <h1>Claude Design으로 시안 만들기</h1>
+      <p>Claude Design의 화면을 외우는 대신 좋은 시안을 만드는 입력을 준비합니다. 이번 실습에서는 행사 신청 페이지의 독자, 핵심 행동, 필수 정보, 디자인 제약을 한 장으로 정리합니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 시안 제작 브리프</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>시안 제작 브리프</strong><p>코드를 작성하기 전에 목적과 정보 구조가 담긴 시안 제작 브리프를 만들고 첫 화면을 검수하는 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>랜딩페이지나 안내페이지의 첫 시안이 필요할 때</li><li>디자이너나 개발자에게 아이디어를 설명할 때</li><li>브랜드 기준을 적용하기 전 정보 구조를 확인할 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>Claude Design 사용 가능 여부를 확인합니다.</li><li>가상의 ‘소상공인 AI 업무혁신 특강’을 실습 주제로 사용합니다.</li><li>실제 로고나 저작권이 있는 참고 이미지는 업로드하지 않습니다.</li></ol>
+          <div class="sample-note"><pre>행사명: 소상공인 AI 업무혁신 특강
+대상: 반복 문서업무를 줄이고 싶은 1인 사업자
+일시: 9월 25일 오후 2시
+핵심 행동: 무료 참가 신청
+필수 정보: 대상, 일정, 얻는 것 3가지, 신청 버튼
+제약: 모바일 우선, 과장 표현 금지</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">독자 + 핵심 행동 + 정보 우선순위 + 시각 제약 + 검수 질문</div>
+          <ul><li><strong>핵심 행동</strong> · 한 화면에서 사용자가 가장 먼저 해야 할 행동을 하나로 정합니다.</li><li><strong>정보 우선순위</strong> · 예쁜 화면보다 누가 무엇을 왜 신청해야 하는지가 먼저 읽혀야 합니다.</li><li><strong>검수 가능한 제약</strong> · 모바일, 대비, 버튼 문구, 필수 섹션처럼 확인할 수 있는 조건을 씁니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 시안 전에 브리프를 만듭니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-3-step-1">프롬프트 복사</button><pre id="prompt-2-3-step-1">아래 행사 정보를 바탕으로 아직 디자인하지 말고 시안 제작 브리프를 작성해주세요.
+독자, 해결하려는 문제, 핵심 행동, 정보 우선순위, 필수 섹션, 제외할 요소, 모바일 검수 기준을 포함해주세요.</pre></div>
+          <h3>2단계 · 첫 화면 구조를 정합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-3-step-2">프롬프트 복사</button><pre id="prompt-2-3-step-2">승인된 브리프를 기준으로 모바일 첫 화면의 구조를 텍스트 와이어프레임으로 보여주세요.
+각 영역의 목적과 들어갈 실제 문구를 적고, 신청 버튼은 하나만 사용해주세요.</pre></div>
+          <h3>3단계 · 시안을 비판적으로 검수합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-3-step-3">프롬프트 복사</button><pre id="prompt-2-3-step-3">이 시안을 처음 보는 예비 참가자의 관점에서 검수해주세요.
+3초 안에 대상·주제·다음 행동을 알 수 있는지, 정보 대비와 글자 크기 문제가 없는지 확인하고 수정 우선순위 3개만 제안해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-2-3-template">프롬프트 복사</button><pre id="prompt-2-3-template">다음 내용을 바탕으로 [페이지 종류] 시안 제작 브리프를 작성해주세요.
+
+독자: [누구]
+독자가 해결하려는 문제: [문제]
+핵심 행동: [버튼 하나]
+필수 정보: [정보]
+브랜드 기준: [색상/말투/참고자료]
+제약: [모바일/접근성/금지요소]
+
+먼저 브리프와 텍스트 와이어프레임만 보여주세요. 제가 승인한 뒤 시안을 만드세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-2-3-checks">
+            <label class="check-item"><input type="checkbox"><span>독자와 핵심 행동이 하나로 정해졌다.</span></label><label class="check-item"><input type="checkbox"><span>첫 화면에 반드시 필요한 정보만 남았다.</span></label><label class="check-item"><input type="checkbox"><span>실제 사용할 버튼 문구가 있다.</span></label><label class="check-item"><input type="checkbox"><span>모바일과 읽기 편의 기준이 포함됐다.</span></label><label class="check-item"><input type="checkbox"><span>참고 디자인을 그대로 복제하지 않았다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>내 서비스에서 설명이 어려운 페이지 하나를 고릅니다.</li><li>방문자가 해야 할 행동을 하나로 줄입니다.</li><li>브리프와 텍스트 와이어프레임을 먼저 검수합니다.</li><li>시안은 정보 구조가 승인된 뒤에만 생성합니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>시안이 그럴듯하지만 목적이 보이지 않습니다</h3><p>디자인 지시보다 독자와 핵심 행동을 브리프 첫 줄에 둡니다.</p><h3>다른 사이트와 너무 비슷합니다</h3><p>참고자료는 분위기가 아니라 구조적 이유를 설명하고 직접 복제를 금지합니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>공개되지 않은 브랜드 자산, 고객 데이터, 내부 화면을 그대로 업로드하지 않습니다. Claude Design은 베타 기능이므로 제공 화면과 가능 범위가 달라질 수 있습니다.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/14604416-get-started-with-claude-design" target="_blank" rel="noopener">Claude Design 시작하기 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-my-chats-with-claude-who-can-view-my-conversations" target="_blank" rel="noopener">민감정보 입력 시 주의사항 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-2-2.html"><span>이전 실습</span><strong>← 2-2 · 팀에서 함께 쓰기 전 정할 것</strong></a><a class="lesson-next" href="claude101-2-4.html"><span>다음 실습</span><strong>2-4 · Cowork와 Projects로 자료 묶기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

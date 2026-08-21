@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 티가 덜 나는 문장으로 고치기 | Claude 101</title>
+  <meta name="description" content="금지 단어 목록보다 실제 사실과 판단을 되살리는 문장 검수표를 만드는 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-3-5.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="AI 티가 덜 나는 문장으로 고치기">
+  <meta property="og:description" content="금지 단어 목록보다 실제 사실과 판단을 되살리는 문장 검수표를 만드는 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-3-5.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>3-5</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 3 · 20분 실습</span>
+      <h1>AI 티가 덜 나는 문장으로 고치기</h1>
+      <p>AI 같은 문장은 특정 단어 하나 때문만이 아닙니다. 주체가 없고, 근거가 없고, 모든 문장이 같은 길이이며, 그럴듯한 대비로 결론을 대신할 때 생깁니다. 문장을 사람답게 꾸미기보다 사실과 판단을 복원합니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 문장 검수표</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>문장 검수표</strong><p>금지 단어 목록보다 실제 사실과 판단을 되살리는 문장 검수표를 만드는 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>AI 초안이 매끈하지만 내 이야기 같지 않을 때</li><li>블로그와 안내문에서 추상어가 많을 때</li><li>조직의 문체 기준을 만들 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>아래 가상 소개문을 사용합니다.</li><li>누가 무엇을 실제로 했는지 표시할 준비를 합니다.</li><li>문장 스타일보다 사실 정확성을 먼저 검수합니다.</li></ol>
+          <div class="sample-note"><pre>우리는 단순한 교육을 넘어 진정한 변화를 만들어갑니다. 혁신적인 솔루션을 통해 고객의 가능성을 실현하며, 효율성과 성장을 동시에 달성합니다. 지금 바로 새로운 여정을 시작하세요.</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">주체 + 실제 행동 + 구체적인 근거 + 솔직한 판단 + 자연스러운 리듬</div>
+          <ul><li><strong>추상어 걷어내기</strong> · 혁신·성장·가능성 대신 누가 무엇을 했는지 씁니다.</li><li><strong>가짜 대비 지우기</strong> · “단순한 X가 아니라 Y”가 실제 차이를 설명하지 못하면 삭제합니다.</li><li><strong>리듬 바꾸기</strong> · 모든 문장을 같은 길이와 구조로 만들지 않습니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 문장의 빈칸을 찾습니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-5-step-1">프롬프트 복사</button><pre id="prompt-3-5-step-1">아래 소개문에서 주체, 실제 행동, 근거, 대상이 빠진 문장을 찾아주세요.
+추상어와 과장 표현에 표시하고, 내용을 새로 만들지 말고 작성자에게 물어볼 질문으로 바꿔주세요.</pre></div>
+          <h3>2단계 · 실제 정보를 넣어 다시 씁니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-5-step-2">프롬프트 복사</button><pre id="prompt-3-5-step-2">추가 정보는 다음과 같습니다.
+- 지난달 1인 사업자 12명이 참여
+- 참가자는 상담 메모를 실행 목록으로 바꿈
+- 교육 종료 후 각자 다음 날 할 일 3개를 정함
+이 사실만 사용해 180자 소개문을 작성해주세요. 과장된 변화나 성과는 약속하지 마세요.</pre></div>
+          <h3>3단계 · 문장 검수표를 만듭니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-5-step-3">프롬프트 복사</button><pre id="prompt-3-5-step-3">이번 수정 과정을 재사용할 문장 검수표로 정리해주세요.
+주체, 행동, 근거, 추상어, 과장, 가짜 대비, 문장 리듬, 독자의 다음 행동을 포함하고 예/아니오로 확인할 수 있게 해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-5-template">프롬프트 복사</button><pre id="prompt-3-5-template">아래 초안을 사람답게 꾸미는 것이 아니라 사실과 판단이 보이게 고쳐주세요.
+
+[초안]
+
+먼저 다음을 표시해주세요.
+- 주체와 실제 행동이 없는 문장
+- 근거 없는 성과와 과장
+- 뜻을 더하지 않는 추상어
+- 억지스러운 대조와 반복 구조
+- 확인이 필요한 사실
+
+질문에 답하기 전에는 내용을 새로 만들지 마세요. 확인된 사실만 사용해 수정본과 변경 이유를 보여주세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-3-5-checks">
+            <label class="check-item"><input type="checkbox"><span>누가 무엇을 했는지가 보인다.</span></label><label class="check-item"><input type="checkbox"><span>모든 숫자와 사례에 근거가 있다.</span></label><label class="check-item"><input type="checkbox"><span>과장된 성과를 약속하지 않는다.</span></label><label class="check-item"><input type="checkbox"><span>내용 없는 대비와 추상어를 줄였다.</span></label><label class="check-item"><input type="checkbox"><span>수정본을 소리 내어 읽고 내 표현으로 고쳤다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>최근 작성한 소개문 하나를 고릅니다.</li><li>추상어가 있는 문장에 실제 주체와 행동을 적습니다.</li><li>근거 없는 성과 문장을 삭제합니다.</li><li>검수표를 다음 글에도 적용하고 불필요한 항목을 다듬습니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>금지 단어를 지웠는데도 AI 같습니다</h3><p>단어보다 실제 장면·행동·판단이 빠졌는지 확인합니다.</p><h3>사람답게 하려다 사실을 꾸밉니다</h3><p>제공된 정보 밖의 경험과 감정을 만들지 못하게 제한합니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>다른 사람의 문체를 그대로 복제하거나 타인의 경험을 본인 이야기처럼 만들지 않습니다. 사실과 출처를 보존하고 최종 표현은 작성자가 직접 결정하세요.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features" target="_blank" rel="noopener">Claude 개인화 기능 이해하기 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8525154-claude-is-providing-incorrect-or-misleading-responses-what-s-going-on" target="_blank" rel="noopener">부정확하거나 오해를 부르는 답변 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-3-4.html"><span>이전 실습</span><strong>← 3-4 · 내가 하던 일을 재현하는 Skill 만들기</strong></a><a class="lesson-next" href="claude101-3-6.html"><span>다음 실습</span><strong>3-6 · Claude와 스프레드시트 작업하기 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>

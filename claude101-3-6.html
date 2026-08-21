@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude와 스프레드시트 작업하기 | Claude 101</title>
+  <meta name="description" content="데이터의 목적, 열 구조, 계산식, 가정을 먼저 적어 오류를 줄이는 분석 요청서 실습입니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bccconsulting.kr/claude101-3-6.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude와 스프레드시트 작업하기">
+  <meta property="og:description" content="데이터의 목적, 열 구조, 계산식, 가정을 먼저 적어 오류를 줄이는 분석 요청서 실습입니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/claude101-3-6.html">
+  <meta property="og:image" content="https://bccconsulting.kr/claude101-og.png">
+  <meta property="og:site_name" content="비즈니스커리어컨설팅 BCC">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="claude101.css?v=2">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a>
+      <nav class="header-nav" aria-label="실습자료 메뉴"><a href="claude101.html">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨</a></nav>
+    </div>
+  </header>
+
+  <main class="lesson-shell">
+    <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">홈</a><span>›</span><a href="claude101.html">Claude 101</a><span>›</span><span>3-6</span></nav>
+    <header class="lesson-hero">
+      <span class="eyebrow">LEVEL 3 · 25분 실습</span>
+      <h1>Claude와 스프레드시트 작업하기</h1>
+      <p>“이 파일 분석해줘”로 시작하지 않습니다. 데이터 사전, 계산 기준, 결측값 처리, 검산 방법, 결과 형식을 먼저 정합니다. 이번 실습은 파일 생성보다 숫자를 확인할 수 있는 분석 요청서를 만드는 데 집중합니다.</p>
+      <div class="hero-meta"><span class="meta-chip active">무료 · 상시 열람</span><span class="meta-chip">결과물 · 데이터 분석 요청서</span><span class="meta-chip">최종 확인 · 사람</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <aside class="toc" aria-label="실습 목차">
+        <strong>실습 목차</strong><a href="#result">완성할 것</a><a href="#prepare">실습 전 준비</a><a href="#concept">핵심 개념</a><a href="#practice">단계별 실습</a><a href="#prompt">복사 프롬프트</a><a href="#review">결과 검수</a><a href="#mission">내 업무 미션</a><a href="#safety">주의사항</a>
+      </aside>
+
+      <article class="lesson-content">
+        <section id="result">
+          <span class="section-number">01</span><h2>이번 실습에서 완성할 것</h2>
+          <div class="result-card"><strong>데이터 분석 요청서</strong><p>데이터의 목적, 열 구조, 계산식, 가정을 먼저 적어 오류를 줄이는 분석 요청서 실습입니다.</p></div>
+          <p style="margin-top:16px">이 결과물은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+          <ul><li>매출·문의·설문 데이터를 요약할 때</li><li>반복 보고용 표와 차트가 필요할 때</li><li>계산 기준이 사람마다 달라지는 것을 막을 때</li></ul>
+        </section>
+
+        <section id="prepare">
+          <span class="section-number">02</span><h2>실습 전 준비</h2>
+          <ol><li>아래 가상 CSV 구조를 사용합니다.</li><li>금액과 개인정보가 없는 연습 데이터로 진행합니다.</li><li>원본 파일은 수정하지 않고 복사본을 사용합니다.</li></ol>
+          <div class="sample-note"><pre>열 이름: order_date, channel, product, quantity, unit_price, refund
+행 수: 240행
+기간: 2026-07-01~2026-07-31
+매출 정의: quantity × unit_price
+환불 처리: refund가 Y인 행은 매출에서 제외
+목표: 채널별 순매출과 주문 수 비교</pre></div>
+        </section>
+
+        <section id="concept">
+          <span class="section-number">03</span><h2>핵심 개념</h2>
+          <div class="formula">분석 목적 + 데이터 사전 + 계산 정의 + 예외 처리 + 검산 + 출력 형식</div>
+          <ul><li><strong>데이터 사전</strong> · 각 열의 의미와 단위, 가능한 값을 먼저 설명합니다.</li><li><strong>계산 정의</strong> · 매출이나 전환율처럼 해석이 달라지는 지표의 수식을 적습니다.</li><li><strong>검산</strong> · 행 수, 합계, 제외 건수, 빈 값 수를 원본과 비교합니다.</li></ul>
+        </section>
+
+        <section id="practice">
+          <span class="section-number">04</span><h2>단계별 실습</h2>
+          <h3>1단계 · 분석 전에 질문을 받습니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-6-step-1">프롬프트 복사</button><pre id="prompt-3-6-step-1">다음 데이터 구조로 채널별 순매출과 주문 수를 분석하려고 합니다.
+바로 계산하지 말고 열 의미, 매출 정의, 환불, 결측값, 중복, 날짜 범위에 대해 확인할 질문을 최대 7개 해주세요.</pre></div>
+          <h3>2단계 · 분석 요청서를 작성합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-6-step-2">프롬프트 복사</button><pre id="prompt-3-6-step-2">답변을 바탕으로 분석 요청서를 작성해주세요.
+목적, 입력 데이터, 열 정의, 계산식, 제외 규칙, 결측값 처리, 출력 표, 차트, 검산 항목, 가정 목록을 포함해주세요.</pre></div>
+          <h3>3단계 · 실행 전 가정을 검사합니다</h3>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-6-step-3">프롬프트 복사</button><pre id="prompt-3-6-step-3">분석 요청서에서 결과를 크게 바꿀 수 있는 가정을 찾아주세요.
+각 가정에 확인 방법을 붙이고, 확인되지 않은 가정은 결과에 명시하도록 검수 규칙을 추가해주세요.</pre></div>
+        </section>
+
+        <section id="prompt">
+          <span class="section-number">05</span><h2>내 업무에 복사해서 쓰는 프롬프트</h2>
+          <div class="prompt-box"><button class="copy-button" type="button" data-copy-target="prompt-3-6-template">프롬프트 복사</button><pre id="prompt-3-6-template">다음 스프레드시트 분석을 실행하기 전에 분석 요청서를 작성해주세요.
+
+분석 목적: [목적]
+열 이름과 의미: [데이터 사전]
+지표 정의와 계산식: [계산]
+제외 규칙: [환불/취소/테스트 데이터]
+원하는 결과: [표/차트/설명]
+
+먼저 확인 질문을 하고, 결측값·중복·단위·날짜 범위·검산 방법·가정 목록을 포함한 요청서를 보여주세요. 승인 전에는 원본을 수정하지 마세요.</pre></div>
+        </section>
+
+        <section id="review">
+          <span class="section-number">06</span><h2>결과 검수 기준</h2>
+          <p>아래 항목을 직접 확인하면 실습이 완료됩니다.</p>
+          <div class="checklist" data-checklist="claude101-3-6-checks">
+            <label class="check-item"><input type="checkbox"><span>분석 질문이 한 문장으로 명확하다.</span></label><label class="check-item"><input type="checkbox"><span>열 이름·의미·단위가 정의됐다.</span></label><label class="check-item"><input type="checkbox"><span>핵심 지표의 계산식이 있다.</span></label><label class="check-item"><input type="checkbox"><span>결측값·중복·제외 규칙이 있다.</span></label><label class="check-item"><input type="checkbox"><span>원본과 비교할 검산 항목이 있다.</span></label>
+          </div>
+          <div class="local-note">체크 상태는 현재 사용 중인 기기에만 저장됩니다.</div>
+        </section>
+
+        <section id="mission">
+          <span class="section-number">07</span><h2>내 업무로 바꾸는 미션</h2>
+          <ol><li>민감정보가 없는 작은 표 하나를 고릅니다.</li><li>데이터 사전과 계산 정의를 적습니다.</li><li>분석 전에 가정 목록을 승인합니다.</li><li>결과 표의 합계와 행 수를 원본에서 다시 계산합니다.</li></ol>
+        </section>
+
+        <section id="safety">
+          <span class="section-number">08</span><h2>자주 생기는 오류와 주의사항</h2>
+          <h3>멋진 차트는 나오지만 숫자가 다릅니다</h3><p>차트 전에 제외 건수와 합계를 검산하고 계산식을 표시합니다.</p><h3>원본 파일이 변경됩니다</h3><p>복사본과 출력 전용 파일을 사용하고 원본 수정 금지를 요청서에 넣습니다.</p>
+          <div class="safety-box" style="margin-top:28px"><strong>실제 업무에 적용하기 전에</strong><p>주민번호, 계좌번호, 연락처, 건강정보가 포함된 파일은 연습에 사용하지 않습니다. 조직이 승인한 환경과 최소한의 열만 사용하고 결과도 동일한 보안 수준으로 관리하세요.</p></div>
+        </section>
+
+        <section id="sources">
+          <span class="section-number">09</span><h2>공식 참고자료</h2>
+          <div class="official-links"><a href="https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude" target="_blank" rel="noopener">Claude로 파일 만들고 편집하기 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8241126-upload-files-to-claude" target="_blank" rel="noopener">파일 업로드 안내 · Anthropic 공식 자료 →</a><a href="https://support.claude.com/en/articles/8525154-claude-is-providing-incorrect-or-misleading-responses-what-s-going-on" target="_blank" rel="noopener">부정확하거나 오해를 부르는 답변 · Anthropic 공식 자료 →</a></div>
+          <p style="margin-top:15px; font-size:12px; color:var(--muted)">최종 확인일 2026-08-05 · 기능과 정책은 변경될 수 있으므로 공식 문서를 함께 확인하세요.</p>
+        </section>
+
+        <nav class="lesson-navigation" aria-label="이전 및 다음 실습"><a class="lesson-prev" href="claude101-3-5.html"><span>이전 실습</span><strong>← 3-5 · AI 티가 덜 나는 문장으로 고치기</strong></a><a class="lesson-next" href="claude101-4-1.html"><span>다음 실습</span><strong>4-1 · 업무 앱과 연결하기 전 점검 →</strong></a></nav>
+      </article>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="footer-inner"><a href="claude101.html">← Claude 101 전체 실습</a><span>© 2026 BCC. All rights reserved.</span></div></footer>
+  <script src="claude101.js?v=2"></script>
+</body>
+</html>
