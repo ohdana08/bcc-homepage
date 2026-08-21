@@ -25,7 +25,10 @@ function setStatus(message, kind = '') {
 }
 
 function setBusy(busy) {
-  purchaseButtons.forEach((button) => { button.disabled = busy; });
+  purchaseButtons.forEach((element) => {
+    if ('disabled' in element) element.disabled = busy;
+    element.setAttribute('aria-disabled', busy ? 'true' : 'false');
+  });
 }
 
 async function getClient() {
@@ -123,7 +126,11 @@ async function beginCheckout() {
   }
 }
 
-purchaseButtons.forEach((button) => button.addEventListener('click', beginCheckout));
+purchaseButtons.forEach((element) => element.addEventListener('click', (event) => {
+  event.preventDefault();
+  if (element.getAttribute('aria-disabled') === 'true') return;
+  beginCheckout();
+}));
 document.getElementById('loginClose').addEventListener('click', closeLogin);
 loginDialog.addEventListener('click', (event) => { if (event.target === loginDialog) closeLogin(); });
 

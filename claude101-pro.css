@@ -63,10 +63,15 @@ button, input { font: inherit; }
 .result-number, .lesson-number { color: var(--coral); font-size: 12px; font-weight: 900; }
 .result-card h3, .lesson-tile h3 { margin: 19px 0 9px; font-size: 21px; line-height: 1.35; letter-spacing: -.025em; }
 .result-card p, .lesson-tile p { margin: 0; color: var(--muted); font-size: 13px; }
-.result-file { display: inline-block; margin-top: 22px; padding: 5px 8px; border-radius: 7px; background: rgba(135,201,168,.09); color: var(--green); font-size: 11px; font-weight: 800; }
+.result-file { display: inline-block; margin-top: 22px; padding: 7px 10px; border: 1px solid rgba(135,201,168,.24); border-radius: 7px; background: rgba(135,201,168,.09); color: var(--green); cursor: pointer; font-size: 11px; font-weight: 800; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+.result-file:hover, .result-file:focus-visible { border-color: var(--green); background: rgba(135,201,168,.18); transform: translateY(-1px); }
 .curriculum-grid { grid-template-columns: repeat(2, 1fr); }
 .lesson-tile { min-height: 190px; }
 .lesson-tile strong { display: block; margin-top: 21px; color: var(--soft); font-size: 12px; }
+.lesson-action { position: relative; color: inherit; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+.lesson-action:hover, .lesson-action:focus-visible { border-color: var(--line-strong); background: var(--surface-2); transform: translateY(-2px); outline: none; }
+.lesson-cta { display: block; margin-top: 12px; color: var(--coral); font-size: 12px; font-weight: 850; }
+.lesson-action[aria-disabled="true"], .result-file:disabled { cursor: wait; opacity: .58; transform: none; }
 .difference { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid var(--line); border-radius: 19px; }
 .difference > div { padding: 34px; }
 .difference > div + div { border-left: 1px solid var(--line); background: rgba(235,157,110,.065); }
