@@ -14,6 +14,8 @@ test("면접톡은 AI 취업 실험실 안에서만 안내한다", () => {
   assert.doesNotMatch(tools, /data-tool-id="interview-talk"/);
   assert.match(home, /data-tool-name="AI 취업 실험실"/);
   assert.match(tools, /data-tool-name="AI 취업 실험실"/);
+  assert.match(home, /data-tool="job-lab"[\s\S]+?href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/employment\?/);
+  assert.match(tools, /data-tool-id="job-lab"[\s\S]+?href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/employment\?/);
   assert.match(jobLab, /AI 취업 실험실/);
   assert.doesNotMatch(jobLab, /AI 취업 실습실/);
 
@@ -33,9 +35,9 @@ test("AI 취업 실험실 첫 화면에서 네 단계를 버튼으로 바로 보
   assert.equal((hero.match(/aria-disabled="true"/g) ?? []).length, 2);
   assert.doesNotMatch(jobLab, /전체 과정 선택하기/);
 
-  assert.match(hero, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\//);
+  assert.match(hero, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/employment\/metacognition/);
   assert.match(hero, /href="https:\/\/bcc-interview-talk\.vercel\.app\//);
 
-  assert.match(jobLab, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/.+>20분 실습하기 →<\/a>/);
+  assert.match(jobLab, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/employment\/metacognition.+>20분 실습하기 →<\/a>/);
   assert.match(jobLab, /href="https:\/\/bcc-interview-talk\.vercel\.app\/.+>면접 연습하기 →<\/a>/);
 });
