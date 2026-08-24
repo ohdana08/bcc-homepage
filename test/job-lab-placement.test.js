@@ -21,11 +21,20 @@ test("면접톡은 AI 취업 실험실 안에서만 안내한다", () => {
   assert.match(jobLab, /https:\/\/bcc-interview-talk\.vercel\.app\//);
 });
 
-test("AI 취업 실험실은 전체 과정을 먼저 보여준 뒤 단계를 선택하게 한다", () => {
-  assert.match(jobLab, /href="#program">전체 과정 선택하기 →<\/a>/);
-  assert.match(jobLab, /전체 과정을 보고,<br>지금 할 단계를 선택하세요/);
-  assert.doesNotMatch(jobLab, />20분 메타인지 실습 시작 →<\/a>/);
-  assert.doesNotMatch(jobLab, />무료 실습 시작 →<\/a>/);
+test("AI 취업 실험실 첫 화면에서 네 단계를 버튼으로 바로 보여준다", () => {
+  const hero = jobLab.match(/<section class="hero">([\s\S]+?)<\/section>/)?.[1] ?? "";
+
+  assert.match(hero, /id="stage-selector"/);
+  assert.match(hero, /원하는 단계를 바로 선택하세요/);
+  assert.match(hero, /<strong>메타인지<\/strong>/);
+  assert.match(hero, /<strong>직무·기업분석<\/strong>/);
+  assert.match(hero, /<strong>자기소개서<\/strong>/);
+  assert.match(hero, /<strong>면접톡<\/strong>/);
+  assert.equal((hero.match(/aria-disabled="true"/g) ?? []).length, 2);
+  assert.doesNotMatch(jobLab, /전체 과정 선택하기/);
+
+  assert.match(hero, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\//);
+  assert.match(hero, /href="https:\/\/bcc-interview-talk\.vercel\.app\//);
 
   assert.match(jobLab, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/.+>20분 실습하기 →<\/a>/);
   assert.match(jobLab, /href="https:\/\/bcc-interview-talk\.vercel\.app\/.+>면접 연습하기 →<\/a>/);

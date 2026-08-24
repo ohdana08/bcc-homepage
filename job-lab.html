@@ -104,12 +104,12 @@
     .nav-links a { text-decoration: none; }
     .nav-links a:hover { color: var(--coral); }
 
-    .hero { padding: 94px 0 74px; }
+    .hero { padding: 66px 0 62px; }
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
-      align-items: end;
-      gap: 64px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(390px, .95fr);
+      align-items: center;
+      gap: 54px;
     }
     .eyebrow {
       display: inline-flex;
@@ -126,12 +126,11 @@
     h1 {
       max-width: 760px;
       margin-bottom: 24px;
-      font-size: clamp(42px, 6.2vw, 76px);
+      font-size: clamp(42px, 5.2vw, 66px);
       line-height: 1.08;
       letter-spacing: -.055em;
     }
-    .hero-lead { max-width: 690px; margin-bottom: 30px; color: var(--ink-soft); font-size: 19px; }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero-lead { max-width: 690px; margin-bottom: 0; color: var(--ink-soft); font-size: 18px; }
     .button {
       min-height: 50px;
       display: inline-flex;
@@ -149,17 +148,64 @@
     .button:hover { transform: translateY(-2px); }
     .button-primary { background: var(--teal); color: var(--white); }
     .button-secondary { background: transparent; color: var(--teal); }
-    .hero-note {
+    .quick-stage-panel {
       border: 1px solid var(--line);
       border-top: 6px solid var(--coral);
       background: var(--white);
-      padding: 28px;
+      padding: 25px;
       border-radius: 4px 4px 18px 18px;
       box-shadow: 12px 12px 0 var(--paper-deep);
     }
-    .hero-note-label { color: var(--coral); font-size: 12px; font-weight: 900; letter-spacing: .1em; }
-    .hero-note strong { display: block; margin: 8px 0 12px; font-size: 24px; line-height: 1.35; }
-    .hero-note p { margin: 0; color: var(--muted); font-size: 14px; }
+    .quick-stage-kicker { color: var(--coral); font-size: 11px; font-weight: 900; letter-spacing: .11em; }
+    .quick-stage-panel h2 { margin: 5px 0 16px; font-size: 24px; line-height: 1.35; letter-spacing: -.035em; }
+    .quick-stage-grid { display: grid; gap: 9px; }
+    .quick-stage-option {
+      min-height: 62px;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      text-decoration: none;
+    }
+    .quick-stage-option.is-active {
+      border-color: var(--teal);
+      background: rgba(35,107,97,.055);
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .quick-stage-option.is-active:hover {
+      transform: translateX(3px);
+      background: rgba(35,107,97,.1);
+      box-shadow: 0 5px 14px rgba(21,75,69,.1);
+    }
+    .quick-stage-option.is-disabled { color: #7c7b74; background: #f2eee7; }
+    .quick-stage-number {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--teal);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .quick-stage-option.is-disabled .quick-stage-number { background: #c9beb0; color: #fffdf8; }
+    .quick-stage-copy strong { display: block; font-size: 16px; line-height: 1.3; }
+    .quick-stage-copy small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 650; }
+    .quick-stage-option.is-active .quick-stage-copy small { color: var(--teal); }
+    .quick-stage-arrow { color: var(--teal); font-size: 20px; font-weight: 900; }
+    .quick-stage-option.is-disabled .quick-stage-arrow {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #ded6ca;
+      color: #6f6c65;
+      font-size: 10px;
+      line-height: 1.4;
+    }
 
     .principle-band { background: var(--teal-dark); color: var(--white); }
     .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -249,6 +295,7 @@
       .nav-links a:first-child { display: none; }
       .hero { padding: 64px 0 56px; }
       .hero-grid { grid-template-columns: 1fr; gap: 38px; }
+      .quick-stage-panel { max-width: 620px; }
       .principle-grid { grid-template-columns: 1fr; }
       .principle { min-height: auto; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.16); }
       .principle:last-child { border-bottom: 0; }
@@ -266,6 +313,7 @@
       .nav-links .nav-inquiry { display: none; }
       h1 { font-size: 42px; }
       .hero-lead { font-size: 17px; }
+      .quick-stage-panel { padding: 21px; box-shadow: 8px 8px 0 var(--paper-deep); }
       .button { width: 100%; }
       .section { padding: 68px 0; }
       .stage-card { display: block; padding: 24px 21px; }
@@ -285,7 +333,7 @@
         <span>AI 취업 실험실<small>비즈니스커리어컨설팅</small></span>
       </a>
       <nav class="nav-links" aria-label="주요 메뉴">
-        <a href="#program">4단계 과정</a>
+        <a href="#stage-selector">4단계 과정</a>
         <a href="tools/">잇툴즈</a>
         <a class="nav-inquiry" href="index.html#contact">기관 강의 문의</a>
       </nav>
@@ -302,14 +350,32 @@
             나를 알고, 시장을 읽고, 나를 설명하고, 면접에서 증명합니다.
             강의에서 자신의 경험과 실제 공고를 사용해 결과물을 완성하는 실습형 취업 프로그램입니다.
           </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#program">전체 과정 선택하기 →</a>
-          </div>
         </div>
-        <aside class="hero-note" aria-label="프로그램 핵심 안내">
-          <span class="hero-note-label">CLASS FIRST</span>
-          <strong>강의에서 직접 써보고,<br>필요할 때 혼자 이어갑니다.</strong>
-          <p>무료 실습도 결과를 끝까지 제공합니다. 유료판은 여러 기업·경험을 반복하고 저장할 때 선택하는 확장 기능입니다.</p>
+        <aside class="quick-stage-panel" id="stage-selector" aria-labelledby="quick-stage-title">
+          <div class="quick-stage-kicker">4 STEP JOB PRACTICE</div>
+          <h2 id="quick-stage-title">원하는 단계를 바로 선택하세요</h2>
+          <div class="quick-stage-grid">
+            <a class="quick-stage-option is-active" href="https://ai-job-metacognition-lab.jinjoopower.chatgpt.site/?utm_source=bcc_homepage&amp;utm_medium=hero_step&amp;utm_campaign=job_program" target="_blank" rel="noopener noreferrer">
+              <span class="quick-stage-number">01</span>
+              <span class="quick-stage-copy"><strong>메타인지</strong><small>20분 실습 · 바로 시작</small></span>
+              <span class="quick-stage-arrow" aria-hidden="true">→</span>
+            </a>
+            <div class="quick-stage-option is-disabled" aria-disabled="true">
+              <span class="quick-stage-number">02</span>
+              <span class="quick-stage-copy"><strong>직무·기업분석</strong><small>채용공고와 기업자료 분석</small></span>
+              <span class="quick-stage-arrow">준비 중</span>
+            </div>
+            <div class="quick-stage-option is-disabled" aria-disabled="true">
+              <span class="quick-stage-number">03</span>
+              <span class="quick-stage-copy"><strong>자기소개서</strong><small>직무에 맞는 경험 연결</small></span>
+              <span class="quick-stage-arrow">준비 중</span>
+            </div>
+            <a class="quick-stage-option is-active" href="https://bcc-interview-talk.vercel.app/?utm_source=bcc_homepage&amp;utm_medium=hero_step&amp;utm_campaign=job_program" target="_blank" rel="noopener noreferrer">
+              <span class="quick-stage-number">04</span>
+              <span class="quick-stage-copy"><strong>면접톡</strong><small>5~7분 연습 · 바로 시작</small></span>
+              <span class="quick-stage-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
         </aside>
       </div>
     </section>
@@ -326,7 +392,7 @@
       <div class="wrap">
         <div class="section-head">
           <div class="section-kicker">FOUR CONNECTED STEPS</div>
-          <h2>전체 과정을 보고,<br>지금 할 단계를 선택하세요</h2>
+          <h2>단계별 결과물과<br>실습 내용을 확인하세요</h2>
           <p>각 단계에서 실제로 사용할 수 있는 결과물 하나를 완성합니다. 현재 준비된 메타인지와 면접 단계는 선택하면 바로 시작됩니다.</p>
         </div>
 
@@ -415,7 +481,7 @@
           <h2>지금 필요한 단계를<br>직접 선택하세요</h2>
           <p>전체 흐름을 확인한 뒤, 준비된 단계부터 하나씩 시작할 수 있습니다.</p>
         </div>
-        <a class="button" href="#program">전체 과정 다시 보기 ↑</a>
+        <a class="button" href="#stage-selector">단계 선택으로 돌아가기 ↑</a>
       </div>
     </section>
   </main>
