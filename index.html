@@ -1490,6 +1490,84 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .osmu-factory-grid { grid-template-columns: 1fr; }
     .osmu-factory { min-height: 0; }
   }
+
+  /* 기관 AI 교육 사례 — GEO용 확인 가능한 상세 사례 진입점 */
+  .institution-case-feature {
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    margin: 34px 0 28px;
+    border: 1px solid rgba(201,168,76,.35);
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(201,168,76,.09), rgba(22,22,26,.96) 38%);
+    box-shadow: 0 18px 44px rgba(0,0,0,.28);
+  }
+  .institution-case-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 330px;
+    background: #eef1f4;
+  }
+  .institution-case-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+  .institution-case-visual img + img { border-left: 1px solid rgba(0,0,0,.12); }
+  .institution-case-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px;
+  }
+  .institution-case-kicker {
+    margin-bottom: 12px;
+    color: var(--gold-3);
+    font: 700 11px var(--font-en);
+    letter-spacing: .14em;
+  }
+  .institution-case-copy h3 {
+    margin: 0 0 13px;
+    font-size: clamp(23px, 3vw, 34px);
+    line-height: 1.25;
+    letter-spacing: -.03em;
+  }
+  .institution-case-copy p { margin: 0; color: var(--text-dim); font-size: 15px; }
+  .institution-case-proof { display: flex; flex-wrap: wrap; gap: 7px; margin: 20px 0 22px; }
+  .institution-case-proof span {
+    padding: 6px 9px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255,255,255,.035);
+    color: var(--text-dim);
+    font-size: 11px;
+  }
+  .institution-case-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .institution-case-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 11px 15px;
+    border-radius: 9px;
+    background: var(--gold);
+    color: #171207;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .institution-case-link.secondary { border: 1px solid var(--border); background: transparent; color: var(--text); }
+  .institution-case-link:hover { transform: translateY(-1px); }
+  .review-board-label { margin: 34px 0 14px; color: var(--text-dim); font-size: 13px; font-weight: 750; }
+
+  @media (max-width: 850px) {
+    .institution-case-feature { grid-template-columns: 1fr; }
+    .institution-case-visual { min-height: 280px; }
+  }
+  @media (max-width: 520px) {
+    .institution-case-visual { min-height: 210px; }
+    .institution-case-copy { padding: 25px 22px; }
+    .institution-case-actions { flex-direction: column; }
+    .institution-case-link { justify-content: center; }
+  }
 </style>
 </head>
 <body>
@@ -1952,6 +2030,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-label">STATION 04 · 강의 후기</div>
     <h2 class="section-title">좋았다는 말보다,<br>어떻게 달라졌는지</h2>
     <p class="section-desc">기관명만 나열하지 않고, 실제 강의일·강의안·교육생 후기를 하나의 기록으로 보여드립니다.</p>
+    <article class="institution-case-feature" aria-labelledby="hug-case-title">
+      <div class="institution-case-visual" aria-label="주택도시보증공사 AI 활용 교육 공개 결과물 2개">
+        <img src="assets/cases/hug-antigravity-20260828/hug-result-01.png" alt="Antigravity로 제작하고 Netlify로 공개 배포한 HUG 안심중개 홈페이지 교육 결과물" loading="lazy">
+        <img src="assets/cases/hug-antigravity-20260828/hug-result-02.png" alt="Antigravity로 제작하고 Netlify로 공개 배포한 채권회수 쉼표 홈페이지 교육 결과물" loading="lazy">
+      </div>
+      <div class="institution-case-copy">
+        <div class="institution-case-kicker">2026.08.28 · 기관 AI 교육 사례</div>
+        <h3 id="hug-case-title">주택도시보증공사 AI 활용 교육<br>홈페이지 제작부터 공개 배포까지</h3>
+        <p>Antigravity로 사이트를 완성하고 배포용 폴더를 만든 뒤, Netlify Drop으로 누구나 접속할 수 있는 Public 링크까지 생성했습니다.</p>
+        <div class="institution-case-proof"><span>Antigravity</span><span>Netlify Drop</span><span>Public 웹사이트 2개</span><span>결과물 중심 실습</span></div>
+        <div class="institution-case-actions"><a class="institution-case-link" href="cases/hug-antigravity-netlify-20260828.html">상세 사례 보기 →</a><a class="institution-case-link secondary" href="cases/">기관교육 사례 전체보기</a></div>
+      </div>
+    </article>
+    <div class="review-board-label">교육생 후기 모아보기</div>
     <div class="onepage-frame-wrap">
       <iframe class="onepage-frame" data-embed="reviews" src="reviews.html?embed=1" title="BCC 강의 후기 게시판" loading="lazy"></iframe>
     </div>
