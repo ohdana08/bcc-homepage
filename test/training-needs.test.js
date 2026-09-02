@@ -5,6 +5,7 @@ import {
   TRAINING_NEED_QUESTIONS,
   normalizeAnswers,
   summarizeResponses,
+  summarizeSurveyList,
   isSurveyOpen,
   generatePublicCode,
   resolvePublicFormReference,
@@ -144,6 +145,16 @@ test('설문 상태와 마감일로 제출 가능 여부를 판정한다', () =>
   assert.equal(isSurveyOpen({ status: 'closed', response_deadline: '2026-08-05' }, '2026-08-04'), false);
 });
 
+test('샘플 설문과 응답은 실제 운영 지표에서 제외한다', () => {
+  const metrics = summarizeSurveyList([
+    { status: 'open', response_count: 1, is_sample: true },
+    { status: 'open', response_count: 3, is_sample: true },
+    { status: 'open', response_count: 2, is_sample: false },
+    { status: 'closed', response_count: 4, is_sample: false, analysis_generated_at: '2026-09-02T00:00:00Z' },
+  ]);
+  assert.deepEqual(metrics, { open: 1, responses: 6, analyzed: 1, total: 2, samples: 2 });
+});
+
 test('공유용 참여코드를 짧은 대문자로 생성한다', () => {
   const code = generatePublicCode();
   assert.match(code, /^[A-F0-9]{8}$/);
@@ -167,6 +178,13 @@ test('관리자는 생성한 수요조사의 기본정보를 다시 수정할 �
   assert.match(adminSurveyPage, /id="editForm"/);
   assert.match(adminSurveyPage, /id="editBtn">기본정보 수정<\/button>/);
   assert.match(adminSurveyPage, /api\('update',\{id:state\.selected,changes:form\}\)/);
+});
+
+test('관리자와 공개 설문에서 샘플을 실제 조사와 명확히 구분한다', () => {
+  assert.match(adminSurveyPage, /실제 누적 응답/);
+  assert.match(adminSurveyPage, /샘플 응답/);
+  assert.match(adminSurveyPage, /샘플 화면입니다\.<\/strong> 이 데이터는 실제 수요조사·누적 응답·분석 완료 집계에 포함되지 않습니다\./);
+  assert.match(publicSurveyPage, /샘플 설문입니다\.<\/strong> 기능을 확인하기 위한 시연용이며 실제 기관 수요조사로 집계되지 않습니다\./);
 });
 
 test('수요조사 수정값은 링크와 응답을 건드리지 않고 기본정보만 정규화한다', () => {

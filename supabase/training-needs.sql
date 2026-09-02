@@ -14,6 +14,7 @@ create table if not exists training_need_surveys (
   lecture_date             date,
   response_deadline        date,
   expected_response_count  integer check (expected_response_count is null or expected_response_count >= 0),
+  is_sample                boolean not null default false,
   status                   text not null default 'open'
                            check (status in ('draft','open','closed','analyzed')),
   analysis                 jsonb not null default '{}'::jsonb,
