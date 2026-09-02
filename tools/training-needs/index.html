@@ -112,7 +112,11 @@
     setAccess('교육 정보를 확인하는 중입니다…','전용 설문을 여는 중입니다.');
     api('get',{form:state.form}).then(function(data){
       state.survey=data.survey; state.questions=data.questions||[]; state.index=0; state.answers={others:{}};
-      if(!data.survey.is_open){ $('accessView').classList.add('hidden'); $('closedView').classList.remove('hidden'); return; }
+      if(!data.survey.is_open){
+        $('accessView').classList.add('hidden'); $('closedView').classList.remove('hidden');
+        if(data.survey.is_sample){$('closedView').querySelector('h2').textContent='샘플 설문입니다.';$('closedText').textContent='기능을 확인하기 위한 시연용이며 실제 기관 수요조사로 집계되지 않습니다. 현재 샘플 폼은 응답 기간이 끝났습니다.';}
+        return;
+      }
       history.replaceState(null,'','?form='+encodeURIComponent(state.form));
       $('accessView').classList.add('hidden'); $('surveyView').classList.remove('hidden');
       renderSurveyHead(); renderQuestion(); track('training_needs_start',{entry:'company_form_link'});

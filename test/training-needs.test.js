@@ -185,6 +185,7 @@ test('관리자와 공개 설문에서 샘플을 실제 조사와 명확히 구�
   assert.match(adminSurveyPage, /샘플 응답/);
   assert.match(adminSurveyPage, /샘플 화면입니다\.<\/strong> 이 데이터는 실제 수요조사·누적 응답·분석 완료 집계에 포함되지 않습니다\./);
   assert.match(publicSurveyPage, /샘플 설문입니다\.<\/strong> 기능을 확인하기 위한 시연용이며 실제 기관 수요조사로 집계되지 않습니다\./);
+  assert.match(publicSurveyPage, /현재 샘플 폼은 응답 기간이 끝났습니다\./);
 });
 
 test('수요조사 수정값은 링크와 응답을 건드리지 않고 기본정보만 정규화한다', () => {
