@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   TRAINING_NEED_QUESTIONS,
   normalizeAnswers,
@@ -8,6 +9,8 @@ import {
   generatePublicCode,
   resolvePublicFormReference,
 } from '../lib/training-needs.js';
+
+const publicSurveyPage = readFileSync(new URL('../tools/training-needs/index.html', import.meta.url), 'utf8');
 
 function completeAnswers(overrides = {}) {
   return {
@@ -148,6 +151,13 @@ test('회사별 전용 폼 식별자를 읽고 기존 code 링크도 유지한�
   assert.equal(resolvePublicFormReference({ form: ' ab12cd34 ' }), 'AB12CD34');
   assert.equal(resolvePublicFormReference({ code: 'ef56ab78' }), 'EF56AB78');
   assert.equal(resolvePublicFormReference({ form: 'ab12cd34', code: 'ef56ab78' }), 'AB12CD34');
+});
+
+test('전용 링크 없이 접속해도 관리자와 잇툴즈로 이동할 수 있다', () => {
+  assert.match(publicSurveyPage, /id="accessActions"/);
+  assert.match(publicSurveyPage, /href="\.\.\/\.\.\/admin-training-needs\.html">\ud68c사별 설문 만들기/);
+  assert.match(publicSurveyPage, /href="\.\.\/">\uc804체 잇툴즈/);
+  assert.match(publicSurveyPage, /\$\('accessActions'\)\.classList\.remove\('hidden'\)/);
 });
 
 test('자유응답에 적힌 이메일과 휴대폰 번호를 저장하지 않는다', () => {
