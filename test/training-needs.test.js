@@ -8,9 +8,11 @@ import {
   isSurveyOpen,
   generatePublicCode,
   resolvePublicFormReference,
+  __test,
 } from '../lib/training-needs.js';
 
 const publicSurveyPage = readFileSync(new URL('../tools/training-needs/index.html', import.meta.url), 'utf8');
+const adminSurveyPage = readFileSync(new URL('../admin-training-needs.html', import.meta.url), 'utf8');
 
 function completeAnswers(overrides = {}) {
   return {
@@ -158,6 +160,40 @@ test('전용 링크 없이 접속해도 관리자와 잇툴즈로 이동할 수 
   assert.match(publicSurveyPage, /href="\.\.\/\.\.\/admin-training-needs\.html">\ud68c사별 설문 만들기/);
   assert.match(publicSurveyPage, /href="\.\.\/">\uc804체 잇툴즈/);
   assert.match(publicSurveyPage, /\$\('accessActions'\)\.classList\.remove\('hidden'\)/);
+});
+
+test('관리자는 생성한 수요조사의 기본정보를 다시 수정할 수 있다', () => {
+  assert.match(adminSurveyPage, /id="editModal"/);
+  assert.match(adminSurveyPage, /id="editForm"/);
+  assert.match(adminSurveyPage, /id="editBtn">기본정보 수정<\/button>/);
+  assert.match(adminSurveyPage, /api\('update',\{id:state\.selected,changes:form\}\)/);
+});
+
+test('수요조사 수정값은 링크와 응답을 건드리지 않고 기본정보만 정규화한다', () => {
+  const changes = __test.cleanSurveyChanges({
+    institution_label: '  부산광역주거복지센터  ',
+    title: ' AI 업무활용 교육 ',
+    audience_label: ' 직원 15명 ',
+    lecture_date: '2026-10-20',
+    response_deadline: '2026-10-18',
+    expected_response_count: '15',
+    case_id: '',
+  });
+  assert.deepEqual(changes, {
+    institution_label: '부산광역주거복지센터',
+    title: 'AI 업무활용 교육',
+    audience_label: '직원 15명',
+    lecture_date: '2026-10-20',
+    response_deadline: '2026-10-18',
+    expected_response_count: 15,
+    case_id: null,
+  });
+  assert.equal('public_code' in changes, false);
+});
+
+test('응답 완료 화면은 다른 서비스로 보내지 않고 감사 인사로 끝난다', () => {
+  assert.match(publicSurveyPage, /class="done-thanks">감사합니다\.<\/strong>/);
+  assert.doesNotMatch(publicSurveyPage, /class="done"[^;]+잇툴즈 둘러보기/);
 });
 
 test('자유응답에 적힌 이메일과 휴대폰 번호를 저장하지 않는다', () => {
