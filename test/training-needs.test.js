@@ -178,6 +178,16 @@ test('관리자는 생성한 수요조사의 기본정보를 다시 수정할 �
   assert.match(adminSurveyPage, /id="editForm"/);
   assert.match(adminSurveyPage, /id="editBtn">기본정보 수정<\/button>/);
   assert.match(adminSurveyPage, /api\('update',\{id:state\.selected,changes:form\}\)/);
+  assert.match(adminSurveyPage, /class="row-edit"[^>]+>수정<\/button>/);
+  assert.match(adminSurveyPage, /if\(await selectSurvey\(button\.dataset\.editId\)\)openEditModal\(\)/);
+});
+
+test('관리자 인증이 만료되면 세션을 갱신해 한 번 재시도하고 작성값을 보존한다', () => {
+  assert.match(adminSurveyPage, /state\.sb\.auth\.refreshSession\(\)/);
+  assert.match(adminSurveyPage, /response\.status===401/);
+  assert.match(adminSurveyPage, /CREATE_DRAFT_KEY='bcc-training-needs-create-draft-v1'/);
+  assert.match(adminSurveyPage, /sessionStorage\.setItem\(CREATE_DRAFT_KEY/);
+  assert.match(adminSurveyPage, /sessionStorage\.removeItem\(CREATE_DRAFT_KEY\)/);
 });
 
 test('관리자와 공개 설문에서 샘플을 실제 조사와 명확히 구분한다', () => {
