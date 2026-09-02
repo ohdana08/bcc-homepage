@@ -6,6 +6,7 @@ import {
   summarizeResponses,
   isSurveyOpen,
   generatePublicCode,
+  resolvePublicFormReference,
 } from '../lib/training-needs.js';
 
 function completeAnswers(overrides = {}) {
@@ -141,6 +142,12 @@ test('설문 상태와 마감일로 제출 가능 여부를 판정한다', () =>
 test('공유용 참여코드를 짧은 대문자로 생성한다', () => {
   const code = generatePublicCode();
   assert.match(code, /^[A-F0-9]{8}$/);
+});
+
+test('회사별 전용 폼 식별자를 읽고 기존 code 링크도 유지한다', () => {
+  assert.equal(resolvePublicFormReference({ form: ' ab12cd34 ' }), 'AB12CD34');
+  assert.equal(resolvePublicFormReference({ code: 'ef56ab78' }), 'EF56AB78');
+  assert.equal(resolvePublicFormReference({ form: 'ab12cd34', code: 'ef56ab78' }), 'AB12CD34');
 });
 
 test('자유응답에 적힌 이메일과 휴대폰 번호를 저장하지 않는다', () => {
