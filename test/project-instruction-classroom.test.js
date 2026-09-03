@@ -29,6 +29,7 @@ function completeState() {
     oneLine: '긴 민원을 핵심 세 줄로 정리한다.',
     problem: '담당자가 긴 민원에서 핵심 요구를 찾는 데 시간이 걸린다.',
     primaryUser: '민원 담당자',
+    useSituation: '온라인 민원 시스템에 들어온 긴 글을 처음 검토할 때',
     solution: '민원 내용을 입력하면 핵심 요구와 확인할 항목을 보여준다.',
     userFlow: ['민원 내용을 붙여넣는다', '요약 버튼을 누른다', '결과를 확인한다'],
     screens: ['민원 입력 화면', '요약 결과 화면'],
@@ -57,6 +58,8 @@ test('필수 정보가 채워진 순서대로 다음 질문 단계를 고른다'
   state.problem = '문제';
   assert.equal(nextProjectStage(state), 'user');
   state.primaryUser = '사용자';
+  assert.equal(nextProjectStage(state), 'user');
+  state.useSituation = '업무를 시작할 때';
   state.solution = '해결';
   state.userFlow = ['입력', '결과'];
   state.screens = ['입력 화면'];
