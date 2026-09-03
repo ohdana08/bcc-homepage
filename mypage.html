@@ -75,6 +75,7 @@
         <span class="name" id="userName"></span>
         <button class="logout" id="logoutBtn">로그아웃</button>
       </div>
+      <a id="proposalsLink" href="admin-proposals.html" class="adminlink" style="display:none">🏛️ 기관 제안 운영실 열기</a>
       <a id="adminLink" href="admin-cardnews.html" class="adminlink" style="display:none">🛠 카드뉴스 공장 열기</a>
       <a id="threadsLink" href="admin-threads.html" class="adminlink" style="display:none">✍️ 스레드 공장 열기</a>
       <a id="blogLink" href="admin-blog.html" class="adminlink" style="display:none">📰 블로그 공장 열기</a>
@@ -115,8 +116,9 @@
     if (!res.ok) throw new Error(data.error || '조회 실패');
 
     document.getElementById('userName').textContent = (data.profile?.name || '회원') + ' 님';
-    // 관리자(is_admin)에게만 카드뉴스 공장 진입 버튼 노출
+    // 관리자(is_admin)에게만 BCC 운영 도구 진입 버튼 노출
     if (data.profile?.is_admin) {
+      document.getElementById('proposalsLink').style.display = 'block';
       document.getElementById('adminLink').style.display = 'block';
       document.getElementById('threadsLink').style.display = 'block';
       document.getElementById('blogLink').style.display = 'block';
