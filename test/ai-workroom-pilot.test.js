@@ -61,3 +61,17 @@ test('신청부터 납품까지 운영 문서는 범위·보안·승인 조건�
   assert.match(fulfillment, /동일 샘플로 기준 결과와 비교/);
   assert.match(fulfillment, /불필요한 고객 원본과 임시파일 삭제/);
 });
+
+test('결제 서버와 매출 집계는 동의 없는 주문·테스트·환불 매출을 제외한다', async () => {
+  const checkoutApi = await readFile(new URL('../api/create-checkout.js', import.meta.url), 'utf8');
+  const metrics = await readFile(new URL('../revenue-launch/SALES_METRICS.sql', import.meta.url), 'utf8');
+  const runbook = await readFile(new URL('../revenue-launch/LAUNCH_RUNBOOK.md', import.meta.url), 'utf8');
+
+  assert.match(checkoutApi, /if \(!refundConsent\)/);
+  assert.match(checkoutApi, /환불·청약철회 안내를 확인하고 동의/);
+  assert.match(metrics, /paid_amount > 0/);
+  assert.match(metrics, /status = 'active'/);
+  assert.match(metrics, /'manual-test', 'test', 'internal'/);
+  assert.match(runbook, /페이지 배포, 메시지 발송, 신청 수는 완료 기준이 아니다/);
+  assert.match(runbook, /각 주문을 토스 관리자 승인 내역과 대조/);
+});
