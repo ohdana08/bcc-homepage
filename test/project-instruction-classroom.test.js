@@ -2,148 +2,119 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import {
+  STAGES,
+  applyLocalAnswer,
   buildProjectInstructionMarkdown,
-  createSessionToken,
   emptyProjectState,
-  handleProjectInstructionClassroom,
-  nextProjectStage,
-  normalizeProjectState,
-  verifySessionToken,
-} from '../lib/project-instruction-classroom.js';
+  getQuestion,
+  nextStage,
+  parseLabeledFields,
+  splitItems,
+} from '../tools/project-instruction/local-engine.js';
 
 const PAGE_URL = new URL('../tools/project-instruction/index.html', import.meta.url);
 
-function responseRecorder() {
-  return {
-    statusCode: 200,
-    payload: null,
-    status(code) { this.statusCode = code; return this; },
-    json(payload) { this.payload = payload; return payload; },
-  };
-}
+test('문제 답변 틀을 현재 상황·방법·불편으로 정확히 나눈다', () => {
+  const answer = [
+    '현재 하는 일: 온라인 민원을 처음 검토한다',
+    '현재 방법: 원문을 읽고 메모장에 옮긴다',
+    '가장 큰 불편: 핵심 요구와 기한을 찾는 데 오래 걸린다',
+  ].join('\n');
+  const fields = parseLabeledFields(answer);
+  assert.equal(fields.currentSituation, '온라인 민원을 처음 검토한다');
+  assert.equal(fields.currentMethod, '원문을 읽고 메모장에 옮긴다');
+  assert.equal(fields.painPoint, '핵심 요구와 기한을 찾는 데 오래 걸린다');
 
-function completeState() {
-  return {
-    ...emptyProjectState(),
-    projectName: '민원 요약 도우미',
-    oneLine: '긴 민원을 핵심 세 줄로 정리한다.',
-    problem: '담당자가 긴 민원에서 핵심 요구를 찾는 데 시간이 걸린다.',
-    primaryUser: '민원 담당자',
-    useSituation: '온라인 민원 시스템에 들어온 긴 글을 처음 검토할 때',
-    solution: '민원 내용을 입력하면 핵심 요구와 확인할 항목을 보여준다.',
-    userFlow: ['민원 내용을 붙여넣는다', '요약 버튼을 누른다', '결과를 확인한다'],
-    screens: ['민원 입력 화면', '요약 결과 화면'],
-    mustFeatures: ['텍스트 입력', '핵심 요약', '결과 복사'],
-    inputs: ['민원 텍스트'],
-    process: ['입력값 확인', '핵심 요구 정리'],
-    outputs: ['핵심 요구 세 줄'],
-    successCriteria: ['민원 텍스트를 입력하면 핵심 요구 세 줄이 보인다'],
-  };
-}
-
-test('강의용 상태는 화면과 MUST 기능을 각각 3개로 제한한다', () => {
-  const state = normalizeProjectState({
-    screens: ['1', '2', '3', '4'],
-    mustFeatures: ['1', '2', '3', '4'],
-    userFlow: ['1', '2', '3', '4', '5', '6', '7'],
-  });
-  assert.deepEqual(state.screens, ['1', '2', '3']);
-  assert.deepEqual(state.mustFeatures, ['1', '2', '3']);
-  assert.equal(state.userFlow.length, 6);
+  const state = applyLocalAnswer(emptyProjectState(), 'problem', answer);
+  assert.equal(state.problem, '핵심 요구와 기한을 찾는 데 오래 걸린다');
+  assert.equal(state.currentMethod, '원문을 읽고 메모장에 옮긴다');
 });
 
-test('필수 정보가 채워진 순서대로 다음 질문 단계를 고른다', () => {
-  const state = emptyProjectState();
-  assert.equal(nextProjectStage(state), 'problem');
-  state.problem = '문제';
-  assert.equal(nextProjectStage(state), 'user');
-  state.primaryUser = '사용자';
-  assert.equal(nextProjectStage(state), 'user');
-  state.useSituation = '업무를 시작할 때';
-  state.solution = '해결';
-  state.userFlow = ['입력', '결과'];
-  state.screens = ['입력 화면'];
-  state.mustFeatures = ['입력'];
-  assert.equal(nextProjectStage(state), 'test');
-  state.successCriteria = ['결과가 보인다'];
-  assert.equal(nextProjectStage(state), 'complete');
+test('사용 순서는 6개, 화면과 핵심 기능은 각각 3개로 제한한다', () => {
+  const flow = splitItems('입력 → 확인 → 처리 → 검토 → 복사 → 저장 → 공유', 6);
+  assert.deepEqual(flow, ['입력', '확인', '처리', '검토', '복사', '저장']);
+
+  const state = applyLocalAnswer(emptyProjectState(), 'features', [
+    '화면: 입력 / 결과 / 도움말 / 관리자',
+    '핵심 기능: 붙여넣기 / 요약 / 복사 / 로그인',
+  ].join('\n'));
+  assert.deepEqual(state.screens, ['입력', '결과', '도움말']);
+  assert.deepEqual(state.mustFeatures, ['붙여넣기', '요약', '복사']);
 });
 
-test('MD 파일에 구현 범위·완료 조건·Antigravity 실행 지시가 포함된다', () => {
-  const markdown = buildProjectInstructionMarkdown(completeState());
+test('정해진 6단계만으로 완성 상태와 MD를 만든다', () => {
+  const answers = {
+    problem: '현재 하는 일: 민원 검토\n현재 방법: 직접 읽기\n가장 큰 불편: 시간이 오래 걸림',
+    user: '주요 사용자: 민원 담당자\n사용하는 때: 긴 민원을 처음 검토할 때',
+    solution: '프로젝트명: 민원 요약 도우미\n해결 방식: 핵심 요구를 정리해 보여준다\n가장 중요한 가치: 누락 방지',
+    flow: '사용 순서: 민원 입력 → 요약 누르기 → 결과 확인 → 복사',
+    features: '화면: 입력과 결과가 있는 한 화면\n핵심 기능: 민원 입력 / 결과 표시 / 결과 복사',
+    test: '예시 입력: 개인정보를 뺀 민원\n화면에 나와야 할 결과: 핵심 요구 / 처리 기한\n완료 기준: 결과가 보인다 / 복사가 된다',
+  };
+  let state = emptyProjectState();
+  let stage = STAGES[0];
+  for (const expectedStage of STAGES) {
+    assert.equal(stage, expectedStage);
+    state = applyLocalAnswer(state, stage, answers[stage]);
+    stage = nextStage(stage);
+  }
+  assert.equal(stage, 'complete');
+  assert.equal(state.projectName, '민원 요약 도우미');
+  assert.deepEqual(state.mustFeatures, ['민원 입력', '결과 표시', '결과 복사']);
+
+  const markdown = buildProjectInstructionMarkdown(state);
   assert.match(markdown, /^# PROJECT_INSTRUCTION\.md/);
   assert.match(markdown, /민원 요약 도우미/);
-  assert.match(markdown, /화면 최대 3개, MUST 기능 최대 3개/);
-  assert.match(markdown, /- \[ \] 민원 텍스트를 입력하면 핵심 요구 세 줄이 보인다/);
-  assert.match(markdown, /로그인·회원가입/);
+  assert.match(markdown, /유료 AI API와 서버 생성 API를 사용하지 않는다/);
+  assert.match(markdown, /- \[ \] 결과가 보인다/);
   assert.match(markdown, /Antigravity 실행 지시/);
 });
 
-test('서명 세션은 턴과 만료시간을 검증하고 변조를 거절한다', () => {
-  const token = createSessionToken('test-secret', 2, 1000);
-  assert.equal(verifySessionToken(token, 'test-secret', 2000).turn, 2);
-  assert.throws(() => verifySessionToken(token + 'x', 'test-secret', 2000), /세션/);
-  assert.throws(() => verifySessionToken(token, 'test-secret', 1000 + (3 * 60 * 60 * 1000)), /만료/);
+test('자유 문장도 버리지 않고 해당 단계의 원문으로 보존한다', () => {
+  const problem = '반복 보고서를 직접 정리하는 데 시간이 오래 걸린다.';
+  const state = applyLocalAnswer(emptyProjectState(), 'problem', problem);
+  assert.equal(state.problem, problem);
+  assert.equal(state.painPoint, problem);
 });
 
-test('시작 요청은 AI를 호출하지 않고 첫 질문과 세션을 반환한다', async () => {
-  const res = responseRecorder();
-  await handleProjectInstructionClassroom({
-    body: { action: 'start', startMode: 'unsure' }, headers: {}, socket: {},
-  }, res, { secret: 'test-secret' });
-  assert.equal(res.statusCode, 200);
-  assert.equal(res.payload.stage, 'problem');
-  assert.match(res.payload.assistantMessage, /불편/);
-  assert.ok(res.payload.sessionToken);
+test('두 시작 유형 모두 비용 없는 문제 질문과 답변 틀을 제공한다', () => {
+  const idea = getQuestion('problem', 'idea');
+  const unsure = getQuestion('problem', 'unsure');
+  assert.match(idea.prompt, /해결하려는 문제/);
+  assert.match(unsure.prompt, /아이디어가 없어도/);
+  assert.equal(idea.quickReplies[0].label, '답변 틀 넣기');
+  assert.match(idea.quickReplies[0].value, /현재 하는 일:/);
 });
 
-test('AI 답변은 정규화한 뒤 완성된 MD와 다음 세션을 돌려준다', async () => {
-  const state = completeState();
-  const client = {
-    messages: {
-      async create() {
-        return {
-          stop_reason: 'end_turn',
-          content: [{ type: 'text', text: JSON.stringify({
-            assistantMessage: '완성됐습니다.', state, quickReplies: [],
-          }) }],
-        };
-      },
-    },
-  };
-  const res = responseRecorder();
-  await handleProjectInstructionClassroom({
-    body: {
-      action: 'answer', startMode: 'idea', stage: 'test',
-      sessionToken: createSessionToken('answer-secret'), state, answer: '결과 세 줄이 화면에 보이면 됩니다.',
-    },
-    headers: { 'x-forwarded-for': '198.51.100.10' }, socket: {},
-  }, res, { secret: 'answer-secret', client });
-  assert.equal(res.payload.ready, true);
-  assert.equal(res.payload.stage, 'complete');
-  assert.match(res.payload.markdown, /민원 요약 도우미/);
-  assert.ok(res.payload.sessionToken);
-});
-
-test('생성기 화면은 두 시작 경로·진행 단계·MD 다운로드를 제공한다', async () => {
-  const [html, app, toolsHub, home, vercel, api] = await Promise.all([
+test('운영 화면은 유료 AI API 0회와 브라우저 처리를 명시한다', async () => {
+  const [html, app, localEngine] = await Promise.all([
     readFile(PAGE_URL, 'utf8'),
     readFile(new URL('../tools/project-instruction/app.js', import.meta.url), 'utf8'),
-    readFile(new URL('../tools/index.html', import.meta.url), 'utf8'),
-    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../tools/project-instruction/local-engine.js', import.meta.url), 'utf8'),
+  ]);
+  assert.match(html, /유료 AI API 호출 0회/);
+  assert.match(html, /브라우저 안에서만 처리/);
+  assert.match(html, /data-local-only="true"/);
+  assert.match(html, /type="module"/);
+  assert.doesNotMatch(app, /fetch\s*\(/);
+  assert.doesNotMatch(app, /API_URL|sessionToken|ANTHROPIC/);
+  assert.match(localEngine, /유료 AI API와 서버 생성 API를 사용하지 않음/);
+});
+
+test('서버 AI 호출 입구와 Vercel rewrite가 제거됐다', async () => {
+  const [vercel, api] = await Promise.all([
     readFile(new URL('../vercel.json', import.meta.url), 'utf8'),
     readFile(new URL('../api/cardnews-generate.js', import.meta.url), 'utf8'),
   ]);
-  assert.match(html, /업무지시서 MD파일 생성기/);
-  assert.match(html, /data-start-mode="idea"/);
-  assert.match(html, /data-start-mode="unsure"/);
-  assert.match(html, /문제[\s\S]*사용자[\s\S]*해결[\s\S]*흐름[\s\S]*기능[\s\S]*테스트/);
-  assert.match(html, /id="download-button"/);
-  assert.match(html, /민감한 정보는 입력하지 마세요/);
-  assert.match(app, /project_instruction_download/);
-  assert.match(app, /교실 안전 모드/);
+  assert.doesNotMatch(vercel, /\/api\/project-instruction/);
+  assert.doesNotMatch(api, /project_instruction_classroom|handleProjectInstructionClassroom/);
+});
+
+test('잇툴즈와 홈페이지의 생성기 진입 카드는 유지한다', async () => {
+  const [toolsHub, home] = await Promise.all([
+    readFile(new URL('../tools/index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+  ]);
   assert.match(toolsHub, /data-tool-id="project-instruction"/);
   assert.match(home, /data-tool="project-instruction"/);
-  assert.match(vercel, /\/api\/project-instruction/);
-  assert.match(api, /engine\) === 'project_instruction_classroom'/);
 });

@@ -7,7 +7,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/project-instruction", "destination": "/api/cardnews-generate" },
     { "source": "/api/course-access", "destination": "/api/claude101-suite?fn=course-access" },
     { "source": "/api/groble-checkout", "destination": "/api/claude101-suite?fn=groble-checkout" },
     { "source": "/api/groble-claude101-event", "destination": "/api/claude101-suite?fn=groble-event" }

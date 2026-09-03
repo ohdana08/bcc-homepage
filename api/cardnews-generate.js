@@ -9,7 +9,6 @@ import { BENCHMARK_COPYRIGHT_BLOCK, COPYRIGHT_GUARDRAIL, normalizeImages, buildB
 import { handleProposal } from '../lib/proposal-os.js';
 import { handleProposalMailIntake } from '../lib/proposal-mail-intake.js';
 import { handleTrainingNeedsAdmin, handleTrainingNeedsPublic } from '../lib/training-needs.js';
-import { handleProjectInstructionClassroom } from '../lib/project-instruction-classroom.js';
 
 // Opus 호출이 길어질 수 있으므로 함수 타임아웃을 넉넉히 둔다(Vercel Hobby 최대 60s).
 export const maxDuration = 60;
@@ -510,22 +509,6 @@ export default async function handler(req, res) {
       if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
       console.error('training-needs-public error:', err?.message || err);
       return res.status(500).json({ error: '수요조사를 처리하지 못했습니다.' });
-    }
-  }
-
-  // 강의용 업무지시서 생성기. 로그인 없이 쓰되 서명된 짧은 세션과 호출 제한을 적용한다.
-  // 별도 API 파일을 만들지 않고 기존 생성 엔진에 통합해 Vercel Hobby 함수 한도를 지킨다.
-  if ((req.body?.engine) === 'project_instruction_classroom') {
-    try {
-      if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'AI 처리 환경변수가 설정되지 않았습니다.' });
-      return await handleProjectInstructionClassroom(req, res, {
-        client: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
-      });
-    } catch (err) {
-      if (err?.httpStatus) return res.status(err.httpStatus).json({ error: err.message });
-      console.error('project-instruction-classroom error:', err?.message || err);
-      const status = err?.status === 429 ? 429 : 500;
-      return res.status(status).json({ error: status === 429 ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.' : '업무지시서를 정리하지 못했습니다.' });
     }
   }
 
