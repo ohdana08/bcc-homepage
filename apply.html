@@ -87,8 +87,8 @@
     <img src="logo.png?v=3" alt="BCC" />
     <strong>BCC</strong>
   </div>
-  <h1>챌린지 신청</h1>
-  <p class="sub">3칸만 입력하면 바로 결제로 이어집니다.</p>
+  <h1 id="applyTitle">챌린지 신청</h1>
+  <p class="sub" id="applySub">3칸만 입력하면 바로 결제로 이어집니다.</p>
 
   <div class="card">
     <form id="applyForm" novalidate>
@@ -133,17 +133,17 @@
       </div>
 
       <div class="refund-notice">
-        <p>[안내] 본 상품은 디지털 콘텐츠로, 강의 영상 재생 또는 자료 열람·다운로드 시 「전자상거래법」 제17조 제2항에 따라 청약철회(환불)가 제한됩니다. 자세한 내용은 <a href="refund.html" target="_blank" rel="noopener">환불정책</a>을 확인해 주세요.</p>
+        <p id="refundNoticeText">[안내] 본 상품은 디지털 콘텐츠로, 강의 영상 재생 또는 자료 열람·다운로드 시 「전자상거래법」 제17조 제2항에 따라 청약철회(환불)가 제한됩니다. 자세한 내용은 <a href="refund.html" target="_blank" rel="noopener">환불정책</a>을 확인해 주세요.</p>
         <label class="consent">
           <input id="agreeRefund" type="checkbox" />
-          <span><b class="req">[필수]</b> 위 환불 제한 사항을 확인하였으며 이에 동의합니다.</span>
+          <span id="refundConsentText"><b class="req">[필수]</b> 위 환불 제한 사항을 확인하였으며 이에 동의합니다.</span>
         </label>
       </div>
 
       <button type="submit" class="submit" id="submitBtn" disabled>결제하기</button>
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </form>
-    <p class="note">이전에 BCC 강의를 구매한 적이 있으면 <b>재수강가</b>가 자동 적용됩니다.</p>
+    <p class="note" id="applyNote">이전에 BCC 강의를 구매한 적이 있으면 <b>재수강가</b>가 자동 적용됩니다.</p>
   </div>
 </div>
 
@@ -206,9 +206,9 @@
       title: '이용약관',
       body:
         '<h3>제1조 (목적)</h3>'+
-        '<p>본 약관은 비즈니스커리어컨설팅(이하 "회사")이 운영하는 온라인 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>'+
+        '<p>본 약관은 비즈니스커리어컨설팅(이하 "회사")이 운영하는 온라인 서비스와 맞춤 제작 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>'+
         '<h3>제2조 (정의)</h3>'+
-        '<ul><li>"서비스"란 회사가 제공하는 온라인 강의·디지털 콘텐츠 및 관련 제반 서비스를 말합니다.</li>'+
+        '<ul><li>"서비스"란 회사가 제공하는 온라인 강의·디지털 콘텐츠, 맞춤형 AI 업무 설계·결과물 제작 및 관련 제반 서비스를 말합니다.</li>'+
         '<li>"이용자"란 본 약관에 동의하고 서비스를 이용하는 회원을 말합니다.</li>'+
         '<li>"콘텐츠"란 영상 강의, 전자문서(PDF 등), 자료 등 디지털 형태로 제공되는 일체의 정보를 말합니다.</li></ul>'+
         '<h3>제3조 (약관의 효력 및 변경)</h3>'+
@@ -224,7 +224,7 @@
         '<li>법정대리인은 해당 아동의 개인정보 열람·정정·삭제 및 동의 철회를 요청할 수 있습니다.</li>'+
         '<li>미성년자가 법정대리인의 동의 없이 체결한 유료 계약은 본인 또는 법정대리인이 취소할 수 있습니다. 다만, 미성년자가 속임수로써 성년자로 믿게 하거나 법정대리인의 동의가 있는 것으로 믿게 한 경우, 또는 통상적으로 용인되는 소액 결제의 경우에는 그러하지 아니합니다.</li></ul>'+
         '<h3>제6조 (서비스의 제공 및 변경)</h3>'+
-        '<ul><li>회사는 콘텐츠를 온라인으로 제공하며, 결제 완료 후 정해진 방식에 따라 이용 권한을 부여합니다.</li>'+
+        '<ul><li>회사는 콘텐츠를 온라인으로 제공하거나 사전에 확정한 범위에 따라 맞춤 결과물을 제작하며, 결제 완료 후 정해진 방식에 따라 이용 권한 또는 결과물을 제공합니다.</li>'+
         '<li>회사는 운영상·기술상 필요에 따라 서비스 내용을 변경할 수 있으며, 중대한 변경 시 사전 공지합니다.</li></ul>'+
         '<h3>제7조 (이용자의 의무)</h3>'+
         '<ul><li>이용자는 콘텐츠를 본인의 학습 목적으로만 이용해야 하며, 다음 행위를 하여서는 안 됩니다.'+
@@ -264,6 +264,16 @@
   function track(name, params){ try{ if(typeof gtag==='function') gtag('event', name, params||{}); }catch(e){} }
   function preselect(){ return new URLSearchParams(location.search).get('product'); }
 
+  var requestedProduct = preselect();
+  if(requestedProduct === 'ai-workroom-pilot'){
+    document.title = 'AI 업무 1개 끝내기 결제 | BCC';
+    document.getElementById('applyTitle').textContent = '맞춤 작업실 결제';
+    document.getElementById('applySub').textContent = '업무 범위와 제작 조건을 확인한 고객 전용 결제입니다.';
+    document.getElementById('refundNoticeText').innerHTML = '[맞춤 제작 안내] 범위 확정서에 따라 고객 전용으로 제작되는 서비스입니다. 제작 시작 전에는 전액 환불합니다. 맞춤 제작이 시작되면 다른 고객에게 재판매할 수 없어 청약철회가 제한될 수 있습니다. 이 제한은 제작 시작 시점과 사유를 별도로 고지하고 전자적 동의를 받은 경우에만 적용합니다. 표시·계약 내용과 다르게 이행된 경우는 제외합니다. 자세한 내용은 <a href="refund.html#custom-service" target="_blank" rel="noopener">환불정책</a>을 확인해 주세요.';
+    document.getElementById('refundConsentText').innerHTML = '<b class="req">[필수]</b> 맞춤 제작 시작 시점과 위 청약철회 안내를 확인하고 동의합니다.';
+    document.getElementById('applyNote').textContent = '무료 적합성 확인과 업무 범위 확정을 마친 뒤 결제해 주세요.';
+  }
+
   // 공개 설정(토스 client key) 로드
   fetch(API + '/api/config').then(function(r){return r.json();}).then(function(c){
     tossClientKey = c.tossClientKey || null;
@@ -273,7 +283,9 @@
   fetch(API + '/api/products').then(function(r){return r.json();}).then(function(d){
     var list = (d && d.products) || [];
     if(!list.length){ prodListEl.innerHTML = '<div class="status err">판매 중인 상품이 없습니다.</div>'; return; }
-    var want = preselect();
+    var want = requestedProduct;
+    var matched = want ? list.filter(function(p){ return p.id === want; }) : [];
+    if(matched.length) list = matched;
     prodListEl.innerHTML = '';
     list.forEach(function(p, i){
       var el = document.createElement('label');

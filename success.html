@@ -52,7 +52,12 @@
   <div id="resultBox" style="display:none">
     <div class="icon">✓</div>
     <h1>결제 완료!</h1>
-    <p class="sub">비밀번호를 설정하면 마이페이지에서 수강이력을 확인할 수 있어요. <br>(선택사항)</p>
+    <p class="sub" id="resultSub">비밀번호를 설정하면 마이페이지에서 수강이력을 확인할 수 있어요. <br>(선택사항)</p>
+
+    <div class="card" id="serviceNext" style="display:none;margin-bottom:14px">
+      <div class="pw-title">다음 단계</div>
+      <p class="pw-desc" style="margin:8px 0 0">결제가 확인되었습니다. 확정한 연락처로 샘플자료 전달 방법과 제작 시작 일정을 영업일 24시간 안에 안내드립니다.</p>
+    </div>
 
     <div class="card">
       <p class="summary" id="summary"></p>
@@ -86,6 +91,7 @@
   var orderId = q.get('orderId');
   var amount = q.get('amount');
   var customerEmail = null;
+  var isWorkroom = String(orderId || '').indexOf('ai-workroom-pilot_') === 0;
 
   function show(id){ ['loadingBox','resultBox','errorBox'].forEach(function(x){document.getElementById(x).style.display = (x===id?'block':'none');}); }
   function won(n){ return Number(n).toLocaleString('ko-KR') + '원'; }
@@ -110,6 +116,10 @@
     document.getElementById('summary').innerHTML =
       '<b>' + (d.orderName||'강의') + '</b> · 결제금액 <b>' + won(d.amount) + '</b>' +
       (d.isRecourse ? ' (재수강가 적용)' : '');
+    if(isWorkroom){
+      document.getElementById('resultSub').textContent = '맞춤 작업실 신청과 결제가 완료되었습니다.';
+      document.getElementById('serviceNext').style.display = 'block';
+    }
     show('resultBox');
   }).catch(function(err){
     document.getElementById('errMsg').textContent = (err && err.message) || '결제 확인 중 오류가 발생했습니다.';
