@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>업무지시서 MD파일 생성기 | BCC 잇툴즈</title>
+  <meta name="description" content="아이디어를 대화로 정리해 Antigravity에서 바로 구현할 수 있는 강의용 PROJECT_INSTRUCTION.md 파일을 만듭니다.">
+  <meta name="robots" content="index,follow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700;800&amp;family=Noto+Sans+KR:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+  <header class="site-header">
+    <a class="brand" href="../../" aria-label="BCC 홈페이지">
+      <img src="../../logo.png?v=3" alt="BCC">
+      <span><strong>BCC</strong><small>비즈니스커리어컨설팅</small></span>
+    </a>
+    <a class="back-link" href="../">잇툴즈 전체보기 <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">IT TOOLS · CLASSROOM MVP</p>
+        <h1 id="page-title">아이디어를 말하면,<br><span>만들 수 있는 지시서</span>가 됩니다.</h1>
+        <p class="hero-description">막연한 생각도 괜찮습니다. 한 번에 하나씩 묻고 답하며 핵심을 좁혀, Antigravity에서 바로 시작할 수 있는 <strong>PROJECT_INSTRUCTION.md</strong> 파일을 만듭니다.</p>
+        <div class="hero-notes" aria-label="도구 특징">
+          <span>로그인 없음</span><span>10–15분</span><span>최대 3개 화면</span><span>무료</span>
+        </div>
+      </div>
+      <aside class="classroom-rule" aria-label="오늘의 완주 기준">
+        <span class="rule-number">3</span>
+        <div><strong>오늘의 완주 기준</strong><p>핵심 기능 3개로 작동하는<br>첫 MVP를 만듭니다.</p></div>
+      </aside>
+    </section>
+
+    <section class="start-section" id="start-section" aria-labelledby="start-title">
+      <div class="section-heading">
+        <p class="step-label">STEP 01</p>
+        <h2 id="start-title">지금 내 상태와 가까운 쪽을 고르세요.</h2>
+      </div>
+      <div class="start-options">
+        <button class="start-card" type="button" data-start-mode="idea">
+          <span class="start-icon" aria-hidden="true">✦</span>
+          <span class="start-copy"><strong>만들고 싶은 게 있어요</strong><small>떠올린 서비스나 해결하고 싶은 문제가 있어요.</small></span>
+          <span class="start-arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="start-card" type="button" data-start-mode="unsure">
+          <span class="start-icon alt" aria-hidden="true">?</span>
+          <span class="start-copy"><strong>아직 잘 모르겠어요</strong><small>현장의 불편부터 함께 찾아보고 싶어요.</small></span>
+          <span class="start-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="workspace" id="workspace" aria-labelledby="workspace-title" hidden>
+      <div class="progress-panel">
+        <div class="progress-head">
+          <div><p class="step-label">STEP 02</p><h2 id="workspace-title">대화로 핵심 좁히기</h2></div>
+          <span id="progress-value">1 / 6</span>
+        </div>
+        <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
+        <ol class="progress-steps" id="progress-steps">
+          <li class="is-current"><span>01</span>문제</li>
+          <li><span>02</span>사용자</li>
+          <li><span>03</span>해결</li>
+          <li><span>04</span>흐름</li>
+          <li><span>05</span>기능</li>
+          <li><span>06</span>테스트</li>
+        </ol>
+      </div>
+
+      <div class="work-grid">
+        <section class="chat-card" aria-label="업무지시서 코치와 대화">
+          <div class="chat-head">
+            <div class="coach-avatar" aria-hidden="true">B</div>
+            <div><strong>BCC 업무지시서 코치</strong><small><i></i> 핵심만 한 가지씩 질문합니다</small></div>
+            <button class="text-button" id="reset-button" type="button">처음부터</button>
+          </div>
+          <div class="messages" id="messages" aria-live="polite"></div>
+          <div class="quick-replies" id="quick-replies"></div>
+          <form class="composer" id="composer">
+            <label class="sr-only" for="answer-input">답변 입력</label>
+            <textarea id="answer-input" rows="3" maxlength="1200" placeholder="편하게 말하듯 입력하세요." required></textarea>
+            <div class="composer-foot">
+              <span><b id="answer-count">0</b> / 1,200</span>
+              <button class="send-button" type="submit">답변 보내기 <span aria-hidden="true">↑</span></button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="brief-card" aria-label="지금까지 정리된 내용">
+          <div class="brief-head"><div><p class="step-label">LIVE BRIEF</p><h2>지금까지 정리</h2></div><span class="saved-state">자동 저장</span></div>
+          <dl id="brief-list">
+            <div><dt>핵심 문제</dt><dd data-brief="problem">대화를 시작하면 여기에 정리됩니다.</dd></div>
+            <div><dt>주요 사용자</dt><dd data-brief="primaryUser">아직 확인되지 않음</dd></div>
+            <div><dt>해결 방식</dt><dd data-brief="solution">아직 확인되지 않음</dd></div>
+            <div><dt>핵심 기능</dt><dd data-brief="mustFeatures">아직 확인되지 않음</dd></div>
+          </dl>
+          <div class="scope-note"><strong>수업용 안전장치</strong><p>로그인·결제·복잡한 외부 API는 기본 범위에서 제외합니다.</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="result-section" id="result-section" aria-labelledby="result-title" hidden>
+      <div class="result-copy">
+        <p class="step-label">STEP 03</p>
+        <h2 id="result-title">업무지시서가 준비됐습니다.</h2>
+        <p>내용을 확인한 뒤 파일을 내려받아 Antigravity에 넣으세요.</p>
+        <ol class="handoff-steps">
+          <li><span>1</span>PROJECT_INSTRUCTION.md 다운로드</li>
+          <li><span>2</span>Antigravity에서 새 프로젝트 열기</li>
+          <li><span>3</span>파일을 첨부하고 “이 지시서대로 구현해줘” 입력</li>
+        </ol>
+        <div class="result-actions">
+          <button class="primary-button" id="download-button" type="button">MD 파일 다운로드</button>
+          <button class="secondary-button" id="copy-button" type="button">내용 복사</button>
+        </div>
+      </div>
+      <div class="document-preview">
+        <div class="preview-head"><span></span><span></span><span></span><strong>PROJECT_INSTRUCTION.md</strong></div>
+        <pre id="markdown-preview"></pre>
+      </div>
+    </section>
+
+    <section class="privacy-note" aria-label="사용 전 확인">
+      <strong>잠깐, 입력 전 확인하세요.</strong>
+      <p>이 도구는 강의 중 프로토타입 제작을 위한 도구입니다. 주민번호·연락처·고객 명단·기관 내부 비밀처럼 민감한 정보는 입력하지 마세요.</p>
+    </section>
+  </main>
+
+  <footer><span>© 2026 BCC 비즈니스커리어컨설팅</span><a href="../">잇툴즈로 돌아가기</a></footer>
+  <script src="./app.js" defer></script>
+</body>
+</html>
