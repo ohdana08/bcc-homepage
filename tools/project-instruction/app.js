@@ -11,7 +11,7 @@ import {
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'bcc-project-instruction-classroom-v2-local';
+  var STORAGE_KEY = 'bcc-project-instruction-classroom-v3-plain';
   var ENGINE = 'local-rules-v1';
 
   var elements = {
@@ -126,9 +126,9 @@ import {
   function renderBrief() {
     var values = {
       problem: briefValue(session.state.problem, '대화를 시작하면 여기에 정리됩니다.'),
-      primaryUser: briefValue(session.state.primaryUser, '아직 확인되지 않음'),
-      solution: briefValue(session.state.solution, '아직 확인되지 않음'),
-      mustFeatures: briefValue(session.state.mustFeatures, '아직 확인되지 않음'),
+      primaryUser: briefValue(session.state.primaryUser, '아직 정하지 않음'),
+      solution: briefValue(session.state.solution, '아직 정하지 않음'),
+      mustFeatures: briefValue(session.state.mustFeatures, '아직 정하지 않음'),
     };
     Object.keys(values).forEach(function (key) {
       var target = document.querySelector('[data-brief="' + key + '"]');
@@ -267,7 +267,7 @@ import {
     var url = URL.createObjectURL(blob);
     var anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'PROJECT_INSTRUCTION.md';
+    anchor.download = '홈페이지_만들기_설명서.md';
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
