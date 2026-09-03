@@ -17,6 +17,8 @@ test('비로그인 무료 1강 페이지는 영상, 실습자료, 9,900원 전�
   assert.match(html, /전체 실습팩 9,900원으로 시작/);
   assert.match(html, /<video[^>]+crossorigin="anonymous"/);
   assert.match(script, /api\/claude101-public-sample/);
+  assert.match(script, /WEBVTT/);
+  assert.match(script, /new Blob\(\[webVtt\], \{ type: 'text\/vtt' \}\)/);
   assert.match(script, /sample_lesson_start/);
   assert.match(script, /sample_purchase_click/);
   assert.ok(config.rewrites.some((item) => item.source === '/api/claude101-public-sample'));

@@ -8,6 +8,7 @@ const video = document.getElementById('sampleVideo');
 const retryButton = document.getElementById('sampleRetry');
 const practiceView = document.getElementById('samplePractice');
 const copyItems = new Map();
+let subtitleObjectUrl = null;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -126,18 +127,35 @@ function saveChecklist() {
   try { localStorage.setItem(checklistKey(), JSON.stringify(state)); } catch (_) {}
 }
 
-function attachVideo(assets) {
+async function createWebVttUrl(subtitleUrl) {
+  if (!subtitleUrl) return null;
+  const response = await fetch(subtitleUrl, { mode: 'cors', credentials: 'omit' });
+  if (!response.ok) throw new Error(`subtitle ${response.status}`);
+  const subtitleText = await response.text();
+  const normalized = subtitleText.replaceAll('\r\n', '\n').trim();
+  const webVtt = normalized.startsWith('WEBVTT')
+    ? normalized
+    : `WEBVTT\n\n${normalized.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2')}`;
+  return URL.createObjectURL(new Blob([webVtt], { type: 'text/vtt' }));
+}
+
+async function attachVideo(assets) {
   video.replaceChildren();
+  if (subtitleObjectUrl) {
+    URL.revokeObjectURL(subtitleObjectUrl);
+    subtitleObjectUrl = null;
+  }
   const source = document.createElement('source');
   source.src = assets.videoUrl;
   source.type = 'video/mp4';
   video.append(source);
   if (assets.subtitleUrl) {
+    subtitleObjectUrl = await createWebVttUrl(assets.subtitleUrl);
     const track = document.createElement('track');
     track.kind = 'captions';
     track.srclang = 'ko';
     track.label = '한국어';
-    track.src = assets.subtitleUrl;
+    track.src = subtitleObjectUrl;
     track.default = true;
     video.append(track);
   }
@@ -158,7 +176,7 @@ async function loadSample() {
     if (!response.ok) throw new Error(`sample ${response.status}`);
     const data = await response.json();
     if (data.lessonId !== SAMPLE_LESSON_ID || !data.lesson?.videoUrl) throw new Error('invalid sample payload');
-    attachVideo(data.lesson);
+    await attachVideo(data.lesson);
     renderPractice(data.lesson);
   } catch (_) {
     video.hidden = true;
