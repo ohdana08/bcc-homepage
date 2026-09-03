@@ -15,6 +15,7 @@ test('비로그인 무료 1강 페이지는 영상, 실습자료, 9,900원 전�
   assert.match(html, /회의 메모 7줄/);
   assert.match(html, /유료 실전팩의 보조 영상 6개 중 첫 번째 영상/);
   assert.match(html, /전체 실습팩 9,900원으로 시작/);
+  assert.match(html, /<video[^>]+crossorigin="anonymous"/);
   assert.match(script, /api\/claude101-public-sample/);
   assert.match(script, /sample_lesson_start/);
   assert.match(script, /sample_purchase_click/);
