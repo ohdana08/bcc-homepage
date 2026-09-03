@@ -30,6 +30,43 @@ import {
     downloadButton: document.getElementById('download-button'),
     copyButton: document.getElementById('copy-button'),
     resetButton: document.getElementById('reset-button'),
+    detailDialog: document.getElementById('detail-dialog'),
+    detailClose: document.getElementById('detail-close'),
+    detailContinue: document.getElementById('detail-continue'),
+    detailSymbol: document.getElementById('detail-symbol'),
+    detailTitle: document.getElementById('detail-title'),
+    detailDescription: document.getElementById('detail-description'),
+    detailBenefits: document.getElementById('detail-benefits'),
+    detailOutcomeTitle: document.getElementById('detail-outcome-title'),
+    detailOutcomeCopy: document.getElementById('detail-outcome-copy'),
+    detailStartLink: document.getElementById('detail-start-link'),
+  };
+
+  var detailContent = {
+    material: {
+      symbol: '＋',
+      title: '사진이나 문서를 함께 살펴볼까요?',
+      description: '자료 속 내용을 읽어, 지금까지 적은 생각과 함께 정리할 수 있어요.',
+      benefits: [
+        '사진의 글씨와 문서 내용을 찾아 반영해요.',
+        '빠진 내용은 다시 물어봐요.',
+        '더 자세한 홈페이지 만들기 설명서로 정리해요.',
+      ],
+      outcomeTitle: '자료를 추가하면',
+      outcomeCopy: '내가 적은 답변과 실제 자료가 한 설명서 안에 함께 정리됩니다.',
+    },
+    link: {
+      symbol: '↗',
+      title: '참고할 홈페이지를 함께 살펴볼까요?',
+      description: '마음에 드는 홈페이지 주소를 알려주면 원하는 분위기와 구성을 더 정확하게 설명할 수 있어요.',
+      benefits: [
+        '참고할 홈페이지에서 눈에 띄는 구성을 찾아요.',
+        '따라 하고 싶은 부분과 바꿔야 할 부분을 나눠요.',
+        '원하는 모습이 더 잘 드러나는 설명서로 정리해요.',
+      ],
+      outcomeTitle: '링크를 추가하면',
+      outcomeCopy: '막연했던 디자인 느낌을 화면 구성과 문장으로 더 구체적으로 남길 수 있습니다.',
+    },
   };
 
   function newSession() {
@@ -152,6 +189,31 @@ import {
     });
   }
 
+  function openDetailDialog(kind) {
+    var selectedKind = kind === 'link' ? 'link' : 'material';
+    var content = detailContent[selectedKind];
+    elements.detailSymbol.textContent = content.symbol;
+    elements.detailTitle.textContent = content.title;
+    elements.detailDescription.textContent = content.description;
+    elements.detailBenefits.replaceChildren();
+    content.benefits.forEach(function (text) {
+      var item = document.createElement('li');
+      item.textContent = text;
+      elements.detailBenefits.appendChild(item);
+    });
+    elements.detailOutcomeTitle.textContent = content.outcomeTitle;
+    elements.detailOutcomeCopy.textContent = content.outcomeCopy;
+    elements.detailStartLink.dataset.entryKind = selectedKind;
+    track('project_instruction_detail_open', { entry_kind: selectedKind });
+    if (typeof elements.detailDialog.showModal === 'function') elements.detailDialog.showModal();
+    else elements.detailDialog.setAttribute('open', '');
+  }
+
+  function closeDetailDialog() {
+    if (typeof elements.detailDialog.close === 'function') elements.detailDialog.close();
+    else elements.detailDialog.removeAttribute('open');
+  }
+
   function renderResult() {
     if (!session.ready) {
       elements.resultSection.hidden = true;
@@ -226,6 +288,19 @@ import {
 
   document.querySelectorAll('[data-start-mode]').forEach(function (button) {
     button.addEventListener('click', function () { start(button.dataset.startMode); });
+  });
+
+  document.querySelectorAll('[data-detail-entry]').forEach(function (button) {
+    button.addEventListener('click', function () { openDetailDialog(button.dataset.detailEntry); });
+  });
+
+  elements.detailClose.addEventListener('click', closeDetailDialog);
+  elements.detailContinue.addEventListener('click', closeDetailDialog);
+  elements.detailDialog.addEventListener('click', function (event) {
+    if (event.target === elements.detailDialog) closeDetailDialog();
+  });
+  elements.detailStartLink.addEventListener('click', function () {
+    track('project_instruction_detail_start', { entry_kind: elements.detailStartLink.dataset.entryKind || 'material' });
   });
 
   elements.answerInput.addEventListener('input', function () {

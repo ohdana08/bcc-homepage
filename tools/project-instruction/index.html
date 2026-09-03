@@ -84,6 +84,10 @@
           <div class="messages" id="messages" aria-live="polite"></div>
           <div class="quick-replies" id="quick-replies"></div>
           <form class="composer" id="composer">
+            <div class="source-actions" aria-label="참고할 내용 더하기">
+              <button class="source-button" type="button" data-detail-entry="material"><span aria-hidden="true">＋</span> 자료 추가</button>
+              <button class="source-button" type="button" data-detail-entry="link"><span aria-hidden="true">↗</span> 링크 추가</button>
+            </div>
             <label class="sr-only" for="answer-input">답변 입력</label>
             <textarea id="answer-input" rows="3" maxlength="1200" placeholder="편하게 말하듯 입력하세요." required></textarea>
             <div class="composer-foot">
@@ -132,6 +136,28 @@
       <p>그래도 주민번호·연락처·고객 명단·기관 내부 비밀처럼 다른 사람에게 보여주면 안 되는 내용은 적지 마세요.</p>
     </section>
   </main>
+
+  <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="detail-title" aria-describedby="detail-description">
+    <div class="detail-dialog-inner">
+      <button class="dialog-close" id="detail-close" type="button" aria-label="안내 닫기">×</button>
+      <p class="detail-kicker">자료와 함께 자세히 만들기</p>
+      <div class="detail-symbol" id="detail-symbol" aria-hidden="true">＋</div>
+      <h2 id="detail-title">사진이나 문서를 함께 살펴볼까요?</h2>
+      <p class="detail-description" id="detail-description">자료 속 내용을 읽어, 지금까지 적은 생각과 함께 정리할 수 있어요.</p>
+      <ul class="detail-benefits" id="detail-benefits">
+        <li>사진의 글씨와 문서 내용을 찾아 반영해요.</li>
+        <li>빠진 내용은 다시 물어봐요.</li>
+        <li>더 자세한 홈페이지 만들기 설명서로 정리해요.</li>
+      </ul>
+      <div class="detail-outcome">
+        <strong id="detail-outcome-title">자료를 추가하면</strong>
+        <p id="detail-outcome-copy">내가 적은 답변과 실제 자료가 한 설명서 안에 함께 정리됩니다.</p>
+      </div>
+      <a class="detail-primary" id="detail-start-link" href="../../?utm_source=project_instruction&amp;utm_medium=detail_gate&amp;utm_campaign=project_instruction_detail#contact">자료와 함께 자세히 만들기 <span aria-hidden="true">→</span></a>
+      <button class="detail-secondary" id="detail-continue" type="button">지금은 질문만 이어가기</button>
+      <p class="detail-footnote">버튼을 누르면 자세한 이용 안내로 이동합니다. 지금까지 적은 내용은 이 기기에 그대로 남아 있어요.</p>
+    </div>
+  </dialog>
 
   <footer><span>© 2026 BCC 비즈니스커리어컨설팅</span><a href="../">잇툴즈로 돌아가기</a></footer>
   <script type="module" src="./app.js"></script>

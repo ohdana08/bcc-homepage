@@ -103,6 +103,25 @@ test('운영 화면은 초보자용 쉬운 말만 보여주고 외부 호출은 
   assert.doesNotMatch(localEngine, /유료 AI API|비용 0원|무료 버전/);
 });
 
+test('입력창에서 자료와 링크를 나누고 자세히 만들기 안내로 연결한다', async () => {
+  const [html, app, styles] = await Promise.all([
+    readFile(PAGE_URL, 'utf8'),
+    readFile(new URL('../tools/project-instruction/app.js', import.meta.url), 'utf8'),
+    readFile(new URL('../tools/project-instruction/styles.css', import.meta.url), 'utf8'),
+  ]);
+  assert.match(html, /data-detail-entry="material"[^>]*><span[^>]*>＋<\/span> 자료 추가/);
+  assert.match(html, /data-detail-entry="link"[^>]*><span[^>]*>↗<\/span> 링크 추가/);
+  assert.match(html, /id="detail-dialog"/);
+  assert.match(html, /자료와 함께 자세히 만들기/);
+  assert.match(html, /utm_medium=detail_gate/);
+  assert.doesNotMatch(html, /유료\s*결제하세요/);
+  assert.match(app, /project_instruction_detail_open/);
+  assert.match(app, /사진의 글씨와 문서 내용/);
+  assert.match(app, /참고할 홈페이지에서 눈에 띄는 구성/);
+  assert.match(styles, /\.detail-dialog::backdrop/);
+  assert.match(styles, /\.source-button:focus-visible/);
+});
+
 test('서버 AI 호출 입구와 Vercel rewrite가 제거됐다', async () => {
   const [vercel, api] = await Promise.all([
     readFile(new URL('../vercel.json', import.meta.url), 'utf8'),
