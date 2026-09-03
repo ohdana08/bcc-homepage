@@ -42,3 +42,22 @@ test('맞춤 제작 결제는 별도 상품 화면과 명시적 환불 동의를
   assert.match(success, /ai-workroom-pilot_/);
   assert.match(success, /맞춤 작업실 신청과 결제가 완료/);
 });
+
+test('신청부터 납품까지 운영 문서는 범위·보안·승인 조건을 고정한다', async () => {
+  const triage = await readFile(new URL('../revenue-launch/LEAD_TRIAGE.md', import.meta.url), 'utf8');
+  const replies = await readFile(new URL('../revenue-launch/REPLY_TEMPLATES.md', import.meta.url), 'utf8');
+  const onboarding = await readFile(new URL('../revenue-launch/CUSTOMER_ONBOARDING.md', import.meta.url), 'utf8');
+  const scope = await readFile(new URL('../revenue-launch/SCOPE_CONFIRMATION_TEMPLATE.md', import.meta.url), 'utf8');
+  const fulfillment = await readFile(new URL('../revenue-launch/FULFILLMENT_CHECKLIST.md', import.meta.url), 'utf8');
+
+  assert.match(triage, /대표 승인 없이 가격 변경, 할인 제안, 결제 링크 발송, 외부 답변 발송을 하지 않는다/);
+  assert.match(triage, /업무 흐름 한 가지/);
+  assert.match(replies, /149,000원\(VAT 포함\)/);
+  assert.match(replies, /무리하게 약속한 뒤 결과가 달라지는 일을 피하기 위해/);
+  assert.match(onboarding, /비밀번호, API 키, 인증서, 로그인 쿠키/);
+  assert.match(scope, /영업일 5일 안에 1차본/);
+  assert.match(scope, /서면 또는 전자문서로 동의/);
+  assert.match(fulfillment, /외부 실결제 149,000원 확인/);
+  assert.match(fulfillment, /동일 샘플로 기준 결과와 비교/);
+  assert.match(fulfillment, /불필요한 고객 원본과 임시파일 삭제/);
+});
