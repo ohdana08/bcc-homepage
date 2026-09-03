@@ -1,0 +1,44 @@
+.sample-shell { max-width: 980px; margin: auto; padding: 0 24px; }
+.sample-hero { min-height: 620px; display: grid; align-content: center; justify-items: start; padding: 84px 0 72px; }
+.sample-hero h1 { max-width: 900px; margin: 22px 0 20px; font-size: clamp(44px, 7.4vw, 76px); line-height: 1.04; letter-spacing: -.065em; }
+.sample-hero h1 em { color: var(--coral); font-style: normal; }
+.sample-hero > p { max-width: 760px; margin: 0; color: var(--soft); font-size: clamp(17px, 2.3vw, 21px); }
+.sample-hero > p strong { color: var(--text); }
+.sample-facts { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 26px; }
+.sample-facts span { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--soft); background: var(--surface); font-size: 12px; }
+.sample-start { margin-top: 30px; }
+.sample-lesson { padding: 90px 0 100px; border-top: 1px solid var(--line); }
+.sample-section-head { display: flex; align-items: end; justify-content: space-between; gap: 36px; margin-bottom: 26px; }
+.sample-section-head > div > span { color: var(--coral); font-size: 12px; font-weight: 900; }
+.sample-section-head h2 { max-width: 680px; margin: 7px 0 0; font-size: clamp(30px, 5vw, 48px); line-height: 1.14; letter-spacing: -.045em; }
+.sample-section-head > p { max-width: 280px; margin: 0; color: var(--muted); font-size: 12px; }
+.sample-video-panel { position: relative; overflow: hidden; padding: 14px; border: 1px solid var(--line-strong); border-radius: 18px; background: #050504; }
+.sample-video-panel .course-video { border: 0; }
+.sample-loading { min-height: 480px; display: grid; place-content: center; gap: 4px; text-align: center; }
+.sample-loading[hidden], .sample-video-panel .course-video[hidden], .sample-retry[hidden] { display: none; }
+.sample-loading strong { font-size: 20px; }
+.sample-loading span { color: var(--muted); font-size: 12px; }
+.sample-loading.is-error strong { color: var(--danger); }
+.sample-retry { width: 100%; margin-top: 12px; }
+.sample-guide { margin: 18px 0 0; padding: 18px 20px; border: 1px solid rgba(135,201,168,.28); border-radius: 13px; background: rgba(135,201,168,.06); }
+.sample-guide strong { color: var(--green); font-size: 14px; }
+.sample-guide p { margin: 4px 0 0; color: var(--soft); font-size: 13px; }
+.sample-practice { margin-top: 24px; }
+.sample-practice .practice-materials { border: 1px solid var(--line); border-radius: 18px; }
+.sample-offer { margin-bottom: 100px; padding: 54px; border: 1px solid var(--line-strong); border-radius: 22px; background: linear-gradient(145deg, rgba(235,157,110,.14), rgba(255,255,255,.025)); text-align: center; }
+.sample-offer > span { color: var(--coral); font-size: 12px; font-weight: 900; }
+.sample-offer h2 { margin: 8px 0 15px; font-size: clamp(31px, 5vw, 48px); line-height: 1.14; letter-spacing: -.045em; }
+.sample-offer p { max-width: 690px; margin: 0 auto 25px; color: var(--soft); }
+.sample-offer .primary-button { width: min(100%, 440px); }
+.sample-text-link { display: block; width: fit-content; margin: 17px auto 0; color: var(--soft); font-size: 12px; text-decoration: underline; }
+@media (max-width: 700px) {
+  .sample-shell { padding: 0 17px; }
+  .sample-hero { min-height: auto; padding: 64px 0 70px; }
+  .sample-hero h1 { font-size: 44px; }
+  .sample-start { width: 100%; }
+  .sample-lesson { padding: 70px 0 76px; }
+  .sample-section-head { align-items: start; flex-direction: column; gap: 12px; }
+  .sample-video-panel { padding: 7px; border-radius: 14px; }
+  .sample-loading { min-height: 220px; }
+  .sample-offer { margin-bottom: 72px; padding: 34px 20px; }
+}

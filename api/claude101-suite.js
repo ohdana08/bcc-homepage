@@ -3,11 +3,13 @@
 import courseAccess from '../lib/claude101-api/course-access.js';
 import grobleCheckout from '../lib/claude101-api/groble-checkout.js';
 import grobleEvent from '../lib/claude101-api/groble-claude101-event.js';
+import publicSample from '../lib/claude101-api/public-sample.js';
 
 const HANDLERS = {
   'course-access': courseAccess,
   'groble-checkout': grobleCheckout,
   'groble-event': grobleEvent,
+  'public-sample': publicSample,
 };
 
 export default async function handler(req, res) {

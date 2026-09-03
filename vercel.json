@@ -8,6 +8,7 @@
   ],
   "rewrites": [
     { "source": "/api/course-access", "destination": "/api/claude101-suite?fn=course-access" },
+    { "source": "/api/claude101-public-sample", "destination": "/api/claude101-suite?fn=public-sample" },
     { "source": "/api/groble-checkout", "destination": "/api/claude101-suite?fn=groble-checkout" },
     { "source": "/api/groble-claude101-event", "destination": "/api/claude101-suite?fn=groble-event" }
   ]
