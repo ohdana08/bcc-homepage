@@ -32,8 +32,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: '이름·연락처·이메일·상품을 모두 입력해 주세요.' });
   if (!EMAIL_RE.test(email))
     return res.status(400).json({ error: '이메일 형식이 올바르지 않습니다.' });
-  if (!refundConsent)
-    return res.status(400).json({ error: '환불·청약철회 안내를 확인하고 동의해 주세요.' });
 
   const db = supabaseAdmin();
 

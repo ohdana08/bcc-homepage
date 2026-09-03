@@ -25,7 +25,7 @@ test('Groble payment event parser reads the documented fields', () => {
         merchantUid: '202608140000000001',
         sellerReference: 'c101_1234567890abcdef1234567890abcdef',
         content: { id: 'nSq3PJ' },
-        pricing: { finalAmount: 29000 },
+        pricing: { finalAmount: 9900 },
       },
     },
   });
@@ -35,7 +35,7 @@ test('Groble payment event parser reads the documented fields', () => {
     merchantUid: '202608140000000001',
     sellerReference: 'c101_1234567890abcdef1234567890abcdef',
     contentId: 'nSq3PJ',
-    amount: 29000,
+    amount: 9900,
   });
   assert.equal(isGroblePaymentCompleted(event.type), true);
   assert.equal(isGroblePaymentRefunded(event.type), false);

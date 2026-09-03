@@ -8,7 +8,7 @@ test('Claude 101 판매 페이지의 결과물과 6강 카드가 실제 구매·
 
   assert.equal((html.match(/class="result-file"[^>]*data-purchase/g) || []).length, 3);
   assert.equal((html.match(/class="lesson-tile lesson-action"[^>]*data-purchase/g) || []).length, 6);
-  assert.equal((html.match(/수강실에서 보기 →/g) || []).length, 6);
+  assert.equal((html.match(/자료실에서 받기 →/g) || []).length, 6);
   assert.match(script, /event\.preventDefault\(\)/);
   assert.match(script, /getAttribute\('aria-disabled'\) === 'true'/);
 });

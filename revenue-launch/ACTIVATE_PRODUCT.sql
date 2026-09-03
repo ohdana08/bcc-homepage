@@ -1,14 +1,11 @@
--- 승인 후에만 bcc-business 운영 DB에서 실행한다.
--- 랜딩 신청을 검토한 뒤 적합 고객에게만 결제 링크를 전달한다.
-insert into public.products (id, name, price, recourse_price, is_active)
-values ('ai-workroom-pilot', 'AI 업무 1개 끝내기 맞춤 작업실', 149000, null, true)
-on conflict (id) do update set
-  name = excluded.name,
-  price = excluded.price,
-  recourse_price = excluded.recourse_price,
-  is_active = excluded.is_active;
+-- 사용자 승인 가격: Claude 101 업무 결과물 실습팩 9,900원
+-- 그로블 상품 nSq3PJ의 판매가도 반드시 9,900원으로 먼저 맞춘 뒤 실행한다.
 
--- 실행 후 검증
-select id, name, price, recourse_price, is_active
-from public.products
-where id = 'ai-workroom-pilot';
+update public.products
+set
+  name = 'AI 업무 결과물 3종 실습팩',
+  price = 9900,
+  recourse_price = null,
+  is_active = true
+where id = 'claude101-pro'
+returning id, name, price, recourse_price, is_active;
