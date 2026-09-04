@@ -14,6 +14,8 @@ import {
 
 const publicSurveyPage = readFileSync(new URL('../tools/training-needs/index.html', import.meta.url), 'utf8');
 const adminSurveyPage = readFileSync(new URL('../admin-training-needs.html', import.meta.url), 'utf8');
+const proposalAdminPage = readFileSync(new URL('../admin-proposals.html', import.meta.url), 'utf8');
+const apiEntry = readFileSync(new URL('../api/cardnews-generate.js', import.meta.url), 'utf8');
 
 function completeAnswers(overrides = {}) {
   return {
@@ -180,6 +182,30 @@ test('관리자는 생성한 수요조사의 기본정보를 다시 수정할 �
   assert.match(adminSurveyPage, /api\('update',\{id:state\.selected,changes:form\}\)/);
   assert.match(adminSurveyPage, /class="row-edit"[^>]+>수정<\/button>/);
   assert.match(adminSurveyPage, /if\(await selectSurvey\(button\.dataset\.editId\)\)openEditModal\(\)/);
+});
+
+test('기관 제안 운영실에서 수요조사 관리와 선택 기관 설문 생성으로 바로 이어진다', () => {
+  assert.match(proposalAdminPage, /id="trainingNeedsHub"/);
+  assert.match(proposalAdminPage, /수요조사 관리 열기/);
+  assert.match(proposalAdminPage, /admin-training-needs\.html\?create=1&case=\$\{encodeURIComponent\(c\.id\)\}/);
+  assert.match(adminSurveyPage, /params\.get\('create'\)==='1'/);
+  assert.match(adminSurveyPage, /openCreateModal\(params\.get\('case'\)\|\|''\)/);
+  assert.match(adminSurveyPage, /form\.elements\.institution_label\.value=proposal\.institution_name/);
+});
+
+test('모바일 목록은 결과 보기 버튼으로 상세를 열고 상세 영역으로 이동한다', () => {
+  assert.match(adminSurveyPage, /class="row-open"[^>]+>결과 보기<\/button>/);
+  assert.match(adminSurveyPage, /selectSurvey\(button\.dataset\.viewId,true\)/);
+  assert.match(adminSurveyPage, /scrollIntoView\(\{behavior:/);
+  assert.match(adminSurveyPage, /min-height:44px/);
+});
+
+test('교육생 전용 링크는 로그인 검사 전에 공개 설문 전용 경로로 처리한다', () => {
+  const publicRoute = apiEntry.indexOf("if ((req.body?.engine) === 'training_needs_public')");
+  const loginGate = apiEntry.indexOf("if (!token) return res.status(401)");
+  assert.ok(publicRoute >= 0 && loginGate >= 0 && publicRoute < loginGate);
+  assert.match(publicSurveyPage, /engine:'training_needs_public'/);
+  assert.doesNotMatch(publicSurveyPage, /Authorization:/);
 });
 
 test('관리자 인증이 만료되면 세션을 갱신해 한 번 재시도하고 작성값을 보존한다', () => {
