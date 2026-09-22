@@ -6,6 +6,7 @@ import {
   campaignAutomation,
   classifyInboundReply,
   contentTypeOrderForDate,
+  contentPlanForDate,
   dateKeyInTimeZone,
   externalCommentsEnabled,
   formatBodyLines,
@@ -412,10 +413,10 @@ function campaignReadyPost(overrides = {}) {
   };
 }
 
-test('기본 캠페인의 확정 발행 시각을 유지한다', () => {
+test('기본 캠페인은 네 구간에 두 번씩 무인 발행한다', () => {
   assert.deepEqual(
     publishTimesForCampaign({ id: 'default' }),
-    ['08:10', '10:30', '12:20', '18:10', '21:20'],
+    ['08:40', '09:10', '11:50', '12:20', '18:00', '18:30', '20:30', '21:00'],
   );
   assert.deepEqual(
     publishTimesForCampaign({ id: 'jiwonfit' }),
@@ -425,6 +426,14 @@ test('기본 캠페인의 확정 발행 시각을 유지한다', () => {
     publishTimesForCampaign({ id: 'unsent_talk', publish_times: ['22:00', '00:00'] }),
     ['22:00', '00:00'],
   );
+});
+
+test('기본 8개 배치는 판매 1개와 가치 글 7개를 만든다', () => {
+  const plan = contentPlanForDate('2026-09-23', 'default', 8);
+  assert.equal(plan.length, 8);
+  assert.equal(plan.filter((type) => type === 'sale').length, 1);
+  assert.equal(plan.filter((type) => type !== 'sale').length, 7);
+  assert.deepEqual(contentPlanForDate('2026-09-23', 'jiwonfit', 5), DAILY_TYPES);
 });
 
 test('안보낸톡 사전승인 큐는 셀프댓글을 끄고 자동답글만 켠다', () => {
