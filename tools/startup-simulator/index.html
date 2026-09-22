@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#184f42">
+  <meta name="description" content="창업 전 매출, 비용, 생활비와 12개월 현금 흐름을 가정해 보는 BCC 창업 시뮬레이터.">
+  <title>창업 시뮬레이터 | BCC 잇툴즈</title>
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://bccconsulting.kr/tools/startup-simulator/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="BCC 잇툴즈">
+  <meta property="og:title" content="창업 시뮬레이터 | BCC 잇툴즈">
+  <meta property="og:description" content="창업 전 매출, 비용, 생활비와 12개월 현금 흐름을 가정해 보세요. 입력 정보는 외부로 전송하지 않습니다.">
+  <meta property="og:url" content="https://bccconsulting.kr/tools/startup-simulator/">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23184f42'/%3E%3Cpath d='M17 44V28h8v16m5 0V20h8v24m5 0V12h8v32' stroke='%23dcecac' stroke-width='5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/tools/startup-simulator/styles.css">
+  <script type="module" src="/tools/startup-simulator/app.mjs"></script>
+</head>
+<body data-local-only="true">
+  <a class="skip-link" href="#assumptions">입력 항목으로 바로가기</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="BCC 창업 시뮬레이터 처음으로"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><strong>BCC</strong><span class="brand-divider"></span><span class="brand-product">창업 시뮬레이터</span></a>
+      <a class="hub-return" href="/tools/"><span aria-hidden="true">←</span> 잇툴즈 전체보기</a>
+      <nav aria-label="주요 메뉴"><a class="nav-active" href="#assumptions">시뮬레이션</a><a href="#methodology">계산 기준</a></nav>
+      <span class="local-badge"><span></span> 내 기기에서 계산</span>
+    </div>
+  </header>
+
+  <main id="top" class="page-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow">BEFORE YOU START, KNOW YOUR NUMBERS</p><h1 id="page-title">이 사업, 한 달에<br class="mobile-break"> <span>얼마나 남을까?</span></h1><p class="intro-description">아이디어에 숫자를 더해 보세요.<br class="mobile-break"> 매출부터 사장님 생활비, 첫 1년의 현금까지.</p></div>
+      <div class="intro-note"><span class="note-symbol" aria-hidden="true">↗</span><p>작게 가정하고,<br><strong>시작 전에 확인하세요.</strong></p></div>
+    </section>
+
+    <section class="presets-section" aria-labelledby="presets-title">
+      <div class="section-topline"><h2 id="presets-title">어떤 사업을 준비하나요?</h2><p>가상 예시로 시작한 뒤 내 숫자로 바꿔 보세요.</p></div>
+      <div id="preset-options" class="preset-options"></div>
+      <p class="preset-disclaimer">예시 금액은 학습을 위한 가정이며, 업종 평균이나 실제 수익 자료가 아닙니다.</p>
+    </section>
+
+    <div class="workspace-toolbar"><div class="workspace-caption"><span class="tiny-grid" aria-hidden="true">▦</span> 나의 사업 설계 <span class="tax-badge">부가세 제외 · 세전 추정</span></div><div class="toolbar-actions"><button id="load-plan" class="button button-quiet" type="button"><span aria-hidden="true">↥</span> 불러오기</button><button id="save-plan" class="button button-outline" type="button"><span aria-hidden="true">↓</span> 내 기기에 저장</button><button id="print-report" class="button button-primary" type="button"><span aria-hidden="true">▤</span> 결과 인쇄</button></div></div>
+    <p id="storage-status" class="storage-status" role="status" aria-live="polite">저장 버튼을 누를 때만 이 브라우저에 입력값을 보관합니다.</p>
+
+    <div class="workspace">
+      <form id="assumptions" class="input-column" novalidate aria-label="사업 가정 입력">
+        <section class="panel input-panel plan-panel"><div class="panel-heading"><span class="section-number">01</span><div><h2>얼마나 팔 수 있을까요?</h2><p>매출이 안정된 한 달을 가정해 주세요.</p></div></div><div id="sales-fields" class="field-grid"></div><div class="field-help-box"><span aria-hidden="true">ⓘ</span><p>판매 1건은 평균 주문 1회입니다. 수업은 수강생 1명, 서비스는 계약 1건으로 생각하세요.</p></div></section>
+        <section class="panel input-panel"><div class="panel-heading"><span class="section-number">02</span><div><h2>운영에 얼마가 들까요?</h2><p>팔 때마다 드는 돈과 매달 드는 돈.</p></div></div><div id="cost-fields" class="field-grid"></div><div class="owner-divider"></div><div id="owner-fields" class="field-grid"></div><p class="field-note">사장님 생활비는 비용·급여가 아닌, 사업에서 매월 가져갈 목표 금액입니다. 직원 인건비에 중복으로 넣지 마세요.</p></section>
+        <details class="panel advanced-panel" open><summary><span class="section-number">03</span><span><strong>첫 1년, 버틸 수 있을까요?</strong><small>창업 자금과 매출 성장 가정</small></span><span class="chevron" aria-hidden="true">⌄</span></summary><div class="advanced-content"><div id="cash-fields" class="field-grid"></div><p class="field-note">총 준비 자금에서 초기 투자와 보증금을 먼저 차감합니다. 보증금 반환은 가정하지 않습니다.</p><div class="owner-divider"></div><div id="growth-fields" class="field-grid"></div><p class="field-note">첫 달 매출에서 매달 설정한 비율만큼 성장하며, 위에서 입력한 정상 매출에 도달하면 유지합니다. 첫 달 0%는 계속 0%입니다.</p></div></details>
+      </form>
+
+      <div class="result-column">
+        <div id="validation-summary" class="validation-summary" role="alert" hidden><span aria-hidden="true">!</span><div><h2>입력값을 확인해 주세요</h2><p>표시된 항목을 고치면 결과가 다시 계산됩니다.</p><ul id="validation-list"></ul></div></div>
+        <div id="results" class="results-wrap" aria-label="정상 매출 기준 시뮬레이션 결과">
+          <section class="summary-card" aria-labelledby="result-heading"><div class="summary-top"><span class="summary-eyebrow">MY MONTHLY PICTURE</span><span class="live-badge"><i></i> 실시간 계산</span></div><h2 id="result-heading">사장님 생활비까지 가져가면</h2><div class="main-metric"><strong id="monthly-surplus">—</strong><span>원 / 월</span></div><p id="summary-description" class="summary-description"></p><p id="funding-alert" class="funding-alert" hidden></p><div class="summary-metrics"><div><span>월 매출</span><strong id="monthly-revenue"></strong></div><div><span>생활비 차감 전 잉여</span><strong id="operating-surplus"></strong></div><div><span>사장님 생활비</span><strong id="owner-draw"></strong></div></div><div class="summary-foot"><span aria-hidden="true">↳</span> 매출이 안정된 한 달 기준 · 초기 성장 기간은 아래 현금 흐름에 반영</div><div class="summary-decoration" aria-hidden="true"><i></i><i></i><i></i><i></i></div></section>
+
+          <section class="panel breakdown-panel" aria-labelledby="breakdown-title"><div class="result-panel-heading"><h2 id="breakdown-title">매출은 이렇게 나뉘어요</h2><span>정상 매출 · 월 기준</span></div><div id="cost-bar" class="cost-bar" aria-hidden="true"></div><div id="breakdown-rows" class="breakdown-rows"></div><div id="target-insight" class="target-insight"></div><div class="target-grid"><div><span>가게 운영비만 충당하려면</span><strong id="break-even-daily"></strong><small id="break-even-revenue"></small></div><div><span>생활비까지 충당하려면</span><strong id="target-daily"></strong><small id="target-revenue"></small></div></div><div id="margin-warning" class="margin-warning" hidden></div></section>
+
+          <section class="panel scenario-panel" aria-labelledby="scenario-title"><div class="result-panel-heading"><h2 id="scenario-title">생각보다 덜 팔리면?</h2><span>판매량만 바꿔 비교</span></div><div id="scenario-cards" class="scenario-cards"></div><p class="panel-footnote">가격·건당 원가·고정비는 동일합니다. 세 가지 가정은 발생 확률이나 시장 전망을 뜻하지 않습니다.</p></section>
+        </div>
+      </div>
+    </div>
+
+    <section id="cash-section" class="panel cash-section" aria-labelledby="cash-title"><div class="cash-header"><div><p class="eyebrow">YOUR FIRST 12 MONTHS</p><h2 id="cash-title">장부에 남는 돈, 통장에 있는 돈.</h2><p>초기 지출과 매출 성장 속도를 반영한 월말 현금 잔액입니다.</p></div><span class="cash-legend"><i></i> 생활비 차감 후 현금</span></div><div class="cash-layout"><div class="cash-overview"><div><span>초기 지출 후 남는 현금</span><strong id="opening-cash"></strong></div><div><span>12개월 뒤 예상 잔액</span><strong id="ending-cash"></strong></div><div id="cash-status" class="cash-status"></div></div><div id="cash-chart" class="cash-chart"></div></div><div class="cash-detail-stats"><div><span>12개월 중 가장 적은 잔액</span><strong id="minimum-cash"></strong></div><div><span>초기 지출의 첫 회수 시점</span><strong id="recovery-month"></strong></div><div><span>정상 매출의 단순 회수 기간</span><strong id="simple-payback"></strong></div></div><p class="panel-footnote cash-assumption">회수 계산은 생활비 차감 후 잉여금의 누적 기준입니다. 보증금 반환을 가정하지 않으며, 회수 이후의 적자도 발생할 수 있습니다.</p><details class="cash-table-details"><summary>월별 계산표 보기 <span aria-hidden="true">＋</span></summary><div class="table-scroll" tabindex="0" role="region" aria-label="12개월 현금 흐름 표. 작은 화면에서 좌우로 이동할 수 있습니다."><table id="cash-table"><caption>단위: 원. 첫 달 전 잔액은 초기 투자와 보증금을 차감한 금액입니다.</caption><thead><tr><th scope="col">시점</th><th scope="col">판매 건수</th><th scope="col">매출</th><th scope="col">변동비</th><th scope="col">운영 잉여</th><th scope="col">생활비</th><th scope="col">현금 증감</th><th scope="col">월말 잔액</th></tr></thead><tbody></tbody></table></div></details></section>
+
+    <section id="print-assumptions" class="print-assumptions"><h2>입력한 사업 가정</h2><p id="print-plan-name"></p><div id="print-inputs"></div></section>
+
+    <section id="methodology" class="methodology"><details><summary><span class="method-symbol" aria-hidden="true">i</span><strong>계산 기준과 알아둘 점</strong><span class="chevron" aria-hidden="true">⌄</span></summary><div class="method-body"><div><h3>숫자를 읽는 방법</h3><p>월 매출 = 평균 판매 가격 × 하루 판매 건수 × 월 영업일. 건당 공헌이익 = 판매 가격 − 건당 원가 − 판매 수수료입니다. 월 운영 잉여는 매출에서 변동비와 고정비를 뺀 금액이며, 사장님 생활비를 추가로 차감해 최종 잉여를 계산합니다.</p><p>손익분기 판매 건수는 비용을 건당 공헌이익으로 나눈 뒤 올림합니다. 표시하는 손익분기 매출은 올림 전 수학적 기준이며, 하루 목표는 월 목표 건수를 영업일로 나눈 뒤 올림한 값입니다.</p></div><div><h3>이번 계산에 포함하지 않은 항목</h3><p>모든 금액은 부가세 제외·세전입니다. 세금, 감가상각, 대출 원리금·이자, 재고·외상매출의 입출금 지연, 추가 시설 투자와 보증금 반환은 포함하지 않습니다. 매출과 비용은 해당 월에 모두 입출금된다고 가정합니다. 금액은 원 단위로 입력하며, 월 변동비는 합산 후 원 단위로 반올림합니다.</p><p>복수 상품은 대표 거래 1건의 평균값으로 입력하세요. 계산 결과는 입력 가정을 비교하는 도구이며, 사업의 성공이나 실제 수익을 판정하지 않습니다. 실제 수요와 하루 처리 가능한 판매량은 검증하지 않습니다. 작은 판매 실험과 실제 견적을 통해 가정을 검증해 보세요.</p></div><div class="source-block"><h3>참고한 계산 원칙</h3><p><a href="https://www.sba.gov/counseling/plan-your-business/" target="_blank" rel="noopener noreferrer">미국 SBA · 손익분기 분석 ↗</a><a href="https://stripe.com/resources/more/how-to-calculate-the-break-even-point" target="_blank" rel="noopener noreferrer">Stripe · 손익분기점 ↗</a><a href="https://www.bdc.ca/en/articles-tools/money-finance/manage-finances/how-complete-sensitivity-analysis" target="_blank" rel="noopener noreferrer">BDC · 민감도 분석 ↗</a><a href="https://business.gov.au/finance/cash-flow/set-up-a-cash-flow-statement" target="_blank" rel="noopener noreferrer">호주 정부 · 현금 흐름 ↗</a></p><small>2026.09.22 확인 · 예시는 모두 가상입니다.</small></div></div></details></section>
+    <footer class="site-footer"><div><strong>BCC</strong><span>생각을 사업으로, 가정을 숫자로.</span></div><nav class="footer-links" aria-label="관련 BCC 도구와 문의"><a href="/tools/">잇툴즈 전체보기</a><a href="https://ai-job-metacognition-lab.jinjoopower.chatgpt.site/startup" target="_blank" rel="noopener noreferrer">AI 창업 실험실 <span aria-hidden="true">↗</span></a><a href="/#contact">BCC 교육 문의</a></nav><p>입력 정보는 외부로 전송하지 않습니다.</p></footer>
+    <noscript><p class="noscript-notice">계산기를 사용하려면 브라우저의 JavaScript를 켜 주세요.</p></noscript>
+  </main>
+</body>
+</html>
