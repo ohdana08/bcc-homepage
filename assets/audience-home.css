@@ -1,0 +1,251 @@
+/* Audience-first homepage: the document example is real text, readable without JavaScript. */
+.geo-home #journey-content {
+  --audience-ink: #183d33;
+  --audience-muted: #596b61;
+  --audience-line: #d5ddd2;
+}
+.geo-home #journey-content > section { order: 0 !important; }
+.geo-home #journey-content > .quick-paths { padding: 66px 24px 42px; background: #f6f4ec; }
+.geo-home .geo-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 54px; align-items: center; margin-bottom: 42px; }
+.geo-home .geo-hero-kicker { font-size: 12px; letter-spacing: .06em; margin-bottom: 26px; }
+.geo-home #journey-content .geo-hero h1 { font-size: clamp(36px, 4vw, 53px); line-height: 1.28; letter-spacing: -.065em; margin-bottom: 25px; }
+.geo-home .geo-hero p { font-size: 16px; line-height: 1.85; color: #53665b; }
+.geo-home .geo-hero-actions { gap: 10px; margin-top: 29px; }
+.geo-home .geo-hero-actions a { font-size: 13px; min-height: 48px; padding: 13px 16px; gap: 14px; border-radius: 4px; }
+.geo-home .geo-hero .journey-hero-note { font-size: 12px; margin-top: 13px; }
+.geo-home .geo-hero .journey-identity { border-top: 1px solid #d8ddd1; margin-top: 30px; padding-top: 19px; font-size: 12px; line-height: 1.75; }
+.geo-home .audience-example { background: #fffefa; border: 1px solid #d0d9cb; border-radius: 6px; box-shadow: 0 13px 36px rgba(35, 62, 43, .07); padding: 23px 25px 20px; min-width: 0; }
+.audience-example-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 7px 15px; padding-bottom: 18px; border-bottom: 1px solid #dce1d7; }
+.audience-example-heading > span { color: #35634b; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+.audience-example-heading small { font-size: 12px; color: #62715f; }
+.audience-document-label { display: flex; justify-content: space-between; gap: 12px; color: #3d604c; font-size: 13px; font-weight: 750; }
+.audience-document-label span { font-weight: 450; color: #687360; font-size: 12px; }
+.audience-memo { padding: 17px 0 19px; }
+.geo-home .audience-memo p { margin-top: 10px; padding-left: 12px; border-left: 2px solid #d8cda9; font-size: 15px; line-height: 1.8; color: #53604e; }
+.audience-document { border-top: 1px solid #dce1d7; padding-top: 17px; }
+.audience-document h2 { font-size: 21px; letter-spacing: -.04em; line-height: 1.4; margin: 9px 0 14px; color: #244536; }
+.audience-task-table { width: 100%; table-layout: fixed; border-collapse: collapse; color: #3e5344; font-size: 14px; line-height: 1.55; }
+.audience-task-table th, .audience-task-table td { padding: 10px 5px; text-align: left; border-bottom: 1px solid #dfe5da; vertical-align: top; overflow-wrap: anywhere; word-break: keep-all; }
+.audience-task-table thead { background: #edf2e8; color: #53684d; }
+.audience-task-table thead th { font-weight: 650; padding-top: 7px; padding-bottom: 7px; }
+.audience-task-table th:first-child { width: 31%; padding-left: 8px; }
+.audience-task-table th:nth-child(2) { width: 20%; }
+.audience-task-table th:nth-child(3) { width: 21%; }
+.audience-task-table th:nth-child(4) { width: 28%; }
+.audience-task-table tbody th { font-weight: 650; }
+.audience-task-table .needs-check { color: #8c5e2c; font-weight: 650; }
+.geo-home .audience-document .audience-review-note { font-size: 13px; line-height: 1.7; padding: 11px 12px; margin-top: 13px; background: #f2f3e9; color: #5a664e; }
+.audience-review-note strong { font-weight: 700; }
+.geo-home .audience-example figcaption { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 9px 12px; align-items: center; justify-content: space-between; color: #606b57; font-size: 12px; line-height: 1.6; }
+.audience-example figcaption a { font-weight: 750; color: #2c5f46; text-decoration: underline; text-underline-offset: 4px; }
+.audience-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.geo-home .journey-audience { background: transparent; border: 0; border-top: 1px solid #cdd7c9; border-bottom: 1px solid #cdd7c9; border-radius: 0; }
+.geo-home .journey-audience > a { padding: 22px 25px 23px 0; }
+.geo-home .journey-audience > a + a { padding-left: 30px; }
+.geo-home .journey-audience small { font-size: 11px; margin-bottom: 7px; color: #60715d; }
+.geo-home .journey-audience strong { font-size: 17px; font-weight: 650; }
+.geo-home .journey-audience strong > span { float: right; margin-left: 12px; color: #537550; }
+.geo-home .journey-audience > a > span { font-size: 12px; margin-top: 5px; }
+.geo-home .journey-audience > a:hover { background: #ecf0e5; }
+@media (max-width: 1080px) {
+  .geo-home .geo-hero { gap: 30px; }
+  .geo-home #journey-content .geo-hero h1 { font-size: 43px; }
+  .geo-home .audience-example { padding: 21px 20px 18px; }
+}
+@media (max-width: 800px) {
+  .geo-home .geo-hero { grid-template-columns: 1fr; gap: 32px; }
+  .geo-home .audience-example { max-width: 590px; width: 100%; }
+  .geo-home .audience-task-table { font-size: 14px; }
+  .geo-home .audience-memo p { font-size: 15px; }
+}
+@media (max-width: 650px) {
+  .geo-home #journey-content > .quick-paths { padding: 34px 20px 30px; }
+  .geo-home #journey-content .geo-hero h1 { font-size: clamp(30px, 7.7vw, 44px); letter-spacing: -.06em; margin-bottom: 19px; }
+  .geo-home .geo-hero-kicker { margin-bottom: 21px; }
+  .geo-home .geo-hero p { font-size: 15px; }
+  .audience-desktop-break { display: none; }
+  .geo-home .geo-hero-actions { display: flex; gap: 9px; }
+  .geo-home .geo-hero-actions a { flex: 1 1 auto; font-size: 12px; padding: 12px 10px; gap: 9px; }
+  .geo-home .geo-hero .journey-identity { margin-top: 22px; padding-top: 15px; }
+  .geo-home .audience-example { padding: 18px 16px; }
+  .geo-home .audience-task-table { font-size: 14px; }
+  .audience-task-table th, .audience-task-table td { padding-left: 4px; padding-right: 3px; }
+  .audience-task-table th:first-child { width: 30%; padding-left: 5px; }
+  .audience-task-table th:nth-child(2) { width: 21%; }
+  .audience-task-table th:nth-child(3) { width: 20%; }
+  .audience-task-table th:nth-child(4) { width: 29%; }
+  .geo-home .journey-audience > a, .geo-home .journey-audience > a + a { padding: 19px 3px; }
+  .geo-home .journey-audience strong { font-size: 15px; }
+}
+
+/* Calm navigation hierarchy; one visible login link at each breakpoint. */
+@media (min-width: 1051px) { .geo-home .nav-actions .nav-account-cta { display: none; } }
+.geo-home .nav .nav-signup { background: transparent; color: #52665a !important; border-color: transparent; font-weight: 550; }
+.geo-home .nav .nav-signup:hover { background: #edf0e7; border-color: #d7dfd0; }
+.geo-home .nav .nav-login { border-color: #d0d9cc; }
+.geo-home .nav-links > a:first-child { color: #245d47; font-weight: 750; }
+
+/* The same source and visual order is used with and without JavaScript. */
+.geo-home #journey-content > #outcomes,
+.geo-home #journey-content > #itschool,
+.geo-home #journey-content > #tools,
+.geo-home #journey-content > #reviews,
+.geo-home #journey-content > #services { padding: 80px 24px; }
+.geo-home #journey-content > #outcomes::after,
+.geo-home #journey-content > #itschool::after,
+.geo-home #journey-content > #tools::after,
+.geo-home #journey-content > #reviews::after,
+.geo-home #journey-content > #services::after { display: none; }
+.audience-section-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 39px; }
+.geo-home #journey-content .audience-section-head .section-title { font-size: clamp(30px, 3.2vw, 43px); margin-bottom: 0; }
+.geo-home #journey-content .audience-section-head .section-desc { margin-bottom: 2px; font-size: 15px; line-height: 1.85; max-width: 440px; }
+.geo-home #journey-content #outcomes { background: #fffefa; }
+.geo-home .journey-output-grid { gap: 28px; }
+.geo-home .journey-output-grid article { border-top: 1px solid #b1c1ac; padding-top: 21px; }
+.geo-home .journey-step { font: 650 12px/1.6 var(--font-ko); letter-spacing: .02em; color: #57704f; }
+.geo-home .journey-output-grid h3 { font-size: 23px; line-height: 1.5; margin: 20px 0 13px; font-weight: 650; }
+.geo-home .journey-output-grid p { font-size: 14px; line-height: 1.85; min-height: 77px; }
+.geo-home .journey-output { padding: 18px 18px 17px; background: #f0f3e9; margin: 20px 0 8px; border-radius: 3px; }
+.geo-home .journey-output small { font-size: 11px; color: #6a765f; margin-bottom: 9px; }
+.geo-home .journey-output strong { font-size: 15px; font-weight: 650; }
+.geo-home .journey-output strong span { margin: 0 5px; color: #8a9c7b; }
+.geo-home .journey-output-grid article > a { font-size: 13px; margin-top: 17px; text-decoration-thickness: 1px; }
+.audience-learning-note { padding-top: 23px; border-top: 1px solid #e0e5d8; margin-top: 31px; color: #67725c; font-size: 13px; line-height: 1.8; }
+
+/* Available learning comes before closed cohorts. */
+.geo-home #journey-content #itschool { background: #edf1e6; }
+.geo-home .school-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.geo-home #journey-content .audience-open-courses .course-card { background: #fffefa; border: 1px solid #d1daca; border-radius: 5px; padding: 27px 29px 25px; box-shadow: none; min-height: 0; }
+.geo-home #journey-content .audience-open-courses .course-card::before { display: none; }
+.audience-course-top { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-bottom: 24px; }
+.geo-home #journey-content .audience-course-top .tool-badge { position: static; font-size: 11px; padding: 4px 9px; background: #edf3e6; border: 1px solid #cbd9c1; border-radius: 3px; color: #365c32; font-weight: 700; }
+.geo-home #journey-content .audience-course-pack .tool-badge { background: #f5eee1; border-color: #dfd2b9; color: #735727; }
+.audience-course-format { font-size: 11px; color: #6c7662; }
+.geo-home #journey-content .audience-open-courses .tool-name { font-size: 28px; line-height: 1.35; letter-spacing: -.04em; font-weight: 650; margin-bottom: 15px; }
+.geo-home #journey-content .audience-open-courses .tool-desc { font-size: 15px; line-height: 1.85; margin-bottom: 22px; color: #596751; }
+.audience-course-preview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: #f3f5ed; margin-top: auto; }
+.audience-course-preview > span { padding: 15px 10px; font-size: 14px; font-weight: 650; color: #385436; text-align: center; }
+.audience-course-preview > span + span { border-left: 1px solid #dbe3d1; }
+.audience-course-preview small { display: block; font-size: 11px; font-weight: 450; color: #6d7a60; margin-bottom: 5px; }
+.audience-course-pack .audience-course-preview { background: #f6f1e6; }
+.audience-course-pack .audience-course-preview > span { color: #735d35; }
+.audience-course-pack .audience-course-preview > span + span { border-color: #e9dfca; }
+.audience-course-bottom { display: flex; align-items: end; justify-content: space-between; gap: 14px; border-top: 1px solid #dde3d5; padding-top: 20px; margin-top: 21px; }
+.geo-home #journey-content .audience-course-bottom .course-series-status { margin: 0; color: #68735e; font-size: 12px; font-weight: 450; }
+.geo-home #journey-content .audience-course-bottom .tool-arrow { color: #2c5f43; font-size: 13px; margin: 0; font-weight: 750; white-space: nowrap; }
+.audience-upcoming-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin: 34px 0 16px; }
+.audience-upcoming-heading h3 { font-size: 15px; font-weight: 650; color: #536548; }
+.audience-upcoming-heading > span { font-size: 12px; color: #6c765f; }
+.geo-home #journey-content .audience-upcoming-courses .course-card { display: block; min-height: 0; background: transparent; border: 1px solid #cdd6c2; border-radius: 4px; padding: 20px 22px; box-shadow: none; }
+.geo-home #journey-content .audience-upcoming-courses .course-card::before { display: none; }
+.geo-home .audience-upcoming-courses .tool-badge { position: static; display: inline-block; border: 0; padding: 0; background: transparent; color: #778069; font-size: 11px; margin-bottom: 8px; }
+.geo-home .audience-upcoming-courses .tool-name { font-size: 17px; margin-bottom: 7px; }
+.geo-home .audience-upcoming-courses .tool-desc { font-size: 13px; line-height: 1.75; color: #65705b; }
+.geo-home .audience-upcoming-courses .course-series-status { font-size: 11px; font-weight: 450; color: #6c765f; margin-top: 12px; }
+.geo-home .audience-upcoming-courses .tool-arrow { font-size: 12px; margin-top: 7px; color: #5e6d54; }
+.geo-home #journey-content .course-card:hover { border-color: #53774b; background-color: #fff; }
+
+/* Tools keep their existing destinations and tracking, with a quieter directory treatment. */
+.geo-home #journey-content #tools { background: #faf9f3; }
+.geo-home .tools-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; }
+.geo-home #journey-content #tools .tool-card { min-height: 239px; padding: 23px 22px; border: 1px solid #d6ddcf; border-radius: 4px; background: #fffefa; box-shadow: none; }
+.geo-home #journey-content #tools .tool-card::before { display: none; }
+.geo-home #tools .tool-icon { width: 38px; height: 38px; font-size: 22px; border-radius: 5px; margin-bottom: 15px; }
+.geo-home #tools .tool-name { font-size: 18px; line-height: 1.45; margin-bottom: 10px; font-weight: 650; }
+.geo-home #tools .tool-desc { font-size: 13px; line-height: 1.8; color: #67715f; }
+.geo-home #tools .tool-arrow { font-size: 12px; color: #456c43; margin-top: auto; padding-top: 18px; }
+.geo-home #tools .tool-badge { color: #63715b; background: #f1f4eb; border: 1px solid #dbe1d2; font-size: 10px; font-weight: 550; }
+.geo-home #journey-content #tools .tool-card.is-active:hover { transform: translateY(-2px); border-color: #6d8a60; box-shadow: 0 5px 15px rgba(44, 66, 34, .06); }
+.geo-home #journey-content #tools .tool-card.is-disabled { background: #f2f2eb; border-style: dashed; }
+
+/* Evidence and the institution route stay available after individual learning. */
+.geo-home #journey-content #reviews { --text: #223b2b; --text-dim: #66725d; --border: #d0dac7; background: #e7edde; color: #223b2b; }
+.geo-home #reviews .section-title { color: #24432f; }
+.geo-home .journey-case { border: 0; border-top: 2px solid #94ab83; border-radius: 0; padding: 26px 25px; background: #f9fbf4; }
+.geo-home .journey-case h3 { font-size: 25px; color: #284932; }
+.geo-home .journey-case-meta { font-size: 12px; color: #5d754f; }
+.geo-home .journey-case dl { border-color: #dbe3d2; }
+.geo-home .journey-case dt { color: #526b45; }
+.geo-home .journey-case dd, .geo-home .journey-case > p { color: #637158; }
+.geo-home .institution-case-feature { background: #f9fbf4; border: 1px solid #cdd8c0; border-radius: 5px; overflow: hidden; box-shadow: none; }
+.geo-home .institution-case-copy { padding: 28px; }
+.geo-home .institution-case-copy h3 { color: #27472f; font-size: 22px; }
+.geo-home .institution-case-copy p { color: #637158; font-size: 14px; }
+.geo-home .institution-case-kicker { color: #5b754f; }
+.geo-home .institution-case-proof span { color: #536f46; background: #eef3e5; border-color: #d5dfcb; }
+.geo-home .institution-case-link { background: #3e6542; color: #fff; box-shadow: none; border-radius: 4px; }
+.geo-home .institution-case-link.secondary { background: transparent; color: #3e6542; border-color: #bccdad; }
+.geo-home .itschool-portfolio { border: 0; border-top: 1px solid #c4d1b9; border-bottom: 1px solid #c4d1b9; border-radius: 0; background: transparent; box-shadow: none; padding: 23px 2px; margin: 27px 0 20px; }
+.geo-home .itschool-portfolio-copy small { color: #5f7a4c; font-size: 11px; }
+.geo-home .itschool-portfolio-copy strong { color: #34532d; font-size: 17px; }
+.geo-home .itschool-portfolio-copy span { color: #667859; }
+.geo-home .itschool-portfolio-link { background: transparent; color: #375b32 !important; border: 1px solid #acbfa0; border-radius: 4px; box-shadow: none; font-weight: 650; }
+.geo-home .itschool-portfolio-link:hover { background: #dae5d0; }
+.geo-home .journey-review-more { border-color: #bdceb0; color: #34532d; }
+.geo-home #journey-content #services { background: #fffefa; }
+.geo-home #services .service-card { padding: 27px 25px; border: 1px solid #d3ddcb; border-radius: 4px; background: #fafcf6; box-shadow: none; }
+.geo-home #services .service-card:hover { box-shadow: none; border-color: #6b885d; }
+.geo-home #services .service-title { font-size: 23px; }
+.geo-home #services .service-points { margin-bottom: 0; }
+.geo-home #services .journey-course-answer { font-size: 13px; margin-top: 21px; }
+.geo-home #services .journey-answer { background: #edf3e6; padding: 22px 25px; margin-top: 25px; border-color: #6c8a5c; }
+
+@media (max-width: 900px) {
+  .audience-section-head { display: block; }
+  .geo-home #journey-content .audience-section-head .section-desc { margin-top: 20px; }
+  .geo-home .tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .geo-home .journey-output-grid h3 { font-size: 21px; }
+  .geo-home .journey-output-grid p { min-height: 103px; }
+  .geo-home #journey-content .audience-open-courses .course-card { padding: 25px 22px; }
+  .geo-home #journey-content .audience-open-courses .tool-name { font-size: 25px; }
+  .audience-course-preview > span { font-size: 12px; padding: 14px 5px; }
+  .audience-course-bottom { display: block; }
+  .geo-home #journey-content .audience-course-bottom .tool-arrow { margin-top: 12px; }
+}
+@media (max-width: 650px) {
+  .geo-home #journey-content > #outcomes, .geo-home #journey-content > #itschool,
+  .geo-home #journey-content > #tools, .geo-home #journey-content > #reviews,
+  .geo-home #journey-content > #services { padding: 52px 20px; }
+  .audience-section-head { margin-bottom: 28px; }
+  .geo-home #journey-content .audience-section-head .section-title { font-size: 31px; }
+  .geo-home #journey-content .audience-section-head .section-desc { font-size: 14px; margin-top: 16px; }
+  .geo-home .journey-output-grid { gap: 30px; }
+  .geo-home .journey-output-grid h3 { font-size: 23px; margin-top: 15px; }
+  .geo-home .journey-output-grid p { min-height: 0; }
+  .geo-home .journey-output { margin-top: 17px; }
+  .geo-home .school-grid, .geo-home .tools-grid { grid-template-columns: 1fr; }
+  .geo-home #journey-content .audience-open-courses .course-card { padding: 23px 20px; }
+  .geo-home #journey-content .audience-open-courses .tool-name { font-size: 28px; }
+  .audience-course-preview > span { font-size: 13px; }
+  .audience-upcoming-heading { margin-top: 29px; }
+  .geo-home #journey-content #tools .tool-card { min-height: 215px; }
+  .geo-home .journey-case { padding: 23px 21px; }
+  .geo-home .institution-case-copy { padding: 24px 20px; }
+  .geo-home .institution-case-copy h3 { font-size: 21px; }
+  .geo-home .itschool-portfolio { padding: 21px 0; gap: 16px; }
+}
+@media (max-width: 420px) {
+  .audience-task-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .audience-task-table, .audience-task-table tbody { display: block; }
+  .audience-task-table tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 11px 0 13px; border-top: 1px solid #dce4d4; }
+  .audience-task-table tbody th:first-child { grid-column: 1 / -1; width: auto; padding: 0; border: 0; font-size: 15px; }
+  .audience-task-table tbody td { padding: 0; border: 0; font-size: 14px; }
+  .audience-task-table tbody td::before { content: attr(data-label); display: block; font-size: 12px; color: #6b7b60; font-weight: 450; margin-bottom: 3px; }
+  .audience-task-table tbody tr:last-child { border-bottom: 1px solid #dce4d4; }
+}
+
+.geo-home #faq .section-desc a { color: #2f6348; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 760px) {
+  .geo-home { padding-bottom: calc(65px + env(safe-area-inset-bottom, 0px)); }
+  .geo-home .mobile-conversion-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px;
+    padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: rgba(248, 249, 241, .98); border-top: 1px solid #cdd8c5;
+  }
+  .geo-home .mobile-conversion-bar a {
+    display: flex; align-items: center; justify-content: center; min-height: 44px;
+    border-radius: 4px; padding: 9px 12px; font-size: 14px; line-height: 1.5; font-weight: 650;
+  }
+  .geo-home .mobile-conversion-bar .practice { background: #2f6348; color: #fff; border: 1px solid #2f6348; }
+  .geo-home .mobile-conversion-bar .ask { background: transparent; color: #355a3d; border: 1px solid #b9cbb0; }
+}
