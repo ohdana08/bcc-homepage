@@ -547,6 +547,16 @@ test('일반 질문은 CTA로 인정하지 않는다', () => {
     .some((problem) => problem.includes('목적지와 행동이 분명한 CTA')));
 });
 
+test('상품 형식 없이 프로필에서 결과 행동을 안내해도 CTA로 인정한다', () => {
+  const post = campaignReadyPost({
+    text: campaignReadyPost().text.replace(
+      '프로필 링크에서 내 조건에 맞는 공고를 확인하세요.',
+      '프로필에서 질문받으며 자기소개서를 완성해봐.',
+    ),
+  });
+  assert.deepEqual(validatePublishReadyPost(post), []);
+});
+
 test('중간에서 끊긴 셀프 댓글은 게시하지 않는다', () => {
   const problems = validateCommentReady(
     '사업 목표를 한 문장으로 적습니다.\n평가표와 근거를 대조합니다.\n3. 지금까지',
