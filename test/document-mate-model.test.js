@@ -251,3 +251,18 @@ test('검증되지 않은 소제목은 배열 위치의 기본 제목 대신 실
   const single = normalizeAnalysis({ documentType: 'plan', fields: [fields[1]], sections: [{ heading: '임의의 새 소제목', fieldIds: ['activities'] }] }, []);
   assert.equal(single.sections[0].heading, '주요 활동');
 });
+
+
+test('자연어 미정 답변은 미확인으로 남기되 완료 사실과 부정 문장은 유지한다', () => {
+  for (const value of ['아직 정하지 않았어요.', '정하지 않았습니다', '아직 결정되지 않았어요.']) {
+    const result = normalizeAnalysis(analysis([field('budget', '예산', value, 'fact', 'input', value)]), [{id:'input', text:value}]);
+    assert.equal(result.fields[0].kind, 'unknown');
+    assert.equal(result.fields[0].value, '');
+    assert.ok(createDraft(result).unknowns.includes('예산'));
+  }
+  for (const value of ['예산은 20만원으로 정했어요.', '설문은 하지 않았어요.']) {
+    const result = normalizeAnalysis(analysis([field('budget', '예산', value, 'fact', 'input', value)]), [{id:'input', text:value}]);
+    assert.equal(result.fields[0].kind, 'fact');
+    assert.equal(result.fields[0].value, value);
+  }
+});

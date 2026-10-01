@@ -31,7 +31,7 @@ const normalized = (value) => value.normalize('NFC').replace(/\s+/g, ' ').trim()
 const fieldKey = (value) => normalized(value).replace(/[\s·/()\[\]:_-]/g, '').toLowerCase();
 const numbers = (value) => value.match(/\d+(?:[,.]\d+)*(?:\s*[%％])?/g) || [];
 const hasNewNumbers = (value, evidence) => numbers(value).some((number) => !numbers(evidence).includes(number));
-const unknownMarker = /^(?:\[?\s*(?:확인\s*필요|미확인|미입력|(?:아직\s*)?미정|자료\s*없음|정보\s*없음|협의\s*필요|(?:잘\s*)?모름|모릅니다|몰라요|(?:잘\s*)?모르겠(?:어요|습니다))\s*\]?)\.?$/;
+const unknownMarker = /^(?:\[?\s*(?:확인\s*필요|미확인|미입력|(?:아직\s*)?미정|자료\s*없음|정보\s*없음|협의\s*필요|(?:잘\s*)?모름|모릅니다|몰라요|(?:잘\s*)?모르겠(?:어요|습니다)|(?:아직\s*)?(?:정하지\s*않았(?:어요|습니다)|결정되지\s*않았(?:어요|습니다)))\s*\]?)\.?$/;
 const predictionPattern = /(?:예상|기대|전망|추정|예정|예측|목표|가정|만약|잠정|것(?:이다|입니다|으로)|높아질|증가할|개선될|향상될|계획(?:이다|입니다|임|해|하))/;
 const conditionalPattern = /(?:조건|경우|(?:이|라|으|되|하|가|오|된다|한다|있다|없다)면(?=[\s,.!?\d]|$)|약\s*\d)/;
 const opinionPattern = /(?:반응.{0,8}(?:좋|긍정)|만족도.{0,8}(?:높|좋)|효과.{0,8}(?:있|좋)|성과.{0,8}(?:있|좋)|참여.{0,8}많|홍보.{0,8}잘|좋았|좋은|높았|낮았|많았|훌륭|성공적|효과적|긍정적|부정적|만족스러|만족하|아쉽|보람|생각(?:한다|합니다|해|합)|느꼈)/;
