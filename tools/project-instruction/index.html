@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>홈페이지 만들기 설명서 | BCC 잇툴즈</title>
-  <meta name="description" content="질문에 하나씩 답하며 생각을 정리하고, Antigravity에 넣어 홈페이지를 만들 수 있는 설명서 파일을 받으세요.">
+  <title>AI 업무지시서 만들기 | BCC 잇툴즈</title>
+  <meta name="description" content="질문에 하나씩 답하며, 만들고 싶은 것을 AI에게 맡길 설명서로 정리하세요.">
   <meta name="robots" content="index,follow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,19 +25,24 @@
   <main id="main">
     <section class="hero" aria-labelledby="page-title">
       <div class="hero-copy">
-        <p class="eyebrow">잇툴즈 · 홈페이지 만들기 준비</p>
-        <h1 id="page-title">아이디어를 말하면,<br><span>홈페이지 만들 준비</span>가 됩니다.</h1>
-        <p class="hero-description">막연한 생각도 괜찮습니다. 질문에 하나씩 답하면 생각을 정리해, Antigravity에 그대로 넣을 수 있는 <strong>홈페이지 만들기 설명서</strong>를 드립니다.</p>
+        <p class="eyebrow">잇툴즈 · 생각을 실행으로</p>
+        <h1 id="page-title">AI 업무지시서<br><span>만들기</span></h1>
+        <p class="hero-description">질문에 하나씩 답하며, 만들고 싶은 것을 AI에게 맡길 설명서로 정리하세요.</p>
         <div class="hero-notes" aria-label="도구 특징">
-          <span>로그인 없이 시작</span><span>10–15분</span><span>하나씩 차근차근</span><span>파일로 받기</span>
+          <span>로그인 없이 시작</span><span>모르는 답은 미정으로</span><span>하나씩 차근차근</span><span>파일로 받기</span>
         </div>
       </div>
-      <aside class="classroom-rule" aria-label="오늘의 완주 기준">
-        <span class="rule-number">3</span>
-        <div><strong>오늘 여기까지 만들어요</strong><p>꼭 필요한 동작 3개가 되는<br>간단한 홈페이지</p></div>
+      <aside class="classroom-rule" aria-label="쉽게 시작하는 방법">
+        <span class="rule-number" aria-hidden="true">✦</span>
+        <div><strong>어려운 말은 몰라도 돼요</strong><p>어떤 일을 편하게 하고 싶은지<br>내 말로 설명해주세요.</p></div>
       </aside>
     </section>
 
+    <noscript><p class="privacy-note">질문에 답하고 업무지시서를 받으려면 브라우저에서 JavaScript를 사용할 수 있어야 합니다.</p></noscript>
+    <aside class="legacy-notice" id="legacy-notice" hidden>
+      <p>이전 버전에서 작성한 기록이 남아 있습니다. 기록을 받아 참고하며 새 질문을 시작할 수 있어요.</p>
+      <button type="button" id="legacy-download">이전 작성 기록 받기</button>
+    </aside>
     <section class="start-section" id="start-section" aria-labelledby="start-title">
       <div class="section-heading">
         <p class="step-label">STEP 01</p>
@@ -61,17 +66,11 @@
       <div class="progress-panel">
         <div class="progress-head">
           <div><p class="step-label">STEP 02</p><h2 id="workspace-title">질문에 답하며 생각 정리하기</h2></div>
-          <span id="progress-value">1 / 6</span>
+          <span id="progress-value" aria-live="polite">질문 준비</span>
         </div>
         <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
-        <ol class="progress-steps" id="progress-steps">
-          <li class="is-current"><span>01</span>불편</li>
-          <li><span>02</span>쓸 사람</li>
-          <li><span>03</span>만들 모습</li>
-          <li><span>04</span>쓰는 순서</li>
-          <li><span>05</span>꼭 할 일</li>
-          <li><span>06</span>확인</li>
-        </ol>
+        <ol class="progress-steps" id="progress-steps" aria-label="질문 순서"></ol>
+        <p class="progress-note">답변에 따라 필요한 질문이 더해집니다.</p>
       </div>
 
       <div class="work-grid">
@@ -94,18 +93,19 @@
               <span><b id="answer-count">0</b> / 1,200</span>
               <button class="send-button" type="submit">답변 보내기 <span aria-hidden="true">↑</span></button>
             </div>
+            <button class="previous-button" id="previous-button" type="button" disabled>← 이전 답변 수정</button>
           </form>
         </section>
 
         <aside class="brief-card" aria-label="지금까지 정리된 내용">
-          <div class="brief-head"><div><p class="step-label">지금까지 적은 내용</p><h2>내가 만들고 싶은 것</h2></div><span class="saved-state">이 기기에 저장</span></div>
+          <div class="brief-head"><div><p class="step-label">지금까지 적은 내용</p><h2>내가 만들고 싶은 것</h2></div><span class="saved-state" id="saved-state" role="status">이 기기에 저장</span></div>
           <dl id="brief-list">
             <div><dt>해결하고 싶은 불편</dt><dd data-brief="problem">대화를 시작하면 여기에 정리됩니다.</dd></div>
             <div><dt>누가 쓰나요</dt><dd data-brief="primaryUser">아직 정하지 않음</dd></div>
-            <div><dt>어떻게 만들까요</dt><dd data-brief="solution">아직 정하지 않음</dd></div>
+            <div><dt>무엇을 도와주면 좋을까요</dt><dd data-brief="solution">아직 정하지 않음</dd></div>
             <div><dt>꼭 필요한 동작</dt><dd data-brief="mustFeatures">아직 정하지 않음</dd></div>
           </dl>
-          <div class="scope-note"><strong>처음에는 작게 만들어요</strong><p>회원가입·결제·복잡한 연결은 이번 만들기에서 빼고, 가장 필요한 것부터 시작합니다.</p></div>
+          <div class="scope-note"><strong>지금 아는 만큼만 답하세요</strong><p>모르는 것은 미정으로 남겨도 됩니다. 필요한 기능을 임의로 빼지 않고, 만드는 과정에서 확인할 내용을 따로 정리합니다.</p></div>
         </aside>
       </div>
     </section>
@@ -113,26 +113,27 @@
     <section class="result-section" id="result-section" aria-labelledby="result-title" hidden>
       <div class="result-copy">
         <p class="step-label">STEP 03</p>
-        <h2 id="result-title">홈페이지 만들기 설명서가 준비됐습니다.</h2>
-        <p>내용을 확인한 뒤 파일을 받아 Antigravity에 넣으세요.</p>
+        <h2 id="result-title">AI 업무지시서가 준비됐습니다.</h2>
+        <p>받은 파일을 Codex, Claude Code, Antigravity 등 사용하는 AI 개발 도구에 전달하세요.</p>
+        <p>먼저 내 답변과 확인할 내용을 읽어보세요. 바꾸고 싶은 내용은 ‘이전 답변 수정’으로 돌아가 고칠 수 있습니다.</p>
         <ol class="handoff-steps">
-          <li><span>1</span>홈페이지 만들기 설명서 받기</li>
-          <li><span>2</span>Antigravity를 열고 새 작업 시작하기</li>
-          <li><span>3</span>받은 파일을 넣고 “이 설명서대로 홈페이지를 만들어줘”라고 쓰기</li>
+          <li><span>1</span>업무지시서 파일 받기</li>
+          <li><span>2</span>사용하는 AI 도구에서 작업 시작하기</li>
+          <li><span>3</span>파일을 넣고 “이 업무지시서를 읽고, 확인할 내용부터 알려줘”라고 쓰기</li>
         </ol>
         <div class="result-actions">
-          <button class="primary-button" id="download-button" type="button">설명서 파일 받기</button>
+          <button class="primary-button" id="download-button" type="button">업무지시서 파일 받기</button>
           <button class="secondary-button" id="copy-button" type="button">내용 복사</button>
         </div>
       </div>
       <div class="document-preview">
-        <div class="preview-head"><span></span><span></span><span></span><strong>홈페이지 만들기 설명서</strong></div>
+        <div class="preview-head"><span></span><span></span><span></span><strong>AI 업무지시서</strong></div>
         <pre id="markdown-preview"></pre>
       </div>
     </section>
 
     <section class="privacy-note" aria-label="사용 전 확인">
-      <strong>입력한 내용은 이 기기에만 남습니다.</strong>
+      <strong>여기 적은 답변은 외부로 보내지 않습니다.</strong>
       <p>그래도 주민번호·연락처·고객 명단·기관 내부 비밀처럼 다른 사람에게 보여주면 안 되는 내용은 적지 마세요.</p>
     </section>
   </main>
@@ -142,20 +143,16 @@
       <button class="dialog-close" id="detail-close" type="button" aria-label="안내 닫기">×</button>
       <p class="detail-kicker">자료와 함께 자세히 만들기</p>
       <div class="detail-symbol" id="detail-symbol" aria-hidden="true">＋</div>
-      <h2 id="detail-title">사진이나 문서를 함께 살펴볼까요?</h2>
-      <p class="detail-description" id="detail-description">자료 속 내용을 읽어, 지금까지 적은 생각과 함께 정리할 수 있어요.</p>
-      <ul class="detail-benefits" id="detail-benefits">
-        <li>사진의 글씨와 문서 내용을 찾아 반영해요.</li>
-        <li>빠진 내용은 다시 물어봐요.</li>
-        <li>더 자세한 홈페이지 만들기 설명서로 정리해요.</li>
-      </ul>
+      <h2 id="detail-title">참고자료 활용 안내</h2>
+      <p class="detail-description" id="detail-description">이 화면에서는 파일이나 링크를 자동으로 읽지 않습니다.</p>
+      <ul class="detail-benefits" id="detail-benefits"></ul>
       <div class="detail-outcome">
-        <strong id="detail-outcome-title">자료를 추가하면</strong>
-        <p id="detail-outcome-copy">내가 적은 답변과 실제 자료가 한 설명서 안에 함께 정리됩니다.</p>
+        <strong id="detail-outcome-title">지금까지 적은 답변은 유지됩니다</strong>
+        <p id="detail-outcome-copy">자료 활용 방법이 궁금하면 BCC에 문의할 수 있습니다.</p>
       </div>
-      <a class="detail-primary" id="detail-start-link" href="../../?utm_source=project_instruction&amp;utm_medium=detail_gate&amp;utm_campaign=project_instruction_detail#contact">자료와 함께 자세히 만들기 <span aria-hidden="true">→</span></a>
+      <a class="detail-primary" id="detail-start-link" href="../../?utm_source=project_instruction&amp;utm_medium=detail_gate&amp;utm_campaign=project_instruction_detail#contact">자료 활용 방법 문의하기 <span aria-hidden="true">→</span></a>
       <button class="detail-secondary" id="detail-continue" type="button">지금은 질문만 이어가기</button>
-      <p class="detail-footnote">버튼을 누르면 자세한 이용 안내로 이동합니다. 지금까지 적은 내용은 이 기기에 그대로 남아 있어요.</p>
+      <p class="detail-footnote">문의 버튼은 BCC 문의 페이지로 이동합니다. 현재 답변은 자동으로 전송되지 않습니다.</p>
     </div>
   </dialog>
 

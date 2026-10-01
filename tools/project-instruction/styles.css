@@ -14,6 +14,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 body { margin: 0; color: var(--ink); background: var(--paper); font-family: var(--font-ko); word-break: keep-all; }
 button, textarea { font: inherit; }
@@ -66,7 +67,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 10px 24px 80px; }
 #progress-value { color: var(--gold-deep); font-family: var(--font-en); font-weight: 800; }
 .progress-track { height: 4px; margin: 20px 0 17px; background: #ddd9cc; border-radius: 999px; overflow: hidden; }
 .progress-track span { display: block; width: 16.667%; height: 100%; background: var(--gold); transition: width .3s ease; }
-.progress-steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; list-style: none; padding: 0; margin: 0; color: #99998f; font-size: 12px; font-weight: 700; }
+.progress-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; color: #76766d; font-size: 12px; font-weight: 700; }
 .progress-steps li { display: flex; gap: 6px; align-items: center; }
 .progress-steps li.is-current, .progress-steps li.is-complete { color: var(--ink); }
 .progress-steps li.is-complete span { color: var(--gold-deep); }
@@ -81,7 +82,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 10px 24px 80px; }
 .chat-head small i { display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%; background: #53a26c; }
 .text-button { margin-left: auto; padding: 7px; border: 0; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
 .messages { min-height: 300px; max-height: 480px; padding: 26px 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; background: #fbfaf5; }
-.message { max-width: 82%; padding: 13px 15px; border-radius: 3px 15px 15px 15px; background: #eeece3; font-size: 14px; line-height: 1.65; white-space: pre-wrap; }
+.message { max-width: 82%; padding: 13px 15px; border-radius: 3px 15px 15px 15px; background: #eeece3; font-size: 14px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .message.is-user { align-self: flex-end; border-radius: 15px 3px 15px 15px; background: var(--olive); color: #fff; }
 .message small { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; }
 .message.is-user small { color: rgba(255,255,255,.58); }
@@ -106,6 +107,15 @@ main { max-width: 1180px; margin: 0 auto; padding: 10px 24px 80px; }
 .brief-head { margin-bottom: 22px; }
 .brief-head h2 { font-size: 23px; }
 .saved-state { padding: 5px 8px; border-radius: 999px; background: #edf3e7; color: #537048; font-size: 10px; font-weight: 800; }
+.progress-note { margin: 14px 0 0; color: var(--muted); font-size: 11px; }
+.previous-button { margin-top: 12px; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
+.previous-button:disabled { opacity: .45; cursor: default; }
+.legacy-notice { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--gold-soft); font-size: 13px; }
+.legacy-notice p { flex: 1 1 260px; margin: 0; line-height: 1.6; }
+.legacy-notice button { min-height: 44px; padding: 10px 14px; border: 1px solid var(--gold-deep); border-radius: 8px; background: var(--white); cursor: pointer; }
+button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 3px; }
+.quick-replies button, .source-button { min-height: 44px; }
+.brief-card dd { overflow-wrap: anywhere; }
 .brief-card dl { margin: 0; display: grid; gap: 16px; }
 .brief-card dl div { padding-bottom: 15px; border-bottom: 1px solid #ece9de; }
 .brief-card dt { margin-bottom: 6px; color: var(--gold-deep); font-size: 11px; font-weight: 800; }
