@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { prepareDraftInput, validateGeneratedDraft, WRITER_PROMPT } from '../lib/document-mate/writer.js';
+import { prepareDraftInput, validateGeneratedDraft, WRITER_PROMPT, DraftValidationError } from '../lib/document-mate/writer.js';
 import { createDocumentMateHandler, validateRequest } from '../lib/document-mate/handler.js';
 
 const sourceText = '홍보물품을 참여 기관에 나눠 주려고 해요. 기관별로 받아가도록 협조를 요청하려는 계획이야.';
@@ -10,7 +10,7 @@ const generated = (extra = {}) => ({ documentType: 'cooperation', title: '홍보
 const prepare = (body = request()) => prepareDraftInput(body, body.sources);
 function backend(options = {}) {
   const calls = [];
-  const handler = createDocumentMateHandler({ env: { ANTHROPIC_API_KEY: 'test-secret', SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-secret', VERCEL: '1' }, getDatabase: () => ({ rpc() { calls.push('quota'); return { async abortSignal(signal) { assert.ok(signal instanceof AbortSignal); return options.quota || { data: { allowed: true, remaining: 10 }, error: null }; } }; } }), makeClient: (config) => { assert.equal(config.maxRetries, 0); assert.equal(config.timeout, 45000); return { messages: { async create(input, settings) { calls.push('writer'); assert.equal(settings.maxRetries, 0); assert.equal(settings.timeout, 45000); assert.ok(settings.signal instanceof AbortSignal); assert.equal(input.tool_choice.name, 'write_reviewable_document'); assert.equal(input.system, WRITER_PROMPT); if (options.error) throw options.error; return { stop_reason: 'tool_use', content: [{ type: 'tool_use', name: 'write_reviewable_document', input: options.raw ?? generated() }] }; } } }; } });
+  const handler = createDocumentMateHandler({ env: { ANTHROPIC_API_KEY: 'test-secret', SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-secret', VERCEL: '1' }, getDatabase: () => ({ rpc() { calls.push('quota'); return { async abortSignal(signal) { assert.ok(signal instanceof AbortSignal); return options.quota || { data: { allowed: true, remaining: 10 }, error: null }; } }; } }), makeClient: (config) => { assert.equal(config.maxRetries, 0); assert.equal(config.timeout, 45000); return { messages: { async create(input, settings) { calls.push('writer'); assert.equal(settings.maxRetries, 0); assert.equal(settings.timeout, 45000); assert.ok(settings.signal instanceof AbortSignal); assert.equal(input.tool_choice.name, 'write_reviewable_document'); assert.equal(input.system, WRITER_PROMPT); if (options.error) throw options.error; return options.response ?? { stop_reason: 'tool_use', content: [{ type: 'tool_use', name: 'write_reviewable_document', input: options.raw ?? generated() }] }; } } }; } });
   return { calls, async run(body = request()) { const result = {}; const res = { setHeader() {}, status(code) { result.status = code; return this; }, json(data) { result.body = data; return this; } }; await handler({ method: 'POST', headers: { 'x-vercel-forwarded-for': '203.0.113.5' }, body }, res); return result; } };
 }
 
@@ -414,4 +414,54 @@ test('A2 협조요청의 분산 근거는 동일한 수신·배부·직접수령
     const extraPrepared=prepare(extra);assert.throws(()=>validateGeneratedDraft(raw,extraPrepared));
   }
   const invented=structuredClone(raw);invented.sections[0].content+=' 담당자와 추가 일정을 협의하겠습니다.';assert.throws(()=>validateGeneratedDraft(invented,prepared));
+});
+
+test('검증 진단은 고정 단계 코드만 남기고 문서·항목명·스택·비밀값을 로그나 응답에 노출하지 않는다', async (t) => {
+  const logs=[];t.mock.method(console,'warn',(...args)=>logs.push(args));
+  const secret='PRIVATE_DOCUMENT_VALUE_AND_SECRET';
+  const raw=generated();raw.sections[0].content+=` ${secret} 987654세트`;
+  const body=request();body.sources[0].text+=` ${secret}`;body.analysis.fields[0].label=`PRIVATE_FIELD_LABEL ${secret}`;
+  const result=await backend({raw}).run(body);
+  assert.equal(result.status,502);assert.deepEqual(logs,[[JSON.stringify({action:'draft',code:'DV15'})]]);
+  assert.ok(!JSON.stringify(result).includes(secret));assert.ok(!JSON.stringify(result).includes('DV15'));
+  const ref=generated();ref.sections[0].evidenceIds=['PRIVATE_FIELD_ID'];
+  await backend({raw:ref}).run();assert.equal(JSON.parse(logs.at(-1)[0]).code,'DV17');
+  for(const entry of logs){assert.equal(entry.length,1);assert.deepEqual(Object.keys(JSON.parse(entry[0])),['action','code']);assert.ok(!entry[0].includes('PRIVATE'));assert.ok(!entry[0].includes('test-secret'));assert.ok(!entry[0].includes('stack'));}
+});
+
+test('제공자 인증·요청·한도·장애는 임의 오류 문자열 대신 허용된 코드로만 구분한다', async (t) => {
+  const logs=[];t.mock.method(console,'warn',(...args)=>logs.push(args));
+  for(const[status,expected]of[[401,'PROVIDER_AUTH'],[403,'PROVIDER_AUTH'],[429,'PROVIDER_RATE_LIMIT'],[400,'PROVIDER_REQUEST'],[404,'PROVIDER_REQUEST'],[500,'PROVIDER_UNAVAILABLE'],[503,'PROVIDER_UNAVAILABLE'],[418,'OTHER_PROVIDER_ERROR'],[undefined,'OTHER_PROVIDER_ERROR']]){
+    const error=Object.assign(new Error('PRIVATE_PROVIDER_MESSAGE key=test-secret'),{status,name:'PRIVATE_PROVIDER_NAME',code:'PRIVATE_PROVIDER_CODE'});
+    const result=await backend({error}).run();assert.equal(result.status,502);assert.deepEqual(logs.at(-1),[JSON.stringify({action:'draft',code:expected})]);assert.ok(!JSON.stringify(result).includes('PRIVATE_PROVIDER'));
+  }
+});
+
+test('도구 누락·출력 잘림은 제공자 호출 오류와 다른 고정 코드로 관측한다', async (t) => {
+  const logs=[];t.mock.method(console,'warn',(...args)=>logs.push(args));
+  for(const[response,code]of[[{stop_reason:'end_turn',content:[{type:'text',text:'PRIVATE_RAW_RESPONSE'}]},'DV38'],[{stop_reason:'max_tokens',content:[]},'DV37']]){
+    const result=await backend({response}).run();assert.equal(result.status,502);assert.deepEqual(logs.at(-1),[JSON.stringify({action:'draft',code})]);
+  }
+});
+
+test('성공·사용자 입력 오류·timeout에서는 문서 진단 로그를 추가하지 않는다', async (t) => {
+  const logs=[];t.mock.method(console,'warn',(...args)=>logs.push(args));
+  assert.equal((await backend().run()).status,200);
+  assert.equal((await backend().run(request({consent:false}))).status,400);
+  assert.equal((await backend({error:Object.assign(new Error('PRIVATE_TIMEOUT'),{name:'APIConnectionTimeoutError'})}).run()).status,504);
+  assert.deepEqual(logs,[]);
+});
+
+test('검증 오류의 로그 코드는 고정 허용 목록이며 문서값으로 변조되지 않는다', () => {
+  const coercible={toString:()=> 'DV28',toJSON:()=> 'PRIVATE_SENTINEL'};assert.equal(new DraftValidationError(coercible).code,'DV01');
+  const error=new DraftValidationError('PRIVATE_DOCUMENT');assert.equal(error.message,'invalid_draft');assert.equal(error.code,'DV01');
+  assert.throws(()=>{error.code='PRIVATE_DOCUMENT';});
+  assert.throws(()=>validateGeneratedDraft(null,prepare()),error=>error instanceof DraftValidationError&&error.code==='DV01');
+});
+
+
+test('위조된 검증 오류 객체도 최종 로거에서 고정 문자열만 허용한다', async (t) => {
+  const logs=[];t.mock.method(console,'warn',(...args)=>logs.push(args));
+  const error=Object.create(DraftValidationError.prototype);error.code={toString:()=> 'DV28',toJSON:()=> 'PRIVATE_SENTINEL'};
+  const result=await backend({error}).run();assert.equal(result.status,502);assert.deepEqual(logs,[[JSON.stringify({action:'draft',code:'DV01'})]]);
 });
