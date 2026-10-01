@@ -406,6 +406,12 @@ test('A2 협조요청의 분산 근거는 동일한 수신·배부·직접수령
   const content='한빛지원센터 운영팀-17(2026. 9. 28., 물품 배부 안내)에 따라 신청 기관에 문구세트를 배부하고자 합니다.\n1. 배부 물품: 문구세트\n2. 수령 수량: 기관당 10세트\n3. 수령 일시: 10월 8일 14~16시\n4. 수령 장소: 센터 1층\n5. 수령 방법: 직접 수령\n위 일시와 장소에서 물품을 수령하여 주시기 바랍니다.';
   const raw=generated({title:'문구세트 수령 협조',recipient:'신청기관',sender:'한빛지원센터',unknowns:[],sections:[{heading:'본문',content,evidenceIds:['basis_relation','receipt_date','receipt_location','receipt_method','items','quantity']}]});
   const prepared=prepare(body);assert.equal(validateGeneratedDraft(raw,prepared).mode,'ai');
+  for(const method of ['직접 방문하여 수령','직접 방문해서 수령','방문 수령']){
+    const equivalent=structuredClone(raw);equivalent.sections[0].content=content.replace('직접 수령',method);assert.equal(validateGeneratedDraft(equivalent,prepared).mode,'ai');
+  }
+  for(const method of ['대리 수령','대리인이 직접 방문하여 수령','직접 방문하여 수령하거나 택배 배송','직접 방문해서 수령 또는 대리 수령']){
+    const unsupported=structuredClone(raw);unsupported.sections[0].content=content.replace('직접 수령',method);assert.throws(()=>validateGeneratedDraft(unsupported,prepared));
+  }
   for(const [from,to]of [['기관당 10세트',''],['기관당 10세트','총 10세트'],['센터 1층',''],['센터 1층','센터 2층'],['직접 수령','택배 배송'],['운영팀-17',''],['14~16시','14~17시'],['배부하고자 합니다','관련 문서를 확인하였습니다']]){
     const bad=structuredClone(raw);bad.sections[0].content=content.replace(from,to);assert.throws(()=>validateGeneratedDraft(bad,prepared),`${from} → ${to}`);
   }
@@ -464,4 +470,21 @@ test('위조된 검증 오류 객체도 최종 로거에서 고정 문자열만 
   const logs=[];t.mock.method(console,'warn',(...args)=>logs.push(args));
   const error=Object.create(DraftValidationError.prototype);error.code={toString:()=> 'DV28',toJSON:()=> 'PRIVATE_SENTINEL'};
   const result=await backend({error}).run();assert.equal(result.status,502);assert.deepEqual(logs,[[JSON.stringify({action:'draft',code:'DV01'})]]);
+});
+
+test('다른 근거의 연도를 연도 없는 수령 월일에 결합한 A3 응답은 계속 DV04로 거부한다', () => {
+  const body=request({basisStatus:'provided'});
+  body.sources[0].text+=' 근거 문서 날짜는 2026. 9. 28.이고 수령 일시는 10월 8일 14~16시입니다.';
+  body.analysis.fields.push(field('basis_date','근거 문서 날짜','2026. 9. 28.'),field('receipt_date','수령 일시','10월 8일 14~16시'));
+  const prepared=prepare(body);const base=generated();base.sections[0].evidenceIds.push('basis_date','receipt_date');
+  base.sections[0].content+='\n근거 문서 날짜: 2026. 9. 28.\n수령 일시: 10월 8일 14~16시';
+  assert.equal(validateGeneratedDraft(base,prepared).mode,'ai');
+  for(const date of ['2026년 10월 8일 14~16시','2026. 10. 8. 14~16시']){
+    const raw=structuredClone(base);raw.sections[0].content=raw.sections[0].content.replace('10월 8일 14~16시',date);
+    assert.throws(()=>validateGeneratedDraft(raw,prepared),error=>error instanceof DraftValidationError&&error.code==='DV04');
+  }
+  const same=structuredClone(base);same.sections[0].content=same.sections[0].content.replace('10월 8일 14~16시','10. 8. 14:00~16:00');assert.equal(validateGeneratedDraft(same,prepared).mode,'ai');
+  const explicit=structuredClone(body);explicit.sources[0].text=explicit.sources[0].text.replace('수령 일시는 10월','수령 일시는 2026년 10월');
+  Object.assign(explicit.analysis.fields.find(f=>f.id==='receipt_date'),{value:'2026년 10월 8일 14~16시',quote:'2026년 10월 8일 14~16시'});
+  const supplied=structuredClone(base);supplied.sections[0].content=supplied.sections[0].content.replace('10월 8일 14~16시','2026년 10월 8일 14~16시');assert.equal(validateGeneratedDraft(supplied,prepare(explicit)).mode,'ai');
 });
