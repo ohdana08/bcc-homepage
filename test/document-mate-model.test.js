@@ -252,6 +252,40 @@ test('검증되지 않은 소제목은 배열 위치의 기본 제목 대신 실
   assert.equal(single.sections[0].heading, '주요 활동');
 });
 
+test('초기 자료에서 명시적으로 미정이라고 답한 장소·예산은 재질문하지 않고 확인 목록에 남긴다', () => {
+  const fields = ['main_content', 'location', 'budget'].map((id, i) => field(id, ['주요 내용', '장소', '예산'][i], '', 'unknown'));
+  const result = normalizeAnalysis({ documentType: 'plan', fields, questions: fields.map((item) => ({ fieldId: item.id })), sections: [{ heading: '준비사항', fieldIds: fields.map((item) => item.id) }] }, [
+    { id: 'input', name: '입력', text: '다음 달 동아리 행사를 준비하려고 해요. 운영진에게 계획을 먼저 공유해야 해요. 장소와 예산은 아직 정하지 않았어요.' },
+  ]);
+  assert.deepEqual(result.questions.map((item) => item.fieldId), ['main_content']);
+  assert.ok(result.fields.every((item) => item.kind === 'unknown' && item.value === ''));
+  assert.deepEqual(createDraft(result).unknowns, ['주요 내용', '장소', '예산']);
+});
+
+test('명시적 모름은 그 항목에만 적용하고 일반 부정이나 다른 문장의 미정은 확장하지 않는다', () => {
+  const fields = [field('location', '장소', '', 'unknown'), field('budget', '예산', '', 'unknown'), field('results', '확인된 성과', '', 'unknown')];
+  for (const text of ['장소는 미정입니다. 예산은 확인하고 있어요. 설문은 하지 않았어요.', '장소는 모르겠어요. 일정은 미정입니다.']) {
+    const result = normalizeAnalysis(analysis(fields), [{ id: 'input', name: '입력', text }]);
+    assert.deepEqual(result.questions.map((item) => item.fieldId), ['budget', 'results'], text);
+  }
+  const unscoped = normalizeAnalysis(analysis(fields), [{ id: 'input', name: '입력', text: '아직 정하지 않았어요. 설문은 하지 않았어요.' }]);
+  assert.deepEqual(unscoped.questions.map((item) => item.fieldId), ['location', 'budget', 'results']);
+  const negatedUnknown = normalizeAnalysis(analysis(fields), [{ id: 'input', name: '입력', text: '장소는 미정이 아닙니다.' }]);
+  assert.ok(negatedUnknown.questions.some((item) => item.fieldId === 'location'));
+});
+
+test('한 문장에 알려진 장소와 미정 예산이 있어도 확인된 장소 값은 보존한다', () => {
+  const text = '장소는 강당이고 예산은 아직 정하지 않았어요.';
+  const result = normalizeAnalysis(analysis([
+    field('location', '장소', '장소는 강당이고 예산은 아직 정하지 않았어요.'),
+    field('budget', '예산', '', 'unknown'),
+    field('results', '확인된 성과', '', 'unknown'),
+  ]), [{ id: 'input', name: '입력', text }]);
+  assert.equal(result.fields[0].kind, 'fact');
+  assert.equal(result.fields[0].value, text);
+  assert.deepEqual(result.questions.map((item) => item.fieldId), ['results']);
+});
+
 
 test('자연어 미정 답변은 미확인으로 남기되 완료 사실과 부정 문장은 유지한다', () => {
   for (const value of ['아직 정하지 않았어요.', '정하지 않았습니다', '아직 결정되지 않았어요.']) {

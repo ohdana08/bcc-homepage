@@ -35,6 +35,30 @@ const unknownMarker = /^(?:\[?\s*(?:확인\s*필요|미확인|미입력|(?:아�
 const predictionPattern = /(?:예상|기대|전망|추정|예정|예측|목표|가정|만약|잠정|것(?:이다|입니다|으로)|높아질|증가할|개선될|향상될|계획(?:이다|입니다|임|해|하))/;
 const conditionalPattern = /(?:조건|경우|(?:이|라|으|되|하|가|오|된다|한다|있다|없다)면(?=[\s,.!?\d]|$)|약\s*\d)/;
 const opinionPattern = /(?:반응.{0,8}(?:좋|긍정)|만족도.{0,8}(?:높|좋)|효과.{0,8}(?:있|좋)|성과.{0,8}(?:있|좋)|참여.{0,8}많|홍보.{0,8}잘|좋았|좋은|높았|낮았|많았|훌륭|성공적|효과적|긍정적|부정적|만족스러|만족하|아쉽|보람|생각(?:한다|합니다|해|합)|느꼈)/;
+const UNKNOWN_TOPIC_NAMES = Object.freeze({
+  location: ['장소', '행사장', '회의실'], budget: ['예산', '비용', '금액'],
+  period: ['기간', '시기', '날짜', '일시'], date: ['날짜', '일시'], schedule: ['일정'],
+  reader: ['제출 대상', '제출처', '수신처', '읽는 사람'], purpose: ['작성 목적', '제출 목적'],
+  activities: ['주요 활동', '활동 내용'], activity_content: ['주요 활동', '활동 내용'], main_content: ['주요 내용', '행사 내용'],
+  target_audience: ['대상', '참여 대상'], participants: ['참석자', '참석 인원'], owner: ['담당자'],
+  results: ['성과', '활동 결과'], quantitative_results: ['성과', '활동 결과'], issues: ['문제점'],
+  improvements: ['개선방안', '개선 방안'], expectations: ['기대 결과'],
+});
+// Match a clear answer at the end of its own clause. General negation such as
+// “설문은 하지 않았다” is not an answer to the separate question about outcomes.
+const explicitUnknownAnswer = /(?:미정(?:입니다|이다|이에요|임)?|미확인(?:입니다|이다|이에요|임)?|(?:잘\s*)?모름|모릅니다|몰라요|(?:잘\s*)?모르겠(?:어요|습니다)|(?:아직\s*)?(?:정하지|결정하지|확정하지|결정되지|확정되지)\s*않(?:았(?:어요|습니다|다|음)|음)|(?:아직\s*)?안\s*(?:정했|결정했|확정했)(?:어요|습니다|다|음)|확인\s*필요)\s*[.!?。！？]*$/;
+
+function isExplicitlyUnresolved(field, sources) {
+  const aliases = [...new Set([...(UNKNOWN_TOPIC_NAMES[field.id] || []), field.label])].map(fieldKey).filter(Boolean);
+  return sources.some((source) => typeof source?.text === 'string' && source.text
+    .split(/[\r\n;!?。！？]|\.(?!\d)|(?:지만|이고|이며|반면|그러나)\s*/)
+    .some((clause) => {
+      const answer = explicitUnknownAnswer.exec(clause.trim());
+      if (!answer) return false;
+      const topic = fieldKey(clause.trim().slice(0, answer.index));
+      return aliases.some((alias) => topic.includes(alias));
+    }));
+}
 // Only neutral field names may be invented by the extractor. All other labels
 // must occur in the submitted material; otherwise labels could smuggle in a fact.
 const GENERIC_LABELS = new Set([
@@ -201,6 +225,11 @@ export function normalizeAnalysis(raw, sources = [], answeredFieldIds = []) {
 
   const knownLabels = new Set(fields.filter((field) => field.kind !== 'unknown').map((field) => fieldKey(field.label)));
   const answered = new Set(answeredFieldIds);
+  // “장소와 예산은 아직 정하지 않았어요” already answers both questions.
+  // Leave those gaps visible for final review without repeatedly asking them.
+  for (const field of fields) {
+    if (field.kind === 'unknown' && isExplicitlyUnresolved(field, sources)) answered.add(field.id);
+  }
   // A concise extraction still needs one useful follow-up when an essential
   // outcome/decision is absent. Do not let an all-false model flag disable it.
   const coreIds = {
