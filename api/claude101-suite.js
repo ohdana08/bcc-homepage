@@ -5,6 +5,7 @@ import grobleCheckout from '../lib/claude101-api/groble-checkout.js';
 import grobleEvent from '../lib/claude101-api/groble-claude101-event.js';
 import publicSample from '../lib/claude101-api/public-sample.js';
 import documentMate from '../lib/document-mate/handler.js';
+import { handleProjectInstruction } from '../lib/project-instruction/handler.js';
 
 const HANDLERS = {
   'course-access': courseAccess,
@@ -12,6 +13,7 @@ const HANDLERS = {
   'groble-event': grobleEvent,
   'public-sample': publicSample,
   'document-mate': documentMate,
+  'project-instruction': handleProjectInstruction,
 };
 
 export default async function handler(req, res) {

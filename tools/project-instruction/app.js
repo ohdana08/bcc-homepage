@@ -9,6 +9,7 @@ import {
   localCoachResponse,
   nextStage,
 } from './local-engine.js';
+import { initCollection } from './collection.js';
 
 (function () {
   'use strict';
@@ -17,6 +18,7 @@ import {
   var LEGACY_KEY = 'bcc-project-instruction-classroom-v3-plain';
   var ENGINE = 'local-workflows-v2';
   var busy = false;
+  var collection = initCollection();
 
   var elements = {
     startSection: document.getElementById('start-section'),
@@ -248,6 +250,7 @@ import {
   }
 
   function renderResult() {
+    collection.setDocument(session.ready ? (session.markdown || buildProjectInstructionMarkdown(session.state)) : '');
     if (!session.ready) {
       elements.resultSection.hidden = true;
       return;
@@ -398,6 +401,7 @@ import {
     if (!window.confirm('지금까지 입력한 내용을 지우고 처음부터 시작할까요?')) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch (error) { /* this page still resets */ }
     session = newSession();
+    collection.reset();
     elements.workspace.hidden = true;
     elements.startSection.hidden = false;
     elements.resultSection.hidden = true;

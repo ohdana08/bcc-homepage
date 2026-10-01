@@ -170,6 +170,47 @@ button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 3px sol
 footer { max-width: 1180px; min-height: 80px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
 footer a { text-decoration: underline; text-underline-offset: 3px; }
 
+.participation-card, .collection-card { margin: 0 0 32px; padding: 32px; border: 1px solid var(--line); border-radius: 22px; background: #fffefa; }
+.participation-card h2, .collection-card h2 { margin: 6px 0 12px; font-size: clamp(21px, 3vw, 28px); }
+.participation-card p, .collection-card p, .receipt-management p { font-size: 14px; line-height: 1.8; color: var(--muted); }
+.participation-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 24px 0; }
+.participation-grid label, .receipt-management label { display: grid; gap: 8px; font-size: 13px; font-weight: 700; }
+.participation-grid label span { color: var(--muted); font-weight: 400; }
+.participation-grid input, .participation-grid select, .receipt-management input { width: 100%; min-width: 0; padding: 12px; border: 1px solid #cbcdbf; border-radius: 9px; background: white; color: var(--ink); font: inherit; }
+.participation-grid input:disabled { background: #f1f2eb; color: #4a5546; }
+.check-line { display: flex; gap: 12px; align-items: flex-start; margin: 20px 0 8px; line-height: 1.65; }
+.check-line input { width: 19px; height: 19px; flex: 0 0 19px; margin-top: 4px; accent-color: var(--olive); }
+.check-line small { display: block; color: var(--muted); font-size: 12px; }
+.collection-note { font-size: 12px !important; }
+.participation-summary { display: flex; gap: 16px; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 16px; font-size: 13px; }
+.participation-review { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 20px; margin: 24px 0; background: #f0f2e9; border-radius: 12px; }
+.participation-review dt { font-size: 12px; color: var(--muted); }
+.participation-review dd { margin: 4px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.document-label { display: block; font-weight: 700; }
+#submission-document { width: 100%; min-width: 0; border: 1px solid #cbcdbf; padding: 18px; border-radius: 12px; font: 13px/1.8 monospace; color: var(--ink); background: white; resize: vertical; }
+.consent-box { margin: 24px 0; padding: 20px; border: 1px solid var(--line); border-radius: 12px; }
+.consent-box p { margin: 6px 0 20px 31px; font-size: 12px; }
+.consent-box .check-line:first-child { margin-top: 0; }
+.consent-box a, .receipt-management a { text-decoration: underline; }
+.receipt-box { padding: 24px; margin-top: 18px; background: #eef3eb; border: 1px solid #b5c6a9; border-radius: 14px; }
+.receipt-box pre { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; font-size: 13px; }
+.receipt-management { padding: 24px; border: 1px solid var(--line); border-radius: 14px; margin: 24px 0; }
+.receipt-management summary { cursor: pointer; font-weight: 700; }
+.receipt-management label { margin: 14px 0; }
+.receipt-management input { max-width: 720px; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+[hidden] { display: none !important; }
+@media (max-width: 680px) {
+  .participation-card, .collection-card { padding: 22px 18px; }
+  .participation-grid { grid-template-columns: 1fr; }
+  .participation-review { grid-template-columns: repeat(2,minmax(0,1fr)); padding: 16px; }
+  .participation-summary { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .consent-box { padding: 16px 12px; }
+  .consent-box p { margin-left: 0; }
+  .receipt-management { padding: 18px; }
+  .collection-card .primary-button { white-space: normal; width: 100%; }
+}
+
 @media (max-width: 820px) {
   .hero { grid-template-columns: 1fr; gap: 38px; padding: 50px 0; }
   .classroom-rule { max-width: 380px; }

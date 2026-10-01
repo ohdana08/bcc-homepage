@@ -228,10 +228,11 @@ test('운영 경로는 로컬 질문 엔진을 쓰며 새 AI 호출을 추가하
     readFile(new URL('../vercel.json', import.meta.url), 'utf8'),
     readFile(new URL('../api/cardnews-generate.js', import.meta.url), 'utf8'),
   ]);
-  assert.match(html, /data-local-only="true"/);
+  assert.match(html, /data-generation="local"/);
+  assert.match(html, /data-submission="opt-in"/);
   assert.match(html, /type="module"/);
   assert.doesNotMatch(app, /fetch\s*\(/);
   assert.doesNotMatch(app, /API_URL|sessionToken|ANTHROPIC/);
-  assert.doesNotMatch(vercel, /\/api\/project-instruction/);
+  assert.match(vercel, /\/api\/project-instruction/);
   assert.doesNotMatch(api, /project_instruction_classroom|handleProjectInstructionClassroom/);
 });
