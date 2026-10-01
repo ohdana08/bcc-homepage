@@ -1,4 +1,5 @@
 // Collection is opt-in. The generator never calls the submission API itself.
+import { initUsage } from './usage-ui.js';
 const API = '/api/project-instruction';
 const VERSION = '2026-10-01-v1';
 const PENDING_KEY = 'bcc-pi-submission-v1';
@@ -39,6 +40,7 @@ export function initCollection() {
   let busy = false;
   let admitted = false;
   let pending = null;
+  const usage = initUsage({ getDocument: id => pending?.result?.id === id ? pending.payload.document : '' });
   try { pending = JSON.parse(sessionStorage.getItem(PENDING_KEY)); } catch { /* in-memory retry remains possible */ }
   if (!pending || typeof pending !== 'object' || !pending.payload || !/^[a-f0-9]{64}$/.test(pending.payload.receiptToken || '')) pending = null;
 
@@ -76,6 +78,7 @@ export function initCollection() {
     $('receipt-details').textContent = `확인번호: ${pending.result.id}\n보관 만료일: ${new Date(pending.result.expiresAt).toLocaleString('ko-KR')}`;
     $('receipt-id').value = pending.result.id;
     $('receipt-token').value = pending.payload.receiptToken;
+    usage.setReceipt({ id: pending.result.id, receiptToken: pending.payload.receiptToken });
     updateButton();
   }
   function resumePending() {
@@ -170,10 +173,11 @@ export function initCollection() {
     const id = $('receipt-id').value.trim(); const receiptToken = $('receipt-token').value.trim();
     if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f]{64}$/i.test(receiptToken)) { $('receipt-status').textContent = '제출 확인서에 적힌 확인번호와 관리키를 확인해 주세요.'; return; }
     const deleting = action === 'receipt-delete';
-    if (!window.confirm(deleting ? '서버에 제출한 원문·참여 정보·사례 편집본을 삭제할까요? 이 기기의 작성 기록은 유지됩니다.' : '사례 활용 동의를 철회하고 서버의 사례 편집본을 지울까요? 원문은 내부 보관됩니다.')) return;
+    if (!window.confirm(deleting ? '서버에 제출한 원문·참여 정보·사례 편집본과 연결된 사용 기록을 삭제할까요? 이 기기의 작성 기록은 유지됩니다.' : '사례 활용 동의를 철회하고 서버의 사례 편집본을 지울까요? 원문은 내부 보관됩니다.')) return;
     busy = true; updateButton(); $('receipt-status').textContent = '처리 중입니다…';
     try {
       await api(action, { id, receiptToken });
+      if (deleting) usage.clear(id);
       $('receipt-status').textContent = deleting ? '서버의 제출 자료를 삭제했습니다.' : '사례 활용 동의를 철회했습니다. 이미 사용된 외부 사례의 제거는 BCC에도 문의해 주세요.';
       if (pending?.result?.id === id) {
         if (deleting) { pending = null; savePending(); $('submission-receipt').hidden = true; $('submission-status').textContent = '제출 자료가 삭제되었습니다. 다시 동의한 뒤 새로 제출할 수 있습니다.'; for (const name of ['internal', 'overseas', 'case']) $('consent-' + name).checked = false; }
@@ -218,6 +222,7 @@ export function initCollection() {
     reset() {
       // Keep downloaded receipts valid; a new local worksheet must not delete server data.
       if (pending && !pending.result) { $('submission-status').textContent = '확인되지 않은 이전 제출이 남아 있습니다. 완성 후 제출 결과를 먼저 확인해 주세요.'; return; }
+      usage.clear();
       pending = null; source = ''; savePending();
       $('submission-copy-notice').textContent = ''; $('refresh-submission-copy').hidden = true;
       $('collection-section').hidden = true; $('submission-receipt').hidden = true;

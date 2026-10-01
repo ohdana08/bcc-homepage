@@ -12,6 +12,10 @@
       "destination": "/api/claude101-suite?fn=saju-admin"
     },
     {
+      "source": "/api/project-instruction-usage",
+      "destination": "/api/claude101-suite?fn=project-instruction-usage"
+    },
+    {
       "source": "/api/project-instruction",
       "destination": "/api/claude101-suite?fn=project-instruction"
     },

@@ -8,8 +8,7 @@ import documentMate from '../lib/document-mate/handler.js';
 import { handleProjectInstruction } from '../lib/project-instruction/handler.js';
 import { loadPrivateSajuHtml } from '../lib/saju-preview/load.js';
 import { handleSajuAdmin } from '../lib/saju-preview/handler.js';
-
-
+import { handleProjectInstructionUsage } from '../lib/project-instruction/telemetry-handler.js';
 
 const HANDLERS = {
   'course-access': courseAccess,
@@ -19,6 +18,7 @@ const HANDLERS = {
   'document-mate': documentMate,
   'project-instruction': handleProjectInstruction,
   'saju-admin': (req, res) => handleSajuAdmin(req, res, { loadHtml: loadPrivateSajuHtml }),
+  'project-instruction-usage': handleProjectInstructionUsage,
 };
 
 export default async function handler(req, res) {

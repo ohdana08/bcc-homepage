@@ -1,13 +1,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.108.2';
+import { renderUsageView } from './project-instruction-usage-view.js';
 const $ = id => document.getElementById(id);
 const API = '/api/project-instruction';
 const state = { client: null, session: null, classes: [], page: 1, data: null, detail: null, loadSequence: 0, detailSequence: 0, busy: false };
 const date = value => value ? new Date(value).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour12: false }) : '—';
 function status(message, error = false) { $('status').textContent = message; $('status').classList.toggle('error', error); }
-function clearPrivateView() { state.data = null; state.detail = null; state.classes = []; state.loadSequence++; state.detailSequence++; $('workspace').hidden = true; $('sign-out').hidden = true; $('rows').replaceChildren(); $('class-list').replaceChildren(); $('original-text').textContent = ''; $('case-draft').value = ''; if ($('detail').open) $('detail').close(); }
+function clearPrivateView() { state.data = null; state.detail = null; state.classes = []; state.loadSequence++; state.detailSequence++; $('workspace').hidden = true; $('sign-out').hidden = true; $('rows').replaceChildren(); $('class-list').replaceChildren(); $('original-text').textContent = ''; $('case-draft').value = ''; $('usage-overview').replaceChildren(); $('detail-usage').replaceChildren(); if ($('detail').open) $('detail').close(); }
 async function request(action, payload = {}, method = 'POST', retried = false) {
-  const url = new URL(API, location.href);
-  url.searchParams.set('action', action);
+  const usage = action.startsWith('usage-');
+  const url = new URL(usage ? '/api/project-instruction-usage' : API, location.href);
+  url.searchParams.set('action', usage ? action.slice(6) : action);
   if (method === 'GET') Object.entries(payload).forEach(([key, value]) => { if (value !== '' && value !== undefined) url.searchParams.set(key, String(value)); });
   const response = await fetch(url, { method, cache: 'no-store', headers: { Authorization: 'Bearer ' + (state.session?.access_token || ''), ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}) }, ...(method === 'POST' ? { body: JSON.stringify({ action, ...payload }) } : {}) });
   if (response.status === 401 && !retried && state.client) {
@@ -69,19 +71,21 @@ function renderList() {
     const answers = element('td'); answers.append(element('span', [p.ageRange, p.gender].filter(Boolean).join(' · ') || '연령·성별 미응답'), element('small', [p.occupation, p.aiExperience].filter(Boolean).join(' · ') || '직무·경험 미응답'));
     const consent = element('td', '내부 보관·국외 처리 동의'); consent.append(element('small', '사례 사용 ' + (item.consent.caseStudy ? '동의' : '미동의·철회') + (item.caseUpdatedAt ? ' · 편집본 있음' : '')));
     const dates = element('td', date(item.submittedAt)); dates.append(element('small', '보관 ~ ' + date(item.expiresAt)));
-    const action = element('td'); action.append(button('원문·편집본', () => openDetail(item.id)));
+    const action = element('td'); action.append(button('원문·사용 기록', () => openDetail(item.id)));
     row.append(title, course, answers, consent, dates, action); $('rows').append(row);
   });
   const pages = Math.max(1, Math.ceil(data.total / data.pageSize)); $('page-label').textContent = data.page + ' / ' + pages + '쪽 · ' + data.total + '건';
   $('previous').disabled = data.page <= 1; $('next').disabled = data.page >= pages;
 }
 async function loadList() {
-  const sequence = ++state.loadSequence; status('제출 자료를 불러오고 있습니다.');
+  const sequence = ++state.loadSequence; const scope = { classId: $('class-filter').value, q: $('search').value.trim(), page: state.page }; status('제출 자료를 불러오고 있습니다.');
   try {
-    const data = await request('admin-list', { classId: $('class-filter').value, q: $('search').value.trim(), page: state.page }, 'GET');
+    const data = await request('admin-list', scope, 'GET');
     if (sequence !== state.loadSequence) return;
     state.data = data; state.classes = data.classes; renderClasses(); renderList();
     $('workspace').hidden = false; $('auth-panel').hidden = true; $('sign-out').hidden = false; status('보관 기간 내 실제 제출 ' + data.total + '건을 확인했습니다.');
+    const usage = await request('usage-admin-summary', { classId: scope.classId, q: scope.q }, 'GET').catch(() => null);
+    if (sequence === state.loadSequence) renderUsageView($('usage-overview'), usage, { summary: true });
   } catch (error) { if (sequence === state.loadSequence) status(error.message, true); }
 }
 function changePane(casePane) {
@@ -101,6 +105,9 @@ async function openDetail(id) {
     $('case-draft').disabled = !submission.consent.caseStudy; $('save-case').disabled = !submission.consent.caseStudy;
     $('case-status').textContent = submission.consent.caseStudy ? '사례 사용 동의 확인됨 · 실제 공개 전 내용과 사용 범위를 별도로 검토해 주세요.' : '사례 사용 미동의 또는 철회됨 · 사례 편집본을 저장할 수 없습니다.';
     changePane(false); if (!$('detail').open) $('detail').showModal();
+    $('detail-usage').textContent = '사용 기록을 확인하고 있습니다…';
+    const usage = await request('usage-admin-detail', { id }, 'GET').catch(() => null);
+    if (sequence === state.detailSequence && state.detail?.id === id) renderUsageView($('detail-usage'), usage);
   } catch (error) { status(error.message, true); }
 }
 function canCloseDetail() { if (state.busy) return false; return !state.detail || $('case-draft').value === state.detail.caseDraft || window.confirm('저장하지 않은 사례 편집 내용이 있습니다. 닫을까요?'); }
@@ -114,7 +121,7 @@ $('save-case').addEventListener('click', () => mutate($('save-case'), async () =
   catch (error) { if (error.status === 409 && state.detail?.id === id) { state.detail.consent.caseStudy = false; $('case-draft').disabled = true; $('case-status').textContent = error.message; } throw error; }
 }));
 $('delete-submission').addEventListener('click', () => mutate($('delete-submission'), async () => {
-  if (!state.detail || !window.confirm('「' + state.detail.title + '」의 원문·참여 정보·사례 편집본을 삭제할까요? 되돌릴 수 없습니다.')) return;
+  if (!state.detail || !window.confirm('「' + state.detail.title + '」의 원문·참여 정보·사례 편집본과 사용 기록을 삭제할까요? 되돌릴 수 없습니다.')) return;
   await request('admin-delete', { id: state.detail.id }); state.detail = null; $('detail').close(); $('original-text').textContent = ''; $('case-draft').value = ''; await loadList(); status('제출 자료를 삭제했습니다.');
 }));
 $('download-original').addEventListener('click', () => { if (!state.detail) return; const url = URL.createObjectURL(new Blob([state.detail.document], { type: 'text/markdown;charset=utf-8' })); const a = element('a'); a.href = url; a.download = 'AI_업무지시서.md'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
