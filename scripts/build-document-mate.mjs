@@ -1,0 +1,12 @@
+import { build } from 'esbuild';
+import { copyFile, cp, mkdir } from 'node:fs/promises';
+const base = new URL('../', import.meta.url);
+const path = value => new URL(value,base).pathname;
+const out = path('tools/document-mate/vendor/');
+await mkdir(out,{recursive:true});
+await build({entryPoints:[path('tools/document-mate/export.mjs')],outfile:out+'export.js',bundle:true,minify:true,format:'esm',platform:'browser',target:['es2022'],legalComments:'eof'});
+await build({entryPoints:[path('tools/document-mate/zip-worker.mjs')],outfile:out+'zip-worker.js',bundle:true,minify:true,format:'esm',platform:'browser',target:['es2022'],legalComments:'eof'});
+for(const file of ['pdf.min.mjs','pdf.worker.min.mjs']) await copyFile(path('node_modules/pdfjs-dist/build/'+file),out+file);
+for(const dir of ['cmaps','standard_fonts','wasm']) await cp(path('node_modules/pdfjs-dist/'+dir),out+dir,{recursive:true});
+for(const [pkg,file] of [['pdfjs-dist','LICENSE'],['fflate','LICENSE'],['docx','LICENSE']]) await copyFile(path(`node_modules/${pkg}/${file}`),out+`${pkg}-LICENSE.txt`);
+console.log('Document Mate browser assets built.');
