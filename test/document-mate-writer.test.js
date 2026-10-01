@@ -366,3 +366,30 @@ test('작성 API 한도·45초 전체 timeout·잘못된 작성 결과는 로컬
   const malformed = backend({ raw: { documentType: 'cooperation' } });
   const malformedResult = await malformed.run(); assert.equal(malformedResult.status, 502); assert.ok(!malformedResult.body.draft);
 });
+
+test('보완 원문의 시간 범위는 양끝을 검증해 공문 시각 표기로 변환하며 시각·수량 변경은 거부한다', () => {
+  const value='10월 8일 14~16시에 센터 1층에서 기관당 10세트씩 받아가게 협조 공문 써주세요.';
+  const body=request({sources:[{id:'input',text:value}],analysis:{documentType:'cooperation',fields:[field('source-statement-time','보완한 원문 1',value)],sections:[]}});
+  const prepared=prepare(body);
+  const draft=(time,quantity=10)=>generated({unknowns:[],sections:[{heading:'본문',content:`10월 8일 ${time}에 센터 1층에서 기관당 ${quantity}세트씩 수령하여 주시기 바랍니다.`,evidenceIds:['source-statement-time']}]});
+  for(const time of ['14~16시','14:00~16:00','14시부터 16시까지'])assert.equal(validateGeneratedDraft(draft(time),prepared).mode,'ai');
+  for(const time of ['15~16시','14~17시','15:00~16:00','14:00~17:00','14:30~16:00','16:00~14:00','16시부터 14시까지','16~14시'])assert.throws(()=>validateGeneratedDraft(draft(time),prepared));
+  assert.throws(()=>validateGeneratedDraft(draft('14:00~16:00',14),prepared));
+});
+
+test('별도 붙임 없음만 인용한 작성 메타는 본문 부정을 요구하지 않으며 붙임은 만들지 못한다', () => {
+  for(const value of ['붙임은 없어요.','별도 붙임은 없어요.','별도의 첨부 파일은 없습니다.']){
+    const body=request({editedFieldIds:['attachments']});body.analysis.fields.push(field('attachments','첨부자료',value));
+    const raw=generated();raw.sections[0].evidenceIds.push('attachments');
+    assert.equal(validateGeneratedDraft(raw,prepare(body)).mode,'ai');
+    raw.closing='붙임 수령 명세서. 끝.';assert.throws(()=>validateGeneratedDraft(raw,prepare(body)));
+  }
+});
+
+test('붙임 없음과 다른 행동이 섞인 문장·일반 미완료는 부정 보존 검사에서 제외하지 않는다', () => {
+  for(const value of ['별도 붙임은 없지만 안내문은 아직 보내지 않았어요.','기관에서 아직 물품을 수령하지 않았어요.']){
+    const body=request({editedFieldIds:['status']});body.analysis.fields.push(field('status','현재 상태',value));
+    const raw=generated();raw.sections[0].evidenceIds.push('status');
+    assert.throws(()=>validateGeneratedDraft(raw,prepare(body)));
+  }
+});
