@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { unzipSync, strFromU8 } from 'fflate';
 import { normalizeAnalysis, createDraft } from '../tools/document-mate/model.mjs';
-import { draftMarkdown, draftDocx } from '../tools/document-mate/export.mjs';
+import { draftMarkdown, draftPlainText, draftDocx } from '../tools/document-mate/export.mjs';
 
 function rawField(value, quote, overrides = {}) {
   return { id: 'result', label: '활동 결과', value, quote, sourceId: 'input', kind: 'fact', required: false, ...overrides };
@@ -48,9 +48,17 @@ test('review: DOCX는 현재 편집한 한글 제목·본문·확인 항목을 �
     sections: [{ heading: '활동 결과', content: '최종 참석자 22명\n장소: [확인 필요]\n<b>원문 텍스트</b>' }],
     unknowns: ['행사 장소'], unsupportedExpressions: ['현장 반응은 사용자 의견'], suggestedAttachments: ['수정한 첨부 목록'],
   };
-  const blob = await draftDocx(draft);
+  const blob = await draftDocx(draft, {includeReview:true});
   const entries = unzipSync(new Uint8Array(await blob.arrayBuffer()));
   assert.ok(entries['[Content_Types].xml']);
   const xml = strFromU8(entries['word/document.xml']);
   for (const expected of ['사용자가 고친 결과보고서', '최종 참석자 22명', '[확인 필요]', '행사 장소', '수정한 첨부 목록', '&lt;b&gt;원문 텍스트&lt;/b&gt;']) assert.ok(xml.includes(expected), expected);
+});
+
+test('review: 작성된 공문의 수신·근거·수정한 표·붙임은 내보내며 추천자료는 본문에 섞지 않는다', async () => {
+  const draft={title:'안내책자 수령 협조 요청',recipient:'각 동아리 대표',documentType:'cooperation',sections:[{heading:'본문',content:'안내책자를 배부하오니 아래 내용을 확인하여 수령해 주시기 바랍니다.',table:{headers:['항목','내용'],rows:[['수령 수량','동아리당 5부'],['수령 장소','학생회관 2층']]}}],closing:'끝.',unknowns:[],unsupportedExpressions:[],suggestedAttachments:['아직 없는 수령 확인서'],qualityNotes:['기관 양식 대조']};
+  const plain=draftPlainText(draft);assert.match(plain,/수신  각 동아리 대표/);assert.match(plain,/동아리당 5부/);assert.ok(!plain.includes('아직 없는'));
+  const md=draftMarkdown(draft);assert.match(md,/\| 수령 수량 \| 동아리당 5부 \|/);
+  const entries=unzipSync(new Uint8Array(await (await draftDocx(draft)).arrayBuffer()));const xml=strFromU8(entries['word/document.xml']);
+  assert.ok(xml.includes('<w:tbl>'));assert.ok(xml.includes('각 동아리 대표'));assert.ok(xml.includes('동아리당 5부'));assert.ok(!xml.includes('아직 없는'));assert.ok(!xml.includes('제출 전 검토 메모'));
 });

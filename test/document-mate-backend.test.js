@@ -39,6 +39,15 @@ function setup(options = {}) {
   } };
 }
 
+test('선행 협조 요청이 있어도 현재 목적이 결과보고이면 회신 장르로 뒤집지 않는다', async () => {
+  const raw=output();raw.content[0].input.documentType='reply';
+  const text='다온센터 운영팀-42의 협조 요청에 따른 결과를 운영팀장에게 보고해요. 기관 5곳 중 3곳에 전달했어요.';
+  const mock=setup({output:raw});const result=await mock.request(body({startMode:'unsure',documentType:'',sources:[{id:'input',name:'현재 상황',text}]}));
+  assert.equal(result.status,200);assert.equal(result.body.analysis.documentType,'report');
+  const known=setup({output:structuredClone(raw)});const explicit=await known.request(body({documentType:'reply',sources:[{id:'input',name:'상황',text}]}));
+  assert.equal(explicit.body.analysis.documentType,'reply');
+});
+
 test('서버는 동의·종류·액션·자료의 크기와 중복 식별자를 AI 호출 전에 검증한다', async () => {
   const invalid = [
     body({ consent: false }), body({ action: 'draft' }), body({ startMode: 'other' }), body({ documentType: 'official' }), body({ documentType: '' }), body({ stage: 'future' }), body({ goal: '가'.repeat(1001) }),
