@@ -136,7 +136,7 @@ test('자료에 없는 기관·승인·성과를 항목명이나 소제목에 �
     field('activity', '부산시 공식 승인 완료', '카드뉴스 4개'),
   ], { sections: [{ heading: '부산시 공식 승인 완료', fieldIds: ['activity'] }] }), input);
   assert.equal(result.fields[0].label, '항목 1');
-  assert.equal(result.sections[0].heading, '개요');
+  assert.equal(result.sections[0].heading, '항목 1');
   assert.ok(!JSON.stringify(result).includes('부산시'));
   assert.equal(result.fields[0].value, '카드뉴스 4개');
 });
@@ -152,7 +152,7 @@ test('부정문 속 표현을 잘라 사실처럼 보이는 항목명·소제목
     field('activity', '부산시 공식 승인 완료', '카드뉴스 4건', 'fact', 'input', text),
   ], { sections: [{ heading: '부산시 공식 승인 완료', fieldIds: ['activity'] }] }), [{ id: 'input', name: '자료', text }]);
   assert.equal(result.fields[0].label, '항목 1');
-  assert.equal(result.sections[0].heading, '개요');
+  assert.equal(result.sections[0].heading, '항목 1');
   assert.equal(result.fields[0].kind, 'fact');
   assert.equal(result.fields[0].value, '카드뉴스 4건');
 });
@@ -229,4 +229,25 @@ test('실제 AI 검증 입력의 활동·학교 제출 목적·독자·설문 �
 test('빠진 핵심 결과도 이미 모른다고 답했다면 다시 묻지 않는다', () => {
   const result = normalizeAnalysis(analysis([field('results', '확인된 성과', '', 'unknown', '', '', false)]), input, ['results']);
   assert.deepEqual(result.questions, []);
+});
+
+test('검증되지 않은 소제목은 배열 위치의 기본 제목 대신 실제 항목명이나 중립 제목으로 대체한다', () => {
+  const fields = [
+    field('purpose', '작성 목적', '', 'unknown'),
+    field('activities', '주요 활동', '', 'unknown'),
+    field('target_audience', '대상', '', 'unknown'),
+    field('location', '장소', '', 'unknown'),
+    field('schedule', '추진 일정', '', 'unknown'),
+    field('budget', '예산', '', 'unknown'),
+  ];
+  const result = normalizeAnalysis({ documentType: 'plan', fields, sections: [
+    { heading: '개요', fieldIds: ['purpose'] },
+    { heading: '상세 실행 묶음', fieldIds: ['activities', 'target_audience'] },
+    { heading: '행사 준비 자원 묶음', fieldIds: ['location', 'schedule', 'budget'] },
+  ] }, []);
+  assert.deepEqual(result.sections.map((section) => section.heading), ['개요', '주요 활동 · 대상', '장소 · 추진 일정 · 예산']);
+  assert.deepEqual(result.sections[1].fieldIds, ['activities', 'target_audience']);
+  assert.deepEqual(result.sections[2].fieldIds, ['location', 'schedule', 'budget']);
+  const single = normalizeAnalysis({ documentType: 'plan', fields: [fields[1]], sections: [{ heading: '임의의 새 소제목', fieldIds: ['activities'] }] }, []);
+  assert.equal(single.sections[0].heading, '주요 활동');
 });

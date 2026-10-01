@@ -173,8 +173,14 @@ export function normalizeAnalysis(raw, sources = [], answeredFieldIds = []) {
   const usedIds = new Set();
   const candidates = Array.isArray(raw.sections) && raw.sections.length ? raw.sections.slice(0, 24) : definition.headings.map((heading) => ({ heading, fieldIds: [] }));
   for (const [index, section] of candidates.entries()) {
-    const heading = safeLabel(section?.heading, definition.headings[index] || '추가 내용', allText);
     const fieldIds = [...new Set(Array.isArray(section?.fieldIds) ? section.fieldIds.filter((id) => ids.has(id) && !usedIds.has(id)) : [])];
+    // A rejected heading cannot be renamed by its array position: the model
+    // may have grouped activities where the default template puts “목적”.
+    const fieldLabels = [...new Set(fieldIds.map((id) => fields.find((field) => field.id === id).label))];
+    const fallbackHeading = fieldLabels.length
+      ? clean(fieldLabels.slice(0, 3).join(' · ') + (fieldLabels.length > 3 ? ' 등' : ''), 200)
+      : '추가 내용';
+    const heading = safeLabel(section?.heading, fallbackHeading, allText);
     if (!fieldIds.length) {
       // Preserve empty template headings as explicit gaps rather than dropping them.
       const match = fields.find((field) => !usedIds.has(field.id) && fieldKey(field.label) === fieldKey(heading));
