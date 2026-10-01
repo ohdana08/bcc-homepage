@@ -8,6 +8,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/saju-admin",
+      "destination": "/api/claude101-suite?fn=saju-admin"
+    },
+    {
       "source": "/api/project-instruction",
       "destination": "/api/claude101-suite?fn=project-instruction"
     },
@@ -38,6 +42,31 @@
     }
   },
   "headers": [
+    {
+      "source": "/admin-saju.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store, max-age=0"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://esm.sh 'sha256-qXgub6E2n71OZoUKCZQ/1e1YN+49gbhI+cPp8PT3iVw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' about:; connect-src 'self' https://jhjxrkypnigcohgnzhvq.supabase.co; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+        }
+      ]
+    },
     {
       "source": "/tools/document-mate/(.*)",
       "headers": [

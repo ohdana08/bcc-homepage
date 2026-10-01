@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>결 사주 · 비공개 검토 | BCC 관리자</title>
+  <link rel="stylesheet" href="/assets/saju-admin.css">
+  <script type="module" src="/assets/saju-admin.js"></script>
+</head>
+<body>
+  <header class="admin-bar">
+    <a href="/admin.html" class="back">← BCC 관리자</a>
+    <strong>결 사주 <span>비공개 검토</span></strong>
+    <button type="button" id="close-preview" hidden>미리보기 닫기</button>
+  </header>
+  <main>
+    <section id="gate" class="gate" aria-labelledby="gate-title">
+      <p class="eyebrow">BCC PRIVATE PREVIEW</p>
+      <h1 id="gate-title">결, 공개 전 함께 살펴보는 공간</h1>
+      <p>기존 BCC 관리자 계정으로 사주 원국과 용신·희신·기신 풀이를 검토할 수 있습니다.</p>
+      <p id="status" role="status" aria-live="polite">관리자 권한을 확인하고 있습니다.</p>
+      <div class="actions"><a href="/admin.html" id="login" hidden>관리자 로그인</a><button id="retry" type="button" hidden>미리보기 열기</button></div>
+      <p class="note">현재는 고객에게 공개되지 않은 검토 단계입니다.<br>출생 정보는 브라우저 안에서만 계산하며, 검색 등록과 고객 유입 측정은 공개 단계에서 시작합니다.</p>
+    </section>
+    <div id="workspace" hidden></div>
+  </main>
+</body>
+</html>

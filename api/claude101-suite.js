@@ -6,6 +6,10 @@ import grobleEvent from '../lib/claude101-api/groble-claude101-event.js';
 import publicSample from '../lib/claude101-api/public-sample.js';
 import documentMate from '../lib/document-mate/handler.js';
 import { handleProjectInstruction } from '../lib/project-instruction/handler.js';
+import { loadPrivateSajuHtml } from '../lib/saju-preview/load.js';
+import { handleSajuAdmin } from '../lib/saju-preview/handler.js';
+
+
 
 const HANDLERS = {
   'course-access': courseAccess,
@@ -14,6 +18,7 @@ const HANDLERS = {
   'public-sample': publicSample,
   'document-mate': documentMate,
   'project-instruction': handleProjectInstruction,
+  'saju-admin': (req, res) => handleSajuAdmin(req, res, { loadHtml: loadPrivateSajuHtml }),
 };
 
 export default async function handler(req, res) {

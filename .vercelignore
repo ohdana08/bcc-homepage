@@ -1,0 +1,12 @@
+# Local-only packaging, synthetic verification and reports for the private app.
+.env*
+.vercel/
+node_modules/
+scripts/package-saju-preview.mjs
+scripts/verify-saju-admin.mjs
+test/saju-preview.test.js
+docs/saju-admin-*.md
+test-results-saju/
+test-results-saju-admin/
+.private-saju/
+scripts/upload-saju-preview.mjs

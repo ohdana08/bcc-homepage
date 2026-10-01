@@ -36,6 +36,8 @@ npm-debug.log*
 .cache/
 .vercel
 .env*
+test-results-saju-admin/
+.private-saju/
 
 # scroll-world 배경 재생성용 로컬 컴포지터 (커밋 금지)
 _compositor/
