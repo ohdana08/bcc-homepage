@@ -393,3 +393,25 @@ test('붙임 없음과 다른 행동이 섞인 문장·일반 미완료는 부�
     assert.throws(()=>validateGeneratedDraft(raw,prepare(body)));
   }
 });
+
+test('A2 협조요청의 분산 근거는 동일한 수신·배부·직접수령 관계와 모든 세부값이 있어야 합산한다', () => {
+  const first='한빛지원센터 운영팀-17(2026. 9. 28., 물품 배부 안내)에 따라 신청한 기관들에 문구세트를 배부해요.';
+  const second='10월 8일 14~16시에 센터 1층에서 기관당 10세트씩 받아가게 협조 공문 써주세요.';
+  const statement=`${first} ${second}`;
+  const body=request({sources:[{id:'input',text:`${statement} 별도 붙임은 없어요.`}],basisStatus:'provided',editedFieldIds:['recipient','sender'],analysis:{documentType:'cooperation',sections:[],fields:[
+    field('recipient','수신','신청기관',{sourceId:'',quote:''}),field('sender','발신','한빛지원센터',{sourceId:'',quote:''}),
+    field('request','협조 사항','',{kind:'unknown',sourceId:'',quote:''}),field('receipt_date','수령 일시','10월 8일 14~16시'),field('receipt_location','수령 장소','센터 1층'),field('receipt_method','수령 방법','받아가게'),field('items','품목','문구세트'),field('quantity','수량','기관당 10세트씩'),
+    field('basis_title','근거 문서 제목','물품 배부 안내'),field('basis_number','관련 공문번호','한빛지원센터 운영팀-17'),field('basis_date','근거 문서 날짜','2026. 9. 28.'),field('basis_relation','근거와의 관계','한빛지원센터 운영팀-17(2026. 9. 28., 물품 배부 안내)에 따라'),field('attachments','첨부자료','별도 붙임은 없어요.'),field('source-statement-split','보완한 원문',statement),
+  ]}});
+  const content='한빛지원센터 운영팀-17(2026. 9. 28., 물품 배부 안내)에 따라 신청 기관에 문구세트를 배부하고자 합니다.\n1. 배부 물품: 문구세트\n2. 수령 수량: 기관당 10세트\n3. 수령 일시: 10월 8일 14~16시\n4. 수령 장소: 센터 1층\n5. 수령 방법: 직접 수령\n위 일시와 장소에서 물품을 수령하여 주시기 바랍니다.';
+  const raw=generated({title:'문구세트 수령 협조',recipient:'신청기관',sender:'한빛지원센터',unknowns:[],sections:[{heading:'본문',content,evidenceIds:['basis_relation','receipt_date','receipt_location','receipt_method','items','quantity']}]});
+  const prepared=prepare(body);assert.equal(validateGeneratedDraft(raw,prepared).mode,'ai');
+  for(const [from,to]of [['기관당 10세트',''],['기관당 10세트','총 10세트'],['센터 1층',''],['센터 1층','센터 2층'],['직접 수령','택배 배송'],['운영팀-17',''],['14~16시','14~17시'],['배부하고자 합니다','관련 문서를 확인하였습니다']]){
+    const bad=structuredClone(raw);bad.sections[0].content=content.replace(from,to);assert.throws(()=>validateGeneratedDraft(bad,prepared),`${from} → ${to}`);
+  }
+  for(const omitted of ['수령 확인서를 제출해요.','신분증을 지참해야 해요.']){
+    const extra=structuredClone(body);const preserved=extra.analysis.fields.find(f=>f.id==='source-statement-split');preserved.value+=` ${omitted}`;preserved.quote=preserved.value;extra.sources[0].text=`${preserved.value} 별도 붙임은 없어요.`;
+    const extraPrepared=prepare(extra);assert.throws(()=>validateGeneratedDraft(raw,extraPrepared));
+  }
+  const invented=structuredClone(raw);invented.sections[0].content+=' 담당자와 추가 일정을 협의하겠습니다.';assert.throws(()=>validateGeneratedDraft(invented,prepared));
+});
