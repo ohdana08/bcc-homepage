@@ -1,4 +1,5 @@
 import {
+  BUILD_START_PROMPT,
   STAGES,
   STAGE_LABELS,
   getStages,
@@ -35,6 +36,9 @@ import { initCollection } from './collection.js';
     markdownPreview: document.getElementById('markdown-preview'),
     downloadButton: document.getElementById('download-button'),
     copyButton: document.getElementById('copy-button'),
+    buildStartPrompt: document.getElementById('build-start-prompt'),
+    copyBuildStart: document.getElementById('copy-build-start'),
+    buildStartStatus: document.getElementById('build-start-status'),
     resetButton: document.getElementById('reset-button'),
     previousButton: document.getElementById('previous-button'),
     savedState: document.getElementById('saved-state'),
@@ -95,6 +99,7 @@ import { initCollection } from './collection.js';
   }
 
   var session = newSession();
+  elements.buildStartPrompt.value = BUILD_START_PROMPT;
 
   function wait(milliseconds) {
     return new Promise(function (resolve) { window.setTimeout(resolve, milliseconds); });
@@ -455,6 +460,18 @@ import { initCollection } from './collection.js';
       track('project_instruction_copy');
     } catch (error) {
       elements.copyButton.textContent = '복사하지 못했습니다';
+    }
+  });
+
+  elements.copyBuildStart.addEventListener('click', async function () {
+    if (!session.ready) return;
+    try {
+      await navigator.clipboard.writeText(BUILD_START_PROMPT);
+      elements.buildStartStatus.textContent = '복사했습니다. MD 파일과 함께 AI 대화에 붙여넣고 보내세요.';
+    } catch (error) {
+      elements.buildStartPrompt.focus();
+      elements.buildStartPrompt.select();
+      elements.buildStartStatus.textContent = '자동 복사가 어려워 문장을 선택했어요. 직접 복사하거나 길게 눌러 복사해 주세요.';
     }
   });
 
