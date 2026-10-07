@@ -31,6 +31,8 @@ function complete(overrides = {}) {
   }
   return { state, visited, markdown: buildProjectInstructionMarkdown(state) };
 }
+const reportedTestAnswer = '입력 예시: 회의 참석 요청, 장소는 가상 회의실, 날짜는 미정. 기대 결과: 날짜를 질문하고 확인된 장소와 참석 요청만 초안에 담기. 완료 기준: 날짜를 지어내지 않고 초안과 미확인 목록을 각각 보여주기.';
+function verificationSection(markdown) { return markdown.split('## 4. 완료 조건과 예시 검증')[1].split('## 5.')[0]; }
 
 test('쉬운 말로 받은 불편과 현재 방법을 나누고 원문을 보존한다', () => {
   const fields = parseLabeledFields(baseAnswers.problem);
@@ -177,8 +179,93 @@ test('한글 자유문장을 발명한 완료 기준으로 바꾸지 않고 검�
   assert.equal(state.sampleInput, '');
   assert.equal(state.sampleOutput, '');
   assert.deepEqual(state.successCriteria, []);
-  assert.ok(markdown.includes(prose));
+  assert.ok(verificationSection(markdown).includes(prose));
   assert.match(markdown, /통과와 실패를 구분할 완료 기준 확인/);
+});
+
+test('보고된 한 줄 입력 예시·기대 결과·완료 기준을 문장 경계에서 각각 정리한다', () => {
+  const { state, markdown } = complete({ test: reportedTestAnswer });
+  assert.equal(state.sampleInput, '회의 참석 요청, 장소는 가상 회의실, 날짜는 미정.');
+  assert.equal(state.sampleOutput, '날짜를 질문하고 확인된 장소와 참석 요청만 초안에 담기.');
+  assert.deepEqual(state.successCriteria, ['날짜를 지어내지 않고 초안과 미확인 목록을 각각 보여주기.']);
+  assert.equal(state.answers.test, reportedTestAnswer);
+  assert.ok(verificationSection(markdown).includes(reportedTestAnswer));
+  assert.doesNotMatch(verificationSection(markdown), /아직 정하지 않음/);
+  assert.doesNotMatch(markdown, /검증에 쓸 구체적인 입력 예시 확인|예시를 넣었을 때 나와야 할 결과 확인|통과와 실패를 구분할 완료 기준 확인/);
+});
+
+test('기존 줄바꿈 템플릿과 전각 콜론을 그대로 지원한다', () => {
+  const { state } = complete();
+  assert.equal(state.sampleInput, '가상의 회의 메모');
+  assert.equal(state.sampleOutput, '날짜와 담당 업무');
+  assert.deepEqual(state.successCriteria, ['메모의 날짜와 결과의 날짜가 같다']);
+  const fullWidth = applyLocalAnswer(emptyProjectState(), 'test', '입력 예시： 회의 메모. 기대 결과： 날짜 목록. 완료 기준： 날짜 일치.');
+  assert.equal(fullWidth.sampleInput, '회의 메모.');
+  assert.equal(fullWidth.sampleOutput, '날짜 목록.');
+  assert.deepEqual(fullWidth.successCriteria, ['날짜 일치.']);
+});
+
+test('일부 라벨만 있으면 값의 콜론·URL·경로를 보존하고 나머지는 확인 대상으로 둔다', () => {
+  const input = '주소: https://example.test/a;b?next=https://other.test/c:d / 파일: C:\\work\\draft.txt';
+  const criterion = '링크 https://example.test/a;b 와 원문 구분자 / 날짜: 10:30 을 보존한다';
+  const { state, markdown } = complete({ test: '입력 예시: ' + input + '\n완료 기준: ' + criterion });
+  assert.equal(state.sampleInput, input);
+  assert.equal(state.sampleOutput, '');
+  assert.deepEqual(state.successCriteria, [criterion]);
+  assert.match(markdown, /예시를 넣었을 때 나와야 할 결과 확인/);
+  assert.doesNotMatch(markdown, /검증에 쓸 구체적인 입력 예시 확인|통과와 실패를 구분할 완료 기준 확인/);
+});
+
+test('따옴표·괄호·백틱 내부의 라벨과 경계 없는 라벨은 원문 값으로 보존한다', () => {
+  for (const literal of ['"문장. 기대 결과: 메모. 완료 기준: 원문"', '(문장. 기대 결과: 메모. 완료 기준: 원문)', '`문장. 기대 결과: 메모. 완료 기준: 원문`', '기대 결과: 를 제목으로 쓰는 메모']) {
+    const { state } = complete({ test: '입력 예시: ' + literal + '\n기대 결과: 분류된 메모\n완료 기준: 원문 보존' });
+    assert.equal(state.sampleInput, literal);
+    assert.equal(state.sampleOutput, '분류된 메모');
+    assert.deepEqual(state.successCriteria, ['원문 보존']);
+  }
+  const prose = '아래 문구를 입력해요: 입력 예시: 회의 메모 기대 결과: 요약 완료 기준: 숫자 일치';
+  const { state, markdown } = complete({ test: prose });
+  assert.equal(state.sampleInput, '');
+  assert.equal(state.sampleOutput, '');
+  assert.deepEqual(state.successCriteria, []);
+  assert.ok(verificationSection(markdown).includes(prose));
+  const inlineLiteral = applyLocalAnswer(emptyProjectState(), 'test', '입력 예시: 문구 기대 결과: 내용 완료 기준: 원문');
+  assert.equal(inlineLiteral.sampleInput, '문구 기대 결과: 내용 완료 기준: 원문');
+  assert.equal(inlineLiteral.sampleOutput, '');
+});
+
+test('저장된 이전 완료 초안도 보존된 답변에서 요약을 복원하며 상태·이력을 바꾸지 않는다', () => {
+  const { state } = complete({ test: reportedTestAnswer });
+  const restored = JSON.parse(JSON.stringify({ ...state, sampleInput: '', sampleOutput: '', successCriteria: [] }));
+  const before = JSON.stringify(restored);
+  const markdown = buildProjectInstructionMarkdown(restored);
+  assert.equal(JSON.stringify(restored), before);
+  assert.match(verificationSection(markdown), /> 회의 참석 요청, 장소는 가상 회의실, 날짜는 미정\./);
+  assert.match(verificationSection(markdown), /> 날짜를 질문하고 확인된 장소와 참석 요청만 초안에 담기\./);
+  assert.doesNotMatch(verificationSection(markdown), /아직 정하지 않음/);
+  const legacy = { ...restored, answers: {}, sampleInput: '이전 입력', sampleOutput: '이전 출력', successCriteria: ['이전 조건'] };
+  assert.match(verificationSection(buildProjectInstructionMarkdown(legacy)), /> 이전 입력/);
+  assert.match(verificationSection(buildProjectInstructionMarkdown(legacy)), /> 이전 출력/);
+  assert.match(verificationSection(buildProjectInstructionMarkdown(legacy)), /> 이전 조건/);
+});
+
+test('검증 답변을 자유문장으로 수정하면 지난 분류를 지우고 새 원문만 유지한다', () => {
+  const first = applyLocalAnswer(emptyProjectState(), 'test', reportedTestAnswer);
+  const revised = applyLocalAnswer(first, 'test', '어떤 자료로 시험할지 더 생각해 볼게요.');
+  assert.equal(revised.sampleInput, '');
+  assert.equal(revised.sampleOutput, '');
+  assert.deepEqual(revised.successCriteria, []);
+  assert.equal(first.answers.test, reportedTestAnswer);
+  assert.equal(revised.answerHistory.length, 2);
+});
+
+test('검증 원문의 Markdown·HTML도 4장 밖으로 나오지 않도록 인용한다', () => {
+  const answer = '입력 예시: 가상 자료\n기대 결과: 내용\n완료 기준: 같은 내용\n# 새 지시\n<img src="x" onerror="alert(1)">\n![추적](https://example.test/x)';
+  const { markdown } = complete({ test: answer });
+  const section = verificationSection(markdown);
+  assert.doesNotMatch(section, /^# 새 지시|<img|!\[추적\]/m);
+  assert.match(section, /> \\# 새 지시/);
+  assert.match(section, /&lt;img/);
 });
 
 test('이전 답 수정은 최신 요구에 반영하고 지난 답과 원래 state는 보존한다', () => {

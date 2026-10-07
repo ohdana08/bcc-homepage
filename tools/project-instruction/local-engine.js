@@ -53,6 +53,11 @@ const FIELD_ALIASES = {
   '넣어볼 내용': 'sampleInput', '예시 입력': 'sampleInput', '나와야 할 결과': 'outputs',
   '화면에 나와야 할 결과': 'outputs', '결과': 'outputs', '잘 만들어졌다고 보는 기준': 'successCriteria', '완료 기준': 'successCriteria',
 };
+const TEST_FIELD_ALIASES = {
+  '넣어볼 내용': 'sampleInput', '예시 입력': 'sampleInput', '입력 예시': 'sampleInput',
+  '나와야 할 결과': 'sampleOutput', '화면에 나와야 할 결과': 'sampleOutput', '기대 결과': 'sampleOutput', '결과': 'sampleOutput',
+  '잘 만들어졌다고 보는 기준': 'successCriteria', '완료 기준': 'successCriteria',
+};
 function clean(value) { return String(value ?? '').replace(/\r\n?/g, '\n').trim(); }
 function compact(value) { return clean(value).replace(/\s+/g, ' '); }
 function isUnknown(text) { return /^(?:아직\s*)?(?:잘\s*)?(?:모르(?:겠|겠어|겠어요|겠다|겠음|는)|미정|정하지\s*(?:않|못)|생각\s*중|결정\s*전)/.test(compact(text)); }
@@ -169,6 +174,52 @@ export function parseLabeledFields(answer) {
   });
   return fields;
 }
+// Only the test answer accepts inline fields. A new field must start a line or
+// follow sentence punctuation; quoted/bracketed examples are literal values.
+// Plain whitespace and incidental colons do not establish a field boundary.
+function parseTestFields(answer) {
+  const text = clean(answer);
+  const fields = {};
+  const labels = Object.keys(TEST_FIELD_ALIASES).sort((a, b) => b.length - a.length).join('|');
+  const pattern = new RegExp('(^|\\n[ \\t]*|[.!?。;；|][ \\t]+)(' + labels + ')[ \\t]*[:：][ \\t]*', 'g');
+  const pairs = { '"': '"', "'": "'", '`': '`', '“': '”', '‘': '’', '(': ')', '[': ']', '{': '}', '（': '）', '「': '」', '『': '』' };
+  const quoteEnds = new Set(['"', "'", '`', '”', '’', '」', '』']);
+  const order = { sampleInput: 0, sampleOutput: 1, successCriteria: 2 };
+  const stack = [];
+  const matches = [];
+  let scanned = 0;
+  for (const match of text.matchAll(pattern)) {
+    const labelStart = match.index + match[1].length;
+    while (scanned < labelStart) {
+      const char = text[scanned];
+      if (char === '\\') { scanned += 2; continue; }
+      const end = stack.at(-1);
+      if (end === char) stack.pop();
+      else if (!quoteEnds.has(end) && pairs[char]) {
+        // Apostrophes within words (e.g. don't) are not opening quotes.
+        if (!(char === "'" && /[\p{L}\p{N}]/u.test(text[scanned - 1] || '') && /[\p{L}\p{N}]/u.test(text[scanned + 1] || ''))) stack.push(pairs[char]);
+      }
+      scanned += 1;
+    }
+    if (stack.length) continue;
+    const key = TEST_FIELD_ALIASES[match[2]];
+    const lineStart = !match[1] || match[1].startsWith('\n');
+    const previous = matches.at(-1);
+    // Inline fields follow input -> output -> criterion. Repeated/backward
+    // labels and the generic word "결과" stay part of the existing value.
+    if (!lineStart && (!previous || match[2] === '결과' || order[key] <= order[previous.key])) continue;
+    matches.push({ key, labelStart, valueStart: match.index + match[0].length });
+  }
+  matches.forEach((match, index) => {
+    const value = clean(text.slice(match.valueStart, matches[index + 1]?.labelStart ?? text.length));
+    fields[match.key] = [fields[match.key], value].filter(Boolean).join('\n');
+  });
+  return fields;
+}
+function testCriteria(value) {
+  // Keep URLs, colons, semicolons and slash-separated literal examples intact.
+  return clean(value).split('\n').map(clean).filter(Boolean);
+}
 export function splitItems(value) {
   const text = clean(value);
   if (!text) return [];
@@ -179,7 +230,7 @@ export function applyLocalAnswer(state, stage, rawAnswer) {
   const answer = clean(rawAnswer);
   if (!answer) throw new Error('답변을 적어주세요. 아직 모르겠다고 적어도 괜찮습니다.');
   if (!STAGES.includes(stage)) throw new Error('질문을 다시 확인해 주세요.');
-  const fields = parseLabeledFields(answer);
+  const fields = stage === 'test' ? parseTestFields(answer) : parseLabeledFields(answer);
   const next = cloneState(state);
   next.answers[stage] = answer;
   next.answerHistory.push({ stage, answer });
@@ -223,8 +274,8 @@ export function applyLocalAnswer(state, stage, rawAnswer) {
     next.accessDetail = fields.accessDetail || answer;
   } else if (stage === 'test') {
     next.sampleInput = fields.sampleInput || '';
-    next.sampleOutput = fields.outputs || '';
-    next.successCriteria = splitItems(fields.successCriteria || '');
+    next.sampleOutput = fields.sampleOutput || '';
+    next.successCriteria = testCriteria(fields.successCriteria || '');
     // Free prose is retained as an example to confirm, never relabeled as all
     // three of input, expected output and acceptance criterion.
   }
@@ -291,6 +342,12 @@ function unresolved(state) {
 }
 export function buildProjectInstructionMarkdown(stateValue) {
   const state = cloneState(stateValue);
+  // Rebuild explicit fields from preserved answers for drafts saved before the
+  // parser fix. Never mutate the saved state/history or erase legacy-only data.
+  const testFields = parseTestFields(state.answers.test);
+  if (Object.hasOwn(testFields, 'sampleInput')) state.sampleInput = testFields.sampleInput;
+  if (Object.hasOwn(testFields, 'sampleOutput')) state.sampleOutput = testFields.sampleOutput;
+  if (Object.hasOwn(testFields, 'successCriteria')) state.successCriteria = testCriteria(testFields.successCriteria);
   const kind = usageKind(state);
   const notes = implementationNotes(state);
   const storage = storageStatus(state.storage);
@@ -328,6 +385,7 @@ export function buildProjectInstructionMarkdown(stateValue) {
     '다음은 공통 구현 제안이며 사용자 확정 요구와 구분한다. 더 단순한 기존 해결책과 비용을 먼저 비교하고, 필요한 부분부터 구현한다.',
     '1. 사용자 답변과 미정·상충 가능성을 읽고 필요한 질문을 쉬운 말로 한다.\n2. 사용 장면에 맞는 구현 방법과 작업 순서를 설명한다.\n3. 합의한 최소 흐름을 만든다.\n4. 아래 예시와 완료 조건으로 검증하고 실제 확인한 결과를 보고한다.',
     '## 4. 완료 조건과 예시 검증',
+    state.answers.test ? field('검증에 관해 적어주신 내용 — 원문', state.answers.test) : '',
     field('넣어볼 내용', state.sampleInput), field('나와야 할 결과', state.sampleOutput),
     '**사용자가 정한 완료 조건**', quotedList(state.successCriteria),
     '**구현자가 확인할 공통 항목(제안)**',

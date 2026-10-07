@@ -198,6 +198,14 @@ footer a { text-decoration: underline; text-underline-offset: 3px; }
 .receipt-management summary { cursor: pointer; font-weight: 700; }
 .receipt-management label { margin: 14px 0; }
 .receipt-management input { max-width: 720px; }
+.collection-card .secondary-button, .receipt-management .secondary-button {
+  background: var(--white);
+  border-color: var(--olive);
+  color: var(--olive);
+}
+.collection-card .secondary-button:hover:not(:disabled), .receipt-management .secondary-button:hover:not(:disabled) {
+  background: var(--gold-soft);
+}
 button:disabled { cursor: not-allowed; opacity: .55; }
 [hidden] { display: none !important; }
 @media (max-width: 680px) {
