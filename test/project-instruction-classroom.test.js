@@ -305,7 +305,7 @@ test('제작 시작 문장은 모든 사용 형태에서 파일 또는 붙여 �
   assert.match(BUILD_START_PROMPT, /AI_업무지시서\.md/);
   assert.match(BUILD_START_PROMPT, /또는 대화에 붙여 넣은 업무지시서 전문을 읽고/);
   assert.match(BUILD_START_PROMPT, /둘 다 읽을 수 없으면 파일이나 전문을 요청/);
-  assert.match(BUILD_START_PROMPT, /도구나 지침을 실제로 만들어/);
+  assert.match(BUILD_START_PROMPT, /결과물이나 지침을 실제로 만들어/);
   for (const usage of ['우리 사이트에서 회의 메모를 정리할 때', 'ChatGPT 안에서 쓰는 지침', '아직 모르겠어요']) {
     const { markdown } = complete({ usage });
     assert.equal(markdown.split(BUILD_START_PROMPT).length - 1, 1);

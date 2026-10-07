@@ -21,7 +21,7 @@ async function api(action, body) {
     if (action.startsWith('receipt-') && result.ok !== true) throw new Error('처리 결과를 확인하지 못했습니다. 확인번호로 다시 요청해 주세요.');
     return result;
   } catch (error) {
-    if (error.name === 'AbortError' || error instanceof TypeError) throw new Error('연결이 끊겼습니다. 입력은 유지됩니다. 같은 내용으로 다시 제출하면 중복 저장되지 않습니다.');
+    if (error.name === 'AbortError' || error instanceof TypeError) throw new Error('연결이 끊겼습니다. 적은 내용은 유지됩니다. 같은 내용으로 다시 제출하면 중복 저장되지 않습니다.');
     throw error;
   } finally { clearTimeout(timer); }
 }

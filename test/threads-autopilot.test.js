@@ -208,7 +208,7 @@ test('비활성 캠페인도 verify_only에서는 게시 없이 토큰 계정을
           maybeSingle: async () => ({
             data: {
               access_token: 'test-token-never-logged',
-              expires_at: '2026-09-30T00:00:00.000Z',
+              expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(),
             },
             error: null,
           }),

@@ -13,6 +13,78 @@
   --font-en: "DM Sans", sans-serif;
 }
 
+/* The beginner flow keeps the current question and its answer together. */
+body[data-generation="local"] .work-grid { grid-template-columns: minmax(0, 1fr); max-width: 760px; margin-inline: auto; }
+body[data-generation="local"] .progress-panel { max-width: 760px; margin-inline: auto; }
+body[data-generation="local"][data-writing="true"] .hero,
+body[data-generation="local"][data-writing="true"] .classroom-entry-note { display: none; }
+body[data-generation="local"] .progress-status { display: grid; gap: 8px; justify-items: end; flex-shrink: 0; }
+body[data-generation="local"] #progress-value { font-size: 24px; white-space: nowrap; }
+body[data-generation="local"] .workspace { padding-top: 20px; scroll-margin-top: 12px; }
+body[data-generation="local"] .messages { min-height: 0; max-height: none; overflow: visible; padding: 24px 24px 16px; gap: 12px; }
+body[data-generation="local"] .messages h3 { margin: 0; font-size: clamp(22px, 4vw, 28px); line-height: 1.5; letter-spacing: -.035em; overflow-wrap: anywhere; }
+body[data-generation="local"] .messages p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+body[data-generation="local"] .quick-replies { padding: 0 24px 20px; gap: 8px; }
+body[data-generation="local"] .quick-replies button { font-size: 14px; min-height: 44px; color: var(--olive); }
+body[data-generation="local"] .quick-replies button[aria-pressed="true"] { background: var(--olive); border-color: var(--olive); color: white; }
+body[data-generation="local"] .chip-group { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+body[data-generation="local"] .chip-group p { flex: 1 0 100%; margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+body[data-generation="local"] .composer { padding: 20px 24px; }
+body[data-generation="local"] .composer textarea { padding: 14px; min-height: 108px; font-size: 16px; border: 1px solid #a4a698; border-radius: 10px; background: white; }
+body[data-generation="local"] .composer textarea[aria-invalid="true"] { border-color: #965431; }
+body[data-generation="local"] .microphone-guidance { margin: 8px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+body[data-generation="local"] .answer-feedback { margin: 0 0 16px; padding: 12px 14px; background: var(--gold-soft); border-radius: 10px; color: #51451f; font-size: 14px; line-height: 1.7; white-space: pre-line; }
+body[data-generation="local"] .answer-feedback:empty { display: none; }
+body[data-generation="local"] .send-button { min-height: 48px; font-size: 15px; }
+body[data-generation="local"] .source-actions { margin: 12px 0 0; }
+body[data-generation="local"] .brief-card summary { font-weight: 700; cursor: pointer; min-height: 24px; font-size: 14px; }
+body[data-generation="local"] .brief-card[open] dl { margin-top: 20px; }
+body[data-generation="local"][data-phase="confirm"] .brief-card,
+body[data-generation="local"][data-phase="review"] .brief-card,
+body[data-generation="local"][data-phase="complete"] .brief-card { display: none; }
+.confirmation-card { padding: 30px; background: var(--white); border: 1px solid var(--line); border-radius: 20px; min-width: 0; }
+.confirmation-card h2 { margin: 0 0 20px; font-size: 26px; letter-spacing: -.04em; }
+.confirmation-work { color: var(--gold-deep); font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.confirmation-summary { margin: 20px 0; font-size: 23px; font-weight: 700; line-height: 1.8; overflow-wrap: anywhere; }
+.confirmation-original { color: var(--muted); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; white-space: pre-wrap; }
+.confirmation-card .primary-button { background: var(--olive); color: white; min-height: 48px; }
+.confirmation-card .secondary-button { border: 1px solid var(--olive); color: var(--olive); background: white; min-height: 48px; }
+.answer-review-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.answer-review-row p { margin: 0; grid-column: 1; font-size: 15px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.answer-review-row button { grid-column: 2; grid-row: 1 / span 2; align-self: center; min-height: 44px; color: var(--olive); font-weight: 700; }
+#answer-review-list { margin-bottom: 22px; }
+#legacy-records, #legacy-preview, #legacy-status { flex-basis: 100%; min-width: 0; }
+#legacy-status:empty { display: none; }
+.legacy-record { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.legacy-record strong { flex-basis: 100%; }
+#legacy-preview { max-height: 360px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--white); padding: 16px; line-height: 1.6; }
+@media (max-width: 600px) {
+  body[data-generation="local"] .hero { min-height: 0; padding: 28px 0; display: block; }
+  body[data-generation="local"] .hero h1 { font-size: 38px; }
+  body[data-generation="local"] .hero-description { margin-top: 18px; font-size: 15px; }
+  body[data-generation="local"] .hero .classroom-rule { display: none; }
+  body[data-generation="local"] .hero-notes { margin-top: 18px; }
+  body[data-generation="local"] .progress-panel { padding: 16px; }
+  body[data-generation="local"] .progress-head h2 { font-size: 20px; }
+  body[data-generation="local"] .progress-steps, body[data-generation="local"] .progress-note { display: none; }
+  body[data-generation="local"] .progress-track { margin: 14px 0 0; }
+  body[data-generation="local"] .messages { padding: 20px 18px 12px; }
+  body[data-generation="local"] .quick-replies { padding: 0 18px 18px; }
+  body[data-generation="local"] .composer { padding: 16px 18px; }
+  body[data-generation="local"] .chat-head { padding: 10px 14px; min-height: 58px; }
+  body[data-generation="local"] .coach-avatar { width: 30px; height: 30px; font-size: 13px; }
+  body[data-generation="local"] .chat-head small { display: none; }
+  .confirmation-card { padding: 22px 18px; }
+  .confirmation-summary { font-size: 21px; }
+  .answer-review-row { display: block; }
+  .answer-review-row p { margin-top: 8px; }
+  .answer-review-row button { margin: 8px 0 0; padding: 8px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  body[data-generation="local"] *, body[data-generation="local"] *::before, body[data-generation="local"] *::after { transition: none !important; animation: none !important; }
+}
+
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { scroll-behavior: smooth; }

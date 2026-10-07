@@ -28,5 +28,7 @@ test('가격 변경 SQL과 실매출 집계는 9,900원 외부 결제만 사용�
   assert.match(metrics, /status = 'active'/);
   assert.match(metrics, /provider = 'groble'/);
   assert.match(metrics, /102 - count/);
-  assert.match(campaign, /대상: 카카오톡 채널 친구 전체 457명/);
+  assert.match(campaign, /대상: 발송 시점의 카카오톡 채널 친구 전체/);
+  assert.match(campaign, /2026-09-03 현재 예상 대상: 463명/);
+  assert.match(campaign, /2026-09-03 표시 발송비: 7,639원\(VAT 포함, 15원 × 463건\)/);
 });

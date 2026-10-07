@@ -1,492 +1,274 @@
+import { BUILD_START_PROMPT, buildProjectInstructionMarkdown } from './local-engine.js';
 import {
-  BUILD_START_PROMPT,
-  STAGES,
-  STAGE_LABELS,
-  getStages,
-  applyLocalAnswer,
-  buildProjectInstructionMarkdown,
-  emptyProjectState,
-  getQuestion,
-  localCoachResponse,
-  nextStage,
-} from './local-engine.js';
+  BEGINNER_STORAGE_KEY, BEGINNER_ENGINE, LEGACY_KEYS, BEGINNER_QUESTIONS,
+  NARROW_QUESTION, MICROPHONE_GUIDANCE, answerLength, newBeginnerSession,
+  restoreBeginnerSession, submitBeginnerAnswer, editBeginnerQuestion,
+  selectRhythmChip, rhythmChoicesFromText, beginnerConfirmation, migrateLegacyRecord, beginnerProjectState,
+} from './beginner-flow.js';
 import { initCollection } from './collection.js';
 
 (function () {
   'use strict';
-
-  var STORAGE_KEY = 'bcc-project-instruction-v4-workflows';
-  var LEGACY_KEY = 'bcc-project-instruction-classroom-v3-plain';
-  var ENGINE = 'local-workflows-v2';
-  var busy = false;
-  var collection = initCollection();
-
-  var elements = {
-    startSection: document.getElementById('start-section'),
-    workspace: document.getElementById('workspace'),
-    resultSection: document.getElementById('result-section'),
-    messages: document.getElementById('messages'),
-    quickReplies: document.getElementById('quick-replies'),
-    composer: document.getElementById('composer'),
-    answerInput: document.getElementById('answer-input'),
-    answerCount: document.getElementById('answer-count'),
-    progressValue: document.getElementById('progress-value'),
-    progressBar: document.getElementById('progress-bar'),
-    progressSteps: document.getElementById('progress-steps'),
-    markdownPreview: document.getElementById('markdown-preview'),
-    downloadButton: document.getElementById('download-button'),
-    copyButton: document.getElementById('copy-button'),
-    buildStartPrompt: document.getElementById('build-start-prompt'),
-    copyBuildStart: document.getElementById('copy-build-start'),
-    buildStartStatus: document.getElementById('build-start-status'),
-    resetButton: document.getElementById('reset-button'),
-    previousButton: document.getElementById('previous-button'),
-    savedState: document.getElementById('saved-state'),
-    legacyNotice: document.getElementById('legacy-notice'),
-    legacyDownload: document.getElementById('legacy-download'),
-    detailDialog: document.getElementById('detail-dialog'),
-    detailClose: document.getElementById('detail-close'),
-    detailContinue: document.getElementById('detail-continue'),
-    detailSymbol: document.getElementById('detail-symbol'),
-    detailTitle: document.getElementById('detail-title'),
-    detailDescription: document.getElementById('detail-description'),
-    detailBenefits: document.getElementById('detail-benefits'),
-    detailOutcomeTitle: document.getElementById('detail-outcome-title'),
-    detailOutcomeCopy: document.getElementById('detail-outcome-copy'),
-    detailStartLink: document.getElementById('detail-start-link'),
-  };
-
-  var detailContent = {
-    material: {
-      symbol: '＋',
-      title: '사진이나 문서를 활용하고 싶으세요?',
-      description: '이 화면에서는 파일을 올리거나 읽지 않습니다. 자료를 함께 활용하는 방법은 BCC에 문의할 수 있어요.',
-      benefits: [
-        '지금은 자료에서 필요한 내용을 직접 답변에 적을 수 있어요.',
-        '업무지시서를 받은 뒤 사용하는 AI 도구에 자료를 함께 전달할 수 있어요.',
-        '자료 활용에 도움이 필요하면 이용 방법을 문의하세요.',
-      ],
-      outcomeTitle: '지금까지 적은 답변은 유지됩니다',
-      outcomeCopy: '문의 버튼을 눌러도 답변이나 파일이 자동으로 전송되지 않습니다.',
-    },
-    link: {
-      symbol: '↗',
-      title: '참고할 링크가 있으세요?',
-      description: '답변에 링크와 참고하고 싶은 부분을 함께 적어주세요. 이 화면에서는 링크를 열거나 내용을 자동 분석하지 않습니다.',
-      benefits: [
-        '어느 부분을 참고할지 내 말로 설명해요.',
-        '원하는 구성과 바꾸고 싶은 점을 함께 남겨요.',
-        '완성된 업무지시서와 링크를 사용하는 AI 도구에 전달해요.',
-      ],
-      outcomeTitle: '참고자료 활용이 어렵다면',
-      outcomeCopy: 'BCC에 이용 방법을 문의할 수 있어요. 링크나 답변은 자동으로 전송되지 않습니다.',
-    },
-  };
-
-  function newSession() {
-    return {
-      engine: ENGINE,
-      startMode: '',
-      stage: 'problem',
-      state: emptyProjectState(),
-      messages: [],
-      ready: false,
-      markdown: '',
-      history: [],
-      draft: '',
-      draftsByStage: {},
-    };
-  }
-
-  var session = newSession();
-  elements.buildStartPrompt.value = BUILD_START_PROMPT;
-
-  function wait(milliseconds) {
-    return new Promise(function (resolve) { window.setTimeout(resolve, milliseconds); });
-  }
+  const $ = id => document.getElementById(id);
+  const collection = initCollection();
+  let session = newBeginnerSession();
+  const legacyRecords = [];
+  let feedback = '';
+  $('build-start-prompt').value = BUILD_START_PROMPT;
+  $('microphone-guidance').textContent = MICROPHONE_GUIDANCE;
 
   function track(name, params) {
     try {
-      var detail = Object.assign({ engine: ENGINE }, params || {});
+      const detail = Object.assign({ engine: BEGINNER_ENGINE }, params || {});
       if (typeof window.gtag === 'function') window.gtag('event', name, detail);
       if (window.dataLayer) window.dataLayer.push(Object.assign({ event: name }, detail));
-    } catch (error) { /* analytics must never block the classroom */ }
+    } catch { /* analytics must never block the lesson */ }
   }
-
   function save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-      elements.savedState.textContent = '이 기기에 저장';
-    } catch (error) {
-      elements.savedState.textContent = '이번 화면에서만 유지';
-    }
+    try { localStorage.setItem(BEGINNER_STORAGE_KEY, JSON.stringify(session)); $('saved-state').textContent = '이 기기에 저장'; }
+    catch { $('saved-state').textContent = '이번 화면에서만 유지'; }
   }
-
   function load() {
     try {
-      var value = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (!value || value.engine !== ENGINE || !['idea', 'unsure'].includes(value.startMode) || !Array.isArray(value.messages) || !Array.isArray(value.history)) return false;
-      if (!STAGES.includes(value.stage) && value.stage !== 'complete') return false;
-      session = Object.assign(newSession(), value, {
-        state: Object.assign(emptyProjectState(), value.state || {}),
-      });
-      session.ready = session.stage === 'complete';
-      session.draft = typeof session.draft === 'string' ? session.draft : '';
-      session.draftsByStage = session.draftsByStage && typeof session.draftsByStage === 'object' && !Array.isArray(session.draftsByStage) ? session.draftsByStage : {};
-      session.markdown = session.ready ? buildProjectInstructionMarkdown(session.state) : '';
-      if (!session.ready && !getStages(session.state).includes(session.stage)) return false;
-      return true;
-    } catch (error) { return false; }
+      const restored = restoreBeginnerSession(JSON.parse(localStorage.getItem(BEGINNER_STORAGE_KEY)));
+      if (restored) session = restored;
+    } catch { /* never replace unavailable records while loading */ }
+    for (const key of LEGACY_KEYS) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw === null) continue;
+        // Copy the exact bytes before offering migration; never rewrite the old key.
+        if (localStorage.getItem(key + '-backup-v5') === null) localStorage.setItem(key + '-backup-v5', raw);
+        legacyRecords.push({ key, raw });
+      } catch {
+        try { const raw = localStorage.getItem(key); if (raw !== null) legacyRecords.push({ key, raw }); } catch { /* local storage unavailable */ }
+      }
+    }
+    if (session.legacy?.raw && !legacyRecords.some(record => record.key === session.legacy.key && record.raw === session.legacy.raw)) legacyRecords.push(session.legacy);
   }
-
-  function addMessage(text, role, skipSave) {
-    var safeText = String(text || '').trim();
-    if (!safeText) return;
-    session.messages.push({ text: safeText, role: role });
-    renderMessage({ text: safeText, role: role });
-    if (!skipSave) save();
+  function downloadText(text, filename, type = 'text/markdown;charset=utf-8') {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const anchor = document.createElement('a');
+    anchor.href = url; anchor.download = filename;
+    document.body.appendChild(anchor); anchor.click(); anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-
-  function renderMessage(message) {
-    var bubble = document.createElement('div');
-    bubble.className = 'message' + (message.role === 'user' ? ' is-user' : '');
-    bubble.textContent = message.text;
-    elements.messages.appendChild(bubble);
-    elements.messages.scrollTop = elements.messages.scrollHeight;
+  function legacyMarkdown(record) {
+    try {
+      const value = JSON.parse(record.raw);
+      if (typeof value.markdown === 'string' && value.markdown) return value.markdown;
+      if (value.state) return buildProjectInstructionMarkdown(value.state);
+      return '# 이전 작성 기록\n\n' + record.raw.split('\n').map(line => '> ' + line).join('\n');
+    } catch { return record.raw; }
   }
-
-  function showTyping() {
-    var bubble = document.createElement('div');
-    bubble.className = 'message';
-    bubble.id = 'typing-message';
-    bubble.innerHTML = '<span class="typing" aria-label="답변 정리 중"><i></i><i></i><i></i></span>';
-    elements.messages.appendChild(bubble);
-    elements.messages.scrollTop = elements.messages.scrollHeight;
+  function showLegacyRecords() {
+    $('legacy-notice').hidden = !legacyRecords.length;
+    $('legacy-records').replaceChildren();
+    legacyRecords.forEach((record, index) => {
+      const row = document.createElement('div'); row.className = 'legacy-record';
+      const title = document.createElement('strong'); title.textContent = '이전 작성 기록 ' + (index + 1);
+      row.appendChild(title);
+      try {
+        const prior = JSON.parse(record.raw);
+        if (prior.draft) { const draft = document.createElement('p'); draft.textContent = '이전에 쓰던 답: ' + prior.draft; row.appendChild(draft); }
+      } catch { /* raw record is still downloadable */ }
+      const actions = [
+        ['내용 보기', () => { $('legacy-preview').textContent = legacyMarkdown(record); $('legacy-preview').hidden = false; }],
+        ['이전 파일 받기', () => downloadText(legacyMarkdown(record), '이전_업무지시서.md')],
+        ['원본 기록 받기', () => downloadText(record.raw, '이전_작성기록_' + (index + 1) + '.json', 'application/json;charset=utf-8')],
+        ['이전 내용 이어 쓰기', () => {
+          if (session.startMode && !window.confirm('현재 적은 내용은 이 기기에 따로 보관하고, 이전 내용을 이어 쓸까요?')) return;
+          const migrated = migrateLegacyRecord(record.raw, record.key);
+          if (!migrated) { $('legacy-status').textContent = '이 기록은 화면에서 이어 쓰기 어려워요. 원본 기록을 받아 확인해 주세요.'; return; }
+          if (session.startMode) {
+            try { localStorage.setItem(BEGINNER_STORAGE_KEY + '-before-restore-' + Date.now(), JSON.stringify(session)); }
+            catch { $('legacy-status').textContent = '현재 내용을 보관하지 못했어요. 먼저 파일로 받아주세요.'; return; }
+          }
+          session = migrated; feedback = ''; save(); renderAll(); focusQuestion();
+        }],
+      ];
+      actions.forEach(([label, action]) => { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.addEventListener('click', action); row.appendChild(button); });
+      $('legacy-records').appendChild(row);
+    });
   }
-
-  function hideTyping() {
-    var typing = document.getElementById('typing-message');
-    if (typing) typing.remove();
-  }
+  $('legacy-download').addEventListener('click', () => downloadText(JSON.stringify(legacyRecords, null, 2), '이전_작성기록_전체.json', 'application/json;charset=utf-8'));
 
   function renderProgress() {
-    var stages = getStages(session.state);
-    var current = stages.indexOf(session.stage);
-    var count = session.ready ? stages.length : Math.max(0, current) + 1;
-    elements.progressValue.textContent = session.ready ? '정리 완료' : String(count) + ' / ' + stages.length;
-    elements.progressBar.style.width = String(session.ready ? 100 : (count / stages.length) * 100) + '%';
-    elements.progressSteps.replaceChildren();
-    stages.forEach(function (stage, index) {
-      var item = document.createElement('li');
-      var number = document.createElement('span');
-      number.textContent = String(index + 1).padStart(2, '0');
-      item.append(number, document.createTextNode(STAGE_LABELS[stage] || stage));
-      item.classList.toggle('is-current', !session.ready && index === current);
-      item.classList.toggle('is-complete', session.ready || index < current);
-      if (!session.ready && index === current) item.setAttribute('aria-current', 'step');
-      elements.progressSteps.appendChild(item);
+    const count = ['confirm', 'review', 'complete'].includes(session.phase) ? 6 : session.index + 1;
+    $('progress-value').textContent = count + ' / 6';
+    $('progress-bar').style.width = (count / 6 * 100) + '%';
+    $('progress-steps').replaceChildren();
+    BEGINNER_QUESTIONS.forEach((question, index) => {
+      const item = document.createElement('li');
+      item.textContent = (index + 1) + ' ' + question.label;
+      item.classList.toggle('is-current', index === session.index && session.phase === 'questions');
+      item.classList.toggle('is-complete', !!session.answers[question.id]);
+      if (index === session.index && session.phase === 'questions') item.setAttribute('aria-current', 'step');
+      $('progress-steps').appendChild(item);
     });
-    elements.previousButton.disabled = busy || !session.history.length;
-    elements.answerInput.disabled = busy || session.ready;
-    elements.composer.querySelector('button[type="submit"]').disabled = busy || session.ready;
   }
-
-  function briefValue(value, emptyText) {
-    if (Array.isArray(value)) return value.length ? value.join(' · ') : emptyText;
-    return value || emptyText;
-  }
-
   function renderBrief() {
-    var values = {
-      problem: briefValue(session.state.problem, '대화를 시작하면 여기에 정리됩니다.'),
-      primaryUser: briefValue(session.state.primaryUser, '아직 정하지 않음'),
-      solution: briefValue(session.state.solution, '아직 정하지 않음'),
-      mustFeatures: briefValue(session.state.mustFeatures, '아직 정하지 않음'),
-    };
-    Object.keys(values).forEach(function (key) {
-      var target = document.querySelector('[data-brief="' + key + '"]');
-      if (target) target.textContent = values[key];
-    });
+    const values = { work: session.workChoice || session.answers.work, material: session.answers.material, result: session.answers.result };
+    Object.entries(values).forEach(([key, value]) => { const target = document.querySelector('[data-brief="' + key + '"]'); if (target) target.textContent = value || '아직 적지 않았어요'; });
   }
-
-  function renderQuickReplies(items) {
-    elements.quickReplies.replaceChildren();
-    (items || []).forEach(function (item) {
-      var button = document.createElement('button');
-      var option = typeof item === 'string' ? { label: item, value: item } : item;
-      button.type = 'button';
-      button.textContent = option.label;
-      button.addEventListener('click', function () {
-        if (busy || session.ready) return;
-        elements.answerInput.value = option.value;
-        session.draft = option.value;
-        session.draftsByStage[session.stage] = option.value;
-        save();
-        elements.answerCount.textContent = String(option.value.length);
-        elements.answerInput.focus();
+  function fillDraft(value) {
+    session.draft = value;
+    if (session.index === 5 && session.phase === 'questions') session.rhythmChoices = rhythmChoicesFromText(value);
+    if (session.phase !== 'narrow') session.draftsByStage[BEGINNER_QUESTIONS[session.index].id] = value;
+    $('answer-input').value = value; $('answer-count').textContent = answerLength(value); save();
+  }
+  function chip(label, action, selected = false) {
+    const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+    button.setAttribute('aria-pressed', String(selected));
+    button.addEventListener('click', () => { action(); $('answer-input').focus(); });
+    return button;
+  }
+  function renderQuickReplies() {
+    $('quick-replies').replaceChildren();
+    const question = BEGINNER_QUESTIONS[session.index];
+    if (session.phase === 'narrow') {
+      session.workOptions.forEach(value => $('quick-replies').appendChild(chip(value, () => fillDraft(value))));
+    } else if (question.groups) {
+      question.groups.forEach(group => {
+        const wrapper = document.createElement('div'); wrapper.className = 'chip-group';
+        const title = document.createElement('p'); title.textContent = group.label; wrapper.appendChild(title);
+        group.chips.forEach(value => wrapper.appendChild(chip(value, () => { session = selectRhythmChip(session, group.id, value); fillDraft(session.draft); renderQuickReplies(); }, session.rhythmChoices[group.id] === value)));
+        $('quick-replies').appendChild(wrapper);
       });
-      elements.quickReplies.appendChild(button);
-    });
+    } else {
+      question.chips.forEach(value => $('quick-replies').appendChild(chip(value, () => fillDraft(value))));
+    }
   }
-
-  function openDetailDialog(kind) {
-    var selectedKind = kind === 'link' ? 'link' : 'material';
-    var content = detailContent[selectedKind];
-    elements.detailSymbol.textContent = content.symbol;
-    elements.detailTitle.textContent = content.title;
-    elements.detailDescription.textContent = content.description;
-    elements.detailBenefits.replaceChildren();
-    content.benefits.forEach(function (text) {
-      var item = document.createElement('li');
-      item.textContent = text;
-      elements.detailBenefits.appendChild(item);
-    });
-    elements.detailOutcomeTitle.textContent = content.outcomeTitle;
-    elements.detailOutcomeCopy.textContent = content.outcomeCopy;
-    elements.detailStartLink.dataset.entryKind = selectedKind;
-    track('project_instruction_detail_open', { entry_kind: selectedKind });
-    if (typeof elements.detailDialog.showModal === 'function') elements.detailDialog.showModal();
-    else elements.detailDialog.setAttribute('open', '');
+  function renderQuestion() {
+    const asking = ['questions', 'narrow'].includes(session.phase);
+    $('question-card').hidden = !asking;
+    if (!asking) return;
+    const question = BEGINNER_QUESTIONS[session.index];
+    // Keep one question on screen. Old answers stay in local history, not bubbles.
+    $('messages').replaceChildren();
+    const title = document.createElement('h3'); title.id = 'current-question'; title.tabIndex = -1;
+    title.textContent = session.phase === 'narrow' ? NARROW_QUESTION : question.prompt;
+    const help = document.createElement('p'); help.id = 'question-help';
+    help.textContent = session.phase === 'narrow' ? '처음 적은 내용: ' + session.answers.work : '예: ' + question.example;
+    $('messages').append(title, help);
+    $('answer-input').value = session.draft;
+    $('answer-count').textContent = answerLength(session.draft);
+    $('answer-feedback').textContent = feedback || (session.shortRetries[question.id] && !session.answers[question.id] && session.phase === 'questions' ? '짧게 적어도 괜찮아요. 한 번 더 보내면 다음으로 넘어가요.' : '');
+    $('answer-input').setAttribute('aria-invalid', feedback ? 'true' : 'false');
+    $('previous-button').disabled = session.index === 0 && session.phase !== 'narrow';
+    $('send-answer').textContent = session.returnToConfirmation ? '고친 내용 확인하기 →' : session.index === 5 ? '정리한 내용 보기 →' : '다음으로 →';
+    renderQuickReplies();
   }
-
-  function closeDetailDialog() {
-    if (typeof elements.detailDialog.close === 'function') elements.detailDialog.close();
-    else elements.detailDialog.removeAttribute('open');
+  function renderConfirmation() {
+    const confirming = ['confirm', 'review'].includes(session.phase);
+    $('confirmation-section').hidden = !confirming;
+    if (!confirming) return;
+    const summary = beginnerConfirmation(session);
+    $('confirmation-summary').textContent = summary.text;
+    $('confirmation-original').textContent = '끝나면 줄 것에 적은 말: ' + (session.answers.result || '아직 정하지 않음');
+    $('confirmation-work').textContent = '오늘 먼저 만들 일: ' + (session.workChoice || session.answers.work);
+    $('answer-review').hidden = session.phase !== 'review';
+    $('confirmation-actions').hidden = session.phase === 'review';
+    $('answer-review-list').replaceChildren();
+    if (session.phase === 'review') {
+      BEGINNER_QUESTIONS.forEach((question, index) => {
+        const row = document.createElement('div'); row.className = 'answer-review-row';
+        const title = document.createElement('strong'); title.textContent = (index + 1) + '. ' + question.label;
+        const answer = document.createElement('p'); answer.textContent = session.answers[question.id] || '아직 적지 않았어요';
+        const button = document.createElement('button'); button.type = 'button'; button.id = 'edit-answer-' + question.id;
+        button.textContent = question.label + ' 고치기'; button.className = 'text-button';
+        button.addEventListener('click', () => { session = editBeginnerQuestion(session, index, true); feedback = ''; save(); renderAll(); focusQuestion(); });
+        row.append(title, answer, button); $('answer-review-list').appendChild(row);
+      });
+    }
   }
-
   function renderResult() {
-    collection.setDocument(session.ready ? (session.markdown || buildProjectInstructionMarkdown(session.state)) : '');
-    if (!session.ready) {
-      elements.resultSection.hidden = true;
-      return;
-    }
-    if (!session.markdown) session.markdown = buildProjectInstructionMarkdown(session.state);
-    elements.markdownPreview.textContent = session.markdown;
-    elements.resultSection.hidden = false;
-    window.setTimeout(function () {
-      elements.resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
+    const ready = session.phase === 'complete';
+    // Only explicit “맞아요” creates a document; setDocument preserves a reviewed copy.
+    collection.setDocument(ready ? session.markdown : '');
+    $('result-section').hidden = !ready;
+    if (ready) $('markdown-preview').textContent = session.markdown;
   }
-
   function renderAll() {
-    elements.startSection.hidden = !!session.startMode;
-    elements.workspace.hidden = !session.startMode;
-    elements.messages.replaceChildren();
-    session.messages.forEach(renderMessage);
-    elements.answerInput.value = session.draft;
-    elements.answerCount.textContent = String(session.draft.length);
-    renderProgress();
-    renderBrief();
-    renderResult();
-    renderQuickReplies(session.ready ? [] : getQuestion(session.stage, session.startMode, session.state).quickReplies);
+    document.body.dataset.writing = session.startMode ? 'true' : 'false';
+    document.body.dataset.phase = session.phase;
+    $('start-section').hidden = !!session.startMode;
+    $('workspace').hidden = !session.startMode;
+    renderProgress(); renderBrief(); renderQuestion(); renderConfirmation(); renderResult();
   }
-
-  async function start(mode) {
-    if (busy) return;
-    busy = true;
-    session = newSession();
-    session.startMode = mode;
-    elements.answerInput.value = '';
-    elements.answerCount.textContent = '0';
-    elements.workspace.hidden = false;
-    elements.startSection.hidden = true;
-    elements.resultSection.hidden = true;
-    elements.messages.replaceChildren();
-    renderProgress();
-    renderBrief();
-    track('project_instruction_start', { start_mode: mode });
-    showTyping();
-    await wait(260);
-    hideTyping();
-    var firstQuestion = getQuestion('problem', mode, session.state);
-    addMessage(firstQuestion.prompt, 'assistant');
-    renderQuickReplies(firstQuestion.quickReplies);
-    save();
-    busy = false;
-    renderProgress();
-    elements.workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    window.setTimeout(function () { elements.answerInput.focus(); }, 350);
+  function focusQuestion() {
+    $('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (['questions', 'narrow'].includes(session.phase)) $('current-question').focus({ preventScroll: true });
+    else if (session.phase === 'confirm') $('confirmation-summary').focus({ preventScroll: true });
   }
-
-  async function submitAnswer(answer) {
-    if (busy || session.ready) return;
-    busy = true;
-    var previousState = structuredClone(session.state);
-    var previousLength = session.messages.length;
-    var completedStage = session.stage;
-    // Keep the saved question and draft intact until the answer is processed.
-    addMessage(answer, 'user', true);
-    renderQuickReplies([]);
-    track('project_instruction_answer', { stage: completedStage });
-    renderProgress();
-    showTyping();
-    await wait(280);
-
-    try {
-      session.state = applyLocalAnswer(session.state, completedStage, answer);
-      session.history.push({ stage: completedStage, state: previousState, answer: answer, messagesLength: previousLength });
-      session.draftsByStage[completedStage] = answer;
-      session.stage = nextStage(completedStage, session.state);
-      session.ready = session.stage === 'complete';
-      session.markdown = session.ready ? buildProjectInstructionMarkdown(session.state) : '';
-      session.draft = session.ready ? '' : (session.draftsByStage[session.stage] || '');
-      elements.answerInput.value = session.draft;
-      elements.answerCount.textContent = String(session.draft.length);
-      hideTyping();
-      addMessage(localCoachResponse(completedStage, session.stage, session.state, session.startMode), 'assistant');
-      if (!session.ready) renderQuickReplies(getQuestion(session.stage, session.startMode, session.state).quickReplies);
-      renderProgress();
-      renderBrief();
-      renderResult();
-      if (session.ready) track('project_instruction_ready');
-      save();
-    } catch (error) {
-      hideTyping();
-      session.state = previousState;
-      session.stage = completedStage;
-      session.ready = false;
-      session.markdown = '';
-      session.messages = session.messages.slice(0, previousLength);
-      if (session.history.length && session.history[session.history.length - 1].stage === completedStage) session.history.pop();
-      session.draft = answer;
-      session.draftsByStage[completedStage] = answer;
-      renderAll();
-      addMessage(error.message || '답변을 확인해 주세요.', 'assistant');
-      elements.answerInput.value = answer;
-      elements.answerCount.textContent = String(answer.length);
-      renderQuickReplies(getQuestion(session.stage, session.startMode, session.state).quickReplies);
-    }
-    busy = false;
-    renderProgress();
-    if (!session.ready) elements.answerInput.focus();
-  }
-
-  document.querySelectorAll('[data-start-mode]').forEach(function (button) {
-    button.addEventListener('click', function () { start(button.dataset.startMode); });
+  document.querySelectorAll('[data-start-mode]').forEach(button => button.addEventListener('click', () => {
+    session = newBeginnerSession(); session.startMode = button.dataset.startMode; feedback = ''; save(); renderAll(); focusQuestion();
+    track('project_instruction_start', { start_mode: session.startMode });
+  }));
+  $('answer-input').addEventListener('input', () => { fillDraft($('answer-input').value); if (session.index === 5) renderQuickReplies(); });
+  $('answer-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); $('composer').requestSubmit(); }
   });
-
-  document.querySelectorAll('[data-detail-entry]').forEach(function (button) {
-    button.addEventListener('click', function () { openDetailDialog(button.dataset.detailEntry); });
-  });
-
-  elements.detailClose.addEventListener('click', closeDetailDialog);
-  elements.detailContinue.addEventListener('click', closeDetailDialog);
-  elements.detailDialog.addEventListener('click', function (event) {
-    if (event.target === elements.detailDialog) closeDetailDialog();
-  });
-  elements.detailStartLink.addEventListener('click', function () {
-    track('project_instruction_detail_start', { entry_kind: elements.detailStartLink.dataset.entryKind || 'material' });
-  });
-
-  elements.answerInput.addEventListener('input', function () {
-    elements.answerCount.textContent = String(elements.answerInput.value.length);
-    session.draft = elements.answerInput.value;
-    session.draftsByStage[session.stage] = session.draft;
-    if (session.startMode && !session.ready) save();
-  });
-
-  elements.answerInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
-      event.preventDefault();
-      elements.composer.requestSubmit();
-    }
-  });
-
-  elements.composer.addEventListener('submit', function (event) {
+  $('composer').addEventListener('submit', event => {
     event.preventDefault();
-    var answer = elements.answerInput.value.trim();
-    if (!answer || session.ready || busy) return;
-    elements.answerInput.value = '';
-    elements.answerCount.textContent = '0';
-    submitAnswer(answer);
+    if (!['questions', 'narrow'].includes(session.phase)) return;
+    const completedQuestion = BEGINNER_QUESTIONS[session.index].id;
+    const result = submitBeginnerAnswer(session, $('answer-input').value);
+    session = result.session; feedback = result.message || ''; save(); renderAll();
+    if (['advance', 'confirm', 'narrow'].includes(result.status)) { track('project_instruction_answer', { stage: completedQuestion }); focusQuestion(); }
+    else $('answer-input').focus();
   });
-
-  elements.resetButton.addEventListener('click', function () {
-    if (busy) return;
-    if (!window.confirm('지금까지 입력한 내용을 지우고 처음부터 시작할까요?')) return;
-    try { localStorage.removeItem(STORAGE_KEY); } catch (error) { /* this page still resets */ }
-    session = newSession();
-    collection.reset();
-    elements.workspace.hidden = true;
-    elements.startSection.hidden = false;
-    elements.resultSection.hidden = true;
-    elements.messages.replaceChildren();
-    elements.answerInput.value = '';
-    elements.answerCount.textContent = '0';
-    renderQuickReplies([]);
+  $('previous-button').addEventListener('click', () => {
+    if (session.phase === 'narrow') session = editBeginnerQuestion(session, 0, session.returnToConfirmation);
+    else if (session.index > 0) session = editBeginnerQuestion(session, session.index - 1, session.returnToConfirmation);
+    feedback = ''; save(); renderAll(); focusQuestion();
+  });
+  $('confirmation-yes').addEventListener('click', () => {
+    if (session.phase !== 'confirm') return;
+    session.markdown = buildProjectInstructionMarkdown(beginnerProjectState(session));
+    session.phase = 'complete'; save(); renderAll();
+    $('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    track('project_instruction_ready');
+  });
+  function reviewAnswers() { session.phase = 'review'; feedback = ''; save(); renderAll(); $('confirmation-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  $('confirmation-edit').addEventListener('click', reviewAnswers);
+  $('review-after-result').addEventListener('click', reviewAnswers);
+  $('confirmation-back').addEventListener('click', () => { session.phase = 'confirm'; save(); renderAll(); focusQuestion(); });
+  $('reset-button').addEventListener('click', () => {
+    if (!window.confirm('지금까지 적은 내용을 지우고 처음부터 시작할까요? 이전 버전 기록과 이미 제출한 사본은 그대로 남아요.')) return;
+    session = newBeginnerSession(); feedback = '';
+    try { localStorage.removeItem(BEGINNER_STORAGE_KEY); } catch { /* reset this screen only */ }
+    // Do not reset the separate submitted/pending copy or receipt.
+    renderAll(); $('start-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     track('project_instruction_reset');
-    elements.startSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-
-  elements.previousButton.addEventListener('click', function () {
-    if (busy || !session.history.length) return;
-    if (!session.ready) session.draftsByStage[session.stage] = session.draft;
-    var previous = session.history.pop();
-    session.stage = previous.stage;
-    session.state = previous.state;
-    session.messages = session.messages.slice(0, previous.messagesLength);
-    session.ready = false;
-    session.markdown = '';
-    session.draft = Object.prototype.hasOwnProperty.call(session.draftsByStage, previous.stage) ? session.draftsByStage[previous.stage] : previous.answer;
-    session.draftsByStage[previous.stage] = session.draft;
-    renderAll();
-    save();
-    elements.answerInput.focus();
+  $('download-button').addEventListener('click', () => { if (session.phase === 'complete') { downloadText(session.markdown, 'AI_업무지시서.md'); track('project_instruction_download'); } });
+  $('copy-button').addEventListener('click', async () => {
+    if (session.phase !== 'complete') return;
+    try { await navigator.clipboard.writeText(session.markdown); $('copy-button').textContent = '복사했습니다'; window.setTimeout(() => { $('copy-button').textContent = '내용 복사'; }, 1600); }
+    catch { $('copy-button').textContent = '복사하지 못했습니다'; }
   });
-
-  function downloadText(text, filename) {
-    var blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-  }
-
-  elements.downloadButton.addEventListener('click', function () {
-    if (!session.ready) return;
-    downloadText(buildProjectInstructionMarkdown(session.state), 'AI_업무지시서.md');
-    track('project_instruction_download');
+  $('copy-build-start').addEventListener('click', async () => {
+    if (session.phase !== 'complete') return;
+    try { await navigator.clipboard.writeText(BUILD_START_PROMPT); $('build-start-status').textContent = '복사했습니다. MD 파일과 함께 AI 대화에 붙여넣고 보내세요.'; }
+    catch { $('build-start-prompt').focus(); $('build-start-prompt').select(); $('build-start-status').textContent = '자동 복사가 어려워 문장을 선택했어요. 직접 복사하거나 길게 눌러 복사해 주세요.'; }
   });
-
-  elements.copyButton.addEventListener('click', async function () {
-    try {
-      await navigator.clipboard.writeText(session.markdown || buildProjectInstructionMarkdown(session.state));
-      elements.copyButton.textContent = '복사했습니다';
-      window.setTimeout(function () { elements.copyButton.textContent = '내용 복사'; }, 1600);
-      track('project_instruction_copy');
-    } catch (error) {
-      elements.copyButton.textContent = '복사하지 못했습니다';
-    }
-  });
-
-  elements.copyBuildStart.addEventListener('click', async function () {
-    if (!session.ready) return;
-    try {
-      await navigator.clipboard.writeText(BUILD_START_PROMPT);
-      elements.buildStartStatus.textContent = '복사했습니다. MD 파일과 함께 AI 대화에 붙여넣고 보내세요.';
-    } catch (error) {
-      elements.buildStartPrompt.focus();
-      elements.buildStartPrompt.select();
-      elements.buildStartStatus.textContent = '자동 복사가 어려워 문장을 선택했어요. 직접 복사하거나 길게 눌러 복사해 주세요.';
-    }
-  });
-
-  try {
-    var legacy = JSON.parse(localStorage.getItem(LEGACY_KEY));
-    if (legacy && Array.isArray(legacy.messages) && legacy.messages.length) {
-      elements.legacyNotice.hidden = false;
-      elements.legacyDownload.addEventListener('click', function () {
-        var text = '# 이전 버전의 작성 기록\n\n' + legacy.messages.map(function (message) {
-          return (message.role === 'user' ? '내 답변' : '질문·안내') + '\n' + String(message.text || '').split('\n').map(function (line) { return '> ' + line; }).join('\n');
-        }).join('\n\n');
-        downloadText(text, '이전_업무지시서_작성기록.md');
-      });
-    }
-  } catch (error) { /* do not overwrite unavailable or older records */ }
+  const detailContent = {
+    material: { symbol: '＋', title: '사진이나 문서를 활용하고 싶으세요?', description: '이 화면에서는 파일을 올리거나 읽지 않습니다. 자료를 함께 활용하는 방법은 BCC에 문의할 수 있어요.', benefits: ['지금은 자료에서 필요한 내용을 직접 답변에 적을 수 있어요.', '업무지시서를 받은 뒤 사용하는 AI에 자료를 함께 전달할 수 있어요.', '자료 활용에 도움이 필요하면 이용 방법을 문의하세요.'], outcomeTitle: '지금까지 적은 답변은 유지됩니다', outcomeCopy: '문의 버튼을 눌러도 답변이나 파일이 자동으로 전송되지 않습니다.' },
+    link: { symbol: '↗', title: '참고할 링크가 있으세요?', description: '답변에 링크와 참고하고 싶은 부분을 함께 적어주세요. 이 화면에서는 링크를 열거나 내용을 자동 분석하지 않습니다.', benefits: ['어느 부분을 참고할지 내 말로 설명해요.', '원하는 구성과 바꾸고 싶은 점을 함께 남겨요.', '완성된 업무지시서와 링크를 사용하는 AI에 전달해요.'], outcomeTitle: '참고자료 활용이 어렵다면', outcomeCopy: 'BCC에 이용 방법을 문의할 수 있어요. 링크나 답변은 자동으로 전송되지 않습니다.' },
+  };
+  document.querySelectorAll('[data-detail-entry]').forEach(button => button.addEventListener('click', () => {
+    const kind = button.dataset.detailEntry === 'link' ? 'link' : 'material'; const content = detailContent[kind];
+    for (const [id, key] of [['detail-symbol', 'symbol'], ['detail-title', 'title'], ['detail-description', 'description'], ['detail-outcome-title', 'outcomeTitle'], ['detail-outcome-copy', 'outcomeCopy']]) $(id).textContent = content[key];
+    $('detail-benefits').replaceChildren(); content.benefits.forEach(text => { const item = document.createElement('li'); item.textContent = text; $('detail-benefits').appendChild(item); });
+    $('detail-start-link').dataset.entryKind = kind;
+    if (typeof $('detail-dialog').showModal === 'function') $('detail-dialog').showModal(); else $('detail-dialog').setAttribute('open', '');
+    track('project_instruction_detail_open', { entry_kind: kind });
+  }));
+  function closeDetail() { if (typeof $('detail-dialog').close === 'function') $('detail-dialog').close(); else $('detail-dialog').removeAttribute('open'); }
+  $('detail-close').addEventListener('click', closeDetail); $('detail-continue').addEventListener('click', closeDetail);
+  $('detail-dialog').addEventListener('click', event => { if (event.target === $('detail-dialog')) closeDetail(); });
+  $('detail-start-link').addEventListener('click', () => track('project_instruction_detail_start', { entry_kind: $('detail-start-link').dataset.entryKind || 'material' }));
+  load(); showLegacyRecords(); renderAll();
   track('project_instruction_page_view', { page_path: '/tools/project-instruction/' });
-  if (load()) renderAll();
 })();
