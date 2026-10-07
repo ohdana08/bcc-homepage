@@ -6,6 +6,7 @@ import {
   selectRhythmChip, rhythmChoicesFromText, beginnerConfirmation, migrateLegacyRecord, beginnerProjectState,
 } from './beginner-flow.js';
 import { initCollection } from './collection.js';
+import { createSpeechInput } from './speech-input.js';
 
 (function () {
   'use strict';
@@ -16,6 +17,85 @@ import { initCollection } from './collection.js';
   let feedback = '';
   $('build-start-prompt').value = BUILD_START_PROMPT;
   $('microphone-guidance').textContent = MICROPHONE_GUIDANCE;
+  let speechAccepted = false;
+  let speechRevision = 0;
+  let speechStatus = 'idle';
+  let speechOverflow = '';
+  let speechRecovery = '';
+  let speech = null;
+  function showSpeechPreview(text) {
+    if (speechOverflow && text) speechOverflow = text;
+    const value = speechOverflow || speechRecovery || text;
+    $('speech-preview').value = value;
+    $('speech-preview-section').hidden = !value;
+    $('speech-preview-label').textContent = speechOverflow || speechRecovery ? '칸에 담지 못한 말이에요. 필요한 부분을 복사해 주세요.' : '말한 내용을 확인하고 있어요';
+  }
+  function cancelSpeech(clearPreview = true) {
+    speechRevision++;
+    speech?.cancel();
+    $('speech-consent').hidden = true;
+    if (clearPreview) { speechOverflow = ''; speechRecovery = ''; showSpeechPreview(''); }
+    $('speech-status').textContent = '';
+  }
+  function canSpeak() {
+    return !!session.startMode && ['questions', 'narrow'].includes(session.phase) && !$('generator-area').hidden && !document.hidden;
+  }
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  speech = createSpeechInput({
+    Recognition: window.isSecureContext === false ? undefined : Recognition,
+    getContext: () => [speechRevision, session.phase, session.index, $('generator-area').hidden, document.hidden].join(':'),
+    onText: text => {
+      if (!canSpeak()) return false;
+      const original = $('answer-input').value;
+      const separator = original && !/\s$/.test(original) ? ' ' : '';
+      const next = original + separator + text;
+      if (next.length > $('answer-input').maxLength) {
+        speechOverflow = text; showSpeechPreview(text); return false;
+      }
+      fillDraft(next, true);
+      if (session.index === 5) renderQuickReplies();
+      return true;
+    },
+    onPreview: showSpeechPreview,
+    onState: state => {
+      if (state.status === 'error' && !speechOverflow && $('speech-preview').value) {
+        speechRecovery = $('speech-preview').value;
+        showSpeechPreview('');
+      }
+      speechStatus = state.status;
+      const active = ['starting', 'listening', 'stopping'].includes(state.status);
+      $('speech-button').setAttribute('aria-pressed', String(active));
+      $('speech-button-label').textContent = state.status === 'starting' ? '준비 중 · 취소' : state.status === 'listening' ? '말하기 끝내기' : state.status === 'stopping' ? '마무리 중 · 취소' : '말로 답하기';
+      $('speech-status').textContent = state.error === 'limit' ? '답변 칸은 1,200자까지 담을 수 있어요. 기존 답은 그대로 두었어요. 아래 말에서 필요한 부분을 복사해 옮겨주세요.' : state.message || '';
+      if (['error', 'unsupported'].includes(state.status) && state.error !== 'limit') $('speech-help').open = true;
+    },
+    setTimer: (callback, delay) => window.setTimeout(callback, delay),
+    clearTimer: timer => window.clearTimeout(timer),
+  });
+  function startSpeech() {
+    if (!canSpeak()) return;
+    speechOverflow = ''; speechRecovery = ''; showSpeechPreview('');
+    $('speech-consent').hidden = true;
+    $('speech-help').open = false;
+    speech.start();
+  }
+  $('speech-button').addEventListener('click', () => {
+    if (speech.isActive()) {
+      if (speechStatus === 'listening') speech.stop(); else cancelSpeech(false);
+      return;
+    }
+    if (!canSpeak()) return;
+    if (typeof Recognition !== 'function' || window.isSecureContext === false) { startSpeech(); return; }
+    if (speechAccepted) { startSpeech(); return; }
+    $('speech-consent').hidden = false;
+    $('speech-start').focus();
+  });
+  $('speech-start').addEventListener('click', () => { speechAccepted = true; startSpeech(); });
+  $('speech-dismiss').addEventListener('click', () => { cancelSpeech(false); $('answer-input').focus(); });
+  $('speech-use-keyboard').addEventListener('click', () => { cancelSpeech(false); $('answer-input').focus(); });
+  $('edit-participation').addEventListener('click', () => cancelSpeech());
+  document.addEventListener('visibilitychange', () => { if (document.hidden) cancelSpeech(); });
+  window.addEventListener('pagehide', () => cancelSpeech());
 
   function track(name, params) {
     try {
@@ -77,6 +157,7 @@ import { initCollection } from './collection.js';
         ['이전 파일 받기', () => downloadText(legacyMarkdown(record), '이전_업무지시서.md')],
         ['원본 기록 받기', () => downloadText(record.raw, '이전_작성기록_' + (index + 1) + '.json', 'application/json;charset=utf-8')],
         ['이전 내용 이어 쓰기', () => {
+          cancelSpeech();
           if (session.startMode && !window.confirm('현재 적은 내용은 이 기기에 따로 보관하고, 이전 내용을 이어 쓸까요?')) return;
           const migrated = migrateLegacyRecord(record.raw, record.key);
           if (!migrated) { $('legacy-status').textContent = '이 기록은 화면에서 이어 쓰기 어려워요. 원본 기록을 받아 확인해 주세요.'; return; }
@@ -111,7 +192,8 @@ import { initCollection } from './collection.js';
     const values = { work: session.workChoice || session.answers.work, material: session.answers.material, result: session.answers.result };
     Object.entries(values).forEach(([key, value]) => { const target = document.querySelector('[data-brief="' + key + '"]'); if (target) target.textContent = value || '아직 적지 않았어요'; });
   }
-  function fillDraft(value) {
+  function fillDraft(value, fromSpeech = false) {
+    if (!fromSpeech) cancelSpeech(false);
     session.draft = value;
     if (session.index === 5 && session.phase === 'questions') session.rhythmChoices = rhythmChoicesFromText(value);
     if (session.phase !== 'narrow') session.draftsByStage[BEGINNER_QUESTIONS[session.index].id] = value;
@@ -190,6 +272,7 @@ import { initCollection } from './collection.js';
     if (ready) $('markdown-preview').textContent = session.markdown;
   }
   function renderAll() {
+    cancelSpeech();
     document.body.dataset.writing = session.startMode ? 'true' : 'false';
     document.body.dataset.phase = session.phase;
     $('start-section').hidden = !!session.startMode;
@@ -235,6 +318,7 @@ import { initCollection } from './collection.js';
   $('review-after-result').addEventListener('click', reviewAnswers);
   $('confirmation-back').addEventListener('click', () => { session.phase = 'confirm'; save(); renderAll(); focusQuestion(); });
   $('reset-button').addEventListener('click', () => {
+    cancelSpeech();
     if (!window.confirm('지금까지 적은 내용을 지우고 처음부터 시작할까요? 이전 버전 기록과 이미 제출한 사본은 그대로 남아요.')) return;
     session = newBeginnerSession(); feedback = '';
     try { localStorage.removeItem(BEGINNER_STORAGE_KEY); } catch { /* reset this screen only */ }
@@ -258,6 +342,7 @@ import { initCollection } from './collection.js';
     link: { symbol: '↗', title: '참고할 링크가 있으세요?', description: '답변에 링크와 참고하고 싶은 부분을 함께 적어주세요. 이 화면에서는 링크를 열거나 내용을 자동 분석하지 않습니다.', benefits: ['어느 부분을 참고할지 내 말로 설명해요.', '원하는 구성과 바꾸고 싶은 점을 함께 남겨요.', '완성된 업무지시서와 링크를 사용하는 AI에 전달해요.'], outcomeTitle: '참고자료 활용이 어렵다면', outcomeCopy: 'BCC에 이용 방법을 문의할 수 있어요. 링크나 답변은 자동으로 전송되지 않습니다.' },
   };
   document.querySelectorAll('[data-detail-entry]').forEach(button => button.addEventListener('click', () => {
+    cancelSpeech();
     const kind = button.dataset.detailEntry === 'link' ? 'link' : 'material'; const content = detailContent[kind];
     for (const [id, key] of [['detail-symbol', 'symbol'], ['detail-title', 'title'], ['detail-description', 'description'], ['detail-outcome-title', 'outcomeTitle'], ['detail-outcome-copy', 'outcomeCopy']]) $(id).textContent = content[key];
     $('detail-benefits').replaceChildren(); content.benefits.forEach(text => { const item = document.createElement('li'); item.textContent = text; $('detail-benefits').appendChild(item); });

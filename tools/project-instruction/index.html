@@ -112,8 +112,25 @@
           <div class="quick-replies" id="quick-replies"></div>
           <form class="composer" id="composer" novalidate>
             <label class="sr-only" for="answer-input">내 답변</label>
-            <textarea id="answer-input" rows="3" maxlength="1200" placeholder="여기에 편하게 적어주세요." aria-describedby="question-help microphone-guidance answer-feedback"></textarea>
+            <div class="answer-with-voice">
+              <textarea id="answer-input" rows="3" maxlength="1200" placeholder="여기에 편하게 적거나, 옆의 마이크를 눌러주세요." aria-describedby="question-help microphone-guidance answer-feedback speech-status"></textarea>
+              <button id="speech-button" class="speech-button" type="button" aria-pressed="false" aria-controls="speech-consent speech-status speech-help">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg>
+                <span id="speech-button-label">말로 답하기</span>
+              </button>
+            </div>
+            <div id="speech-consent" class="speech-notice" hidden>
+              <strong>말로 답하기 전에</strong>
+              <p id="speech-disclosure">음성은 글로 바꾸기 위해 브라우저 제공업체 서버로 전송될 수 있어요. BCC는 음성 파일을 받거나 저장하지 않아요. 글로 바뀐 내용은 답변 칸에 붙고, 직접 고칠 수 있어요.</p>
+              <div class="speech-actions"><button id="speech-start" type="button" aria-describedby="speech-disclosure">말하기 시작</button><button id="speech-dismiss" type="button">지금은 글로 쓸게요</button></div>
+            </div>
+            <p id="speech-status" class="speech-status" role="status" aria-live="polite" aria-atomic="true"></p>
+            <div id="speech-preview-section" class="speech-preview" hidden>
+              <label id="speech-preview-label" for="speech-preview">말한 내용을 확인하고 있어요</label>
+              <textarea id="speech-preview" rows="2" readonly spellcheck="false"></textarea>
+            </div>
             <p id="microphone-guidance" class="microphone-guidance">키보드의 마이크 버튼을 누르면 말로 답할 수 있어요</p>
+            <details id="speech-help" class="speech-help"><summary>말로 답하기가 안 되나요?</summary><p>카카오톡 안에서 열었다면 이 주소를 Safari나 Chrome에서 다시 열어 보세요. 적은 답은 다른 브라우저로 저절로 옮겨지지 않으니, 먼저 복사해 두세요.</p><p>키보드로도 말할 수 있어요. 답변 칸을 누른 뒤 키보드의 마이크를 눌러주세요. 아이폰에서 마이크가 안 보이면 설정 → 일반 → 키보드 → 받아쓰기 활성화를 확인해 주세요.</p><button id="speech-use-keyboard" type="button">답변 칸으로 가기</button></details>
             <p id="answer-feedback" class="answer-feedback" role="alert"></p>
             <div class="composer-foot">
               <span><b id="answer-count">0</b> / 1,200</span>
@@ -254,7 +271,7 @@
     </details>
     <section class="privacy-note" aria-label="사용 전 확인">
       <strong>작성 중인 답변은 이 기기에 저장됩니다.</strong>
-      <p>BCC에 명시적으로 제출하기 전에는 답변을 서버에 보내지 않습니다. 주민번호·연락처·고객 명단·기관 내부 비밀처럼 다른 사람에게 보여주면 안 되는 내용은 적지 마세요.</p>
+      <p>BCC에 명시적으로 제출하기 전에는 답변을 BCC 서버에 보내지 않습니다. ‘말로 답하기’를 사용하면 음성을 글로 바꾸기 위해 브라우저 제공업체 서버로 전송될 수 있으며, BCC는 음성 파일을 받거나 저장하지 않습니다. 주민번호·연락처·고객 명단·기관 내부 비밀처럼 다른 사람에게 보여주면 안 되는 내용은 적거나 말하지 마세요.</p>
     </section>
   </main>
 
