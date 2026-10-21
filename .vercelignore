@@ -14,3 +14,5 @@ scripts/upload-saju-preview.mjs
 scripts/lecture-request-local-server.mjs
 scripts/verify-lecture-request.sql
 test/lecture-request-integration.test.js
+test/lecture-request-analytics.test.js
+test/lecture-request-analytics-sre.test.js

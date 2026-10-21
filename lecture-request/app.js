@@ -2,6 +2,10 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const form = $('requestForm');
+  // Analytics is optional and receives no answers, field labels or DOM values.
+  function track(method, value) {
+    try { window.BCCLectureAnalytics?.[method]?.(value); } catch { /* The form must work when analytics is blocked. */ }
+  }
   const steps = [...document.querySelectorAll('.step')];
   const stepNames = ['기관·담당자', '교육대상·목표', '일정·환경', '예산·요청 사항', '확인·제출'];
   const groups = [
@@ -224,6 +228,7 @@
     hide('submitBtn', step !== steps.length - 1);
     $('optionalNote').textContent = step === 0 ? '필수 정보부터 시작해요' : step === 4 ? '내용 확인 후 제출해 주세요' : '미정인 항목은 비워두세요';
     if (step === 4) renderReview();
+    if (!edit) track('step', step + 1);
     if (focus) $(`step${step}Title`).focus({ preventScroll: false });
   }
   function validate(index) {
@@ -304,6 +309,7 @@
     pending = null;
   }
   async function loadEdit(item) {
+    track('stop');
     hide('loading', false); hide('formShell'); hide('success'); message('', 'pageError');
     try {
       const data = await api({ action: 'get', receipt: item.receipt, key: item.key });
@@ -323,6 +329,11 @@
     } finally { hide('loading'); }
   }
   form.addEventListener('input', (event) => { dirty = true; if (event.target.setCustomValidity) { event.target.setCustomValidity(''); event.target.removeAttribute('aria-invalid'); } });
+  const trackFirstInput = (event) => {
+    if (!edit && event.isTrusted && ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target?.tagName) && event.target.name !== 'website') track('start');
+  };
+  form.addEventListener('input', trackFirstInput);
+  form.addEventListener('change', trackFirstInput);
   $('nextBtn').addEventListener('click', () => { if (!busy && validate(step)) showStep(step + 1); });
   $('backBtn').addEventListener('click', () => { if (!busy) showStep(step - 1); });
   form.addEventListener('submit', async (event) => {
@@ -340,6 +351,9 @@
       const identifiers = edit || identity();
       const data = await api({ action: edit ? 'update' : 'submit', ...identifiers, expected_revision: edit?.revision, payload: currentPayload, consent: $('consent').checked, overseas_consent: $('overseas_consent').checked, consent_version: '2026-10-21-v1', website: form.elements.website.value });
       if (!data.receipt) throw new Error('접수 확인번호가 없습니다. 다시 시도하거나 전화로 문의해 주세요.');
+      // A successful new submission (including recovered duplicate) is the
+      // conversion boundary. An update, button click or failed request is not.
+      if (!edit && data.ok === true) track('complete', data.receipt);
       // A retry after an interrupted response refers to the original stored payload.
       if (data.duplicate) {
         const saved = await api({ action: 'get', receipt: data.receipt, key: identifiers.key });
@@ -375,7 +389,16 @@
     const link = document.createElement('a'); link.href = url; link.download = 'BCC_강의의뢰_접수확인서.txt'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     status('접수 확인서에는 개인정보와 수정 링크가 들어 있습니다. 안전하게 보관해 주세요.');
   });
-  $('continueEditBtn').addEventListener('click', () => { if (receipt) { history.replaceState(null, '', privateUrl(receipt)); loadEdit(receipt); } });
+  $('continueEditBtn').addEventListener('click', () => {
+    if (!receipt) return;
+    track('stop');
+    const target = new URL(privateUrl(receipt));
+    // A query change forces a new document; changing only the hash would leave
+    // the Google library alive in the current document.
+    target.searchParams.set('mode', 'edit');
+    dirty = false;
+    location.assign(target.href);
+  });
   const retryNotice = document.createElement('div'); retryNotice.id = 'duplicateNotice'; retryNotice.className = 'notice hidden'; retryNotice.setAttribute('role', 'status');
   $('successTitle').insertAdjacentElement('afterend', retryNotice);
   const retryButton = document.createElement('button'); retryButton.id = 'reviewRetryBtn'; retryButton.type = 'button'; retryButton.className = 'button primary hidden'; retryButton.textContent = '다시 작성한 내용 확인·저장하기';

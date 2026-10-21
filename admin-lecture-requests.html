@@ -15,7 +15,7 @@
   <div id="app" class="hidden">
     <header class="admin-header"><a class="brand" href="/"><span class="brand-mark">BCC<span>↗</span></span><span>기관·강의 의뢰 기록<small>Business Career Consulting</small></span></a><nav class="admin-nav" aria-label="관리 메뉴"><a href="/admin-proposals.html">기관 제안 운영실</a><a href="/admin-training-needs.html">교육생 수요조사</a><a href="/admin.html">BCC 관리자</a></nav></header>
     <main class="admin-main">
-      <div class="admin-heading"><div><p class="eyebrow">LECTURE REQUESTS</p><h1>문의부터 수요조사까지, 한 강의의 기록</h1><p>담당자가 보낸 의뢰를 확인하고 같은 기관의 강의 이력을 연결하세요. 담당자 요구와 교육생 수요조사는 구분해서 쌓입니다.</p></div><div class="heading-actions"><a class="button secondary" href="/lecture-request/" target="_blank" rel="noopener noreferrer">담당자 의뢰 폼 열기</a><button id="copyPublic" type="button" class="button primary">의뢰 링크 복사</button><button id="reload" type="button" class="button secondary">새로고침</button></div></div>
+      <div class="admin-heading"><div><p class="eyebrow">LECTURE REQUESTS</p><h1>문의부터 수요조사까지, 한 강의의 기록</h1><p>담당자가 보낸 의뢰를 확인하고 같은 기관의 강의 이력을 연결하세요. 담당자 요구와 교육생 수요조사는 구분해서 쌓입니다.</p></div><div class="heading-actions"><a class="button secondary" href="/lecture-request/" target="_blank" rel="noopener noreferrer">담당자 의뢰 폼 열기</a><button id="copyPublic" type="button" class="button primary">카카오용 의뢰 링크 복사</button><button id="reload" type="button" class="button secondary">새로고침</button></div></div>
       <div id="adminError" class="notice error admin-error hidden" role="alert"></div>
       <div class="stats"><div class="stat"><span>연결된 기관</span><strong id="institutionCount">—</strong></div><div class="stat"><span>강의·의뢰 기록</span><strong id="caseCount">—</strong></div><div class="stat"><span>담당자 온라인 접수</span><strong id="requestCount">—</strong></div><div class="stat"><span>기관 연결 대기</span><strong id="pendingCount">—</strong></div></div>
       <p class="load-note" id="loadNote"></p>
@@ -78,7 +78,7 @@
     async function runAction(button,fn){if(button.disabled)return;button.disabled=true;error('');try{await fn()}catch(err){error(err.message||'요청을 처리하지 못했습니다.');$('adminError').scrollIntoView({block:'nearest'})}finally{button.disabled=false}}
     async function load(){const result=await api('list');state.institutions=result.institutions||[];state.cases=result.cases||[];state.requests=result.requests||[];state.surveys=result.surveys||[];renderInstitutions();renderCases();$('loadNote').textContent=(result.limited?'일부 최근 기록만 불러왔습니다. 아래 수치는 전체 누적 통계가 아닙니다. ':'현재 불러온 기록 기준 · ')+new Date().toLocaleString('ko-KR');}
     $('search').addEventListener('input',event=>{state.query=event.target.value;renderCases()});
-    $('copyPublic').addEventListener('click',()=>copy(location.origin+'/lecture-request/'));
+    $('copyPublic').addEventListener('click',()=>copy('https://bccconsulting.kr/lecture-request/?utm_source=kakao&utm_medium=messenger&utm_campaign=lecture_request&utm_content=channel_reply'));
     $('reload').addEventListener('click',()=>runAction($('reload'),async()=>{await load();toast('최신 기록을 불러왔습니다.')}));
     (async()=>{try{
       const [{createClient},configResponse]=await Promise.all([import('https://esm.sh/@supabase/supabase-js@2'),fetch('/api/config',{cache:'no-store'})]);
