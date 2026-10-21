@@ -1,0 +1,46 @@
+begin;
+set local role service_role;
+do $$
+declare p jsonb:=jsonb_build_object('institution_name','SYNTHETIC_QA_ROLLBACK','contact_name','합성 검증','contact_email','synthetic@example.invalid','audience','행정 실무자','purpose','합성검증','project_name','강의 A','location','장소 A','special_notes','기존 메모');
+a jsonb; b jsonb; u jsonb; v jsonb; r uuid; c uuid; admin_id uuid; i uuid; v_survey_id uuid; row_case proposal_cases; n integer;
+begin
+  a:=lecture_request_submit(repeat('a',64),gen_random_uuid(),p,'2026-10-21-v1');
+  if a->>'ok'<>'true' then raise exception 'submit_failed %',a; end if;
+  r:=(a->>'receipt')::uuid; select case_id into c from lecture_requests where receipt=r;
+  select id into admin_id from profiles where is_admin=true limit 1;
+  if (select institution_id is not null from proposal_cases where id=c) then raise exception 'unexpected_auto_link'; end if;
+  b:=lecture_request_submit(repeat('a',64),(select idempotency_key from lecture_requests where receipt=r),p||'{"purpose":"changed retry"}'::jsonb,'2026-10-21-v1');
+  if b->>'duplicate'<>'true' or b->>'receipt'<>r::text or (select payload<>p from lecture_requests where receipt=r) then raise exception 'retry_mutated'; end if;
+  b:=lecture_request_submit(repeat('b',64),(select idempotency_key from lecture_requests where receipt=r),p,'2026-10-21-v1');
+  if b->>'error'<>'conflict' then raise exception 'key_conflict_missing'; end if;
+  b:=lecture_request_get(r,repeat('b',64)); if b->>'error'<>'not_found' then raise exception 'read_key_missing'; end if;
+  b:=lecture_request_get(r,repeat('a',64)); if b ? 'case_id' or b ? 'key_hash' or b->'payload'<>p then raise exception 'read_contract'; end if;
+  -- Explicit administrator override survives a later public edit.
+  update proposal_cases set audience='관리자 확인 대상',status='waiting' where id=c;
+  u:=p||'{"location":"장소 B","special_notes":"수정 메모","project_name":"강의 B","audience":"담당자 수정 대상","total_budget":1000000}'::jsonb;
+  b:=lecture_request_update(r,repeat('a',64),u,1,'2026-10-21-v1');
+  if b->>'revision'<>'2' then raise exception 'update_failed %',b; end if;
+  select * into row_case from proposal_cases where id=c;
+  if row_case.constraints<>E'수정 메모\n장소 B' or row_case.project_name<>'강의 B' or row_case.audience<>'관리자 확인 대상' or row_case.status<>'waiting' or row_case.budget<>1000000 then raise exception 'case_sync'; end if;
+  b:=lecture_request_update(r,repeat('a',64),u,1,'2026-10-21-v1'); if b->>'duplicate'<>'true' then raise exception 'update_retry'; end if;
+  b:=lecture_request_update(r,repeat('a',64),p,1,'2026-10-21-v1'); if b->>'error'<>'conflict' then raise exception 'revision_missing'; end if;
+  if (select count(*) from lecture_request_revisions where receipt=r)<>2 then raise exception 'revision_count'; end if;
+  insert into lecture_institutions(name,created_by) values('SYNTHETIC_QA_ROLLBACK',admin_id) returning id into i;
+  update proposal_cases set institution_id=i where id=c;
+  b:=lecture_request_ensure_survey(c,admin_id); v_survey_id:=(b->'survey'->>'id')::uuid;
+  if v_survey_id is null or b->'survey'->>'case_id'<>c::text then raise exception 'survey_link'; end if;
+  v:=lecture_request_ensure_survey(c,admin_id); if v->'survey'->>'id'<>v_survey_id::text then raise exception 'survey_duplicate'; end if;
+  insert into training_need_responses(survey_id,idempotency_key,answers) values(v_survey_id,gen_random_uuid(),'{"synthetic":true}'::jsonb);
+  if (select count(*) from training_need_responses t where t.survey_id=v_survey_id)<>1 then raise exception 'learner_link'; end if;
+  b:=lecture_request_submit(repeat('c',64),gen_random_uuid(),p,'2026-10-21-v1');
+  if (select institution_id is not null from proposal_cases where id=(select case_id from lecture_requests where receipt=(b->>'receipt')::uuid)) then raise exception 'name_merge'; end if;
+  update lecture_requests set editable_until=now()-interval '1 second' where receipt=r;
+  b:=lecture_request_get(r,repeat('a',64)); if b->>'error'<>'not_found' then raise exception 'expiry_read'; end if;
+  b:=lecture_request_update(r,repeat('a',64),p,2,'2026-10-21-v1'); if b->>'error'<>'not_found' then raise exception 'expiry_write'; end if;
+  for n in 1..21 loop b:=lecture_request_rate(repeat('f',64),'submit'); end loop;
+  if b->>'error'<>'limit' then raise exception 'rate_missing'; end if;
+end $$;
+rollback;
+select 'RPC runtime, retry, revision, admin override, institution, survey, expiry, rate PASS (rolled back)' as result;
+select tablename,rowsecurity from pg_tables where schemaname='public' and tablename like 'lecture_%' order by tablename;
+select p.proname,has_function_privilege('anon',p.oid,'EXECUTE') as anon_can_execute,has_function_privilege('authenticated',p.oid,'EXECUTE') as member_can_execute from pg_proc p join pg_namespace n on p.pronamespace=n.oid where n.nspname='public' and p.proname like 'lecture_request_%';

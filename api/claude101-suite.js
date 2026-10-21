@@ -10,7 +10,10 @@ import { loadPrivateSajuHtml } from '../lib/saju-preview/load.js';
 import { handleSajuAdmin } from '../lib/saju-preview/handler.js';
 import { handleProjectInstructionUsage } from '../lib/project-instruction/telemetry-handler.js';
 
+import { handleLectureRequest } from '../lib/lecture-request.js';
+
 const HANDLERS = {
+  'lecture-request': handleLectureRequest,
   'course-access': courseAccess,
   'groble-checkout': grobleCheckout,
   'groble-event': grobleEvent,

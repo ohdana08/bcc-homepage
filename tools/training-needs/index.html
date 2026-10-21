@@ -79,7 +79,7 @@
 
 <script>
 (function(){
-  var API = window.BCC_API_BASE || 'https://bcc-homepage.vercel.app';
+  var API = (location.hostname === 'ohdana08.github.io' ? 'https://bccconsulting.kr' : location.origin);
   var state = { form:'', survey:null, questions:[], index:0, answers:{ others:{} }, idempotency: makeId() };
   var $ = function(id){ return document.getElementById(id); };
   var esc = function(value){ return String(value == null ? '' : value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };

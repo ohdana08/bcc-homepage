@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#214e43">
+  <title>강의 의뢰 | BCC 비즈니스커리어컨설팅</title>
+  <link rel="icon" href="/logo.png">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#requestForm">입력으로 바로 가기</a>
+  <header class="site-header"><a class="brand" href="/"><span class="brand-mark">BCC<span>↗</span></span><span>비즈니스커리어컨설팅<small>Business Career Consulting</small></span></a><span class="header-note">기관·기업 교육 문의</span></header>
+  <main class="layout">
+    <aside class="intro">
+      <p class="eyebrow">LET’S PLAN YOUR CLASS</p>
+      <h1>우리에게 필요한 강의,<br><em>함께 준비해요.</em></h1>
+      <p class="intro-copy">교육 기획이 아직 없어도 괜찮아요.<br>가까운 항목을 선택해 주시면<br>우리 교육생에게 맞는 방향을 함께 상의하겠습니다.</p>
+      <div class="intro-note"><span class="note-symbol">✦</span><p><strong>잘 모르겠다면 ‘미정’이나 ‘추천’을 선택하세요.</strong><br>기관명과 연락받을 정보만 적고, 나머지는 선택으로 시작할 수 있습니다.</p></div>
+      <ol class="process"><li><span>01</span><div><strong>알고 계신 내용부터</strong><p>파일을 만들거나 회원가입할 필요 없어요.</p></div></li><li><span>02</span><div><strong>제출 후에도 내용 보완</strong><p>발급받은 개인 수정 링크로 다시 작성하세요.</p></div></li><li><span>03</span><div><strong>담당 강사와 맞춤 상담</strong><p>접수 내용을 확인한 뒤 연락드리겠습니다.</p></div></li></ol>
+      <p class="contact-help">작성 중 도움이 필요하신가요?<br><a href="tel:01093210093">010-9321-0093</a></p>
+    </aside>
+    <section class="form-card" aria-label="강의 의뢰서">
+      <div id="loading" class="notice hidden" role="status">저장된 의뢰 내용을 불러오고 있습니다.</div>
+      <div id="pageError" class="notice error hidden" role="alert"></div>
+      <div id="editNotice" class="notice hidden"></div>
+      <div id="formShell">
+        <div class="progress-head"><span id="stepCount">01 / 05</span><span id="stepName">기관·담당자</span></div>
+        <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
+        <form id="requestForm" novalidate>
+          <div class="honeypot" aria-hidden="true"><label for="website">웹사이트</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+          <section class="step" data-step="0" aria-labelledby="step0Title">
+            <p class="section-kicker">먼저, 연락드릴 곳을 알려주세요.</p><h2 id="step0Title" tabindex="-1">어느 기관의 교육인가요?</h2><p class="section-help"><span class="required-mark">*</span> 표시만 필수입니다. 나머지는 비워두셔도 됩니다.</p>
+            <div class="fields">
+              <div class="field full"><label for="institution_name">기관·회사명 <span class="required-mark">*</span></label><input id="institution_name" name="institution_name" required maxlength="160" autocomplete="organization" placeholder="예: ○○교육센터 / ○○회사 ○○지점"></div>
+              <div class="field full"><label for="project_name">담당 사업명·교육명 <span>선택</span></label><input id="project_name" name="project_name" maxlength="160" placeholder="예: 재직자 생성형 AI 실무교육"></div>
+              <div class="field"><label for="contact_name">담당자 성함 <span class="required-mark">*</span></label><input id="contact_name" name="contact_name" required maxlength="80" autocomplete="name"></div>
+              <div class="field"><label for="contact_phone">담당자 연락처 <span>선택</span></label><input id="contact_phone" name="contact_phone" type="tel" maxlength="40" autocomplete="tel" placeholder="연락 가능한 전화번호"></div>
+              <div class="field full"><label for="contact_email">담당자 이메일 <span class="required-mark">*</span></label><input id="contact_email" name="contact_email" type="email" required maxlength="254" autocomplete="email" placeholder="name@example.com"><small>강의 상담과 요청하신 자료를 안내할 주소입니다.</small></div>
+            </div>
+          </section>
+          <section class="step hidden" data-step="1" aria-labelledby="step1Title">
+            <p class="section-kicker">어떤 교육인지, 두 가지만 선택해 주세요.</p><h2 id="step1Title" tabindex="-1">대상과 관심 있는 주제는 무엇인가요?</h2><p class="section-help">아직 기획 전이라면 ‘아직 미정’과 ‘추천받고 싶어요’만 선택하셔도 됩니다. 선택은 희망사항이며, 상담을 통해 구체화합니다.</p>
+            <div class="fields">
+              <div class="field full"><label for="audience">교육대상 <span class="required-mark">*</span></label><input id="audience" name="audience" required maxlength="500" placeholder="예: 행정 실무자, 취업 준비생, 소상공인"></div>
+              <div class="field"><label for="age_range">연령대 <span>선택</span></label><input id="age_range" name="age_range" maxlength="100" placeholder="예: 30~50대 / 다양한 연령"></div>
+              <div class="field"><label for="audience_size">예상 인원 <span>선택</span></label><div class="input-unit"><input id="audience_size" name="audience_size" type="number" min="1" max="100000" step="1" inputmode="numeric" placeholder="미정이면 비워두세요"><span>명</span></div></div>
+              <div class="field"><label for="ai_experience">AI 활용 경험 <span>선택</span></label><select id="ai_experience" name="ai_experience"><option value="">아직 확인하지 못했어요</option><option>처음 사용해요</option><option>가끔 사용해요</option><option>업무에 자주 사용해요</option><option>수준이 다양해요</option></select></div>
+              <div class="field"><label for="ai_tools">사용 중인 AI 도구 <span>선택</span></label><input id="ai_tools" name="ai_tools" maxlength="500" placeholder="예: ChatGPT, Gemini / 아직 없음"></div>
+              <div class="field full"><label for="purpose">이번 교육의 목적 <span class="required-mark">*</span></label><textarea id="purpose" name="purpose" required maxlength="2000" placeholder="예: 반복적인 보고서 작성 시간을 줄이고, AI 결과를 검토하는 방법을 배우고 싶어요."></textarea></div>
+              <div class="field full"><label for="learner_expectations">교육생이 바라는 기대효과 <span>선택</span></label><textarea id="learner_expectations" name="learner_expectations" maxlength="2000" placeholder="교육생에게 들은 의견이 있으면 알려주세요."></textarea></div>
+              <div class="field full"><label for="organizer_expectations">교육담당자가 바라는 기대효과 <span>선택</span></label><textarea id="organizer_expectations" name="organizer_expectations" maxlength="2000" placeholder="교육을 마친 뒤 어떤 변화가 생기면 좋을까요?"></textarea></div>
+              <div class="field full"><label for="desired_outputs">직접 만들어보고 싶은 결과물 <span>선택</span></label><input id="desired_outputs" name="desired_outputs" maxlength="2000" placeholder="예: 사업계획서, 홍보 콘텐츠, 업무 자동화 도구"></div>
+            </div>
+          </section>
+          <section class="step hidden" data-step="2" aria-labelledby="step2Title">
+            <p class="section-kicker">실제 수업을 준비하기 위한 정보</p><h2 id="step2Title" tabindex="-1">언제, 어디서 만나면 좋을까요?</h2><p class="section-help">모든 항목은 선택입니다. 일정·장소가 미정이면 다음으로 넘어가세요.</p>
+            <div class="fields">
+              <div class="field"><label for="lecture_date">희망 강의 날짜 <span>선택</span></label><input id="lecture_date" name="lecture_date" type="date"></div>
+              <div class="field"><label for="time">강의 시간대 <span>선택</span></label><input id="time" name="time" maxlength="100" placeholder="예: 14:00~17:00"></div>
+              <div class="field full"><label for="date_notes">일정 관련 메모 <span>선택</span></label><input id="date_notes" name="date_notes" maxlength="300" placeholder="예: 11월 중 협의 / 매주 화요일, 총 3회"></div>
+              <div class="field"><label for="duration_hours">총 강의 시간 <span>선택</span></label><div class="input-unit"><input id="duration_hours" name="duration_hours" type="number" min="0.25" max="1000" step="0.25" inputmode="decimal" placeholder="예: 3"><span>시간</span></div></div>
+              <div class="field"><label for="desk_layout">책상 배열 <span>선택</span></label><select id="desk_layout" name="desk_layout"><option value="">미정·확인 필요</option><option>학교식 (앞을 보는 배열)</option><option>모둠식 (조별 배열)</option><option>회의식</option><option>온라인 교육</option><option>기타 (특이사항에 기재)</option></select></div>
+              <div class="field full"><label for="location">장소·주소 <span>선택</span></label><input id="location" name="location" maxlength="500" placeholder="주소와 강의실 / 온라인 플랫폼"></div>
+              <fieldset class="field full choice-field"><legend>사용 가능한 장비 <span>선택 · 여러 개 선택 가능</span></legend><div class="choices"><label><input type="checkbox" name="equipment" value="빔프로젝터"><span>빔프로젝터</span></label><label><input type="checkbox" name="equipment" value="스크린·대형 모니터"><span>스크린·대형 모니터</span></label><label><input type="checkbox" name="equipment" value="스피커"><span>스피커</span></label><label><input type="checkbox" name="equipment" value="마이크"><span>마이크</span></label><label><input type="checkbox" name="equipment" value="와이파이"><span>와이파이</span></label></div></fieldset>
+              <div class="field"><label for="computer_access">교육생 컴퓨터 사용 <span>선택</span></label><select id="computer_access" name="computer_access"><option value="">미정·확인 필요</option><option>기관 컴퓨터 제공</option><option>개인 노트북 지참</option><option>일부만 사용 가능</option><option>스마트폰만 사용</option><option>실습 기기 없음</option></select></div>
+              <div class="field"><label for="tool_access">AI 도구 이용 환경 <span>선택</span></label><select id="tool_access" name="tool_access"><option value="">미정·확인 필요</option><option>무료 도구만 사용</option><option>유료 도구 사용 가능</option><option>무료·유료 혼합</option><option>기관 보안정책 확인 필요</option></select></div>
+            </div>
+          </section>
+          <section class="step hidden" data-step="3" aria-labelledby="step3Title">
+            <p class="section-kicker">원활한 준비를 위해</p><h2 id="step3Title" tabindex="-1">예산과 요청 사항을 알려주세요.</h2><p class="section-help">대략적인 범위만 선택해도 됩니다. 예산·서류가 아직 미정이면 다음으로 넘어가세요.</p>
+            <div class="fields">
+              <div class="field"><label for="total_budget">총 교육 예산 <span>선택</span></label><div class="input-unit"><input id="total_budget" name="total_budget" type="number" min="0" max="2147483647" step="1" inputmode="numeric" placeholder="예: 1000000"><span>원</span></div></div>
+              <div class="field"><label for="lecturer_fee">책정 강사료 <span>선택</span></label><div class="input-unit"><input id="lecturer_fee" name="lecturer_fee" type="number" min="0" max="2147483647" step="1" inputmode="numeric" placeholder="예: 600000"><span>원</span></div></div>
+              <div class="field full"><label for="required_documents">필요한 서류 <span>선택</span></label><textarea id="required_documents" name="required_documents" maxlength="1000" placeholder="예: 강사 프로필, 견적서, 강의계획서, 기관 지정 양식"></textarea><small>별도 양식이 있다면 상담 시 전달해 주세요.</small></div>
+              <div class="field full"><label for="deadline_notes">회신·서류 제출 기한 <span>선택</span></label><input id="deadline_notes" name="deadline_notes" maxlength="300" placeholder="예: 다음 주 금요일까지 견적서가 필요해요"></div>
+              <div class="field full"><label for="parking">주차·출입 안내 <span>선택</span></label><input id="parking" name="parking" maxlength="500" placeholder="예: 지하주차장 이용 가능, 사전 차량등록 필요"></div>
+              <div class="field full"><label for="special_notes">그 밖의 특이사항 <span>선택</span></label><textarea id="special_notes" name="special_notes" maxlength="2000" placeholder="접근성 지원, 실습 보안규정, 세금·교통비 포함 여부 등 미리 알아야 할 내용을 알려주세요."></textarea></div>
+            </div>
+          </section>
+          <section class="step hidden" data-step="4" aria-labelledby="step4Title">
+            <p class="section-kicker">마지막으로 한 번 확인해 주세요.</p><h2 id="step4Title" tabindex="-1">이 내용으로 문의할게요.</h2><p class="section-help">접수는 강의 일정·비용의 확정을 의미하지 않습니다. 내용을 확인한 뒤 개별 상담을 진행합니다.</p>
+            <div id="reviewSummary" class="review-summary"></div>
+            <div class="consent-box">
+              <p><strong>강의 상담을 위한 개인정보 수집·이용</strong></p><p>수집자: 비즈니스커리어컨설팅(BCC)<br>항목: 기관명, 담당자 성함·이메일, 선택한 연락처와 의뢰 내용<br>목적: 강의 상담·교육 운영 및 의뢰 이력 관리<br>보관: 상담·교육 운영 목적 달성 시까지. 삭제 요청은 BCC에서 확인 후 처리합니다.</p><p>동의를 거부하면 온라인 접수는 제한되며 전화로 문의하실 수 있습니다. 의뢰 내용은 공개 포트폴리오에 자동 게시되지 않습니다. <a href="/privacy.html#lecture-request" target="_blank" rel="noopener noreferrer">자세한 처리 안내</a></p>
+              <label class="consent"><input id="consent" type="checkbox" required><span><b>[필수]</b> 개인정보 수집·이용에 동의합니다.</span></label>
+              <label class="consent"><input id="overseas_consent" type="checkbox" required><span><b>[필수]</b> 입력 내용과 관리키가 Vercel 미국 서버에서 요청 처리되는 것에 동의합니다. 저장 DB는 대한민국 서울입니다.</span></label>
+            </div>
+          </section>
+          <div id="formError" class="notice error hidden" role="alert"></div>
+          <div class="form-actions"><button type="button" id="backBtn" class="button secondary hidden">이전</button><span id="optionalNote">필수 정보부터 시작해요</span><button type="button" id="nextBtn" class="button primary">다음 <span aria-hidden="true">→</span></button><button type="submit" id="submitBtn" class="button primary hidden">강의 의뢰 보내기</button></div>
+          <p class="save-note">입력 내용은 제출할 때 전송됩니다. 제출 전 창을 닫으면 작성 중인 내용은 사라집니다.</p>
+        </form>
+      </div>
+      <section id="success" class="success hidden" aria-labelledby="successTitle"><div class="success-icon" aria-hidden="true">✓</div><p class="section-kicker">THANK YOU</p><h2 id="successTitle" tabindex="-1">강의 의뢰가 접수되었습니다.</h2><p>보내주신 내용을 확인한 뒤 연락드리겠습니다.<br>아래 링크로 제출 내용을 확인하고 보완할 수 있어요.</p><div class="receipt"><span>접수번호</span><strong id="receiptNumber"></strong></div><div class="private-link-box"><label for="privateLink">이 의뢰의 개인 수정 링크</label><textarea id="privateLink" readonly rows="3" spellcheck="false"></textarea><div class="success-actions"><button id="copyLinkBtn" type="button" class="button primary">수정 링크 복사</button><button id="downloadBtn" type="button" class="button secondary">접수 확인서 저장</button></div><p><strong>링크를 가진 사람은 의뢰 내용을 볼 수 있습니다.</strong><br>본인만 보관하고 교육생에게 공유하지 마세요. 수정 링크는 최초 접수일부터 90일 동안 유효합니다.</p></div><button id="continueEditBtn" type="button" class="text-button">제출한 내용 다시 확인·수정하기 →</button><a class="text-button new-request" href="./">다른 강의 의뢰하기 →</a></section>
+      <p id="status" role="status" aria-live="polite" class="status"></p>
+    </section>
+  </main>
+  <footer class="site-footer">© BCC 비즈니스커리어컨설팅 <span>강의 의뢰 · 기관별 맞춤 교육</span></footer>
+  <noscript><div class="no-script">입력 폼을 이용하려면 자바스크립트를 켜주세요. 전화 문의: 010-9321-0093</div></noscript>
+</body>
+</html>

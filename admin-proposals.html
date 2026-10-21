@@ -54,6 +54,7 @@
       <a class="btn ghost secondary" href="admin.html" style="text-decoration:none">BCC 공장</a>
       <a class="btn ghost secondary" href="admin-project-instructions.html" style="text-decoration:none">업무지시서 결과물</a>
       <a class="btn ghost secondary" href="admin-training-needs.html" style="text-decoration:none">교육생 니즈분석</a>
+      <a class="btn ghost secondary" href="admin-lecture-requests.html" style="text-decoration:none">강의 의뢰 기록</a>
       <button class="btn secondary" id="syncOpenBtn">옵시디언 동기화</button>
       <button class="btn gold" id="newCaseBtn">+ 새 기관 문의</button>
     </div>
@@ -66,6 +67,7 @@
       <button class="nav-item" id="sideNewBtn"><span class="nav-icon">＋</span>새 문의 등록</button>
       <button class="nav-item" id="sideSyncBtn"><span class="nav-icon">↻</span>BCC_Brain 동기화</button>
       <a class="nav-item" href="admin-training-needs.html" style="text-decoration:none"><span class="nav-icon">◫</span>교육생 수요조사</a>
+      <a class="nav-item" href="admin-lecture-requests.html" style="text-decoration:none"><span class="nav-icon">↗</span>담당자 강의 의뢰</a>
       <div class="side-label" style="margin-top:28px">LEARNING LOOP</div>
       <button class="nav-item"><span class="nav-icon">◎</span>수정 이유 축적</button>
       <div class="side-card"><b>승인된 지식</b><div class="sync-count" id="knowledgeCount">0</div><p>옵시디언에서 선별해 가져온 강의기록과 운영 규칙입니다.</p></div>
@@ -145,7 +147,7 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-  const API = window.BCC_API_BASE || 'https://bcc-homepage.vercel.app';
+  const API = location.hostname === 'ohdana08.github.io' ? 'https://bccconsulting.kr' : location.origin;
   const STATUS = {
     inquiry:'새 문의', analyzing:'요구분석 중', drafted:'초안 생성', reviewing:'검수 중',
     sent:'발송', waiting:'회신 대기', won:'확정', lost:'종료', on_hold:'보류'
@@ -237,6 +239,8 @@
       if (!response.ok || !data.profile?.is_admin) throw new Error('admin');
       $('boot').classList.add('hidden'); $('app').classList.remove('hidden');
       await loadCases();
+      const requestedCase = new URLSearchParams(location.search).get('case');
+      if (requestedCase && state.cases.some((item) => item.id === requestedCase)) await selectCase(requestedCase);
     } catch (error) {
       $('boot').classList.add('hidden'); $('denied').classList.remove('hidden');
       if (error.message === 'admin') $('deniedTitle').textContent = '관리자 계정만 사용할 수 있습니다';

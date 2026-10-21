@@ -10,3 +10,7 @@ test-results-saju/
 test-results-saju-admin/
 .private-saju/
 scripts/upload-saju-preview.mjs
+# Lecture request: local synthetic harness and validation artifacts are not served.
+scripts/lecture-request-local-server.mjs
+scripts/verify-lecture-request.sql
+test/lecture-request-integration.test.js
