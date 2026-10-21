@@ -8,6 +8,15 @@ const LIVE = 'https://bccconsulting.kr/lecture-request/';
 const RECEIPT = '12345678-1234-4234-8234-123456789012';
 const MEASUREMENT = 'G-5TN5XW0T2J';
 
+test('GA: intake exclusion selector has one body root containing every form field', () => {
+  const html = readFileSync(new URL('../lecture-request/index.html', import.meta.url), 'utf8');
+  const body = html.match(/<body class="bcc-lecture-request">([\s\S]*)<\/body>/);
+  assert.ok(body, 'The Google tag exclusion class must identify the entire intake body.');
+  assert.equal((html.match(/class="bcc-lecture-request"/g) || []).length, 1);
+  assert.match(body[1], /<form\b[^>]*id="requestForm"/);
+  assert.equal((body[1].match(/<(?:input|select|textarea)\b/g) || []).length, (html.match(/<(?:input|select|textarea)\b/g) || []).length);
+});
+
 function run({ url = LIVE, storage = new Map(), blockedStorage = false, existing = {}, historyError = false } = {}) {
   const scripts = [];
   const listeners = new Map();
