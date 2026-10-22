@@ -525,9 +525,19 @@
     try { sessionStorage.setItem(storageKey, JSON.stringify(pending)); } catch { /* In-memory identity still protects retry in this tab. */ }
     return pending;
   }
-  function privateUrl(item) {
+  const qaNavigation = (() => {
+    const initial = new URL(location.href);
+    return initial.searchParams.has('qa') || new URLSearchParams(initial.hash.slice(1)).has('qa');
+  })();
+  function requestUrl() {
     const url = new URL('./', location.href);
-    url.search = '';
+    // Carry only the QA boolean. Never copy arbitrary query/hash values.
+    url.search = qaNavigation ? '?qa=1' : '';
+    url.hash = '';
+    return url;
+  }
+  function privateUrl(item) {
+    const url = requestUrl();
     url.hash = new URLSearchParams({ receipt: item.receipt, key: item.key }).toString();
     return url.href;
   }
@@ -659,6 +669,8 @@
   $('reloadAttachmentsBtn').addEventListener('click', () => { const item = receipt || edit; if (item) void refreshAttachments(item); });
   $('retryAttachmentsBtn').addEventListener('click', () => { if (receipt) void uploadAttachments(receipt); });
   window.addEventListener('beforeunload', (event) => { if ((dirty && !busy) || attachmentBusy || localAttachments.some((item) => item.status !== 'ready')) { event.preventDefault(); event.returnValue = ''; } });
+  const newRequestLink = document.querySelector('.new-request');
+  if (newRequestLink && qaNavigation) newRequestLink.href = requestUrl().href;
   const hash = new URLSearchParams(location.hash.slice(1));
   buildChoices();
   restoreSchedules({});
