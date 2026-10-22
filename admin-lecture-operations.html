@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+  <title>강의 운영실 | BCC</title><link rel="icon" href="/logo.png">
+  <link rel="stylesheet" href="/lecture-operations/style.css">
+  <script type="module" src="/lecture-operations/app.js"></script>
+</head>
+<body>
+  <div id="boot" class="boot"><span class="brand-mark">BCC</span><h1>강의 운영실을 여는 중입니다</h1><p>관리자 권한을 확인하고 있습니다.</p></div>
+  <div id="denied" class="boot" hidden><span class="brand-mark">BCC</span><h1>관리자 로그인이 필요합니다</h1><p id="denied-message"></p><a class="button primary" href="/admin.html">관리자 로그인</a></div>
+  <div id="app" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="/admin.html"><span class="brand-mark">BCC</span><span>강의 운영실<small>Business Career Consulting</small></span></a>
+      <p class="nav-label">강의 업무</p>
+      <nav id="navigation" aria-label="강의 운영 메뉴">
+        <button type="button" data-view="today" aria-current="page"><span>◷</span> 오늘 할 일</button>
+        <button type="button" data-view="cases"><span>▤</span> 문의·진행</button>
+        <button type="button" data-view="calendar"><span>▦</span> 확정 일정</button>
+        <button type="button" data-view="settlements"><span>₩</span> 청구·입금</button>
+      </nav>
+      <div class="sidebar-links"><p class="nav-label">기존 업무 바로가기</p><a href="/admin-lecture-requests.html">기관·문의 원문 ↗</a><a href="/admin-proposals.html">제안 운영실 ↗</a><a href="/admin-training-needs.html">교육생 수요조사 ↗</a><a href="https://bcc-admin-eight.vercel.app/finance" target="_blank" rel="noopener noreferrer">기존 강의 수입 장부 ↗</a></div>
+      <p class="sidebar-note">문의부터 강의 준비와 입금까지<br>한 강의의 기록으로 이어집니다.</p>
+    </aside>
+    <main>
+      <header class="page-head"><div><p class="eyebrow" id="today-date"></p><h1 id="view-title">오늘 할 일</h1><p id="view-description">답변할 문의와 다가오는 강의를 확인하세요.</p></div><div class="actions"><a class="button" href="/lecture-request/" target="_blank" rel="noopener noreferrer">의뢰 폼 열기 ↗</a><button id="reload" type="button" class="button">새로고침</button></div></header>
+      <div id="error" class="notice error" role="alert" hidden></div>
+      <div class="metrics" id="metrics"></div>
+      <div class="workspace">
+        <section class="list-panel" aria-label="강의 업무 목록">
+          <div class="filters"><label class="search"><span class="sr-only">기관·교육명 검색</span><input id="search" type="search" placeholder="기관·교육명 검색" autocomplete="off"></label><label><span class="sr-only">진행 상태</span><select id="status-filter"><option value="">모든 진행 상태</option><option value="inquiry">새 문의</option><option value="waiting">회신 대기</option><option value="won">확정</option><option value="on_hold">보류</option><option value="lost">종료</option></select></label><label id="month-wrap" hidden><span class="sr-only">일정 조회 월</span><input id="month" type="month"></label></div>
+          <p id="list-note" class="small"></p><div id="list"></div><button id="more" type="button" class="button wide" hidden>다음 기록 불러오기</button>
+        </section>
+        <section id="detail" class="detail-panel" aria-label="선택한 강의 상세"><div class="empty"><span class="empty-icon">↗</span><h2>강의 기록을 선택하세요</h2><p>문의·일정·준비·정산을<br>같은 기록에서 관리할 수 있습니다.</p></div></section>
+      </div>
+    </main>
+  </div>
+  <dialog id="finance-login"><form id="finance-login-form"><div class="dialog-head"><div><p class="eyebrow">강의 수입 장부</p><h2>재무 소유자 로그인</h2></div><button type="button" id="close-finance" class="icon-button" aria-label="로그인 창 닫기">×</button></div><p>현재 사용 중인 장부를 연결합니다. 재무 소유자 계정으로 로그인하면 강의 수입만 조회할 수 있습니다.</p><label>이메일<input name="email" type="email" autocomplete="username" required></label><label>비밀번호<input name="password" type="password" autocomplete="current-password" required></label><p id="finance-login-error" class="error-text" role="alert"></p><button class="button primary wide" type="submit">장부 연결</button></form></dialog>
+  <dialog id="void-dialog"><form id="void-form"><div class="dialog-head"><h2>입금·환급 기록 취소</h2><button type="button" id="close-void" class="icon-button" aria-label="기록 취소 창 닫기">×</button></div><p>취소한 기록은 합계에서 제외되며, 원본과 사유는 이력에 남습니다.</p><label>취소 사유<textarea name="reason" maxlength="500" required></textarea></label><button class="button primary wide" type="submit">사유를 남기고 기록 취소</button></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

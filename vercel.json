@@ -8,6 +8,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/lecture-operations",
+      "destination": "/api/claude101-suite?fn=lecture-operations"
+    },
+    {
       "source": "/api/lecture-request-attachments",
       "destination": "/api/claude101-suite?fn=lecture-request-attachments"
     },
@@ -169,6 +173,31 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/admin-lecture-operations.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://esm.sh; style-src 'self'; connect-src 'self' https://jhjxrkypnigcohgnzhvq.supabase.co https://epyaaenpnljoqycccesz.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
         }
       ]
     }

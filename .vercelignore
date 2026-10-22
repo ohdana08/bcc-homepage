@@ -19,3 +19,10 @@ test/lecture-request-analytics-sre.test.js
 test/lecture-request-feedback.test.js
 test/lecture-request-feedback-sre.test.js
 test/lecture-request-qa-navigation.test.js
+
+# Local-only operations validation and migration sources.
+scripts/verify-lecture-operations.mjs
+scripts/lecture-operations-local-server.mjs
+test/lecture-operations*.test.js
+docs/lecture-operations*.md
+supabase/lecture-operations*.sql
