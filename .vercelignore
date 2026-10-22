@@ -16,3 +16,5 @@ scripts/verify-lecture-request.sql
 test/lecture-request-integration.test.js
 test/lecture-request-analytics.test.js
 test/lecture-request-analytics-sre.test.js
+test/lecture-request-feedback.test.js
+test/lecture-request-feedback-sre.test.js

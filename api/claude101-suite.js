@@ -11,9 +11,11 @@ import { handleSajuAdmin } from '../lib/saju-preview/handler.js';
 import { handleProjectInstructionUsage } from '../lib/project-instruction/telemetry-handler.js';
 
 import { handleLectureRequest } from '../lib/lecture-request.js';
+import { handleLectureRequestAttachments } from '../lib/lecture-request-attachments.js';
 
 const HANDLERS = {
   'lecture-request': handleLectureRequest,
+  'lecture-request-attachments': handleLectureRequestAttachments,
   'course-access': courseAccess,
   'groble-checkout': grobleCheckout,
   'groble-event': grobleEvent,

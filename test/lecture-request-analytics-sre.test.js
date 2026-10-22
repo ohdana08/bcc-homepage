@@ -181,7 +181,7 @@ function appListener({ tracker = environment(), db = createLectureFixture(), edi
     labels: Object.fromEntries(Object.keys(syntheticPayload).map(key => [key, key])), changedRetryDraft: null,
     api: async body => { requests.push(body); return apiOverride ? apiOverride(body, db) : backend(db, body); },
     track() {}, showStep() {}, message: value => messages.push(value), showSuccess: (...args) => successes.push(args),
-    document: { createElement: () => ({ addEventListener() {} }) }, loadEdit() {},
+    document: { createElement: () => ({ addEventListener() {} }) }, loadEdit() {}, refreshScheduleControls() {}, renderAttachments() {},
   });
   vm.runInContext(TRACK_WRAPPER + SUBMIT_LISTENER + INPUT_LISTENERS, context);
   return { tracker, db, context, handlers, requests, successes, messages, identifiers, submit: () => handlers.submit({ preventDefault() {} }) };

@@ -8,6 +8,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/lecture-request-attachments",
+      "destination": "/api/claude101-suite?fn=lecture-request-attachments"
+    },
+    {
       "source": "/api/lecture-request",
       "destination": "/api/claude101-suite?fn=lecture-request"
     },

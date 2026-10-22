@@ -13,12 +13,44 @@ export const MEMBER_TOKEN = 'local-synthetic-member';
 
 const copy = (value) => value === undefined ? undefined : structuredClone(value);
 
+/** In-memory bytes only. Never constructs a Supabase URL or reads credentials. */
+export function createMemoryStorage() {
+  const objects = new Map(), calls = [];
+  const failures = new Map();
+  return {
+    objects, calls,
+    fail(operation, error = { message: 'Synthetic storage outage', statusCode: '503' }) { failures.set(operation, error); },
+    recover(operation) { operation ? failures.delete(operation) : failures.clear(); },
+    from(bucket) {
+      if (bucket !== 'lecture-request-forms') throw new Error('Fixture storage bucket not implemented');
+      return {
+        async upload(path, bytes, options = {}) {
+          calls.push({ operation: 'upload', bucket, path });
+          if (failures.has('upload')) return { data: null, error: copy(failures.get('upload')) };
+          const key = `${bucket}/${path}`;
+          if (objects.has(key) && !options.upsert) return { data: null, error: { message: 'The resource already exists', statusCode: '409' } };
+          const buffer = Buffer.isBuffer(bytes) ? Buffer.from(bytes) : Buffer.from(await new Blob([bytes]).arrayBuffer());
+          objects.set(key, { bytes: buffer, contentType: options.contentType || 'application/octet-stream' });
+          return { data: { path }, error: null };
+        },
+        async download(path) {
+          calls.push({ operation: 'download', bucket, path });
+          if (failures.has('download')) return { data: null, error: copy(failures.get('download')) };
+          const object = objects.get(`${bucket}/${path}`);
+          return object ? { data: new Blob([object.bytes], { type: object.contentType }), error: null }
+            : { data: null, error: { message: 'Object not found', statusCode: '404' } };
+        },
+      };
+    },
+  };
+}
+
 /** A deliberately bounded PostgREST-shaped fixture, not a PostgreSQL/RLS test. */
 export function createMemoryDb({ tables: seed = {}, rpcHandlers = {} } = {}) {
   const tables = {
     profiles: [{ id: ADMIN_ID, is_admin: true }, { id: MEMBER_ID, is_admin: false }],
     proposal_cases: [], lecture_institutions: [], lecture_requests: [], lecture_request_revisions: [],
-    training_need_surveys: [], training_need_responses: [],
+    training_need_surveys: [], training_need_responses: [], lecture_request_attachments: [],
     ...copy(seed),
   };
   const calls = [];
@@ -146,19 +178,41 @@ export function createLectureFixture() {
       }
       return ok({ survey: copy(survey) });
     },
+    lecture_request_attachment_reserve(args, tables) {
+      if (!findRequest(args, tables)) return failure('not_found');
+      const existing = tables.lecture_request_attachments.find(row => row.id === args.p_upload_id);
+      if (existing) {
+        if (existing.receipt !== args.p_receipt || existing.original_name !== args.p_name || existing.mime_type !== args.p_mime || existing.byte_size !== args.p_size || existing.sha256 !== args.p_sha256) return failure('conflict');
+        return ok({ attachment: copy(existing) });
+      }
+      const rows = tables.lecture_request_attachments.filter(row => row.receipt === args.p_receipt);
+      if (rows.length >= 3 || rows.reduce((sum, row) => sum + row.byte_size, 0) + args.p_size > 6 * 1024 * 1024) return failure('limit');
+      const row = { id: args.p_upload_id, receipt: args.p_receipt, original_name: args.p_name, mime_type: args.p_mime, byte_size: args.p_size, sha256: args.p_sha256, object_path: `${args.p_receipt}/${args.p_upload_id}`, status: 'pending', created_at: new Date().toISOString() };
+      tables.lecture_request_attachments.push(row);
+      return ok({ attachment: copy(row) });
+    },
+    lecture_request_attachment_ready(args, tables) {
+      if (!findRequest(args, tables)) return failure('not_found');
+      const row = tables.lecture_request_attachments.find(value => value.receipt === args.p_receipt && value.id === args.p_attachment_id);
+      if (!row) return failure('not_found');
+      row.status = 'ready';
+      return ok({ attachment: copy(row) });
+    },
   } });
+  db.storage = createMemoryStorage();
   return db;
 }
 
 function decorateResponse(res) {
   res.status = (status) => { res.statusCode = status; return res; };
   res.json = (data) => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(data)); return res; };
+  res.send = (data) => { res.end(data); return res; };
   return res;
 }
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.json': 'application/json; charset=utf-8' };
 
-export async function createLocalServer({ handler, db, port = 0 } = {}) {
+export async function createLocalServer({ handler, attachmentHandler, db, port = 0 } = {}) {
   if (typeof handler !== 'function' || !db) throw new Error('Explicit synthetic handler and database are required.');
   const server = http.createServer(async (req, originalRes) => {
     const res = decorateResponse(originalRes);
@@ -170,14 +224,23 @@ export async function createLocalServer({ handler, db, port = 0 } = {}) {
       if (req.headers.host !== new URL(origin).host || (req.headers.origin && req.headers.origin !== origin)) {
         return res.status(403).json({ error: 'Loopback fixture only' });
       }
-      if (url.pathname === '/api/lecture-request' || url.pathname === '/api/cardnews-generate') {
-        let text = '';
+      if (['/api/lecture-request', '/api/lecture-request-attachments', '/api/cardnews-generate'].includes(url.pathname)) {
+        const attachments = url.pathname === '/api/lecture-request-attachments';
+        const chunks = [];
+        let bytes = 0;
         for await (const chunk of req) {
-          text += chunk;
-          if (Buffer.byteLength(text) > 65536) return res.status(413).json({ error: 'Fixture request too large' });
+          bytes += chunk.length;
+          if (bytes > (attachments ? 3 * 1024 * 1024 : 65536)) return res.status(413).json({ error: 'Fixture request too large' });
+          chunks.push(chunk);
         }
+        const text = Buffer.concat(chunks).toString('utf8');
         try { req.body = text ? JSON.parse(text) : {}; } catch { return res.status(400).json({ error: 'Invalid JSON' }); }
+        if (attachments && req.body.action !== 'upload' && bytes > 65536) return res.status(413).json({ error: 'Fixture request too large' });
         req.query = Object.fromEntries(url.searchParams);
+        if (attachments) {
+          const handle = attachmentHandler || (await import('../lib/lecture-request-attachments.js')).handleLectureRequestAttachments;
+          return await handle(req, res, { db, rateSecret: 'synthetic-rate-secret-not-production' });
+        }
         if (url.pathname === '/api/cardnews-generate') {
           if (req.body.engine !== 'training_needs_public') return res.status(403).json({ error: 'Only synthetic public learner survey enabled' });
           const { handleTrainingNeedsPublic } = await import('../lib/training-needs.js');
