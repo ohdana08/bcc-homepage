@@ -247,3 +247,53 @@ footer .brand-sub{color:#b8c8bf}
 .inst-list li{break-inside:avoid;padding:6px 0;font-size:15px;color:var(--ink-2);border-bottom:1px dashed var(--line)}
 @media (max-width:1024px){.inst-list{columns:2}}
 @media (max-width:760px){.inst-list{columns:1}.inst{padding:104px 0 70px}}
+
+/* 기관 교육 페이지 */
+.edu-hero{padding:132px 0 72px}
+.edu-hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.edu-hero h1{font-size:clamp(30px,3.6vw,44px)}
+.edu-hero h1 em{font-style:normal;color:var(--green)}
+.edu-hero-photo{margin:0;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:#fff}
+.edu-hero-photo img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3}
+.edu-hero-photo figcaption{padding:10px 14px;font-size:12.5px;color:var(--mute)}
+.courses{padding:88px 0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.course-grid{margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.course{display:flex;flex-direction:column;gap:12px;padding:28px 26px;background:var(--cream);border:1.5px solid var(--line);border-radius:var(--radius)}
+.course .num{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em}
+.course h3{font-size:22px}
+.course p{font-size:15px;color:var(--ink-2)}
+.course ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.course ul li{font-size:14px;color:var(--ink-2);padding-left:20px;position:relative}
+.course ul li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}
+.course .q{font-size:13.5px;background:#fff;border-radius:10px;padding:12px 14px;margin-top:4px}
+.course .q b{display:block;color:var(--ink);margin-bottom:2px}
+.course .link{margin-top:auto;align-self:flex-start}
+.course-foot{margin-top:26px;font-size:15px;color:var(--ink-2)}
+.course-foot a{color:var(--green);font-weight:700;text-decoration:underline}
+.process{padding:88px 0}
+.steps{list-style:none;padding:0;margin:34px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.steps li{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px}
+.steps li span{display:inline-block;font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.1em;margin-bottom:10px}
+.steps li h3{font-size:17px;margin-bottom:8px}
+.steps li p{font-size:14px;color:var(--ink-2)}
+.edu-field{padding:88px 0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.photo-grid{margin-top:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.photo-grid figure{margin:0;position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--cream)}
+.photo-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.photo-grid figcaption{position:absolute;left:0;right:0;bottom:0;padding:9px 12px;background:rgba(29,42,36,.86);color:#fff;display:flex;flex-direction:column}
+.photo-grid figcaption b{font-size:13.5px}
+.photo-grid figcaption span{font-size:12px;opacity:.85}
+.edu-field .cases{margin-top:40px}
+.faq{padding:88px 0}
+.faq-inner{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:start}
+.faq .lead{margin-top:14px;font-size:15px}
+.faq .lead a{color:var(--green);font-weight:700;text-decoration:underline}
+.faq-list{display:grid;gap:10px}
+.faq-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 20px}
+.faq-item summary{cursor:pointer;font-weight:700;font-size:16px;padding:14px 0;list-style:none;position:relative;padding-right:28px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:after{content:"+";position:absolute;right:0;top:12px;color:var(--green);font-size:20px;font-weight:300}
+.faq-item[open] summary:after{content:"−"}
+.faq-item p{padding:0 0 16px;color:var(--ink-2);font-size:15px;line-height:1.7}
+@media (max-width:1024px){.edu-hero-grid{grid-template-columns:1fr}.course-grid{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,1fr)}.photo-grid{grid-template-columns:repeat(2,1fr)}.faq-inner{grid-template-columns:1fr;gap:24px}}
+@media (max-width:760px){.edu-hero{padding:104px 0 48px}.courses,.process,.edu-field,.faq{padding:60px 0}.steps,.photo-grid{grid-template-columns:1fr}}
