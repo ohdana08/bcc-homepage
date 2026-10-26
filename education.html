@@ -43,7 +43,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="stylesheet" href="assets/home-2026.css?v=20261026">
 <script defer src="assets/education.js?v=20260915"></script>
 </head>
-<body>
+<body class="has-hero">
 <nav class="nav">
   <div class="nav-inner">
     <a href="#top" class="brand">
@@ -74,27 +74,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <main>
 
-<section class="edu-hero" aria-labelledby="edu-title">
-  <div class="inner edu-hero-grid">
-    <div>
+<section class="hero-a edu" aria-labelledby="edu-title">
+  <img class="hero-bg" src="assets/field/field-18.jpg" alt="" aria-hidden="true">
+  <div class="inner hero-a-inner">
+    <div class="hero-copy">
       <p class="eyebrow">기업 · 대학 · 공공기관 교육 담당자분께</p>
-      <h1 id="edu-title">직원 수준이 제각각이어도,<br>끝나면 각자 <em>결과물 하나씩</em> 들고 나가는 AI 수업이에요.</h1>
+      <h1 id="edu-title">직원 수준이 제각각이어도,<br>끝나면 각자 결과물 하나씩 들고 나가는 AI 수업이에요.</h1>
       <p class="lead">AI 강의 듣고 나면 아무도 안 쓰죠. 그래서 수업 시간에 본인 일을 직접 시킵니다. 보고서, 사업계획서, 홍보 글을 각자 자기 업무로 만들고, 제가 하나씩 같이 봐 드려요. 외부 접속이 막힌 기관도 됩니다.</p>
       <div class="hero-cta">
-        <a href="#contact" class="btn btn-primary">교육 문의 남기기</a>
-        <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn btn-ghost" data-kakao="edu-hero">카톡으로 물어보기</a>
+        <a href="#contact" class="btn btn-white">교육 문의 남기기</a>
+        <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="btn btn-outline" data-kakao="edu-hero">카톡으로 물어보기</a>
       </div>
       <p class="hero-note">대상·인원·날짜만 알려주시면 돼요. 아직 안 정해진 건 비워두셔도 됩니다.</p>
-      <div class="hero-inst">
-        <span class="hi-label">다녀온 곳</span>
-        <span class="hi-names">HUG 주택도시보증공사 · 부산교통공사 · 한국토지주택공사 · 부산대학교 · 경상국립대학교 · 동래여성인력개발센터 · 부산경제진흥원</span>
-        <a href="institutions.html" class="hi-more">외 184곳 전체 보기 →</a>
-      </div>
     </div>
-    <figure class="edu-hero-photo">
-      <img src="assets/field/field-03.jpg" alt="부산경제진흥원 취업캠프에서 ChatGPT 수업을 하는 모습" loading="eager">
-      <figcaption>부산경제진흥원 취업캠프 · 2024.11</figcaption>
-    </figure>
+  </div>
+  <div class="inner hero-a-strip">
+    <div class="hero-inst">
+      <span class="hi-label">다녀온 곳</span>
+      <span class="hi-names">HUG 주택도시보증공사 · 부산교통공사 · 한국토지주택공사 · 부산대학교 · 경상국립대학교 · 동래여성인력개발센터 · 부산경제진흥원</span>
+      <a href="institutions.html" class="hi-more">외 184곳 전체 보기 →</a>
+    </div>
+    <span class="hero-cap">창업 성장·투자유치 전략 교육 · 2024.11</span>
   </div>
 </section>
 
@@ -347,6 +347,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 
 
+<script>(function(){ var nav=document.querySelector('.nav'); function u(){ nav.classList.toggle('is-top', window.scrollY<40); } u(); window.addEventListener('scroll',u,{passive:true}); })();</script>
 <!-- 로그인 상태 헤더 -->
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
