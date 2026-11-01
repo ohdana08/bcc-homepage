@@ -36,7 +36,7 @@
 (async function(){
   var wrap=document.getElementById('links-groups'), tabs=document.getElementById('links-tabs'), q=document.getElementById('links-q'), cnt=document.getElementById('links-count');
   if(!wrap) return;
-  var data; try{ data=await fetch('/ddakfit/links.json?v=20261031').then(function(r){return r.json();}); }catch(e){ wrap.innerHTML='<p class="links-note">목록을 불러오지 못했습니다. 새로고침해 주세요.</p>'; return; }
+  var data; try{ data=await fetch('/ddakfit/links.json?v=20261101').then(function(r){return r.json();}); }catch(e){ wrap.innerHTML='<p class="links-note">목록을 불러오지 못했습니다. 새로고침해 주세요.</p>'; return; }
   var region=(location.hash.match(/region=(\w+)/)||[])[1]||'national';
   function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function render(){
