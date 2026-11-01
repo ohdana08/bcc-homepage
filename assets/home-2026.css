@@ -564,3 +564,8 @@ body.has-hero .nav.is-top .nav-signup{background:#fff;border-color:#fff;color:va
 .it-bot-note{margin:22px 0 0;font-size:13px;color:var(--mute)}
 @media (max-width:980px){.it-bot-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.it-bot-grid{grid-template-columns:1fr}}
+
+/* AI 코치 데모 영상 */
+.it-coach-demo{margin:4px 0 28px;max-width:880px}
+.it-coach-demo video{display:block;width:100%;border-radius:14px;box-shadow:var(--shadow);background:#eee}
+.it-coach-demo p{margin:10px 0 0;font-size:13px;color:var(--ink-2)}
