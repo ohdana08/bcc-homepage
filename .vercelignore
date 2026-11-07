@@ -26,3 +26,7 @@ scripts/lecture-operations-local-server.mjs
 test/lecture-operations*.test.js
 docs/lecture-operations*.md
 supabase/lecture-operations*.sql
+
+# Backup/old-version pages are local only; never deploy (duplicate-content index risk).
+*.backup-*.html
+**/*.backup-*.html

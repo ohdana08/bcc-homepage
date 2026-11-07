@@ -1,8 +1,8 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bccconsulting.kr/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
@@ -11,14 +11,24 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://bccconsulting.kr/news/ai-education-cases-2026/</loc>
-    <lastmod>2026-08-27</lastmod>
-    <priority>0.8</priority>
+    <loc>https://bccconsulting.kr/busan-ai-education/</loc>
+    <lastmod>2026-10-22</lastmod>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://bccconsulting.kr/projects.html</loc>
-    <lastmod>2026-07-02</lastmod>
-    <priority>0.8</priority>
+    <loc>https://bccconsulting.kr/busan-startup-education/</loc>
+    <lastmod>2026-10-22</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/ai-marketing-education/</loc>
+    <lastmod>2026-10-22</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/education.html</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://bccconsulting.kr/cases/</loc>
@@ -31,52 +41,113 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bccconsulting.kr/busan-ai-education/</loc>
-    <lastmod>2026-10-22</lastmod>
-  </url>
-  <url>
-    <loc>https://bccconsulting.kr/busan-startup-education/</loc>
-    <lastmod>2026-10-22</lastmod>
-  </url>
-  <url>
     <loc>https://bccconsulting.kr/cases/busan-startup-20260306.html</loc>
     <lastmod>2026-10-22</lastmod>
-  </url>
-  <url>
-    <loc>https://bccconsulting.kr/ai-marketing-education/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://bccconsulting.kr/cases/sacheon-ai-marketing-20241230.html</loc>
     <lastmod>2026-10-22</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/news/ai-education-cases-2026/</loc>
+    <lastmod>2026-08-28</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/institutions.html</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/field.html</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/reviews.html</loc>
+    <lastmod>2026-08-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/projects.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/online.html</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/claude101.html</loc>
+    <lastmod>2026-09-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/job-lab.html</loc>
+    <lastmod>2026-08-24</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/resume-workbook.html</loc>
+    <lastmod>2026-08-21</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/tools.html</loc>
+    <lastmod>2026-10-26</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/tools/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/tools/naver/</loc>
+    <lastmod>2026-08-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/tools/chatbots/</loc>
+    <lastmod>2026-11-07</lastmod>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://bccconsulting.kr/tools/startup-simulator/</loc>
     <lastmod>2026-09-22</lastmod>
-  </url>
-  <url>
-    <loc>https://bccconsulting.kr/startup-story/</loc>
-    <lastmod>2026-09-29</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://bccconsulting.kr/startup-story/musinsa/</loc>
-    <lastmod>2026-09-29</lastmod>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://bccconsulting.kr/tools/document-mate/</loc>
-    <lastmod>2026-10-01</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-02</lastmod>
     <priority>0.7</priority>
-  </url>
-  <url><loc>https://bccconsulting.kr/ddakfit/</loc><lastmod>2026-10-06</lastmod></url>
-  <url>
-    <loc>https://bccconsulting.kr/claude101.html</loc>
   </url>
   <url>
     <loc>https://bccconsulting.kr/tools/project-instruction/</loc>
     <lastmod>2026-10-22</lastmod>
+    <priority>0.7</priority>
   </url>
-  <url><loc>https://bccconsulting.kr/tools/chatbots/</loc><lastmod>2026-10-30</lastmod></url>
+  <url>
+    <loc>https://bccconsulting.kr/ittools-gpts.html</loc>
+    <lastmod>2026-08-03</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/ddakfit/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/startup-story/</loc>
+    <lastmod>2026-09-29</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/startup-story/musinsa/</loc>
+    <lastmod>2026-09-29</lastmod>
+    <priority>0.7</priority>
+  </url>
 </urlset>
