@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# BCC pre-push 알림 — 큰 기능 변경이 main에 올라갈 때 Codex Security 1회 스캔을 권장한다.
+# 자동 실행·차단 없음. 스캔은 사용자가 ChatGPT > Codex Security Cloud 에서 직접 1회 돌린다.
+# 운영 기록: ~/BCC_Brain/30_dev/261107_Codex_Security_무료크레딧_운영.md
+PATTERN='^(api/|lib/|app/api/|server/|.*(auth|login|signup|password|payment|pay|checkout|webhook|callback|oauth|token|secret|session)[^/]*\.(js|ts|tsx|mjs)$)'
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in */main|*/master) ;; *) continue ;; esac
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then range="$local_sha"; else range="$remote_sha..$local_sha"; fi
+  hits=$(git diff --name-only $range 2>/dev/null | grep -E "$PATTERN" | head -10 || true)
+  if [ -n "$hits" ]; then
+    echo ""
+    echo "🔎 [Codex Security] main에 보안 관련 변경이 올라갑니다:"
+    echo "$hits" | sed "s/^/    /"
+    echo "    푸시 후 Codex Security Cloud 에서 Repository scan 1회(Extra High 기준 약 30달러 크레딧, 모델 낮추면 절감)를 권장합니다."
+    echo "    Continuous monitoring 켜기·결제 수단 등록은 하지 않습니다."
+    echo ""
+  fi
+done
+exit 0
