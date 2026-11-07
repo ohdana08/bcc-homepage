@@ -50,6 +50,8 @@ regexes = [
     '''script\.google\.com/macros/s/AKfyc[a-zA-Z0-9_-]+/exec''',
     # AIza placeholder (가이드 문서 등에서 예시로 쓰는 경우)
     '''AIza[a-zA-Z]{1,5}<your-key-here>''',
+    # PostHog 프로젝트 토큰 — 브라우저에 공개되는 쓰기 전용 키 (2026-11-07 PostHog 연동)
+    '''POSTHOG_KEY\s*=\s*['"]phc_[A-Za-z0-9]{40,}['"]''',
 ]
 paths = [
     # 의도적으로 공개 식별자만 담는 파일 — 진짜 secret이 들어가면 안 되지만

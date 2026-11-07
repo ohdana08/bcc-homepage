@@ -11,7 +11,7 @@
   'use strict';
 
   var GA4_ID = 'G-5TN5XW0T2J';
-  var POSTHOG_KEY = '';                          // ← PostHog 프로젝트 API 키(phc_...)를 여기에 넣는다
+  var POSTHOG_KEY = 'phc_zgiMdXHHW8kk3tQSaQKrQcAYLwSEPK7PyX4DP3RD5jUr';                          // ← PostHog 프로젝트 API 키(phc_...)를 여기에 넣는다
   var POSTHOG_HOST = 'https://us.i.posthog.com'; // EU 리전이면 https://eu.i.posthog.com
 
   var path = location.pathname;
