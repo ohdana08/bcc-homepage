@@ -455,7 +455,8 @@
     hide('backBtn', step === 0);
     hide('nextBtn', step === steps.length - 1);
     hide('submitBtn', step !== steps.length - 1);
-    $('optionalNote').textContent = step === 0 ? '필수 정보부터 시작해요' : step === 4 ? '내용 확인 후 제출해 주세요' : '교육 준비에 필요한 내용을 알려주세요';
+    hide('skipBtn', step !== 1);
+    $('optionalNote').textContent = step === 0 ? '필수 정보부터 시작해요' : step === 1 ? '여기까지가 필수예요' : step === 4 ? '내용 확인 후 제출해 주세요' : '비워두셔도 됩니다';
     if (step === 4) renderReview();
     if (!edit) track('step', step + 1);
     if (focus) $(`step${step}Title`).focus({ preventScroll: false });
@@ -587,6 +588,7 @@
   form.addEventListener('change', trackFirstInput);
   $('nextBtn').addEventListener('click', () => { if (!busy && validate(step)) showStep(step + 1); });
   $('backBtn').addEventListener('click', () => { if (!busy) showStep(step - 1); });
+  $('skipBtn').addEventListener('click', () => { if (busy) return; if (!validate(0)) { showStep(0); return; } if (validate(1)) { track('skip_to_review', 2); showStep(4); } });
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (busy) return;
