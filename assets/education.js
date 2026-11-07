@@ -3,7 +3,8 @@
   'use strict';
   var topics = {
     ai: '기업·기관 AI 실무교육', startup: 'AI 활용 창업교육',
-    marketing: 'AI 활용 마케팅 교육', institution: '기관 맞춤 교육 상담',
+    marketing: 'AI 활용 마케팅 교육', automation: 'AI 업무자동화 교육',
+    geo: 'AI 검색노출(GEO) 교육', institution: '기관 맞춤 교육 상담',
     individual: '개인 학습·컨설팅 상담'
   };
   var message = document.getElementById('lf-message');
