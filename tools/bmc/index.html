@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>비즈니스 모델 캔버스 | BCC 잇툴즈</title>
 <meta name="description" content="멘토링하면서 함께 채우는 비즈니스 모델 캔버스. 팀별로 저장하고 PDF 한 장으로 전달합니다.">
-<meta name="robots" content="noindex">
 <style>
 :root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6}
 *{box-sizing:border-box}
@@ -152,7 +151,7 @@ footer{max-width:1500px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     function slot(k,l){var v=first(k);return v?'<b>'+esc(v)+'</b>':'<span class="blank">['+l+']</span>'}
     document.getElementById('pitch').innerHTML='우리는 '+slot('cs','① 고객')+'에게 '+slot('vp','② 가치')+'을(를) '+slot('ch','③ 채널')+'(으)로 전하고, '+slot('rv','⑤ 수익')+'(으)로 돈을 법니다.';
     document.getElementById('ptLeft').textContent='비즈니스 모델 캔버스 — '+(val('team')||'팀 이름')+(val('idea')?' | '+val('idea'):'');
-    document.getElementById('ptRight').textContent=(val('date')||'')+' · 멘토 오예림';
+    document.getElementById('ptRight').textContent=(val('date')||'')+' · BCC 창업 멘토링';
     var next=null;
     for(var i=0;i<order.length;i++){if(!val(order[i])){next=order[i];break}}
     document.querySelectorAll('.cell').forEach(function(c){c.classList.toggle('now',c.querySelector('textarea').dataset.k===next)});
