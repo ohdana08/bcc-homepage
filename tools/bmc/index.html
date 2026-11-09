@@ -3,157 +3,196 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>비즈니스 모델 캔버스 만들기 | BCC 잇툴즈</title>
-<meta name="description" content="아이디어를 한 장의 사업모델로 정리하는 비즈니스 모델 캔버스. 질문에 답하며 9칸을 채우고 PDF로 저장하세요.">
-<link rel="canonical" href="https://bccconsulting.kr/tools/bmc/">
+<title>비즈니스 모델 캔버스 | BCC 잇툴즈</title>
+<meta name="description" content="멘토링하면서 함께 채우는 비즈니스 모델 캔버스. 팀별로 저장하고 PDF 한 장으로 전달합니다.">
+<meta name="robots" content="noindex">
 <style>
 :root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-header{background:var(--navy);color:#fff;padding:14px 16px}
-header .in{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header{background:var(--navy);color:#fff;padding:12px 16px}
+header .in{max-width:1500px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 header a{color:#fff;text-decoration:none;font-weight:700}
 header h1{font-size:18px;margin:0}
-main{max-width:1400px;margin:0 auto;padding:16px}
-.top{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-bottom:12px}
-.top label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:4px}
-.top input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;font-family:inherit;background:#fff}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-button{font-family:inherit;font-size:14px;font-weight:700;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+main{max-width:1500px;margin:0 auto;padding:14px 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+button,select{font-family:inherit;font-size:14px;font-weight:700;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+select{max-width:260px}
 button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
 button.warn{color:#b3261e}
 .saved{font-size:13px;color:var(--mute);margin-left:auto}
-.guide{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:12px}
+.top{display:grid;grid-template-columns:1fr 2fr 170px;gap:10px;margin-bottom:10px}
+label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:4px}
+.top input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;font-family:inherit;background:#fff}
+.guide{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:14px;margin-bottom:10px}
 .guide b{color:var(--blue)}
-.canvas{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:minmax(220px,auto) minmax(220px,auto) minmax(190px,auto);gap:8px}
-.cell{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;min-width:0}
+.canvas{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:minmax(210px,auto) minmax(210px,auto) minmax(180px,auto);gap:8px}
+.cell,.note{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;min-width:0}
 .cell.now{border-color:var(--blue);box-shadow:0 0 0 2px rgba(36,87,214,.18)}
-.cell h2{font-size:15px;margin:0 0 2px;display:flex;gap:6px;align-items:center}
+h2{font-size:15px;margin:0 0 2px;display:flex;gap:6px;align-items:center}
 .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
 .en{font-size:11px;color:var(--mute);font-weight:400}
 .q{font-size:12.5px;color:var(--mute);margin:2px 0 6px}
-.cell textarea{flex:1;width:100%;min-height:90px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:15px;font-family:inherit;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
-.cell textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
+textarea{flex:1;width:100%;min-height:90px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:15px;font-family:inherit;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
+textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
 .kp{grid-column:1/3;grid-row:1/3}.ka{grid-column:3/5;grid-row:1}.kr{grid-column:3/5;grid-row:2}
 .vp{grid-column:5/7;grid-row:1/3}.cr{grid-column:7/9;grid-row:1}.ch{grid-column:7/9;grid-row:2}
 .cs{grid-column:9/11;grid-row:1/3}.co{grid-column:1/6;grid-row:3}.rv{grid-column:6/11;grid-row:3}
-.one{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-.one h3{margin:0 0 6px;font-size:15px}
+.one{margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.one h3{margin:0 0 4px;font-size:15px}
 .one p{margin:0;font-size:15px}
 .one .blank{color:#b3261e}
-footer{max-width:1400px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
-.print-title{display:none}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.note textarea{min-height:80px}
+footer{max-width:1500px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
+.print-title,.print-foot{display:none}
 @media(max-width:900px){
-  .top{grid-template-columns:1fr}
+  .top,.notes{grid-template-columns:1fr}
   .canvas{display:flex;flex-direction:column}
   .cell{order:var(--o)}
   .saved{margin-left:0;width:100%}
 }
 @media print{
-  @page{size:A4 landscape;margin:8mm}
+  @page{size:A4 landscape;margin:7mm}
   body{background:#fff}
   header,.bar,.guide,footer,.top{display:none}
   main{padding:0;max-width:none}
-  .print-title{display:block;font-size:15px;font-weight:700;margin:0 0 6px}
-  .canvas{display:grid;grid-template-rows:62mm 62mm 40mm;gap:3px}
-  .cell{border-radius:0;border-color:#444;padding:5px;overflow:hidden;order:0}
-  .cell h2{font-size:11px}.q{display:none}.num{width:15px;height:15px;font-size:9px}
-  .cell textarea{border:none;background:#fff;font-size:10.5px;padding:2px;resize:none;min-height:0}
-  .one{border-color:#444;border-radius:0;margin-top:4px;padding:5px}
+  .print-title{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin:0 0 4px}
+  .print-title span:last-child{font-weight:400;font-size:11px}
+  .canvas{display:grid;grid-template-rows:50mm 50mm 32mm;gap:3px}
+  .cell,.note{border-radius:0;border-color:#444;padding:4px 5px;overflow:hidden;order:0}
+  .cell.now{box-shadow:none;border-color:#444}
+  h2{font-size:11px}.q{display:none}.num{width:15px;height:15px;font-size:9px}
+  textarea{border:none;background:#fff;font-size:10.5px;line-height:1.4;padding:2px;resize:none;min-height:0;overflow:hidden}
+  .one{border-color:#444;border-radius:0;margin-top:3px;padding:4px 5px}
   .one h3{font-size:11px;margin:0}.one p{font-size:10.5px}
+  .one .blank{color:#888}
+  .notes{gap:3px;margin-top:3px}
+  .note{height:24mm}
+  .print-foot{display:block;font-size:9px;color:#555;margin-top:3px;text-align:right}
 }
 </style>
 </head>
 <body>
 <header><div class="in">
-  <h1>비즈니스 모델 캔버스 만들기</h1>
-  <a href="/tools.html">← 잇툴즈</a>
+  <h1>비즈니스 모델 캔버스 · 멘토링용</h1>
+  <a href="https://bccconsulting.kr/tools.html">← 잇툴즈</a>
 </div></header>
 <main>
-  <div class="top">
-    <div><label for="team">팀 이름 / 이름</label><input id="team" data-k="team" placeholder="예: 3조 바다팀"></div>
-    <div><label for="idea">우리 아이디어 한 줄</label><input id="idea" data-k="idea" placeholder="예: 혼자 사는 대학생을 위한 반찬 소분 배달"></div>
-  </div>
   <div class="bar">
-    <button class="pri" id="btnPrint">PDF로 저장 / 인쇄</button>
+    <select id="pick" aria-label="팀 고르기"></select>
+    <button id="btnNew">+ 새 팀</button>
+    <button class="pri" id="btnPrint">PDF로 저장</button>
     <button id="btnCopy">글로 복사</button>
-    <button id="btnExample">예시 채워 보기</button>
-    <button class="warn" id="btnReset">전부 지우기</button>
-    <span class="saved" id="saved">쓰는 대로 이 기기에 자동 저장됩니다</span>
+    <button id="btnExample">예시</button>
+    <button class="warn" id="btnReset">이 팀 지우기</button>
+    <span class="saved" id="saved">쓰는 대로 이 기기에 팀별로 자동 저장됩니다</span>
   </div>
-  <div class="guide"><b>쓰는 순서</b> ① 고객 → ② 가치 → ③ 채널 → ④ 고객 관계 → ⑤ 수익 → ⑥ 핵심 자원 → ⑦ 핵심 활동 → ⑧ 파트너 → ⑨ 비용. 번호 순서대로, 한 칸에 2~3줄만 짧게 쓰세요. 모르는 칸은 "아직 모름"이라고 적어도 됩니다. 그게 다음에 확인할 숙제입니다.</div>
+  <div class="top">
+    <div><label for="team">팀 이름 / 멘티 이름</label><input id="team" data-k="team" placeholder="예: 3조 바다팀"></div>
+    <div><label for="idea">아이디어 한 줄</label><input id="idea" data-k="idea" placeholder="예: 혼자 사는 대학생을 위한 반찬 소분 배달"></div>
+    <div><label for="date">멘토링 날짜</label><input id="date" type="date" data-k="date"></div>
+  </div>
+  <div class="guide"><b>묻는 순서</b> ① 고객 → ② 가치 → ③ 채널 → ④ 고객 관계 → ⑤ 수익 → ⑥ 자원 → ⑦ 활동 → ⑧ 파트너 → ⑨ 비용. 칸 안의 회색 글은 멘티에게 던질 질문입니다(PDF에는 안 나옵니다). 답을 못 하는 칸은 "아직 모름"으로 적고 아래 "다음 만남까지 할 일"로 옮기세요.</div>
 
-  <p class="print-title" id="printTitle"></p>
+  <p class="print-title"><span id="ptLeft"></span><span id="ptRight"></span></p>
   <div class="canvas" id="canvas">
     <section class="cell kp" style="--o:8"><h2><span class="num">8</span>핵심 파트너 <span class="en">Key Partners</span></h2><p class="q">혼자 못 하는 일은 누구와 함께 하나요? 재료·기술·홍보를 도와줄 곳은?</p><textarea data-k="kp"></textarea></section>
     <section class="cell ka" style="--o:7"><h2><span class="num">7</span>핵심 활동 <span class="en">Key Activities</span></h2><p class="q">약속한 가치를 주려면 매일 꼭 해야 하는 일은?</p><textarea data-k="ka"></textarea></section>
     <section class="cell kr" style="--o:6"><h2><span class="num">6</span>핵심 자원 <span class="en">Key Resources</span></h2><p class="q">꼭 있어야 하는 것은? 사람·기술·장비·돈·자격 중 지금 가진 것과 없는 것.</p><textarea data-k="kr"></textarea></section>
     <section class="cell vp" style="--o:2"><h2><span class="num">2</span>가치 제안 <span class="en">Value Proposition</span></h2><p class="q">그 고객의 어떤 불편을 없애 주나요? 지금 쓰는 방법보다 뭐가 더 좋은가요?</p><textarea data-k="vp"></textarea></section>
     <section class="cell cr" style="--o:4"><h2><span class="num">4</span>고객 관계 <span class="en">Customer Relationships</span></h2><p class="q">한 번 쓴 고객이 다시 오게 하려면? 어떻게 연락하고 챙기나요?</p><textarea data-k="cr"></textarea></section>
-    <section class="cell ch" style="--o:3"><h2><span class="num">3</span>채널 <span class="en">Channels</span></h2><p class="q">고객은 우리를 어디서 알게 되고, 어디서 사고, 어떻게 받나요?</p><textarea data-k="ch"></textarea></section>
-    <section class="cell cs" style="--o:1"><h2><span class="num">1</span>고객 <span class="en">Customer Segments</span></h2><p class="q">누가 돈을 내나요? "모든 사람" 말고, 얼굴이 떠오르는 한 사람으로 적어 보세요. 가장 먼저 살 사람은?</p><textarea data-k="cs"></textarea></section>
+    <section class="cell ch" style="--o:3"><h2><span class="num">3</span>채널 <span class="en">Channels</span></h2><p class="q">고객은 어디서 알게 되고, 어디서 사고, 어떻게 받나요?</p><textarea data-k="ch"></textarea></section>
+    <section class="cell cs" style="--o:1"><h2><span class="num">1</span>고객 <span class="en">Customer Segments</span></h2><p class="q">누가 돈을 내나요? "모든 사람" 말고 얼굴이 떠오르는 한 사람. 가장 먼저 살 사람은?</p><textarea data-k="cs"></textarea></section>
     <section class="cell co" style="--o:9"><h2><span class="num">9</span>비용 <span class="en">Cost Structure</span></h2><p class="q">돈이 가장 많이 드는 곳 3가지는? 한 달에 대략 얼마가 나가나요?</p><textarea data-k="co"></textarea></section>
-    <section class="cell rv" style="--o:5"><h2><span class="num">5</span>수익 <span class="en">Revenue Streams</span></h2><p class="q">무엇에 얼마를 받나요? 한 번 결제인가요, 매달 결제인가요? 고객은 지금 비슷한 것에 얼마를 쓰나요?</p><textarea data-k="rv"></textarea></section>
+    <section class="cell rv" style="--o:5"><h2><span class="num">5</span>수익 <span class="en">Revenue Streams</span></h2><p class="q">무엇에 얼마를 받나요? 한 번 결제인가요, 매달인가요? 고객은 지금 비슷한 것에 얼마를 쓰나요?</p><textarea data-k="rv"></textarea></section>
   </div>
 
   <div class="one">
-    <h3>한 문장으로 말하기 (발표 첫 문장)</h3>
+    <h3>한 문장으로 말하기</h3>
     <p id="pitch"></p>
   </div>
+  <div class="notes">
+    <section class="note"><h2>멘토 의견</h2><p class="q">잘 잡힌 점, 가장 약한 칸, 먼저 고칠 것.</p><textarea data-k="memo"></textarea></section>
+    <section class="note"><h2>다음 만남까지 할 일</h2><p class="q">"아직 모름"인 칸을 확인할 방법. 누구에게 무엇을 물어볼지.</p><textarea data-k="todo"></textarea></section>
+  </div>
+  <p class="print-foot">BCC · bccconsulting.kr</p>
 </main>
-<footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 다른 기기에서는 보이지 않으니 PDF로 저장해 두세요. · BCC 비즈니스커리어컨설팅</footer>
+<footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 멘토링이 끝나면 PDF로 저장해 두세요.</footer>
 
 <script>
 (function(){
-  var KEY='bcc_bmc_v1';
+  var KEY='bcc_bmc_v2',OLD='bcc_bmc_v1';
   var fields=[].slice.call(document.querySelectorAll('[data-k]'));
-  var saved=document.getElementById('saved');
+  var saved=document.getElementById('saved'),pick=document.getElementById('pick');
   var names={cs:'고객',vp:'가치 제안',ch:'채널',cr:'고객 관계',rv:'수익',kr:'핵심 자원',ka:'핵심 활동',kp:'핵심 파트너',co:'비용'};
   var order=['cs','vp','ch','cr','rv','kr','ka','kp','co'];
-  var data={};
-  try{data=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){data={}}
+  var store={cur:null,items:{}},data={};
+  function today(){var d=new Date();function p(n){return (n<10?'0':'')+n}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.items)store=s}catch(e){}
+  if(!Object.keys(store.items).length){
+    try{var o=JSON.parse(localStorage.getItem(OLD)||'null');if(o&&Object.keys(o).some(function(k){return (o[k]||'').trim()})){o.date=o.date||today();store.items.t1=o;store.cur='t1'}}catch(e){}
+  }
+  function persist(){
+    try{localStorage.setItem(KEY,JSON.stringify(store));return true}catch(e){saved.textContent='이 브라우저는 자동 저장이 안 됩니다. PDF로 저장해 주세요.';return false}
+  }
+  function newTeam(){var id='t'+Date.now();store.items[id]={date:today()};store.cur=id;data=store.items[id]}
+  if(!store.cur||!store.items[store.cur]){var ids=Object.keys(store.items);if(ids.length){store.cur=ids[ids.length-1]}else newTeam()}
+  data=store.items[store.cur];
   function val(k){return (data[k]||'').trim()}
   function first(k){return val(k).split('\n')[0].replace(/^[-•·\s]+/,'')}
   function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
-  function render(){
-    fields.forEach(function(f){f.value=data[f.dataset.k]||''});
-    update();
+  function label(it){return ((it.team||'').trim()||'이름 없는 팀')+(it.date?' · '+it.date.slice(5):'')}
+  function buildPick(){
+    pick.innerHTML='';
+    Object.keys(store.items).forEach(function(id){var op=document.createElement('option');op.value=id;op.textContent=label(store.items[id]);if(id===store.cur)op.selected=true;pick.appendChild(op)});
   }
+  function render(){fields.forEach(function(f){f.value=data[f.dataset.k]||''});buildPick();update()}
   function update(){
-    function slot(k,label){var v=first(k);return v?'<b>'+esc(v)+'</b>':'<span class="blank">['+label+']</span>'}
+    function slot(k,l){var v=first(k);return v?'<b>'+esc(v)+'</b>':'<span class="blank">['+l+']</span>'}
     document.getElementById('pitch').innerHTML='우리는 '+slot('cs','① 고객')+'에게 '+slot('vp','② 가치')+'을(를) '+slot('ch','③ 채널')+'(으)로 전하고, '+slot('rv','⑤ 수익')+'(으)로 돈을 법니다.';
-    document.getElementById('printTitle').textContent='비즈니스 모델 캔버스 — '+(val('team')||'팀 이름')+' | '+(val('idea')||'아이디어');
+    document.getElementById('ptLeft').textContent='비즈니스 모델 캔버스 — '+(val('team')||'팀 이름')+(val('idea')?' | '+val('idea'):'');
+    document.getElementById('ptRight').textContent=(val('date')||'')+' · 멘토 오예림';
     var next=null;
     for(var i=0;i<order.length;i++){if(!val(order[i])){next=order[i];break}}
-    document.querySelectorAll('.cell').forEach(function(c){
-      c.classList.toggle('now',c.querySelector('textarea').dataset.k===next);
-    });
+    document.querySelectorAll('.cell').forEach(function(c){c.classList.toggle('now',c.querySelector('textarea').dataset.k===next)});
+    var op=pick.querySelector('option[value="'+store.cur+'"]');if(op)op.textContent=label(data);
   }
   function save(){
     fields.forEach(function(f){data[f.dataset.k]=f.value});
-    try{localStorage.setItem(KEY,JSON.stringify(data));saved.textContent='저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}
-    catch(e){saved.textContent='이 브라우저는 자동 저장이 안 됩니다. PDF로 저장해 주세요.'}
+    if(persist())saved.textContent='저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
     update();
   }
   fields.forEach(function(f){f.addEventListener('input',save)});
-  document.getElementById('btnPrint').addEventListener('click',function(){window.print()});
-  document.getElementById('btnCopy').addEventListener('click',function(){
-    var b=this,t='[비즈니스 모델 캔버스]\n팀: '+val('team')+'\n아이디어: '+val('idea')+'\n';
-    order.forEach(function(k,i){t+='\n'+(i+1)+'. '+names[k]+'\n'+(val(k)||'(아직 비어 있음)')+'\n'});
-    function done(){b.textContent='복사했습니다';setTimeout(function(){b.textContent='글로 복사'},1500)}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback)}else fallback();
-    function fallback(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
+  pick.addEventListener('change',function(){store.cur=pick.value;data=store.items[store.cur];persist();render()});
+  document.getElementById('btnNew').addEventListener('click',function(){newTeam();persist();render();document.getElementById('team').focus();saved.textContent='새 팀을 만들었습니다'});
+  var baseTitle=document.title;
+  document.getElementById('btnPrint').addEventListener('click',function(){
+    document.title='BMC_'+(val('team')||'팀')+'_'+(val('date')||today());
+    window.print();
   });
-  var resetArmed=false;
+  window.addEventListener('afterprint',function(){document.title=baseTitle});
+  document.getElementById('btnCopy').addEventListener('click',function(){
+    var b=this,t='[비즈니스 모델 캔버스]\n팀: '+val('team')+'\n아이디어: '+val('idea')+'\n날짜: '+val('date')+'\n';
+    order.forEach(function(k,i){t+='\n'+(i+1)+'. '+names[k]+'\n'+(val(k)||'(아직 비어 있음)')+'\n'});
+    t+='\n[멘토 의견]\n'+(val('memo')||'-')+'\n\n[다음 만남까지 할 일]\n'+(val('todo')||'-')+'\n';
+    function done(){b.textContent='복사했습니다';setTimeout(function(){b.textContent='글로 복사'},1500)}
+    function fallback(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback)}else fallback();
+  });
+  var armed=false;
   document.getElementById('btnReset').addEventListener('click',function(){
     var b=this;
-    if(!resetArmed){resetArmed=true;b.textContent='한 번 더 누르면 지워집니다';setTimeout(function(){resetArmed=false;b.textContent='전부 지우기'},3000);return}
-    resetArmed=false;b.textContent='전부 지우기';data={};try{localStorage.removeItem(KEY)}catch(e){}render();saved.textContent='모두 지웠습니다';
+    if(!armed){armed=true;b.textContent='한 번 더 누르면 지워집니다';setTimeout(function(){armed=false;b.textContent='이 팀 지우기'},3000);return}
+    armed=false;b.textContent='이 팀 지우기';
+    delete store.items[store.cur];
+    var ids=Object.keys(store.items);
+    if(ids.length){store.cur=ids[ids.length-1];data=store.items[store.cur]}else newTeam();
+    persist();render();saved.textContent='지웠습니다';
   });
   document.getElementById('btnExample').addEventListener('click',function(){
-    var has=order.some(function(k){return val(k)});
-    if(has){saved.textContent='이미 쓴 내용이 있어 예시를 넣지 않았습니다. 먼저 전부 지우기를 눌러 주세요.';return}
-    data={team:'예시팀',idea:'혼자 사는 대학생을 위한 반찬 소분 배달',
+    if(order.some(function(k){return val(k)})){saved.textContent='이미 쓴 내용이 있습니다. "+ 새 팀"을 만든 뒤 예시를 눌러 주세요.';return}
+    var ex={team:'예시팀',idea:'혼자 사는 대학생을 위한 반찬 소분 배달',date:today(),
       cs:'학교 근처에서 자취하는 대학생\n요리는 귀찮고 배달은 비싼 사람\n먼저 살 사람: 기숙사에서 나온 2학년',
       vp:'1인분씩 나눈 집반찬 5가지를 주 1회\n배달 음식 한 번 값으로 일주일 반찬\n남아서 버리는 반찬이 없음',
       ch:'학교 커뮤니티 앱, 자취방 건물 전단\n카카오톡 채널로 주문\n수요일 저녁 문 앞 배달',
@@ -162,11 +201,13 @@ footer{max-width:1400px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
       kr:'공유주방, 조리 가능한 팀원 1명\n소분 용기, 배달 가능한 시간',
       ka:'메뉴 정하기와 장보기\n조리·소분·배달\n후기 모으기',
       kp:'학교 앞 반찬가게, 공유주방\n자취방 건물 관리인',
-      co:'재료비, 공유주방 사용료\n용기·포장비\n배달 교통비'};
-    try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}
-    render();saved.textContent='예시입니다. 전부 지우기를 누르고 우리 팀 내용으로 쓰세요.';
+      co:'재료비, 공유주방 사용료\n용기·포장비\n배달 교통비',
+      memo:'고객이 구체적임. 가격 근거가 아직 없음.',
+      todo:'자취생 5명에게 "지금 반찬에 한 달 얼마 쓰는지" 물어보기'};
+    Object.keys(ex).forEach(function(k){data[k]=ex[k]});
+    persist();render();saved.textContent='예시입니다. "이 팀 지우기"로 지울 수 있습니다.';
   });
-  render();
+  persist();render();
 })();
 </script>
 </body>
