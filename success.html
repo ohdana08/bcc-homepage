@@ -59,13 +59,9 @@
       <p class="summary" id="summary"></p>
 
       <div class="pw-title">비밀번호 설정 (선택)</div>
-      <p class="pw-desc">설정하지 않아도 결제는 완료됐습니다. 나중에 설정해도 됩니다.</p>
+      <p class="pw-desc">설정하지 않아도 결제는 완료됐습니다. 결제에 쓴 이메일로 설정 링크를 보내 드려요. 본인 확인을 위해 메일의 링크에서 비밀번호를 정합니다.</p>
       <form id="pwForm" novalidate>
-        <div class="row">
-          <label for="pw">비밀번호 (8자 이상)</label>
-          <input id="pw" type="password" minlength="8" autocomplete="new-password" />
-        </div>
-        <button type="submit" class="btn btn-gold" id="pwBtn">비밀번호 설정하고 마이페이지로</button>
+        <button type="submit" class="btn btn-gold" id="pwBtn">비밀번호 설정 메일 받기</button>
         <a class="btn btn-ghost" href="mypage.html">나중에 할게요 (마이페이지)</a>
         <p id="pwStatus" class="status" role="status" aria-live="polite"></p>
       </form>
@@ -120,26 +116,25 @@
   // 비밀번호 설정 (선택)
   document.getElementById('pwForm').addEventListener('submit', function(e){
     e.preventDefault();
-    var pw = document.getElementById('pw').value;
     var btn = document.getElementById('pwBtn');
     var st = document.getElementById('pwStatus');
     function setSt(m,k){ st.textContent=m; st.className='status'+(k?' '+k:''); }
 
-    if(pw.length < 8){ setSt('비밀번호는 8자 이상이어야 합니다.','err'); return; }
     if(!customerEmail){ setSt('계정 정보를 확인하지 못했습니다.','err'); return; }
 
-    btn.disabled = true; setSt('설정 중…');
+    btn.disabled = true; setSt('메일을 보내는 중…');
     fetch(API + '/api/set-password', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ orderId:orderId, email:customerEmail, password:pw })
+      body: JSON.stringify({ orderId:orderId, email:customerEmail })
     }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
     .then(function(res){
-      if(!res.ok || !res.j.success){ throw new Error(res.j && res.j.error || '설정 실패'); }
-      track('sign_up', { method:'password' });
-      setSt('완료! 마이페이지로 이동합니다…','ok');
-      setTimeout(function(){ location.href = 'mypage.html'; }, 900);
+      if(!res.ok || !res.j.success){ throw new Error(res.j && res.j.error || '메일 발송 실패'); }
+      track('sign_up', { method:'password_email_link' });
+      setSt('메일을 보냈습니다. ' + customerEmail + ' 메일함에서 링크를 열어 비밀번호를 설정해 주세요. (1시간 안에, 스팸함도 확인)','ok');
+      btn.textContent = '메일 다시 받기';
+      setTimeout(function(){ btn.disabled = false; }, 60000);
     }).catch(function(err){
-      setSt((err && err.message) || '비밀번호 설정에 실패했습니다.','err');
+      setSt((err && err.message) || '메일 발송에 실패했습니다.','err');
       btn.disabled = false;
     });
   });
