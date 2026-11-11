@@ -1,8 +1,5 @@
-// Claude 101 유료 과정 API 묶음 — Vercel Hobby 함수 수 제한 안에서
-// 수강권 확인, 그로블 결제 준비, 결제·환불 웹훅을 한 함수로 처리한다.
-import courseAccess from '../lib/claude101-api/course-access.js';
-import grobleCheckout from '../lib/claude101-api/groble-checkout.js';
-import grobleEvent from '../lib/claude101-api/groble-claude101-event.js';
+// Claude 101·운영 도구 API 묶음 — Vercel Hobby 함수 수 제한 안에서 여러 기능을 한 함수로 처리한다.
+// (손님용 회원·결제 기능은 2026-11-12 제거. 실습팩 판매는 그로블 링크로만 한다.)
 import publicSample from '../lib/claude101-api/public-sample.js';
 import documentMate from '../lib/document-mate/handler.js';
 import { handleProjectInstruction } from '../lib/project-instruction/handler.js';
@@ -18,9 +15,6 @@ const HANDLERS = {
   'lecture-operations': handleLectureOperations,
   'lecture-request': handleLectureRequest,
   'lecture-request-attachments': handleLectureRequestAttachments,
-  'course-access': courseAccess,
-  'groble-checkout': grobleCheckout,
-  'groble-event': grobleEvent,
   'public-sample': publicSample,
   'document-mate': documentMate,
   'project-instruction': handleProjectInstruction,

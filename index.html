@@ -4,10 +4,10 @@
 <meta name="facebook-domain-verification" content="sxs1dtezvt18esr0tbg26cbx79puxi" />
 <script>(function(){if(location.hostname==="ohdana08.github.io"){var p=location.pathname.replace("/bcc-homepage","")||"/";location.replace("https://bccconsulting.kr"+p+location.search+location.hash);return;}
 var h=location.hash;
-if(h==="#login"){location.replace("mypage.html"+location.search);return;}
-if(h==="#signup"){location.replace("signup.html"+location.search);return;}
+
+
 /* 예전 메인의 섹션 앵커 → 분리된 페이지로 안내 */
-var map={"#itschool":"online.html","#outcomes":"online.html","#tools":"tools.html","#services":"education.html","#process":"education.html#process","#faq":"education.html#faq","#account":"mypage.html","#reviews":"#results","#about":"#instructor","#explog":"#results","#osmu":"#results"};
+var map={"#itschool":"online.html","#outcomes":"online.html","#tools":"tools.html","#services":"education.html","#process":"education.html#process","#faq":"education.html#faq","#reviews":"#results","#about":"#instructor","#explog":"#results","#osmu":"#results"};
 if(map[h]&&map[h].charAt(0)!=="#"){location.replace(map[h]+location.search);return;}
 if(map[h]&&map[h].charAt(0)==="#"){location.hash=map[h];}
 })();</script>
@@ -89,11 +89,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <a href="tools.html" data-nav="ittools">잇툴즈</a>
       <a href="/ddakfit/">딱지원핏</a>
       <a href="ai-instructor/">강사 소개</a>
-      <a href="signup.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login nav-signup" data-nav="signup" id="navSignup">회원가입</a>
-      <a href="mypage.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login" data-nav="login" id="navLogin">로그인</a>
-      <a href="admin.html" class="nav-login" id="navAdmin" hidden>관리자</a>
-      <span class="nav-user" id="navUser" hidden></span>
-      <a href="#" class="nav-login" id="navLogout" hidden>로그아웃</a>
     </div>
     <div class="nav-actions">
       <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
@@ -478,9 +473,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <a href="https://blog.naver.com/biz_cc" target="_blank" rel="noopener">네이버 블로그</a>
       </div>
       <div>
-        <b>계정·정책</b>
-        <a href="signup.html?utm_source=homepage&amp;utm_medium=footer&amp;utm_campaign=always_on">회원가입</a>
-        <a href="mypage.html?utm_source=homepage&amp;utm_medium=footer&amp;utm_campaign=always_on">로그인 · 마이페이지</a>
+        <b>정책</b>
         <a href="privacy.html">개인정보처리방침</a>
         <a href="refund.html">환불정책</a>
       </div>
@@ -565,46 +558,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })();
 </script>
 
-<!-- 로그인 상태 헤더 -->
-<script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-  const API = window.BCC_API_BASE || 'https://bcc-homepage.vercel.app';
-  const $ = (id) => document.getElementById(id);
-  let sb = null;
-  async function client() {
-    if (sb) return sb;
-    const c = await fetch(API + '/api/config').then((r) => r.json());
-    if (!c.supabaseUrl || !c.supabaseAnonKey) return null;
-    sb = createClient(c.supabaseUrl, c.supabaseAnonKey);
-    return sb;
-  }
-  function render(state) {
-    const on = !!state;
-    $('navSignup').hidden = on; $('navLogin').hidden = on; $('navUser').hidden = !on; $('navLogout').hidden = !on;
-    $('navAdmin').hidden = !(on && state.isAdmin);
-    if (on) $('navUser').textContent = (state.name || '회원') + ' 님';
-  }
-  let refreshing = false;
-  async function refresh() {
-    if (refreshing) return; refreshing = true;
-    try {
-      const c = await client(); if (!c) return;
-      const { data: { session } } = await c.auth.getSession();
-      if (!session) { render(null); return; }
-      let name = session.user?.user_metadata?.name || (session.user?.email || '').split('@')[0];
-      let isAdmin = false;
-      try {
-        const r = await fetch(API + '/api/my-enrollments', { headers: { Authorization: 'Bearer ' + session.access_token } });
-        if (r.ok) { const d = await r.json(); if (d.profile) { name = d.profile.name || name; isAdmin = !!d.profile.is_admin; } }
-      } catch (e) {}
-      render({ name, isAdmin });
-    } catch (e) {} finally { refreshing = false; }
-  }
-  refresh();
-  client().then((c) => { if (c) c.auth.onAuthStateChange(() => refresh()); });
-  window.addEventListener('storage', (e) => { if (!e.key || e.key.includes('auth-token')) refresh(); });
-  $('navLogout').addEventListener('click', async (ev) => { ev.preventDefault(); try { const c = await client(); if (c) await c.auth.signOut(); } catch (e) {} render(null); });
-</script>
 <script>
 (function(){var imgs=document.querySelectorAll('.hero-bgs .hero-bg');if(imgs.length<2)return;var caps=['동래여성인력개발센터 예비 창업자 기본교육 · 2025.02','부산경제진흥원 취업캠프 · ChatGPT로 취업력 키우기 · 2024.11','창업 성장·투자유치 전략 교육 · 2024.11','부경대학교 워크숍 · 2023.09','송이공방 ChatGPT 활용 교육 · 2024.05'];var cap=document.getElementById('heroCap');var i=0;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;setInterval(function(){imgs[i].classList.remove('is-on');i=(i+1)%imgs.length;imgs[i].classList.add('is-on');if(cap&&caps[i])cap.textContent=caps[i];},6000);})();
 </script>

@@ -60,11 +60,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <a href="tools.html" data-nav="ittools">잇툴즈</a>
       <a href="/ddakfit/">딱지원핏</a>
       <a href="ai-instructor/">강사 소개</a>
-      <a href="signup.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login nav-signup" data-nav="signup" id="navSignup">회원가입</a>
-      <a href="mypage.html?utm_source=homepage&amp;utm_medium=nav&amp;utm_campaign=always_on" class="nav-login" data-nav="login" id="navLogin">로그인</a>
-      <a href="admin.html" class="nav-login" id="navAdmin" hidden>관리자</a>
-      <span class="nav-user" id="navUser" hidden></span>
-      <a href="#" class="nav-login" id="navLogout" hidden>로그아웃</a>
     </div>
     <div class="nav-actions">
       <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener" class="nav-cta" data-kakao="nav">카톡 상담</a>
@@ -399,9 +394,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <a href="https://blog.naver.com/biz_cc" target="_blank" rel="noopener">네이버 블로그</a>
       </div>
       <div>
-        <b>계정·정책</b>
-        <a href="signup.html?utm_source=homepage&amp;utm_medium=footer&amp;utm_campaign=always_on">회원가입</a>
-        <a href="mypage.html?utm_source=homepage&amp;utm_medium=footer&amp;utm_campaign=always_on">로그인 · 마이페이지</a>
+        <b>정책</b>
         <a href="privacy.html">개인정보처리방침</a>
         <a href="refund.html">환불정책</a>
       </div>
@@ -421,46 +414,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </div>
 
 
-<!-- 로그인 상태 헤더 -->
-<script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-  const API = window.BCC_API_BASE || 'https://bcc-homepage.vercel.app';
-  const $ = (id) => document.getElementById(id);
-  let sb = null;
-  async function client() {
-    if (sb) return sb;
-    const c = await fetch(API + '/api/config').then((r) => r.json());
-    if (!c.supabaseUrl || !c.supabaseAnonKey) return null;
-    sb = createClient(c.supabaseUrl, c.supabaseAnonKey);
-    return sb;
-  }
-  function render(state) {
-    const on = !!state;
-    $('navSignup').hidden = on; $('navLogin').hidden = on; $('navUser').hidden = !on; $('navLogout').hidden = !on;
-    $('navAdmin').hidden = !(on && state.isAdmin);
-    if (on) $('navUser').textContent = (state.name || '회원') + ' 님';
-  }
-  let refreshing = false;
-  async function refresh() {
-    if (refreshing) return; refreshing = true;
-    try {
-      const c = await client(); if (!c) return;
-      const { data: { session } } = await c.auth.getSession();
-      if (!session) { render(null); return; }
-      let name = session.user?.user_metadata?.name || (session.user?.email || '').split('@')[0];
-      let isAdmin = false;
-      try {
-        const r = await fetch(API + '/api/my-enrollments', { headers: { Authorization: 'Bearer ' + session.access_token } });
-        if (r.ok) { const d = await r.json(); if (d.profile) { name = d.profile.name || name; isAdmin = !!d.profile.is_admin; } }
-      } catch (e) {}
-      render({ name, isAdmin });
-    } catch (e) {} finally { refreshing = false; }
-  }
-  refresh();
-  client().then((c) => { if (c) c.auth.onAuthStateChange(() => refresh()); });
-  window.addEventListener('storage', (e) => { if (!e.key || e.key.includes('auth-token')) refresh(); });
-  $('navLogout').addEventListener('click', async (ev) => { ev.preventDefault(); try { const c = await client(); if (c) await c.auth.signOut(); } catch (e) {} render(null); });
-</script>
 <script>
 (function(){var el=document.getElementById('itRotate');if(!el)return;var words=['지원사업 찾기','공고 진단','사업계획서 초안','한 달 손익 계산','면접 연습','AI 업무지시서'];var i=0;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;setInterval(function(){el.classList.add('is-out');setTimeout(function(){i=(i+1)%words.length;el.textContent=words[i];el.classList.remove('is-out');},380);},2600);})();
 </script>

@@ -1,11 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cleanup-pending",
-      "schedule": "0 0 * * *"
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/lecture-operations",
@@ -36,20 +30,8 @@
       "destination": "/api/claude101-suite?fn=document-mate"
     },
     {
-      "source": "/api/course-access",
-      "destination": "/api/claude101-suite?fn=course-access"
-    },
-    {
       "source": "/api/claude101-public-sample",
       "destination": "/api/claude101-suite?fn=public-sample"
-    },
-    {
-      "source": "/api/groble-checkout",
-      "destination": "/api/claude101-suite?fn=groble-checkout"
-    },
-    {
-      "source": "/api/groble-claude101-event",
-      "destination": "/api/claude101-suite?fn=groble-event"
     }
   ],
   "functions": {

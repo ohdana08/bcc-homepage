@@ -20,7 +20,7 @@
   if (/^\/admin/.test(path) || /^\/gyeol\//.test(path)) return;
 
   // 로그인·구매자 전용 영역: 페이지뷰만 보내고 세션 리플레이는 끈다.
-  var NO_REPLAY = /^\/(mypage\.html|course-claude101-pro\.html|signup\.html|success\.html|fail\.html)$/.test(path);
+  var NO_REPLAY = false; // 회원·결제 페이지 제거(2026-11-12)로 녹화 제외 대상 없음
 
   /* ---------- GA4 ---------- */
   if (!document.querySelector('script[src*="gtag/js?id=' + GA4_ID + '"]')) {
