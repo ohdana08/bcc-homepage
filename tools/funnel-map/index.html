@@ -26,9 +26,15 @@ button.warn{color:var(--red)}
 .box>.q{font-size:14px;color:var(--mute);margin:0 0 10px}
 .lead{font-size:15px;margin:0}
 .lead b{color:var(--blue)}
-.top{display:grid;grid-template-columns:2fr 2fr 1fr;gap:10px}
+.top{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.top .full{grid-column:1/-1}
+.goalrow{display:flex;gap:8px;flex-wrap:wrap}
+.goalrow select{width:auto;min-width:150px}
+.goalrow input{flex:1;min-width:160px}
+.top textarea{width:100%;min-height:68px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;line-height:1.5;resize:vertical;background:#fff;color:var(--ink);overflow:hidden}
+.top .tip{font-size:12.5px;color:var(--mute);margin:4px 0 0}
 label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:4px}
-.top input,.top select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;background:#fff;color:var(--ink)}
+.top input,.top select{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;background:#fff;color:var(--ink)}
 .groups{display:grid;gap:10px}
 .grp h3{font-size:13px;color:var(--mute);margin:0 0 6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -100,6 +106,9 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   .col{border-radius:0;padding:6px}
   .col:not(:last-child)::after{display:none}
   .col textarea{border:none;background:#fff;min-height:0;resize:none;font-size:11px;padding:2px}
+  .top{grid-template-columns:1fr 1fr;gap:4px}
+  .top textarea,.top input,.top select{border:none;padding:2px;font-size:11px;min-height:0;resize:none}
+  .top .tip,.goalrow input[hidden]{display:none}
   .node{padding:4px 6px}
   .node b{font-size:12px;margin:0}
   .bands{display:grid}
@@ -130,11 +139,18 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
 
   <section class="box">
     <h2>① 내 사업</h2>
-    <p class="q">고객은 "모든 사람" 말고 얼굴이 떠오르는 한 사람으로 적어 주세요.</p>
+    <p class="q">한 줄로 짧게 써도 되고, 생각나는 대로 길게 설명해도 됩니다. 길게 쓸수록 "AI에게 물어볼 글"의 답이 구체적으로 나옵니다. 고객은 "모든 사람" 말고 얼굴이 떠오르는 한 사람으로 적어 주세요.</p>
     <div class="top">
-      <div><label for="biz">무엇을 파나요</label><input id="biz" data-k="biz" placeholder="예: 생활 도자기 원데이 클래스"></div>
-      <div><label for="who">누가 사나요 (한 사람)</label><input id="who" data-k="who" placeholder="예: 주말 취미를 찾는 30대 직장인"></div>
-      <div><label for="goal">마지막에 고객이 할 행동</label><select id="goal" data-k="goal"><option>구매</option><option>예약</option><option>상담 신청</option><option>수강 신청</option><option>매장 방문</option><option>문의</option></select></div>
+      <div><label for="biz">무엇을 파나요</label><textarea id="biz" rows="2" placeholder="예: 생활 도자기 원데이 클래스&#10;(길게) 2시간 동안 컵이나 접시를 직접 만들고, 2주 뒤 구워서 택배로 보내드려요. 1인 5만 원, 커플 할인도 있어요."></textarea></div>
+      <div><label for="who">누가 사나요 (한 사람)</label><textarea id="who" rows="2" placeholder="예: 주말 취미를 찾는 30대 직장인&#10;(길게) 평일엔 야근이 많아 주말엔 손으로 뭔가 해보고 싶어 해요. 인스타에서 공방 사진을 자주 저장하지만 혼자 가기는 망설여요."></textarea></div>
+      <div class="full"><label for="goal">마지막에 고객이 할 행동</label>
+        <div class="goalrow">
+          <select id="goal"><option>구매</option><option>예약</option><option>상담 신청</option><option>수강 신청</option><option>매장 방문</option><option>문의</option><option value="__custom">직접 적기</option></select>
+          <input id="goalCustom" maxlength="20" placeholder="짧게 이름 붙이기 (예: 체험 신청)" hidden>
+        </div>
+        <textarea id="goalDetail" rows="2" style="margin-top:8px" placeholder="(선택) 고객이 실제로 하는 일을 자세히. 예: 카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 1만 원 입금하면 확정"></textarea>
+        <p class="tip">지도와 길에는 위에서 고른 짧은 이름이 쓰이고, 자세한 설명은 글 복사·AI 질문에 들어갑니다.</p>
+      </div>
     </div>
   </section>
 
@@ -206,9 +222,10 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   var GROUPS=['영상','SNS·광고','검색','오프라인','연결·판매'];
   var BASE={};CH.forEach(function(c){BASE[c[0]]={name:c[1],group:c[2],stage:c[3]}});
 
-  function blank(){return {biz:'',who:'',goal:'구매',sel:{},order:[],custom:{},msg:{1:'',2:'',3:'',4:''}}}
+  var GOALS=['구매','예약','상담 신청','수강 신청','매장 방문','문의'];
+  function blank(){return {biz:'',who:'',goal:'구매',goalPick:'구매',goalCustom:'',goalDetail:'',sel:{},order:[],custom:{},msg:{1:'',2:'',3:'',4:''}}}
   var st=blank();
-  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.sel){st=s;st.msg=st.msg||{1:'',2:'',3:'',4:''};st.custom=st.custom||{};st.order=st.order||Object.keys(st.sel);st.goal=st.goal||'구매'}}catch(e){}
+  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.sel){st=s;st.msg=st.msg||{1:'',2:'',3:'',4:''};st.custom=st.custom||{};st.order=st.order||Object.keys(st.sel);st.goal=st.goal||'구매';if(!st.goalPick){st.goalPick=GOALS.indexOf(st.goal)>=0?st.goal:'__custom';st.goalCustom=st.goalPick==='__custom'?st.goal:''}st.goalCustom=st.goalCustom||'';st.goalDetail=st.goalDetail||''}}catch(e){}
 
   var $=function(id){return document.getElementById(id)};
   var saved=$('saved');
@@ -338,13 +355,19 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     $('diag').innerHTML=diagnose().map(function(o){return '<li class="'+o.c+'"><b>'+esc(o.t)+'</b>'+esc(o.d)+'</li>'}).join('');
   }
 
+  function short(v,n){v=(v||'').trim().split('\n')[0];return v.length>n?v.slice(0,n)+'…':v}
+  function grow(el){el.style.height='auto';el.style.height=el.scrollHeight+2+'px'}
+  function syncGoal(){st.goal=st.goalPick==='__custom'?((st.goalCustom||'').trim()||'행동'):st.goalPick}
+  function setTitle(){$('ptLeft').textContent=(short(st.biz,40)||'내 사업')+(st.who?' · 고객: '+short(st.who,40):'')}
   function renderTop(){
-    ['biz','who','goal'].forEach(function(k){$(k).value=st[k]||(k==='goal'?'구매':'')});
-    $('ptLeft').textContent=(st.biz||'내 사업')+(st.who?' · 고객: '+st.who:'');
+    $('biz').value=st.biz||'';$('who').value=st.who||'';$('goal').value=st.goalPick||'구매';
+    $('goalCustom').value=st.goalCustom||'';$('goalCustom').hidden=st.goalPick!=='__custom';$('goalDetail').value=st.goalDetail||'';
+    ['biz','who','goalDetail'].forEach(function(k){grow($(k))});
+    setTitle();
   }
 
   function renderAll(){renderTop();renderGroups();renderMap();renderPaths();renderDiag()}
-  function renderLive(){renderPaths();renderDiag();$('ptLeft').textContent=(st.biz||'내 사업')+(st.who?' · 고객: '+st.who:'')}
+  function renderLive(){renderPaths();renderDiag();setTitle()}
 
   $('groups').addEventListener('click',function(e){var b=e.target.closest('.chip');if(b)toggle(b.dataset.id)});
   $('map').addEventListener('change',function(e){
@@ -353,8 +376,10 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     else if(t.dataset.next){st.sel[t.dataset.next].next=t.value;persist();renderMap();renderLive()}
   });
   $('map').addEventListener('input',function(e){var t=e.target;if(t.dataset.msg){st.msg[t.dataset.msg]=t.value;persist();renderDiag()}});
-  ['biz','who'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;persist();renderLive()})});
-  $('goal').addEventListener('change',function(){st.goal=this.value;persist();renderMap();renderLive()});
+  ['biz','who','goalDetail'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;grow(this);persist();renderLive()})});
+  $('goal').addEventListener('change',function(){st.goalPick=this.value;$('goalCustom').hidden=this.value!=='__custom';if(this.value==='__custom')$('goalCustom').focus();syncGoal();persist();renderMap();renderLive()});
+  $('goalCustom').addEventListener('input',function(){st.goalCustom=this.value;syncGoal();persist();renderMap();renderLive()});
+  window.addEventListener('resize',function(){['biz','who','goalDetail'].forEach(function(k){grow($(k))})});
   function addCustom(){
     var v=$('customName').value.trim();if(!v)return;
     var id='c'+Date.now();st.custom[id]=v;st.sel[id]={stage:1,next:''};st.order.push(id);
@@ -364,7 +389,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   $('customName').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addCustom()}});
 
   function summaryText(){
-    var t='[마케팅 경로 지도]\n무엇을: '+(st.biz||'-')+'\n누가: '+(st.who||'-')+'\n마지막 행동: '+st.goal+'\n';
+    var t='[마케팅 경로 지도]\n무엇을: '+((st.biz||'').trim()||'-')+'\n누가: '+((st.who||'').trim()||'-')+'\n마지막 행동: '+st.goal+((st.goalDetail||'').trim()?'\n마지막 행동 자세히: '+st.goalDetail.trim():'')+'\n';
     STAGES.forEach(function(S){
       var l=byStage(S.n);
       t+='\n'+S.n+'. '+S.t+' ('+S.s+')\n- 하는 곳: '+(l.length?l.map(function(id){return nameOf(id)+' → '+(st.sel[id].next?nextLabel(st.sel[id].next):'(다음 없음)')}).join(' / '):'(비어 있음)')+'\n- 할 말: '+((st.msg[S.n]||'').trim()||'(비어 있음)')+'\n';
@@ -382,7 +407,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   }
   $('btnCopy').addEventListener('click',function(){copy(this,summaryText(),'글로 복사')});
   $('btnPrompt').addEventListener('click',function(){
-    var p='너는 소상공인·1인 사업자를 돕는 마케팅 코치야. 아래는 내가 그린 마케팅 경로 지도야.\n\n'+summaryText()+
+    var p='너는 소상공인·1인 사업자를 돕는 마케팅 코치야. 아래는 내가 그린 마케팅 경로 지도야. 내가 길게 설명한 부분이 있으면 거기서 고객의 상황과 망설이는 이유를 찾아 답에 활용해줘.\n\n'+summaryText()+
       '\n\n아래 순서로 도와줘.\n1. 끊긴 곳과 빈 단계를 채울 방법을 내 사업에 맞게 2가지씩 제안해줘. 돈이 덜 들고 혼자 할 수 있는 것부터.\n2. 단계별로 고객에게 할 말을 3개씩 써줘. 1·2단계는 "사세요" 없이 고객이 듣고 싶은 말, 3단계는 믿을 근거, 4단계는 "무엇을 누르면 무엇을 받는지" 한 문장.\n3. 앞으로 2주 동안 할 일을 하루 30분 기준으로 순서대로 정리해줘.\n\n지키기: 내가 적지 않은 숫자·후기·성과는 지어내지 말고, 모르는 건 나에게 먼저 물어봐줘. 쉬운 말로 써줘.';
     copy(this,p,'AI에게 물어볼 글 복사');
   });
@@ -397,7 +422,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   });
   $('btnExample').addEventListener('click',function(){
     if(selIds().length||st.biz||st.who){saved.textContent='이미 쓴 내용이 있습니다. "처음부터"로 지운 뒤 예시를 눌러 주세요.';return}
-    st={biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',custom:{},
+    st={biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',goalPick:'예약',goalCustom:'',goalDetail:'카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 입금하면 확정',custom:{},
       sel:{shorts:{stage:1,next:'insta'},flyer:{stage:1,next:'kakao'},insta:{stage:2,next:'place'},place:{stage:3,next:'booking'},booking:{stage:4,next:'goal'},kakao:{stage:4,next:'goal'}},
       order:['shorts','flyer','insta','place','booking','kakao'],
       msg:{1:'흙 만지는 40초 영상 — "퇴근 후 2시간, 내 그릇이 생깁니다"',2:'처음이어도 되는지, 몇 시간 걸리는지, 완성품은 언제 받는지',3:'수강생 작품 사진과 후기, 공방 내부 사진',4:'토요일·일요일 시간표 + 예약 버튼 / 카톡 채널 추가하면 이번 달 시간표 안내'}};
