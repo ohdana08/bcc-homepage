@@ -59,8 +59,10 @@ label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bott
 .node .rm{flex:none;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;color:var(--mute)}
 .node .rm:hover{color:var(--red);border-color:var(--red)}
 button:disabled{opacity:.45;cursor:default}
+.maptools{display:flex;gap:10px;align-items:center}
+.undo2{font-size:13px;padding:6px 12px;border-color:var(--blue);color:var(--blue)}
 .backlink{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:10;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:10;width:max-content;max-width:calc(100% - 32px)}
 .toast[hidden]{display:none}
 .toast button{flex:none;white-space:nowrap;padding:6px 12px;font-size:13px;background:#fff;color:var(--navy);border:none}
 .node .row{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:4px}
@@ -104,7 +106,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
 @media print{
   @page{size:A4 portrait;margin:10mm}
   body{background:#fff}
-  header,.bar,footer,.toast,.node .rm,.backlink,#introBox,#pickBox,#caseBox,.add,.node select,.node .row,.lead{display:none}
+  header,.bar,footer,.toast,.undo2,.node .rm,.backlink,#introBox,#pickBox,#caseBox,.add,.node select,.node .row,.lead{display:none}
   main{padding:0;max-width:none}
   .print-title{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin:0 0 6px}
   .print-title span:last-child{font-weight:400;font-size:11px}
@@ -131,7 +133,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
 </div></header>
 <main>
   <div class="bar">
-    <button id="btnUndo" disabled title="방금 한 선택·연결·빼기를 되돌립니다">↶ 되돌리기</button>
+    <button id="btnUndo" disabled title="방금 한 선택·연결·빼기를 되돌립니다">↩ 되돌리기</button>
     <button id="btnExample">예시 보기</button>
     <button class="pri" id="btnPrint">PDF로 저장</button>
     <button id="btnCopy">글로 복사</button>
@@ -174,8 +176,8 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   </section>
 
   <section class="box">
-    <h2 style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">③ 경로 지도 <a class="backlink" href="#pickBox">↑ 채널 더 고르기</a></h2>
-    <p class="q">고른 것이 고객 단계별로 놓입니다. 칸이 틀렸으면 "단계"를, 그걸 본 고객이 다음에 어디로 가는지는 "다음"을 고르세요. 아래 칸에는 그 단계에서 고객에게 할 말을 적습니다. 잘못 골랐으면 "빼기", 방금 한 걸 취소하려면 맨 위 "되돌리기"를 누르세요.</p>
+    <h2 style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">③ 경로 지도 <span class="maptools"><button type="button" id="btnUndo2" class="undo2" disabled>↩ 되돌리기</button><a class="backlink" href="#pickBox">↑ 채널 더 고르기</a></span></h2>
+    <p class="q">고른 것이 고객 단계별로 놓입니다. 칸이 틀렸으면 "단계"를, 그걸 본 고객이 다음에 어디로 가는지는 "다음"을 고르세요. 아래 칸에는 그 단계에서 고객에게 할 말을 적습니다. 잘못 골랐으면 "빼기", 방금 한 걸 취소하려면 오른쪽 위 "↩ 되돌리기"를 누르세요.</p>
     <div class="bands"><div class="bi">유입 · 사세요 말고 고객이 듣고 싶은 말</div><div class="bo">전환 · 믿게 한 뒤 분명한 행동 하나</div></div>
     <div class="map" id="map"></div>
   </section>
@@ -246,7 +248,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   function byStage(n){return selIds().filter(function(id){return st.sel[id].stage===n})}
 
   var hist=[],toastTimer=null;
-  function updUndo(){$('btnUndo').disabled=!hist.length}
+  function updUndo(){$('btnUndo').disabled=$('btnUndo2').disabled=!hist.length}
   function snap(){hist.push(JSON.stringify(st));if(hist.length>30)hist.shift();updUndo()}
   function toast(msg,canUndo){
     $('toastMsg').textContent=msg;$('toastUndo').hidden=!canUndo;$('toast').hidden=false;
@@ -401,7 +403,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     else if(t.dataset.next){st.sel[t.dataset.next].next=t.value;persist();renderMap();renderLive()}
   });
   $('map').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b)toggle(b.dataset.rm)});
-  $('btnUndo').addEventListener('click',undo);$('toastUndo').addEventListener('click',undo);
+  $('btnUndo').addEventListener('click',undo);$('btnUndo2').addEventListener('click',undo);$('toastUndo').addEventListener('click',undo);
   $('map').addEventListener('input',function(e){var t=e.target;if(t.dataset.msg){st.msg[t.dataset.msg]=t.value;persist();renderDiag()}});
   ['biz','who','goalDetail'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;grow(this);persist();renderLive()})});
   $('goal').addEventListener('change',function(){st.goalPick=this.value;$('goalCustom').hidden=this.value!=='__custom';if(this.value==='__custom')$('goalCustom').focus();syncGoal();persist();renderMap();renderLive()});
