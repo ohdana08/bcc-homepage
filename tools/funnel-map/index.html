@@ -55,6 +55,14 @@ label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bott
 .node{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}
 .node.dead{border-color:var(--red);box-shadow:0 0 0 2px rgba(179,38,30,.15)}
 .node b{display:block;font-size:14.5px;margin-bottom:4px}
+.node .nh{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.node .rm{flex:none;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;color:var(--mute)}
+.node .rm:hover{color:var(--red);border-color:var(--red)}
+button:disabled{opacity:.45;cursor:default}
+.backlink{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:10;max-width:calc(100% - 32px)}
+.toast[hidden]{display:none}
+.toast button{flex:none;white-space:nowrap;padding:6px 12px;font-size:13px;background:#fff;color:var(--navy);border:none}
 .node .row{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:4px}
 .node .row span{flex:none;width:34px}
 .node select{flex:1;min-width:0;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
@@ -96,7 +104,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
 @media print{
   @page{size:A4 portrait;margin:10mm}
   body{background:#fff}
-  header,.bar,footer,#introBox,#pickBox,#caseBox,.add,.node select,.node .row,.lead{display:none}
+  header,.bar,footer,.toast,.node .rm,.backlink,#introBox,#pickBox,#caseBox,.add,.node select,.node .row,.lead{display:none}
   main{padding:0;max-width:none}
   .print-title{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin:0 0 6px}
   .print-title span:last-child{font-weight:400;font-size:11px}
@@ -123,6 +131,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
 </div></header>
 <main>
   <div class="bar">
+    <button id="btnUndo" disabled title="방금 한 선택·연결·빼기를 되돌립니다">↶ 되돌리기</button>
     <button id="btnExample">예시 보기</button>
     <button class="pri" id="btnPrint">PDF로 저장</button>
     <button id="btnCopy">글로 복사</button>
@@ -165,8 +174,8 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   </section>
 
   <section class="box">
-    <h2>③ 경로 지도</h2>
-    <p class="q">고른 것이 고객 단계별로 놓입니다. 칸이 틀렸으면 "단계"를, 그걸 본 고객이 다음에 어디로 가는지는 "다음"을 고르세요. 아래 칸에는 그 단계에서 고객에게 할 말을 적습니다.</p>
+    <h2 style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">③ 경로 지도 <a class="backlink" href="#pickBox">↑ 채널 더 고르기</a></h2>
+    <p class="q">고른 것이 고객 단계별로 놓입니다. 칸이 틀렸으면 "단계"를, 그걸 본 고객이 다음에 어디로 가는지는 "다음"을 고르세요. 아래 칸에는 그 단계에서 고객에게 할 말을 적습니다. 잘못 골랐으면 "빼기", 방금 한 걸 취소하려면 맨 위 "되돌리기"를 누르세요.</p>
     <div class="bands"><div class="bi">유입 · 사세요 말고 고객이 듣고 싶은 말</div><div class="bo">전환 · 믿게 한 뒤 분명한 행동 하나</div></div>
     <div class="map" id="map"></div>
   </section>
@@ -193,6 +202,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   </section>
   <p class="print-foot">BCC · bccconsulting.kr/tools/funnel-map/</p>
 </main>
+<div class="toast" id="toast" hidden role="status"><span id="toastMsg"></span><button type="button" id="toastUndo">되돌리기</button></div>
 <footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 수업이 끝나면 PDF로 저장해 두세요.</footer>
 
 <script>
@@ -235,7 +245,20 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   function selIds(){return st.order.filter(function(id){return st.sel[id]})}
   function byStage(n){return selIds().filter(function(id){return st.sel[id].stage===n})}
 
+  var hist=[],toastTimer=null;
+  function updUndo(){$('btnUndo').disabled=!hist.length}
+  function snap(){hist.push(JSON.stringify(st));if(hist.length>30)hist.shift();updUndo()}
+  function toast(msg,canUndo){
+    $('toastMsg').textContent=msg;$('toastUndo').hidden=!canUndo;$('toast').hidden=false;
+    clearTimeout(toastTimer);toastTimer=setTimeout(function(){$('toast').hidden=true},6000);
+  }
+  function undo(){
+    if(!hist.length)return;
+    try{st=JSON.parse(hist.pop())}catch(e){return}
+    persist();renderAll();updUndo();toast('되돌렸습니다',false);
+  }
   function toggle(id){
+    snap();var nm=nameOf(id),was=!!st.sel[id];
     if(st.sel[id]){
       delete st.sel[id];st.order=st.order.filter(function(x){return x!==id});
       Object.keys(st.sel).forEach(function(k){if(st.sel[k].next===id)st.sel[k].next=''});
@@ -245,6 +268,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
       st.sel[id]={stage:stg,next:stg===4?'goal':''};st.order.push(id);
     }
     persist();renderAll();
+    toast(was?'「'+nm+'」을(를) 뺐습니다':'「'+nm+'」을(를) '+st.sel[id].stage+'단계에 넣었습니다',true);
   }
 
   function renderGroups(){
@@ -269,7 +293,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
       if(!list.length)html+='<p class="hint">'+EMPTY_HINT[S.n]+'</p>';
       list.forEach(function(id){
         var it=st.sel[id],dead=!it.next;
-        html+='<div class="node'+(dead?' dead':'')+'"><b>'+esc(nameOf(id))+'</b>';
+        html+='<div class="node'+(dead?' dead':'')+'"><div class="nh"><b>'+esc(nameOf(id))+'</b><button type="button" class="rm" data-rm="'+id+'" aria-label="'+esc(nameOf(id))+' 빼기">✕ 빼기</button></div>';
         html+='<div class="row"><span>단계</span><select data-stage="'+id+'" aria-label="'+esc(nameOf(id))+' 단계">';
         STAGES.forEach(function(T){html+='<option value="'+T.n+'"'+(T.n===it.stage?' selected':'')+'>'+T.n+'. '+T.t+'</option>'});
         html+='</select></div><div class="row"><span>다음</span><select data-next="'+id+'" aria-label="'+esc(nameOf(id))+' 다음">';
@@ -372,9 +396,12 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   $('groups').addEventListener('click',function(e){var b=e.target.closest('.chip');if(b)toggle(b.dataset.id)});
   $('map').addEventListener('change',function(e){
     var t=e.target;
+    if(t.dataset.stage||t.dataset.next)snap();
     if(t.dataset.stage){st.sel[t.dataset.stage].stage=+t.value;persist();renderMap();renderLive()}
     else if(t.dataset.next){st.sel[t.dataset.next].next=t.value;persist();renderMap();renderLive()}
   });
+  $('map').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b)toggle(b.dataset.rm)});
+  $('btnUndo').addEventListener('click',undo);$('toastUndo').addEventListener('click',undo);
   $('map').addEventListener('input',function(e){var t=e.target;if(t.dataset.msg){st.msg[t.dataset.msg]=t.value;persist();renderDiag()}});
   ['biz','who','goalDetail'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;grow(this);persist();renderLive()})});
   $('goal').addEventListener('change',function(){st.goalPick=this.value;$('goalCustom').hidden=this.value!=='__custom';if(this.value==='__custom')$('goalCustom').focus();syncGoal();persist();renderMap();renderLive()});
@@ -382,7 +409,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   window.addEventListener('resize',function(){['biz','who','goalDetail'].forEach(function(k){grow($(k))})});
   function addCustom(){
     var v=$('customName').value.trim();if(!v)return;
-    var id='c'+Date.now();st.custom[id]=v;st.sel[id]={stage:1,next:''};st.order.push(id);
+    snap();var id='c'+Date.now();st.custom[id]=v;st.sel[id]={stage:1,next:''};st.order.push(id);
     $('customName').value='';persist();renderAll();saved.textContent='추가했습니다. 지도에서 단계를 맞춰 주세요.';
   }
   $('btnAdd').addEventListener('click',addCustom);
@@ -418,11 +445,11 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   $('btnReset').addEventListener('click',function(){
     var b=this;
     if(!armed){armed=true;b.textContent='한 번 더 누르면 지워집니다';setTimeout(function(){armed=false;b.textContent='처음부터'},3000);return}
-    armed=false;b.textContent='처음부터';st=blank();persist();renderAll();saved.textContent='지웠습니다';
+    armed=false;b.textContent='처음부터';snap();st=blank();persist();renderAll();saved.textContent='지웠습니다';toast('모두 지웠습니다',true);
   });
   $('btnExample').addEventListener('click',function(){
     if(selIds().length||st.biz||st.who){saved.textContent='이미 쓴 내용이 있습니다. "처음부터"로 지운 뒤 예시를 눌러 주세요.';return}
-    st={biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',goalPick:'예약',goalCustom:'',goalDetail:'카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 입금하면 확정',custom:{},
+    snap();st={biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',goalPick:'예약',goalCustom:'',goalDetail:'카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 입금하면 확정',custom:{},
       sel:{shorts:{stage:1,next:'insta'},flyer:{stage:1,next:'kakao'},insta:{stage:2,next:'place'},place:{stage:3,next:'booking'},booking:{stage:4,next:'goal'},kakao:{stage:4,next:'goal'}},
       order:['shorts','flyer','insta','place','booking','kakao'],
       msg:{1:'흙 만지는 40초 영상 — "퇴근 후 2시간, 내 그릇이 생깁니다"',2:'처음이어도 되는지, 몇 시간 걸리는지, 완성품은 언제 받는지',3:'수강생 작품 사진과 후기, 공방 내부 사진',4:'토요일·일요일 시간표 + 예약 버튼 / 카톡 채널 추가하면 이번 달 시간표 안내'}};
