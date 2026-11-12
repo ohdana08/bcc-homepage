@@ -48,7 +48,7 @@
     },
     {
       "name": "중소벤처기업부 사업공고",
-      "url": "https://www.mss.go.kr/site/smba/ex/bbs/List.do?cbIdx=81",
+      "url": "https://www.mss.go.kr/site/smba/ex/bbs/List.do?cbIdx=310",
       "region": "national",
       "cat": "중소기업",
       "who": "중소기업·창업자",
@@ -228,7 +228,7 @@
     },
     {
       "name": "부산테크노파크 사업공고",
-      "url": "https://www.btp.or.kr/kor/CMS/ContractMgr/list.do?mCode=MN164",
+      "url": "https://www.btp.or.kr/kor/CMS/Board/Board.do?mCode=MN013",
       "region": "busan",
       "cat": "R&D",
       "who": "부산 기술·제조 기업",
@@ -300,7 +300,7 @@
     },
     {
       "name": "경남테크노파크 사업공고",
-      "url": "https://www.gntp.or.kr/board/list.do?boardId=BBS_0000005",
+      "url": "https://www.gntp.or.kr/biz/apply",
       "region": "gyeongnam",
       "cat": "R&D",
       "who": "경남 기술·제조 기업",
@@ -516,7 +516,7 @@
     },
     {
       "name": "울산광역시 고시공고",
-      "url": "https://www.ulsan.go.kr/u/rep/bbs/list.ulsan?bbsId=BBS_0000000000000182",
+      "url": "https://www.ulsan.go.kr/u/rep/transfer/notice/list.ulsan?mId=001004002000000000",
       "region": "ulsan",
       "cat": "중소기업",
       "who": "울산 소재 기업·시민",
