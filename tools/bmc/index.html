@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>비즈니스 모델 캔버스 | BCC 잇툴즈</title>
-<meta name="description" content="멘토링하면서 함께 채우는 비즈니스 모델 캔버스. 팀별로 저장하고 PDF 한 장으로 전달합니다.">
+<meta name="description" content="내 자료(한 일·고객 인터뷰·ChatGPT 대화)를 넣으면 내 AI가 9칸 초안을 만들고, 추측인 칸을 고객에게 확인하며 고쳐 가는 비즈니스 모델 캔버스. 멘토가 직접 채울 수도 있습니다.">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -20,7 +20,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   gtag('config', 'G-5TN5XW0T2J');
 </script>
 <style>
-:root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6}
+:root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6;--ok:#1e7a3c;--okbg:#e3f4e8;--gs:#a35a00;--gsbg:#fff1dc;--red:#b3261e}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
 header{background:var(--navy);color:#fff;padding:12px 16px}
@@ -32,50 +32,109 @@ main{max-width:1500px;margin:0 auto;padding:14px 16px}
 button,select{font-family:inherit;font-size:14px;font-weight:700;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
 select{max-width:260px}
 button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
-button.warn{color:#b3261e}
+button.warn{color:var(--red)}
+button.sm{font-size:13px;padding:6px 10px}
 .saved{font-size:13px;color:var(--mute);margin-left:auto}
 .top{display:grid;grid-template-columns:1fr 2fr 170px;gap:10px;margin-bottom:10px}
 label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:4px}
 .top input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;font-family:inherit;background:#fff}
 .guide{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:14px;margin-bottom:10px}
 .guide b{color:var(--blue)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.tabs button{flex:1;min-width:220px;text-align:left;padding:12px 14px}
+.tabs button small{display:block;font-weight:400;color:var(--mute);font-size:12.5px;margin-top:2px}
+.tabs button[aria-pressed="true"]{border-color:var(--blue);box-shadow:0 0 0 2px rgba(36,87,214,.2);background:#f3f6ff}
+.step{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.step>h2{font-size:16px;margin:0 0 4px}
+.step .sn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;margin-right:6px}
+.step .desc{font-size:13.5px;color:var(--mute);margin:0 0 10px}
+.qs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.qs textarea{min-height:70px}
+.addsrc{display:grid;grid-template-columns:240px 1fr;gap:8px;align-items:start}
+.addsrc select{max-width:none;width:100%}
+.addsrc .row{grid-column:1/3;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.addsrc textarea{min-height:110px}
+.hint{font-size:12.5px;color:var(--mute);margin:4px 0 0}
+.warnbox{font-size:12.5px;color:var(--red)}
+.srcs{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.srcs li{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.srcs li .hint{margin:0}
+.srcs li details{flex-basis:100%;font-size:13.5px}
+.srcs li details summary{cursor:pointer;color:var(--mute)}
+.srcs li pre{white-space:pre-wrap;word-break:break-all;font-family:inherit;margin:6px 0 0;background:#f8f9fc;padding:8px;border-radius:6px;max-height:260px;overflow:auto}
+.srcs li .del{margin-left:auto}
+.tag{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;border:1px solid}
+.tag.s3{color:var(--ok);background:var(--okbg);border-color:#9ed3ae}
+.tag.s2{color:#2457d6;background:#eaf0ff;border-color:#b6c8f5}
+.tag.s1{color:var(--mute);background:#f1f2f5;border-color:#d6d9e0}
+.empty{font-size:13.5px;color:var(--mute);margin:8px 0 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two h3{font-size:14.5px;margin:0 0 4px}
+.two textarea{min-height:150px}
+.msg{font-size:13.5px;margin:6px 0 0;color:var(--ink)}
+.msg.bad{color:var(--red)}
 .canvas{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:minmax(210px,auto) minmax(210px,auto) minmax(180px,auto);gap:8px}
 .cell,.note{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;min-width:0}
 .cell.now{border-color:var(--blue);box-shadow:0 0 0 2px rgba(36,87,214,.18)}
-h2{font-size:15px;margin:0 0 2px;display:flex;gap:6px;align-items:center}
+.cell h2,.note h2{font-size:15px;margin:0 0 2px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
 .en{font-size:11px;color:var(--mute);font-weight:400}
 .q{font-size:12.5px;color:var(--mute);margin:2px 0 6px}
 textarea{flex:1;width:100%;min-height:90px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:16px;font-family:inherit;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
 textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
+button.st{margin-left:auto;font-size:12px;padding:2px 9px;border-radius:999px}
+button.st.ok{color:var(--ok);background:var(--okbg);border-color:#9ed3ae}
+button.st.guess{color:var(--gs);background:var(--gsbg);border-color:#f0c58a}
+button.st.none{color:#8a90a0;background:#f4f5f8;cursor:default}
+.ev{font-size:12px;color:var(--mute);margin:5px 0 0;word-break:break-all}
+.ev:empty{display:none}
 .kp{grid-column:1/3;grid-row:1/3}.ka{grid-column:3/5;grid-row:1}.kr{grid-column:3/5;grid-row:2}
 .vp{grid-column:5/7;grid-row:1/3}.cr{grid-column:7/9;grid-row:1}.ch{grid-column:7/9;grid-row:2}
 .cs{grid-column:9/11;grid-row:1/3}.co{grid-column:1/6;grid-row:3}.rv{grid-column:6/11;grid-row:3}
 .one{margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
 .one h3{margin:0 0 4px;font-size:15px}
 .one p{margin:0;font-size:15px}
-.one .blank{color:#b3261e}
+.one .blank{color:var(--red)}
 .notes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .note textarea{min-height:80px}
+.picks{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.picks label{display:inline-flex;align-items:center;gap:5px;margin:0;font-size:14px;color:var(--ink);font-weight:400;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;background:#fff}
+.picks label.on{border-color:var(--blue);background:#f3f6ff;font-weight:700}
+.picks input{margin:0}
+.picks .s{font-size:11.5px}
+.qgroup{border-left:3px solid var(--blue);padding:2px 0 2px 10px;margin:0 0 10px}
+.qgroup h4{margin:0 0 3px;font-size:14.5px}
+.qgroup ol{margin:0;padding-left:20px;font-size:14.5px}
+.avoid{font-size:13.5px;background:#fff6f5;border:1px solid #f2c9c5;border-radius:8px;padding:8px 10px;margin:8px 0}
+.goal{font-size:14px;font-weight:700;margin:8px 0}
+.hist{list-style:none;margin:6px 0 0;padding:0;font-size:13.5px}
+.hist li{border-bottom:1px solid #eef0f5;padding:6px 0}
+.hist li b{display:inline-block;min-width:130px}
 footer{max-width:1500px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
-.print-title,.print-foot,.pv,.more,.appendix{display:none}
+.print-title,.print-foot,.pv,.more,.appendix,.pst{display:none}
+[hidden]{display:none!important}
 @media(max-width:900px){
-  .top,.notes{grid-template-columns:1fr}
+  .top,.notes,.qs,.two,.addsrc{grid-template-columns:1fr}
+  .addsrc .row{grid-column:1}
   .canvas{display:flex;flex-direction:column}
   .cell{order:var(--o)}
   .saved{margin-left:0;width:100%}
 }
 /* 인쇄 배치: PDF 버튼·Ctrl+P 직전에 body.printing을 붙여 같은 크기로 미리 맞춰 봅니다 */
 body.printing main{width:283mm;max-width:none;padding:0;margin:0}
-body.printing header,body.printing .bar,body.printing .guide,body.printing footer,body.printing .top,body.printing .q,body.printing textarea{display:none}
+body.printing header,body.printing .bar,body.printing .guide,body.printing footer,body.printing .top,body.printing .q,body.printing textarea,body.printing .tabs,body.printing .step,body.printing button.st,body.printing .ev{display:none!important}
 body.printing .print-title{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin:0 0 4px;height:6mm}
 body.printing .print-title span:last-child{font-weight:400;font-size:11px}
 body.printing .canvas{display:grid;grid-template-rows:50mm 50mm 31mm;gap:3px}
 body.printing .cell,body.printing .note{border-radius:0;border-color:#444;padding:4px 5px;overflow:hidden;order:0;min-height:0}
 body.printing .cell.now{box-shadow:none;border-color:#444}
-body.printing h2{font-size:11px;flex:none}
+body.printing .cell h2,body.printing .note h2{font-size:11px;flex:none;flex-wrap:nowrap}
 body.printing .num{width:15px;height:15px;font-size:9px}
-body.printing .more{display:inline;font-size:9px;font-weight:700;color:#b3261e;margin-left:auto}
+body.printing .pst{display:inline;margin-left:auto;font-size:9px;font-weight:700;border:1px solid;border-radius:999px;padding:0 5px;white-space:nowrap}
+body.printing .pst.ok{color:var(--ok)}
+body.printing .pst.guess{color:var(--gs)}
+body.printing .pst.none{display:none}
+body.printing .more{display:inline;font-size:9px;font-weight:700;color:var(--red);white-space:nowrap}
 body.printing .more:empty{display:none}
 body.printing .pv{display:block;flex:1;min-height:0;overflow:hidden;white-space:pre-wrap;word-break:break-all;font-size:10.5px;line-height:1.4;padding:2px}
 body.printing .one{border-color:#444;border-radius:0;margin-top:3px;padding:3px 5px;height:13mm;overflow:hidden}
@@ -86,8 +145,7 @@ body.printing .notes{grid-template-columns:1fr 1fr;gap:3px;margin-top:3px}
 body.printing .note{height:25mm}
 body.printing .print-foot{display:block;font-size:9px;color:#555;margin:3px 0 0;text-align:right}
 body.printing .appendix.on{display:block;break-before:page;page-break-before:always;font-size:11px;column-count:2;column-gap:8mm}
-body.printing .appendix h3{column-span:all}
-body.printing .appendix h3{font-size:13px;margin:0 0 6px}
+body.printing .appendix h3{column-span:all;font-size:13px;margin:0 0 6px}
 body.printing .appendix h4{font-size:11.5px;margin:8px 0 2px;border-bottom:1px solid #999}
 body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-height:1.45}
 @media print{
@@ -99,7 +157,7 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
 </head>
 <body>
 <header><div class="in">
-  <h1>비즈니스 모델 캔버스 · 멘토링용</h1>
+  <h1>비즈니스 모델 캔버스</h1>
   <a href="https://bccconsulting.kr/tools.html">← 잇툴즈</a>
 </div></header>
 <main>
@@ -108,16 +166,70 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     <button id="btnNew">+ 새 팀</button>
     <button class="pri" id="btnPrint">PDF로 저장</button>
     <button id="btnCopy">글로 복사</button>
+    <button id="btnExport">파일로 내보내기</button>
+    <button id="btnImport">파일 불러오기</button>
+    <input type="file" id="fileIn" accept=".json,application/json" hidden>
     <button id="btnExample">예시</button>
     <button class="warn" id="btnReset">이 팀 지우기</button>
     <span class="saved" id="saved">쓰는 대로 이 기기에 팀별로 자동 저장됩니다</span>
   </div>
   <div class="top">
-    <div><label for="team">팀 이름 / 멘티 이름</label><input id="team" data-k="team" placeholder="예: 3조 바다팀"></div>
+    <div><label for="team">팀 이름 / 이름</label><input id="team" data-k="team" placeholder="예: 3조 바다팀"></div>
     <div><label for="idea">아이디어 한 줄</label><input id="idea" data-k="idea" placeholder="예: 혼자 사는 대학생을 위한 반찬 소분 배달"></div>
-    <div><label for="date">멘토링 날짜</label><input id="date" type="date" data-k="date"></div>
+    <div><label for="date">날짜</label><input id="date" type="date" data-k="date"></div>
   </div>
-  <div class="guide"><b>묻는 순서</b> ① 고객 → ② 가치 → ③ 채널 → ④ 고객 관계 → ⑤ 수익 → ⑥ 자원 → ⑦ 활동 → ⑧ 파트너 → ⑨ 비용. 칸 안의 회색 글은 멘티에게 던질 질문입니다(PDF에는 안 나옵니다). 답을 못 하는 칸은 "아직 모름"으로 적고 아래 "다음 만남까지 할 일"로 옮기세요.</div>
+  <div class="guide"><b>처음 쓴 캔버스는 '추측 9개'입니다.</b> 고객을 만나 확인한 칸이 늘어날수록 사업이 단단해집니다. 순서: ① 내 자료 넣기 → ② 내 AI에게 9칸 초안 받기 → ③ 칸마다 🟢확인됨 / 🟠추측 보기 → ④ 추측인 칸을 고객 5명에게 물어보고 다시 넣기.</div>
+
+  <div class="tabs" role="group" aria-label="시작 방법">
+    <button id="tabAi" aria-pressed="true">내 자료로 시작<small>한 일·인터뷰·ChatGPT 대화를 넣으면 내 AI가 9칸 초안을 만듭니다</small></button>
+    <button id="tabManual" aria-pressed="false">직접 채우기<small>멘토와 함께 칸마다 질문에 답하며 손으로 채웁니다</small></button>
+  </div>
+
+  <section class="step" id="step1">
+    <h2><span class="sn">1</span>내 자료 넣기</h2>
+    <p class="desc">파일이 아니어도 됩니다. 글이면 무엇이든 붙여넣으세요. 판매 기록이나 고객 인터뷰처럼 <b>실제로 있었던 일</b>일수록 근거가 강합니다.</p>
+    <div class="qs">
+      <div><label for="qDid">지금까지 해 본 것 (선택)</label><textarea id="qDid" data-k="qDid" placeholder="예: 친구 5명에게 반찬을 만들어 2주 동안 보내 봄"></textarea></div>
+      <div><label for="qWill">앞으로 하려는 것 (선택)</label><textarea id="qWill" data-k="qWill" placeholder="예: 학교 앞에서 주 1회 정기 배달 시작"></textarea></div>
+      <div><label for="qWho">누구를 돕고 싶은지 (선택)</label><textarea id="qWho" data-k="qWho" placeholder="예: 요리할 시간이 없는 자취 대학생"></textarea></div>
+    </div>
+    <div class="addsrc">
+      <div>
+        <label for="srcType">자료 종류</label>
+        <select id="srcType"></select>
+        <p class="hint" id="srcHint"></p>
+      </div>
+      <div>
+        <label for="srcText">자료 붙여넣기</label>
+        <textarea id="srcText" placeholder="예: ChatGPT와 나눈 대화 전체, 고객 인터뷰 메모, 경쟁 업체 가격표, 판매·문의 기록을 그대로 붙여넣으세요."></textarea>
+      </div>
+      <div class="row">
+        <button class="pri" id="btnAddSrc">자료 추가</button>
+        <span class="warnbox">고객 이름·연락처는 지우고 넣으세요. 이 자료는 ②에서 내 AI에게 그대로 전달됩니다.</span>
+      </div>
+    </div>
+    <ul class="srcs" id="srcList"></ul>
+    <p class="empty" id="srcEmpty">아직 넣은 자료가 없습니다. 위 질문 3개만 답해도 초안은 만들 수 있지만, 모두 '추측'으로 나옵니다.</p>
+  </section>
+
+  <section class="step" id="step2">
+    <h2><span class="sn">2</span>내 AI에게 맡기기</h2>
+    <p class="desc">ChatGPT·Claude·Gemini 무료 계정도 됩니다. 이 페이지는 내 자료를 어디에도 보내지 않습니다. 내가 직접 복사해서 붙여넣습니다.</p>
+    <div class="two">
+      <div>
+        <h3>가. AI에게 보낼 글 복사</h3>
+        <p class="hint" id="promptInfo"></p>
+        <p style="margin:8px 0"><button class="pri" id="btnPrompt">AI에게 보낼 글 복사</button></p>
+        <p class="hint">새 대화창에 붙여넣고 보내세요. 이미 캔버스에 쓴 내용이 있으면 함께 보내서, 새 자료로 바뀐 칸만 고치게 합니다.</p>
+      </div>
+      <div>
+        <h3>나. AI 답을 그대로 붙여넣기</h3>
+        <textarea id="aiAnswer" placeholder="AI가 [1 고객] 내용: … 상태: … 근거: … 모양으로 답한 것을 통째로 붙여넣으세요."></textarea>
+        <p style="margin:8px 0 0;display:flex;flex-wrap:wrap;gap:8px"><button class="pri" id="btnApply">캔버스에 채우기</button><button id="btnUndo" hidden>방금 채운 것 되돌리기</button></p>
+        <p class="msg" id="applyMsg"></p>
+      </div>
+    </div>
+  </section>
 
   <p class="print-title"><span id="ptLeft"></span><span id="ptRight"></span></p>
   <div class="canvas" id="canvas">
@@ -138,107 +250,416 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
   </div>
   <div class="notes">
     <section class="note"><h2>멘토 의견</h2><p class="q">잘 잡힌 점, 가장 약한 칸, 먼저 고칠 것.</p><textarea data-k="memo"></textarea></section>
-    <section class="note"><h2>다음 만남까지 할 일</h2><p class="q">"아직 모름"인 칸을 확인할 방법. 누구에게 무엇을 물어볼지.</p><textarea data-k="todo"></textarea></section>
+    <section class="note"><h2>다음 만남까지 할 일</h2><p class="q">"추측"인 칸을 확인할 방법. 누구에게 무엇을 물어볼지.</p><textarea data-k="todo"></textarea></section>
   </div>
+
+  <section class="step" id="step4" style="margin-top:10px">
+    <h2><span class="sn">4</span>이번 주 확인할 것</h2>
+    <p class="desc">추측인 칸 중 틀리면 사업이 성립하지 않는 칸 1~3개를 고르세요. <b>고객 칸부터</b> 확인하는 것을 권합니다. 고객에게는 앞으로의 생각이 아니라 <b>지난번에 실제로 한 일</b>을 물어야 답이 근거가 됩니다.</p>
+    <div class="picks" id="picks"></div>
+    <div id="qOut"></div>
+    <div class="avoid"><b>피할 질문</b> "이거 사실래요?" · "얼마면 사시겠어요?" · "좋은 아이디어 같아요?" — 사람들은 친절하게 "네"라고 답하지만, 실제로 사지는 않습니다.</div>
+    <p class="goal">목표: 이번 주에 고객 5명에게 묻고, 답을 ①에 '고객 인터뷰·관찰 메모'로 넣은 뒤 ②를 다시 하세요.</p>
+    <p style="display:flex;flex-wrap:wrap;gap:8px;margin:0"><button id="btnQCopy">질문 복사</button><button id="btnQTodo">'다음 만남까지 할 일'에 넣기</button></p>
+  </section>
+
+  <section class="step" id="stepHist">
+    <h2>변경 기록</h2>
+    <p class="desc">AI 초안을 채우거나 상태를 바꿀 때마다 남습니다. 추측이 확인됨으로 바뀐 기록이 사업이 진척된 증거입니다.</p>
+    <ul class="hist" id="hist"></ul>
+    <p class="empty" id="histEmpty">아직 기록이 없습니다.</p>
+  </section>
+
   <p class="print-foot">BCC · bccconsulting.kr</p>
   <section class="appendix" id="appendix"></section>
 </main>
-<footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 멘토링이 끝나면 PDF로 저장해 두세요.</footer>
+<footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 다른 기기에서 이어 쓰려면 "파일로 내보내기"로 저장해 두었다가 "파일 불러오기"를 누르세요. 브라우저 기록을 지우면 사라집니다.</footer>
 
 <script>
 (function(){
   var KEY='bcc_bmc_v2',OLD='bcc_bmc_v1';
+  var $=function(id){return document.getElementById(id)};
   var fields=[].slice.call(document.querySelectorAll('[data-k]'));
-  var saved=document.getElementById('saved'),pick=document.getElementById('pick');
+  var saved=$('saved'),pick=$('pick');
   var names={cs:'고객',vp:'가치 제안',ch:'채널',cr:'고객 관계',rv:'수익',kr:'핵심 자원',ka:'핵심 활동',kp:'핵심 파트너',co:'비용'};
   var order=['cs','vp','ch','cr','rv','kr','ka','kp','co'];
+  var stName={ok:'🟢 확인됨',guess:'🟠 추측',none:'⚪ 비움'};
+  var TYPES=[
+    {id:'sale',name:'판매·결제·사전신청·문의 기록',lv:3,hint:'실제로 돈을 냈거나 신청·문의한 기록입니다. 가장 강한 근거입니다.'},
+    {id:'interview',name:'고객 인터뷰·관찰 메모',lv:3,hint:'고객이 "지난번에 실제로 한 일"을 들은 메모입니다. 강한 근거입니다.'},
+    {id:'competitor',name:'경쟁사 가격·리뷰 조사',lv:2,hint:'비슷한 상품의 가격표, 후기, 판매 페이지 내용입니다.'},
+    {id:'stats',name:'공공 통계·기사',lv:2,hint:'통계·상권 정보·기사 같은 숫자 자료입니다. 출처도 같이 적어 주세요.'},
+    {id:'chat',name:'ChatGPT 대화',lv:1,hint:'AI와 나눈 대화입니다. 생각을 정리하는 데는 좋지만 고객의 실제 행동은 아니라서 근거가 약합니다.'},
+    {id:'memo',name:'내 메모·아이디어',lv:1,hint:'내가 한 일, 하려는 일, 떠오른 생각입니다. 근거가 약합니다.'}
+  ];
+  var LV={3:'근거 강함',2:'근거 중간',1:'근거 약함'};
+  function typeOf(id){for(var i=0;i<TYPES.length;i++)if(TYPES[i].id===id)return TYPES[i];return TYPES[5]}
+  var QUEST={
+    cs:['이 문제를 마지막으로 겪은 게 언제였나요? 그때 무슨 일이 있었나요?','그 문제를 해결하려고 무엇을 해 봤나요?','주변에 같은 문제를 겪는 사람이 있나요? 어떤 사람인가요?'],
+    vp:['지금은 그 문제를 어떤 방법으로 해결하고 있나요?','그 방법에서 가장 불편했던 순간은 언제였나요?','더 나은 방법을 찾아본 적이 있나요? 무엇을 찾아봤나요?'],
+    ch:['비슷한 상품·서비스를 처음 어디서 알게 됐나요?','마지막으로 비슷한 것을 산 곳은 어디였나요?','살 때 누구의 말이나 어떤 글을 참고했나요?'],
+    cr:['비슷한 서비스를 다시 이용한 적이 있나요? 왜 다시 썼나요?','쓰다가 그만둔 서비스가 있다면, 그만둔 이유는 무엇이었나요?'],
+    rv:['이 문제에 마지막으로 돈을 쓴 게 언제였고, 얼마였나요?','한 달에 이 문제로 대략 얼마를 쓰나요?','돈을 낼 때 누가 결정하나요?'],
+    kr:['(비슷한 일을 하는 사람에게) 시작할 때 가장 구하기 어려웠던 것은 무엇이었나요?','(나에게) 이 일에 꼭 필요한데 지금 없는 것은 무엇인가요? 언제까지 어떻게 구하나요?'],
+    ka:['(비슷한 일을 하는 사람에게) 하루 중 시간이 가장 많이 드는 일은 무엇인가요?','(나에게) 지난 일주일 동안 이 사업을 위해 실제로 한 일은 무엇인가요?'],
+    kp:['(함께할 곳 후보에게) 지금 비슷한 협력을 하는 곳이 있나요? 어떤 조건이었나요?','(함께할 곳 후보에게) 최근에 새 거래처와 일을 시작한 게 언제였나요? 무엇을 보고 정했나요?'],
+    co:['(비슷한 일을 하는 사람에게) 한 달에 가장 많이 나가는 비용 3가지는 무엇인가요?','(공급처에게) 실제 견적을 받아 보면 얼마인가요?']
+  };
+  function track(n,p){try{if(typeof gtag==='function')gtag('event',n,p||{})}catch(e){}}
+  function p2(n){return (n<10?'0':'')+n}
+  function today(){var d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+  function nowLabel(){var d=new Date();return today()+' '+p2(d.getHours())+':'+p2(d.getMinutes())}
+
   var store={cur:null,items:{}},data={};
-  function today(){var d=new Date();function p(n){return (n<10?'0':'')+n}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
   try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.items)store=s}catch(e){}
   if(!Object.keys(store.items).length){
     try{var o=JSON.parse(localStorage.getItem(OLD)||'null');if(o&&Object.keys(o).some(function(k){return (o[k]||'').trim()})){o.date=o.date||today();store.items.t1=o;store.cur='t1'}}catch(e){}
   }
   function persist(){
-    try{localStorage.setItem(KEY,JSON.stringify(store));return true}catch(e){saved.textContent='이 브라우저는 자동 저장이 안 됩니다. PDF로 저장해 주세요.';return false}
+    try{localStorage.setItem(KEY,JSON.stringify(store));return true}catch(e){saved.textContent='이 브라우저는 자동 저장이 안 됩니다. "파일로 내보내기"나 PDF로 저장해 주세요.';return false}
   }
-  function newTeam(){var id='t'+Date.now();store.items[id]={date:today()};store.cur=id;data=store.items[id]}
+  function norm(it){
+    it.st=it.st||{};it.ev=it.ev||{};it.sources=it.sources||[];it.history=it.history||[];
+    if(!it.mode)it.mode=order.some(function(k){return (it[k]||'').trim()})?'manual':'ai';
+    return it;
+  }
+  function newTeam(){var id='t'+Date.now();store.items[id]=norm({date:today(),mode:'ai'});store.cur=id;data=store.items[id]}
   if(!store.cur||!store.items[store.cur]){var ids=Object.keys(store.items);if(ids.length){store.cur=ids[ids.length-1]}else newTeam()}
+  Object.keys(store.items).forEach(function(id){norm(store.items[id])});
   data=store.items[store.cur];
+
   function val(k){return (data[k]||'').trim()}
+  function stOf(k){return !val(k)?'none':(data.st[k]==='ok'?'ok':'guess')}
+  function stWord(k){var s=stOf(k);return s==='ok'?'확인됨':s==='guess'?'추측':'비움'}
   function first(k){return val(k).split('\n')[0].replace(/^[-•·\s]+/,'')}
-  function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function label(it){return ((it.team||'').trim()||'이름 없는 팀')+(it.date?' · '+it.date.slice(5):'')}
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+
+  // 칸마다: 상태 버튼, 근거 줄, 인쇄용 상자
+  document.querySelectorAll('.cell,.note').forEach(function(c){
+    var k=c.querySelector('textarea').dataset.k,h=c.querySelector('h2');
+    if(names[k]){
+      var b=el('button','st');b.type='button';b.dataset.k=k;b.title='눌러서 추측 ↔ 확인됨 바꾸기';h.appendChild(b);
+      var ps=el('span','pst');ps.dataset.k=k;h.appendChild(ps);
+      b.addEventListener('click',function(){toggleSt(k)});
+      var ev=el('p','ev');ev.dataset.k=k;c.appendChild(ev);
+    }
+    h.appendChild(el('span','more'));
+    c.appendChild(el('div','pv'));
+  });
+
   function buildPick(){
     pick.innerHTML='';
     Object.keys(store.items).forEach(function(id){var op=document.createElement('option');op.value=id;op.textContent=label(store.items[id]);if(id===store.cur)op.selected=true;pick.appendChild(op)});
   }
-  function render(){fields.forEach(function(f){f.value=data[f.dataset.k]||''});buildPick();update()}
+  function renderMode(){
+    var ai=data.mode!=='manual';
+    $('tabAi').setAttribute('aria-pressed',ai?'true':'false');$('tabManual').setAttribute('aria-pressed',ai?'false':'true');
+    $('step1').hidden=!ai;$('step2').hidden=!ai;
+  }
+  function renderCells(){
+    order.forEach(function(k){
+      var s=stOf(k);
+      var b=document.querySelector('button.st[data-k="'+k+'"]');b.className='st '+s;b.textContent=stName[s];
+      var ps=document.querySelector('.pst[data-k="'+k+'"]');ps.className='pst '+s;ps.textContent=stWord(k);
+      var e=document.querySelector('.ev[data-k="'+k+'"]');e.textContent=(data.ev[k]&&val(k))?'근거: '+data.ev[k]:'';
+    });
+  }
+  function renderSources(){
+    var ul=$('srcList');ul.innerHTML='';
+    data.sources.forEach(function(sr,i){
+      var t=typeOf(sr.type),li=el('li');
+      li.appendChild(el('b',null,'자료'+(i+1)));
+      li.appendChild(el('span','tag s'+t.lv,t.name+' · '+LV[t.lv]));
+      li.appendChild(el('span','hint',sr.d||''));
+      var del=el('button','sm warn del','삭제');del.type='button';var armed=false;
+      del.addEventListener('click',function(){
+        if(!armed){armed=true;del.textContent='한 번 더 누르면 삭제';setTimeout(function(){armed=false;del.textContent='삭제'},3000);return}
+        data.sources.splice(i,1);persist();renderSources();
+      });
+      li.appendChild(del);
+      var dt=el('details');dt.appendChild(el('summary',null,sr.text.slice(0,80).replace(/\s+/g,' ')+(sr.text.length>80?' …':'')));
+      dt.appendChild(el('pre',null,sr.text));li.appendChild(dt);
+      ul.appendChild(li);
+    });
+    $('srcEmpty').hidden=data.sources.length>0;
+    var strong=data.sources.filter(function(s){return typeOf(s.type).lv===3}).length;
+    $('promptInfo').textContent='넣은 자료 '+data.sources.length+'개 (강한 근거 '+strong+'개)'+(order.some(val)?' · 지금 캔버스 내용도 함께 보냅니다.':'');
+  }
+  function defaultFocus(){return ['cs','vp','rv'].filter(function(k){return stOf(k)!=='ok'})}
+  function focusKeys(){return (data.focus&&data.focus.length)?data.focus.slice(0,3):defaultFocus()}
+  function questionText(){
+    var t='[이번 주 확인할 것] '+(val('team')||'')+'\n';
+    focusKeys().forEach(function(k){t+='\n■ '+names[k]+' ('+(val(k)?first(k):'아직 비어 있음')+')\n';QUEST[k].forEach(function(q,i){t+=(i+1)+'. '+q+'\n'})});
+    t+='\n피할 질문: "이거 사실래요?" "얼마면 사시겠어요?" "좋은 아이디어 같아요?"\n목표: 고객 5명에게 묻고, 답을 고객 인터뷰 자료로 넣은 뒤 캔버스를 다시 고치기\n';
+    return t;
+  }
+  function renderFocus(){
+    var box=$('picks');box.innerHTML='';var fk=focusKeys();
+    order.forEach(function(k){
+      var s=stOf(k),lb=el('label');if(fk.indexOf(k)>=0)lb.className='on';
+      var cb=document.createElement('input');cb.type='checkbox';cb.checked=fk.indexOf(k)>=0;
+      cb.addEventListener('change',function(){
+        var cur=focusKeys().slice(),i=cur.indexOf(k);
+        if(cb.checked){if(cur.length>=3){cb.checked=false;saved.textContent='3칸까지만 고를 수 있습니다. 하나를 풀고 다시 고르세요.';return}cur.push(k)}else if(i>=0)cur.splice(i,1);
+        data.focus=order.filter(function(x){return cur.indexOf(x)>=0});persist();renderFocus();
+      });
+      lb.appendChild(cb);lb.appendChild(document.createTextNode(names[k]));lb.appendChild(el('span','s',s==='ok'?'🟢':s==='guess'?'🟠':'⚪'));
+      box.appendChild(lb);
+    });
+    var out=$('qOut');out.innerHTML='';
+    if(!fk.length){out.appendChild(el('p','empty','확인할 칸을 하나 이상 골라 주세요.'));return}
+    fk.forEach(function(k){
+      var g=el('div','qgroup');g.appendChild(el('h4',null,names[k]+' — '+(val(k)?first(k):'아직 비어 있음')));
+      var ol=el('ol');QUEST[k].forEach(function(q){ol.appendChild(el('li',null,q))});g.appendChild(ol);out.appendChild(g);
+    });
+  }
+  function renderHist(){
+    var ul=$('hist');ul.innerHTML='';
+    data.history.slice().reverse().forEach(function(h){
+      var li=el('li');li.appendChild(el('b',null,h.d));
+      li.appendChild(document.createTextNode(h.ch.length?h.ch.join(' · '):'바뀐 칸 없음'));
+      if(h.note)li.appendChild(el('span','hint',' ('+h.note+')'));
+      ul.appendChild(li);
+    });
+    $('histEmpty').hidden=data.history.length>0;
+  }
+  function render(){
+    fields.forEach(function(f){f.value=data[f.dataset.k]||''});
+    buildPick();renderMode();renderSources();update();
+    $('btnUndo').hidden=!data.prev;$('applyMsg').textContent='';$('applyMsg').className='msg';
+  }
   function update(){
     function slot(k,l){var v=first(k);return v?'<b>'+esc(v)+'</b>':'<span class="blank">['+l+']</span>'}
-    document.getElementById('pitch').innerHTML='우리는 '+slot('cs','① 고객')+'에게 '+slot('vp','② 가치')+'을(를) '+slot('ch','③ 채널')+'(으)로 전하고, '+slot('rv','⑤ 수익')+'(으)로 돈을 법니다.';
-    document.getElementById('ptLeft').textContent='비즈니스 모델 캔버스 — '+(val('team')||'팀 이름')+(val('idea')?' | '+val('idea'):'');
-    document.getElementById('ptRight').textContent=(val('date')||'')+' · BCC 창업 멘토링';
+    $('pitch').innerHTML='우리는 '+slot('cs','① 고객')+'에게 '+slot('vp','② 가치')+'을(를) '+slot('ch','③ 채널')+'(으)로 전하고, '+slot('rv','⑤ 수익')+'(으)로 돈을 법니다.';
+    $('ptLeft').textContent='비즈니스 모델 캔버스 — '+(val('team')||'팀 이름')+(val('idea')?' | '+val('idea'):'');
+    var okN=order.filter(function(k){return stOf(k)==='ok'}).length;
+    $('ptRight').textContent=(val('date')||'')+' · 확인됨 '+okN+'칸 / 9칸 · BCC';
     var next=null;
     for(var i=0;i<order.length;i++){if(!val(order[i])){next=order[i];break}}
     document.querySelectorAll('.cell').forEach(function(c){c.classList.toggle('now',c.querySelector('textarea').dataset.k===next)});
     var op=pick.querySelector('option[value="'+store.cur+'"]');if(op)op.textContent=label(data);
+    renderCells();renderFocus();renderHist();
   }
   function save(){
     fields.forEach(function(f){data[f.dataset.k]=f.value});
     if(persist())saved.textContent='저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
     update();
   }
+  function logManual(txt){
+    var last=data.history[data.history.length-1];
+    if(last&&last.manual&&last.d.slice(0,10)===today()){last.ch.push(txt);last.d=nowLabel()}
+    else data.history.push({d:nowLabel(),ch:[txt],manual:true,note:'직접 표시'});
+  }
+  function toggleSt(k){
+    if(!val(k)){saved.textContent='"'+names[k]+'" 칸에 먼저 내용을 적어 주세요.';return}
+    var old=stOf(k);data.st[k]=old==='ok'?'guess':'ok';
+    logManual(names[k]+': '+(old==='ok'?'확인됨 → 추측':'추측 → 확인됨'));
+    persist();update();track('bmc_status',{to:data.st[k]});
+  }
   fields.forEach(function(f){f.addEventListener('input',save)});
-  pick.addEventListener('change',function(){store.cur=pick.value;data=store.items[store.cur];persist();render()});
-  document.getElementById('btnNew').addEventListener('click',function(){newTeam();persist();render();document.getElementById('team').focus();saved.textContent='새 팀을 만들었습니다'});
-  var baseTitle=document.title,app=document.getElementById('appendix');
-  // 각 칸에 인쇄용 글 상자(.pv)와 "2쪽에 이어짐" 표시(.more)를 붙임
-  document.querySelectorAll('.cell,.note').forEach(function(c){
-    var pv=document.createElement('div');pv.className='pv';c.appendChild(pv);
-    var m=document.createElement('span');m.className='more';c.querySelector('h2').appendChild(m);
+  pick.addEventListener('change',function(){store.cur=pick.value;data=norm(store.items[store.cur]);persist();render()});
+  $('btnNew').addEventListener('click',function(){newTeam();persist();render();$('team').focus();saved.textContent='새 팀을 만들었습니다'});
+  $('tabAi').addEventListener('click',function(){data.mode='ai';persist();renderMode()});
+  $('tabManual').addEventListener('click',function(){data.mode='manual';persist();renderMode()});
+
+  // ① 자료
+  TYPES.forEach(function(t){var op=document.createElement('option');op.value=t.id;op.textContent=t.name+' ('+LV[t.lv]+')';$('srcType').appendChild(op)});
+  $('srcType').value='chat';
+  function showHint(){$('srcHint').textContent=typeOf($('srcType').value).hint}
+  $('srcType').addEventListener('change',showHint);showHint();
+  $('btnAddSrc').addEventListener('click',function(){
+    var t=$('srcText').value.trim(),ty=$('srcType').value;
+    if(!t){saved.textContent='붙여넣을 자료를 먼저 넣어 주세요.';$('srcText').focus();return}
+    data.sources.push({type:ty,d:today(),text:t});$('srcText').value='';
+    persist();renderSources();saved.textContent='자료'+data.sources.length+'을(를) 추가했습니다';
+    track('bmc_source_add',{type:ty});
   });
-  function fits(el){return el.scrollHeight<=el.clientHeight+1}
+
+  // ② AI에게 보낼 글
+  function buildPrompt(){
+    var has=order.some(val),p='당신은 예비창업자의 비즈니스 모델 캔버스(BMC) 9칸을 채우는 도우미입니다.\n아래 [내 자료]에 있는 내용만 근거로 9칸을 채우세요.\n\n[규칙]\n';
+    p+='1. 자료에 없는 내용은 지어내지 마세요. 근거가 없는 칸은 "상태: 비움"으로 두세요.\n';
+    p+='2. 근거가 [판매·결제·사전신청·문의 기록] 또는 [고객 인터뷰·관찰 메모] 자료에서 나온 칸만 "확인됨"입니다. 나머지 자료(ChatGPT 대화, 내 메모, 경쟁사 조사, 통계, 기본 정보)에서 나온 칸은 모두 "추측"입니다.\n';
+    p+='3. 고객 칸은 "모든 사람", "20~30대"처럼 넓게 쓰지 말고 얼굴이 떠오르는 한 사람으로 쓰세요. 가장 먼저 돈을 낼 사람을 쓰세요.\n';
+    p+='4. 내용은 칸마다 1~3줄, 중학생도 알아듣는 쉬운 말로 쓰세요.\n';
+    p+='5. 근거에는 자료 번호와 그 자료 속 문장을 짧게 인용하세요. 예: (자료2) "한 달 반찬값 15만 원"\n';
+    p+='6. 아래 [답 형식]만 출력하세요. 인사말, 설명, 표, 굵은 글씨, 제목을 붙이지 마세요.\n';
+    if(has)p+='7. [지금 캔버스]가 있습니다. 새 자료로 바뀌는 칸만 고치고, 바뀌지 않는 칸은 지금 내용과 상태를 그대로 다시 적으세요. 확인됨인 칸을 근거 없이 추측으로 바꾸지 마세요.\n';
+    p+='\n[답 형식]\n';
+    order.forEach(function(k,i){p+='['+(i+1)+' '+names[k]+']\n내용: \n상태: 확인됨 또는 추측 또는 비움\n근거: \n\n'});
+    p+='[가장 위험한 추측]\n추측인 칸 중에서 틀리면 사업이 성립하지 않는 칸을 1~3개, 한 줄에 하나씩 "번호 칸이름: 이유" 모양으로\n\n';
+    p+='────────\n[기본 정보]\n팀 이름: '+(val('team')||'-')+'\n아이디어 한 줄: '+(val('idea')||'-')+'\n';
+    p+='지금까지 해 본 것: '+(val('qDid')||'-')+'\n앞으로 하려는 것: '+(val('qWill')||'-')+'\n누구를 돕고 싶은지: '+(val('qWho')||'-')+'\n\n[내 자료]\n';
+    if(!data.sources.length)p+='(따로 넣은 자료 없음 — 위 기본 정보만 있으므로 모든 칸은 추측 또는 비움입니다)\n';
+    data.sources.forEach(function(sr,i){p+='\n(자료'+(i+1)+') ['+typeOf(sr.type).name+'] '+(sr.d||'')+'\n'+sr.text+'\n'});
+    if(has){
+      p+='\n[지금 캔버스]\n';
+      order.forEach(function(k,i){p+='['+(i+1)+' '+names[k]+'] 상태: '+stWord(k)+'\n'+(val(k)||'(비어 있음)')+(data.ev[k]&&val(k)?'\n근거: '+data.ev[k]:'')+'\n'});
+    }
+    return p;
+  }
+  function copyText(t,btn,okText){
+    var orig=btn.dataset.orig||(btn.dataset.orig=btn.textContent);
+    function done(){btn.textContent=okText||'복사했습니다';setTimeout(function(){btn.textContent=orig},2200)}
+    function fallback(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback)}else fallback();
+  }
+  $('btnPrompt').addEventListener('click',function(){
+    copyText(buildPrompt(),this,'복사했습니다 → 내 AI 새 대화창에 붙여넣으세요');
+    track('bmc_prompt_copy',{sources:data.sources.length,update:order.some(val)?1:0});
+  });
+
+  // ② AI 답 읽기
+  function parseAI(txt){
+    var t=txt.replace(/\r/g,'').replace(/\*\*/g,'').replace(/^[ \t]*#+[ \t]*/gm,'').replace(/`/g,'');
+    var re=/^[ \t]*\[[ \t]*([1-9])[ \t]*[^\]\n]*\][ \t]*:?[ \t]*$/gm,heads=[],m;
+    while((m=re.exec(t))){heads.push({n:+m[1],start:m.index,end:re.lastIndex})}
+    var riskM=/^[ \t]*\[[ \t]*가장[ \t]*위험한[ \t]*추측[ \t]*\]/m.exec(t);
+    var riskAt=riskM?riskM.index:t.length;
+    var cells={},risk=[];
+    heads.forEach(function(h,i){
+      var stop=Math.min(i+1<heads.length?heads[i+1].start:t.length,h.start<riskAt?riskAt:t.length);
+      var body=t.slice(h.end,stop).split('\n'),cur='내용',f={'내용':[],'상태':[],'근거':[]};
+      body.forEach(function(line){
+        var fm=line.match(/^[ \t]*[-•*]?[ \t]*(내용|상태|근거)[ \t]*[:：][ \t]*(.*)$/);
+        if(fm){cur=fm[1];if(fm[2].trim())f[cur].push(fm[2].trim())}
+        else if(line.trim()&&!/^[ \t]*[-─=_]{3,}[ \t]*$/.test(line))f[cur].push(line.trim());
+      });
+      var k=order[h.n-1],text=f['내용'].join('\n').trim(),st=f['상태'].join(' ');
+      if(/^(\(?비움\)?|없음|해당 ?없음|-|—|모름|아직 모름)$/.test(text))text='';
+      var s=/확인/.test(st)?'ok':(/비움/.test(st)||!text)?'none':'guess';
+      if(s==='none')text='';
+      cells[k]={text:text,st:s,ev:f['근거'].join(' ').trim().replace(/^(없음|-|—)$/,'')};
+    });
+    if(riskM){
+      t.slice(riskM.index+riskM[0].length).split('\n').slice(0,8).forEach(function(line){
+        var pre=line.split(/[:：—]| - /)[0],mm=pre.match(/^[ \t]*[-•*]?[ \t]*\[?[ \t]*([1-9])(?![0-9])/);
+        if(mm){var k=order[+mm[1]-1];if(k&&risk.indexOf(k)<0&&risk.length<3)risk.push(k)}
+      });
+    }
+    return {cells:cells,risk:risk};
+  }
+  $('btnApply').addEventListener('click',function(){
+    var msg=$('applyMsg'),txt=$('aiAnswer').value;
+    if(!txt.trim()){msg.className='msg bad';msg.textContent='AI 답을 먼저 붙여넣어 주세요.';return}
+    var r=parseAI(txt),got=Object.keys(r.cells);
+    if(!got.length){msg.className='msg bad';msg.textContent='[1 고객] 같은 칸 이름표를 찾지 못했습니다. AI에게 "답 형식 그대로 다시 써 줘"라고 한 뒤 다시 붙여넣어 주세요.';track('bmc_ai_apply',{cells:0});return}
+    var snap={st:JSON.parse(JSON.stringify(data.st)),ev:JSON.parse(JSON.stringify(data.ev)),focus:data.focus?data.focus.slice():null};
+    order.forEach(function(k){snap[k]=data[k]||''});
+    var ch=[],kept=[];
+    got.forEach(function(k){
+      var c=r.cells[k],oldT=val(k),oldS=stOf(k);
+      if(!c.text&&oldT){kept.push(names[k]);return}
+      if(!c.text&&!oldT)return;
+      if(c.text!==oldT)ch.push(names[k]+(oldT?': 내용 바뀜':': 새로 채움'));
+      if(oldT&&c.st!==oldS)ch.push(names[k]+': '+(oldS==='ok'?'확인됨':'추측')+' → '+(c.st==='ok'?'확인됨':'추측'));
+      data[k]=c.text;data.st[k]=c.st==='ok'?'ok':'guess';data.ev[k]=c.ev;
+    });
+    if(r.risk.length)data.focus=r.risk;
+    data.prev=snap;
+    var okN=order.filter(function(k){return stOf(k)==='ok'}).length,gN=order.filter(function(k){return stOf(k)==='guess'}).length;
+    data.history.push({d:nowLabel(),ch:ch,note:'AI 초안 · 자료 '+data.sources.length+'개 · 확인됨 '+okN+'칸'});
+    persist();
+    fields.forEach(function(f){f.value=data[f.dataset.k]||''});update();$('btnUndo').hidden=false;
+    var miss=order.filter(function(k){return got.indexOf(k)<0}).map(function(k){return names[k]});
+    msg.className='msg'+(miss.length?' bad':'');
+    msg.textContent=got.length+'칸을 읽었습니다. 확인됨 '+okN+'칸 / 추측 '+gN+'칸.'+(miss.length?' 못 읽은 칸: '+miss.join(', ')+' — 손으로 채워 주세요.':'')+(kept.length?' AI가 비움으로 답한 '+kept.join(', ')+' 칸은 기존 내용을 그대로 두었습니다.':'')+' 아래 캔버스를 확인하고, ④에서 이번 주에 확인할 칸을 고르세요.';
+    var ver=data.history.filter(function(h){return !h.manual&&/^AI/.test(h.note||'')}).length;
+    track('bmc_ai_apply',{cells:got.length,ok:okN,version:ver});
+    if(ver>=2)track('bmc_version',{ok:okN});
+  });
+  $('btnUndo').addEventListener('click',function(){
+    if(!data.prev)return;var p=data.prev;
+    order.forEach(function(k){data[k]=p[k]});data.st=p.st;data.ev=p.ev;data.focus=p.focus;delete data.prev;
+    data.history.push({d:nowLabel(),ch:['방금 채운 AI 초안을 되돌림'],note:'되돌리기'});
+    persist();render();saved.textContent='되돌렸습니다';
+  });
+
+  // ④ 질문
+  $('btnQCopy').addEventListener('click',function(){copyText(questionText(),this);track('bmc_questions',{how:'copy',n:focusKeys().length})});
+  $('btnQTodo').addEventListener('click',function(){
+    if(!focusKeys().length){saved.textContent='확인할 칸을 먼저 골라 주세요.';return}
+    var line='이번 주: 고객 5명에게 묻기 — '+focusKeys().map(function(k){return names[k]}).join('·')+' 칸 확인 ('+today()+')';
+    data.todo=(val('todo')?val('todo')+'\n':'')+line;
+    document.querySelector('textarea[data-k="todo"]').value=data.todo;persist();update();saved.textContent='"다음 만남까지 할 일"에 넣었습니다';
+    track('bmc_questions',{how:'todo',n:focusKeys().length});
+  });
+
+  // 내보내기·불러오기
+  $('btnExport').addEventListener('click',function(){
+    var copy=JSON.parse(JSON.stringify(data));delete copy.prev;
+    var b=new Blob([JSON.stringify({app:'bcc_bmc',v:2,saved:nowLabel(),item:copy},null,1)],{type:'application/json'});
+    var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='BMC_'+(val('team')||'팀').replace(/[\\\/:*?"<>|\s]+/g,'_')+'_'+today()+'.json';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},5000);
+    saved.textContent='파일로 저장했습니다. 다른 기기에서 "파일 불러오기"로 이어 쓰세요.';track('bmc_export');
+  });
+  $('btnImport').addEventListener('click',function(){$('fileIn').value='';$('fileIn').click()});
+  $('fileIn').addEventListener('change',function(){
+    var f=this.files&&this.files[0];if(!f)return;var rd=new FileReader();
+    rd.onload=function(){
+      try{var o=JSON.parse(rd.result);if(!o||o.app!=='bcc_bmc'||!o.item||typeof o.item!=='object')throw 0;
+        var id='t'+Date.now();store.items[id]=norm(o.item);store.cur=id;data=store.items[id];persist();render();
+        saved.textContent='"'+label(data)+'"을(를) 불러왔습니다';track('bmc_import');
+      }catch(e){saved.textContent='이 파일은 불러올 수 없습니다. 이 도구에서 "파일로 내보내기"한 파일인지 확인해 주세요.'}
+    };
+    rd.readAsText(f);
+  });
+
+  // 인쇄
+  var baseTitle=document.title,app=$('appendix');
+  function fits(e){return e.scrollHeight<=e.clientHeight+1}
   function preparePrint(){
     document.body.classList.add('printing');
     var over=[];
     document.querySelectorAll('.cell,.note').forEach(function(c){
-      var k=c.querySelector('textarea').dataset.k,pv=c.querySelector('.pv'),m=c.querySelector('.more'),t=val(k);
-      m.textContent='';pv.textContent=t;
+      var k=c.querySelector('textarea').dataset.k,pv=c.querySelector('.pv'),mo=c.querySelector('.more'),t=val(k);
+      mo.textContent='';pv.textContent=t;
       var fs=10.5;pv.style.fontSize=fs+'px';
       while(!fits(pv)&&fs>7.5){fs-=0.5;pv.style.fontSize=fs+'px'}
       if(fits(pv))return;
-      // 가장 작은 글씨로도 넘치면 줄 단위로 줄이고 나머지는 2쪽에 전체를 싣습니다
       var lines=t.split('\n');
       while(lines.length>1){lines.pop();pv.textContent=lines.join('\n')+'\n… 2쪽에 이어짐';if(fits(pv))break}
-      m.textContent='2쪽에 이어짐';
+      mo.textContent='2쪽에 이어짐';
       over.push({name:names[k]||{memo:'멘토 의견',todo:'다음 만남까지 할 일'}[k],text:t});
     });
-    var p=document.getElementById('pitch'),pf=10.5;p.style.fontSize='';
+    var p=$('pitch'),pf=10.5;p.style.fontSize='';
     while(!fits(p.parentNode)&&pf>7.5){pf-=0.5;p.style.fontSize=pf+'px'}
-    app.innerHTML='';app.classList.toggle('on',over.length>0);
-    if(over.length){
-      var h=document.createElement('h3');h.textContent='이어지는 내용 — 1쪽 칸에 다 들어가지 않은 글 전체';app.appendChild(h);
-      over.forEach(function(o){var a=document.createElement('h4');a.textContent=o.name;var b=document.createElement('div');b.textContent=o.text;app.appendChild(a);app.appendChild(b)});
+    app.innerHTML='';
+    var useQ=!!((data.focus&&data.focus.length)||data.history.length);
+    var evTxt=order.filter(function(k){return val(k)&&data.ev[k]}).map(function(k){return names[k]+' ('+stWord(k)+'): '+data.ev[k]}).join('\n');
+    function sec(title,text){app.appendChild(el('h4',null,title));app.appendChild(el('div',null,text))}
+    var parts=[over.length?'1쪽에 다 못 들어간 글':'',evTxt?'칸별 근거':'',useQ?'이번 주 확인할 질문':'',data.history.length?'변경 기록':''].filter(Boolean);
+    if(parts.length){
+      app.appendChild(el('h3',null,'2쪽 — '+parts.join(' · ')));
+      over.forEach(function(o){sec(o.name+' (전체)',o.text)});
+      if(evTxt)sec('칸별 근거',evTxt);
+      if(useQ)sec('이번 주 확인할 질문',questionText().replace(/^\[이번 주 확인할 것\][^\n]*\n\n?/,''));
+      if(data.history.length)sec('변경 기록',data.history.slice(-12).map(function(h){return h.d+'  '+(h.ch.length?h.ch.join(' · '):'바뀐 칸 없음')+(h.note?' ('+h.note+')':'')}).join('\n'));
     }
+    app.classList.toggle('on',parts.length>0);
   }
-  function endPrint(){document.body.classList.remove('printing');document.title=baseTitle;document.getElementById('pitch').style.fontSize=''}
-  document.getElementById('btnPrint').addEventListener('click',function(){
+  function endPrint(){document.body.classList.remove('printing');document.title=baseTitle;$('pitch').style.fontSize=''}
+  $('btnPrint').addEventListener('click',function(){
     document.title='BMC_'+(val('team')||'팀')+'_'+(val('date')||today());
-    try{if(typeof gtag==='function')gtag('event','bmc_pdf',{filled:order.filter(function(k){return val(k)}).length})}catch(e){}
+    track('bmc_pdf',{filled:order.filter(function(k){return val(k)}).length,ok:order.filter(function(k){return stOf(k)==='ok'}).length});
     window.print();
   });
   window.addEventListener('beforeprint',preparePrint);
   window.addEventListener('afterprint',endPrint);
-  document.getElementById('btnCopy').addEventListener('click',function(){
-    var b=this,t='[비즈니스 모델 캔버스]\n팀: '+val('team')+'\n아이디어: '+val('idea')+'\n날짜: '+val('date')+'\n';
-    order.forEach(function(k,i){t+='\n'+(i+1)+'. '+names[k]+'\n'+(val(k)||'(아직 비어 있음)')+'\n'});
+
+  // 글로 복사
+  $('btnCopy').addEventListener('click',function(){
+    var t='[비즈니스 모델 캔버스]\n팀: '+val('team')+'\n아이디어: '+val('idea')+'\n날짜: '+val('date')+'\n';
+    order.forEach(function(k,i){t+='\n'+(i+1)+'. '+names[k]+' ['+stWord(k)+']\n'+(val(k)||'(아직 비어 있음)')+'\n'+(data.ev[k]&&val(k)?'근거: '+data.ev[k]+'\n':'')});
     t+='\n[멘토 의견]\n'+(val('memo')||'-')+'\n\n[다음 만남까지 할 일]\n'+(val('todo')||'-')+'\n';
-    function done(){b.textContent='복사했습니다';setTimeout(function(){b.textContent='글로 복사'},1500)}
-    function fallback(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback)}else fallback();
+    copyText(t,this);
   });
+
+  // 지우기
   var armed=false;
-  document.getElementById('btnReset').addEventListener('click',function(){
+  $('btnReset').addEventListener('click',function(){
     var b=this;
     if(!armed){armed=true;b.textContent='한 번 더 누르면 지워집니다';setTimeout(function(){armed=false;b.textContent='이 팀 지우기'},3000);return}
     armed=false;b.textContent='이 팀 지우기';
@@ -247,23 +668,31 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     if(ids.length){store.cur=ids[ids.length-1];data=store.items[store.cur]}else newTeam();
     persist();render();saved.textContent='지웠습니다';
   });
-  document.getElementById('btnExample').addEventListener('click',function(){
-    if(order.some(function(k){return val(k)})){saved.textContent='이미 쓴 내용이 있습니다. "+ 새 팀"을 만든 뒤 예시를 눌러 주세요.';return}
+
+  // 예시
+  $('btnExample').addEventListener('click',function(){
+    if(order.some(val)||data.sources.length){saved.textContent='이미 쓴 내용이 있습니다. "+ 새 팀"을 만든 뒤 예시를 눌러 주세요.';return}
     var ex={team:'예시팀',idea:'혼자 사는 대학생을 위한 반찬 소분 배달',date:today(),
-      cs:'학교 근처에서 자취하는 대학생\n요리는 귀찮고 배달은 비싼 사람\n먼저 살 사람: 기숙사에서 나온 2학년',
-      vp:'1인분씩 나눈 집반찬 5가지를 주 1회\n배달 음식 한 번 값으로 일주일 반찬\n남아서 버리는 반찬이 없음',
-      ch:'학교 커뮤니티 앱, 자취방 건물 전단\n카카오톡 채널로 주문\n수요일 저녁 문 앞 배달',
-      cr:'매주 메뉴 투표\n한 달 쓰면 반찬 1개 추가',
+      qDid:'친구 5명에게 2주 동안 반찬을 만들어 보내 봄',qWill:'학교 앞에서 주 1회 정기 배달 시작',qWho:'요리할 시간이 없는 자취 대학생',
+      cs:'학교 근처에서 자취하는 2학년 대학생\n요리는 귀찮고 배달은 비싸다고 느끼는 사람',
+      vp:'1인분씩 나눈 집반찬 5가지를 주 1회\n배달 음식 한 번 값으로 일주일 반찬',
+      ch:'학교 커뮤니티 앱, 자취방 건물 전단\n카카오톡 채널로 주문',
+      cr:'매주 메뉴 투표',
       rv:'주 1회 정기 배달 월 39,000원\n맛보기 1회 9,900원',
-      kr:'공유주방, 조리 가능한 팀원 1명\n소분 용기, 배달 가능한 시간',
-      ka:'메뉴 정하기와 장보기\n조리·소분·배달\n후기 모으기',
-      kp:'학교 앞 반찬가게, 공유주방\n자취방 건물 관리인',
-      co:'재료비, 공유주방 사용료\n용기·포장비\n배달 교통비',
-      memo:'고객이 구체적임. 가격 근거가 아직 없음.',
-      todo:'자취생 5명에게 "지금 반찬에 한 달 얼마 쓰는지" 물어보기'};
+      kr:'공유주방, 조리 가능한 팀원 1명',
+      ka:'메뉴 정하기·장보기·조리·소분·배달',
+      kp:'공유주방',
+      co:'재료비, 공유주방 사용료, 용기·포장비',
+      memo:'고객은 구체적임. 가격은 아직 추측.',todo:''};
     Object.keys(ex).forEach(function(k){data[k]=ex[k]});
+    data.st={cs:'ok'};
+    data.ev={cs:'(자료1) "5명 중 4명이 2주 내내 받음, 3명이 계속 받고 싶다고 함"',vp:'(자료1) "라면만 먹다가 반찬이 생겨 좋았다"',rv:'(기본 정보) 가격은 아직 물어보지 않음'};
+    data.sources=[{type:'interview',d:today(),text:'친구 5명에게 2주 동안 반찬을 보냄. 5명 중 4명이 2주 내내 받음, 3명이 계속 받고 싶다고 함.\n"라면만 먹다가 반찬이 생겨 좋았다"\n지금 반찬에 한 달 얼마 쓰는지는 물어보지 않음.'}];
+    data.focus=['vp','rv'];data.mode='ai';
+    data.history=[{d:nowLabel(),ch:['고객: 새로 채움','가치 제안: 새로 채움','수익: 새로 채움'],note:'예시'}];
     persist();render();saved.textContent='예시입니다. "이 팀 지우기"로 지울 수 있습니다.';
   });
+
   persist();render();
 })();
 </script>
