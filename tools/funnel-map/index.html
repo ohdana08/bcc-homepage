@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>마케팅 경로 지도 | BCC 잇툴즈</title>
+<meta name="description" content="지금 하고 있는 채널을 고르면 고객이 나를 처음 알게 되는 곳부터 구매까지의 길을 그리고, 끊긴 곳을 빨간색으로 보여줍니다. 유튜브·블로그·전단지·AI 검색 모두 해당.">
+<link rel="canonical" href="https://bccconsulting.kr/tools/funnel-map/">
+<style>
+:root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6;--red:#b3261e;--redbg:#fdecea;--green:#1e7b45;--greenbg:#e8f5ec;--amber:#8a5a00;--amberbg:#fff4d6;--in:#e9f0ff;--out:#e8f5ec}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+header{background:var(--navy);color:#fff;padding:12px 16px}
+header .in{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header a{color:#fff;text-decoration:none;font-weight:700}
+header h1{font-size:18px;margin:0}
+main{max-width:1200px;margin:0 auto;padding:14px 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+button,select,input,textarea{font-family:inherit}
+button{font-size:14px;font-weight:700;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+button.warn{color:var(--red)}
+.saved{font-size:13px;color:var(--mute);margin-left:auto}
+.box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.box>h2{font-size:17px;margin:0 0 4px}
+.box>.q{font-size:14px;color:var(--mute);margin:0 0 10px}
+.lead{font-size:15px;margin:0}
+.lead b{color:var(--blue)}
+.top{display:grid;grid-template-columns:2fr 2fr 1fr;gap:10px}
+label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:4px}
+.top input,.top select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;background:#fff;color:var(--ink)}
+.groups{display:grid;gap:10px}
+.grp h3{font-size:13px;color:var(--mute);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-weight:600;font-size:14px;padding:7px 12px;border-radius:999px;background:#fff}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip small{font-weight:400;opacity:.75;margin-left:2px}
+.add{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.add input{flex:1;min-width:180px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+.bands{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;font-size:13px;font-weight:700;text-align:center}
+.bands div{border-radius:8px;padding:5px}
+.bands .bi{background:var(--in);color:#1d3f99}.bands .bo{background:var(--out);color:var(--green)}
+.map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.col{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col.empty{border:2px dashed var(--red);background:var(--redbg)}
+.col h3{font-size:15px;margin:0;display:flex;gap:6px;align-items:center}
+.num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+.col .sub{font-size:12.5px;color:var(--mute);margin:0}
+.node{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}
+.node.dead{border-color:var(--red);box-shadow:0 0 0 2px rgba(179,38,30,.15)}
+.node b{display:block;font-size:14.5px;margin-bottom:4px}
+.node .row{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:4px}
+.node .row span{flex:none;width:34px}
+.node select{flex:1;min-width:0;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.node .warnline{color:var(--red);font-size:12.5px;font-weight:700;margin-top:4px}
+.hint{font-size:13px;color:var(--red);margin:0}
+.col textarea{width:100%;min-height:72px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:14px;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
+.col textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
+.col .mlabel{font-size:12.5px;font-weight:700;color:var(--mute);margin:2px 0 -4px}
+.paths{display:grid;gap:6px}
+.path{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:14.5px}
+.path .p{background:var(--in);border-radius:6px;padding:3px 8px;font-weight:600}
+.path .g{background:var(--greenbg);color:var(--green);border-radius:6px;padding:3px 8px;font-weight:700}
+.path .x{background:var(--redbg);color:var(--red);border-radius:6px;padding:3px 8px;font-weight:700}
+.path .a{color:var(--mute)}
+.diag{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.diag li{border-radius:8px;padding:8px 12px;font-size:14.5px}
+.diag .r{background:var(--redbg);color:#7d1b15}
+.diag .y{background:var(--amberbg);color:var(--amber)}
+.diag .ok{background:var(--greenbg);color:var(--green)}
+.diag li b{display:block}
+.cases{margin:0;padding-left:18px;font-size:14px}
+.cases li{margin-bottom:3px}
+.empty-msg{color:var(--mute);font-size:14px;margin:0}
+footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
+.print-title,.print-foot{display:none}
+@media(max-width:900px){
+  .top{grid-template-columns:1fr}
+  .bands{display:none}
+  .map{grid-template-columns:1fr}
+  .col{position:relative}
+  .col:not(:last-child)::after{content:"↓";position:absolute;left:50%;bottom:-18px;transform:translateX(-50%);color:var(--mute);font-weight:700}
+  .map{gap:22px}
+  .col .band{display:inline-block}
+  .saved{margin-left:0;width:100%}
+}
+.band{display:none;font-size:11.5px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:auto}
+.band.i{background:var(--in);color:#1d3f99}.band.o{background:var(--out);color:var(--green)}
+@media(max-width:900px){.band{display:inline-block}}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  body{background:#fff}
+  header,.bar,footer,#introBox,#pickBox,#caseBox,.add,.node select,.node .row,.lead{display:none}
+  main{padding:0;max-width:none}
+  .print-title{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin:0 0 6px}
+  .print-title span:last-child{font-weight:400;font-size:11px}
+  .box{border-color:#999;border-radius:0;padding:8px 10px;margin-bottom:6px;break-inside:avoid}
+  .box>.q{display:none}
+  .map{grid-template-columns:repeat(4,1fr);gap:4px}
+  .col{border-radius:0;padding:6px}
+  .col:not(:last-child)::after{display:none}
+  .col textarea{border:none;background:#fff;min-height:0;resize:none;font-size:11px;padding:2px}
+  .node{padding:4px 6px}
+  .node b{font-size:12px;margin:0}
+  .bands{display:grid}
+  .print-foot{display:block;font-size:9px;color:#555;text-align:right}
+}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>마케팅 경로 지도</h1>
+  <a href="https://bccconsulting.kr/tools.html">← 잇툴즈</a>
+</div></header>
+<main>
+  <div class="bar">
+    <button id="btnExample">예시 보기</button>
+    <button class="pri" id="btnPrint">PDF로 저장</button>
+    <button id="btnCopy">글로 복사</button>
+    <button id="btnPrompt">AI에게 물어볼 글 복사</button>
+    <button class="warn" id="btnReset">처음부터</button>
+    <span class="saved" id="saved">쓰는 대로 이 기기에 자동 저장됩니다</span>
+  </div>
+
+  <p class="print-title"><span id="ptLeft"></span><span>BCC 잇툴즈 · 마케팅 경로 지도</span></p>
+
+  <section class="box" id="introBox">
+    <p class="lead">채널보다 중요한 건 <b>고객이 걷는 길</b>입니다. 지금 하고 있는 것을 고르면, 고객이 나를 처음 알게 되는 곳부터 돈을 내는 곳까지 길을 그리고 <b>끊긴 곳</b>을 빨간색으로 보여줍니다.</p>
+  </section>
+
+  <section class="box">
+    <h2>① 내 사업</h2>
+    <p class="q">고객은 "모든 사람" 말고 얼굴이 떠오르는 한 사람으로 적어 주세요.</p>
+    <div class="top">
+      <div><label for="biz">무엇을 파나요</label><input id="biz" data-k="biz" placeholder="예: 생활 도자기 원데이 클래스"></div>
+      <div><label for="who">누가 사나요 (한 사람)</label><input id="who" data-k="who" placeholder="예: 주말 취미를 찾는 30대 직장인"></div>
+      <div><label for="goal">마지막에 고객이 할 행동</label><select id="goal" data-k="goal"><option>구매</option><option>예약</option><option>상담 신청</option><option>수강 신청</option><option>매장 방문</option><option>문의</option></select></div>
+    </div>
+  </section>
+
+  <section class="box" id="pickBox">
+    <h2>② 지금 하고 있는 것 모두 고르기</h2>
+    <p class="q">온라인이든 오프라인이든 손님을 부르려고 하는 건 다 고르세요. 아직 아무것도 안 한다면 해보고 싶은 것을 고르세요.</p>
+    <div class="groups" id="groups"></div>
+    <div class="add">
+      <input id="customName" placeholder="목록에 없으면 직접 적기 (예: 동네 맘카페)" maxlength="30">
+      <button id="btnAdd">추가</button>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>③ 경로 지도</h2>
+    <p class="q">고른 것이 고객 단계별로 놓입니다. 칸이 틀렸으면 "단계"를, 그걸 본 고객이 다음에 어디로 가는지는 "다음"을 고르세요. 아래 칸에는 그 단계에서 고객에게 할 말을 적습니다.</p>
+    <div class="bands"><div class="bi">유입 · 사세요 말고 고객이 듣고 싶은 말</div><div class="bo">전환 · 믿게 한 뒤 분명한 행동 하나</div></div>
+    <div class="map" id="map"></div>
+  </section>
+
+  <section class="box">
+    <h2>④ 고객이 걷는 길</h2>
+    <p class="q">"다음"을 따라 이어 본 길입니다. 빨간 칸에서 고객이 사라집니다.</p>
+    <div class="paths" id="paths"></div>
+  </section>
+
+  <section class="box">
+    <h2>⑤ 진단</h2>
+    <ul class="diag" id="diag"></ul>
+  </section>
+
+  <section class="box" id="caseBox">
+    <h2>참고: 수업에서 본 길</h2>
+    <ul class="cases">
+      <li>매일 30초 정보 영상 → 블로그 → 카카오톡 상담 (세무사)</li>
+      <li>쇼츠 → 긴 영상 → 홈페이지 → 무료 강의 → 유료 서비스</li>
+      <li>"이런 고민 있으세요?" 쇼츠 → 긴 영상 → 블로그·홈페이지 → 상담 → 방문 (병원)</li>
+      <li>유행 챌린지 영상에 객실·조식을 자연스럽게 → 홈페이지 예약 (호텔)</li>
+    </ul>
+  </section>
+  <p class="print-foot">BCC · bccconsulting.kr/tools/funnel-map/</p>
+</main>
+<footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 수업이 끝나면 PDF로 저장해 두세요.</footer>
+
+<script>
+(function(){
+  var KEY='bcc_funnelmap_v1';
+  var STAGES=[
+    {n:1,t:'모르는 고객',s:'처음 알게 되는 곳',band:'i'},
+    {n:2,t:'문제를 아는 고객',s:'"나 이거 필요하네" 느끼는 곳',band:'i'},
+    {n:3,t:'알아보는 고객',s:'비교하고 믿게 되는 곳',band:'o'},
+    {n:4,t:'바로 사는 고객',s:'연락·예약·구매하는 곳',band:'o'}
+  ];
+  var MSG_PH={1:'예: "퇴근 후 2시간, 내 그릇이 생깁니다" 40초 영상',2:'예: 처음이어도 되는지, 몇 시간 걸리는지',3:'예: 수강생 작품 사진과 후기',4:'예: 토요일·일요일 시간표 + 예약 버튼'};
+  var EMPTY_HINT={
+    1:'비었습니다. 나를 모르는 사람을 데려올 곳이 없어, 이미 아는 사람만 만나게 됩니다. 예: 쇼츠·릴스, 전단지, 행사 부스',
+    2:'비었습니다. 고객이 필요를 느끼게 할 정보가 없습니다. 예: 블로그 정보글, 유튜브 설명 영상, 스레드',
+    3:'비었습니다. 비교하는 고객이 확인할 후기·사례·소개가 없습니다. 예: 네이버 플레이스 후기, 홈페이지, 체험단',
+    4:'비었습니다. 마음먹은 고객이 연락하거나 살 곳이 없습니다. 예: 카카오톡 채널, 예약 페이지, 스마트스토어'
+  };
+  var CH=[
+    ['shorts','쇼츠·릴스·틱톡','영상',1],['youtube','유튜브 긴 영상','영상',2],
+    ['insta','인스타그램 게시물','SNS·광고',1],['threads','스레드','SNS·광고',1],['facebook','페이스북·밴드','SNS·광고',1],['ads','유료 광고','SNS·광고',1],
+    ['blog','네이버 블로그','검색',2],['geo','AI 검색 노출 (ChatGPT·AI 브리핑)','검색',2],['place','네이버 플레이스','검색',3],['web','홈페이지','검색',3],['review','체험단·후기','검색',3],
+    ['flyer','전단지·팜플렛','오프라인',1],['banner','현수막·간판','오프라인',1],['booth','행사·플리마켓 부스','오프라인',1],['refer','지인 소개·입소문','오프라인',3],['card','명함','오프라인',3],
+    ['kakao','카카오톡 채널','연결·판매',4],['openchat','오픈채팅·단톡방','연결·판매',3],['store','스마트스토어·쇼핑몰','연결·판매',4],['booking','예약 페이지','연결·판매',4],['phone','전화·문자','연결·판매',4],['shop','매장·공방 방문','연결·판매',4]
+  ];
+  var OFFLINE={flyer:1,banner:1,booth:1,card:1};
+  var GROUPS=['영상','SNS·광고','검색','오프라인','연결·판매'];
+  var BASE={};CH.forEach(function(c){BASE[c[0]]={name:c[1],group:c[2],stage:c[3]}});
+
+  function blank(){return {biz:'',who:'',goal:'구매',sel:{},order:[],custom:{},msg:{1:'',2:'',3:'',4:''}}}
+  var st=blank();
+  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.sel){st=s;st.msg=st.msg||{1:'',2:'',3:'',4:''};st.custom=st.custom||{};st.order=st.order||Object.keys(st.sel);st.goal=st.goal||'구매'}}catch(e){}
+
+  var $=function(id){return document.getElementById(id)};
+  var saved=$('saved');
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function nameOf(id){return BASE[id]?BASE[id].name:(st.custom[id]||'')}
+  function persist(){try{localStorage.setItem(KEY,JSON.stringify(st));saved.textContent='저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}catch(e){saved.textContent='이 브라우저는 자동 저장이 안 됩니다. PDF로 저장해 주세요.'}}
+  function selIds(){return st.order.filter(function(id){return st.sel[id]})}
+  function byStage(n){return selIds().filter(function(id){return st.sel[id].stage===n})}
+
+  function toggle(id){
+    if(st.sel[id]){
+      delete st.sel[id];st.order=st.order.filter(function(x){return x!==id});
+      Object.keys(st.sel).forEach(function(k){if(st.sel[k].next===id)st.sel[k].next=''});
+      if(st.custom[id])delete st.custom[id];
+    }else{
+      var stg=BASE[id]?BASE[id].stage:1;
+      st.sel[id]={stage:stg,next:stg===4?'goal':''};st.order.push(id);
+    }
+    persist();renderAll();
+  }
+
+  function renderGroups(){
+    var html='';
+    GROUPS.forEach(function(g){
+      html+='<div class="grp"><h3>'+g+'</h3><div class="chips">';
+      CH.forEach(function(c){if(c[2]!==g)return;html+='<button type="button" class="chip" data-id="'+c[0]+'" aria-pressed="'+(st.sel[c[0]]?'true':'false')+'">'+esc(c[1])+'</button>'});
+      html+='</div></div>';
+    });
+    var cs=Object.keys(st.custom);
+    if(cs.length){html+='<div class="grp"><h3>직접 추가한 것</h3><div class="chips">';cs.forEach(function(id){html+='<button type="button" class="chip" data-id="'+id+'" aria-pressed="true">'+esc(st.custom[id])+' <small>✕</small></button>'});html+='</div></div>'}
+    $('groups').innerHTML=html;
+  }
+
+  function nextLabel(id){return id==='goal'?'바로 '+st.goal:nameOf(id)}
+
+  function renderMap(){
+    var ids=selIds(),html='';
+    STAGES.forEach(function(S){
+      var list=byStage(S.n);
+      html+='<div class="col'+(list.length?'':' empty')+'"><h3><span class="num">'+S.n+'</span>'+S.t+'<span class="band '+S.band+'">'+(S.band==='i'?'유입':'전환')+'</span></h3><p class="sub">'+S.s+'</p>';
+      if(!list.length)html+='<p class="hint">'+EMPTY_HINT[S.n]+'</p>';
+      list.forEach(function(id){
+        var it=st.sel[id],dead=!it.next;
+        html+='<div class="node'+(dead?' dead':'')+'"><b>'+esc(nameOf(id))+'</b>';
+        html+='<div class="row"><span>단계</span><select data-stage="'+id+'" aria-label="'+esc(nameOf(id))+' 단계">';
+        STAGES.forEach(function(T){html+='<option value="'+T.n+'"'+(T.n===it.stage?' selected':'')+'>'+T.n+'. '+T.t+'</option>'});
+        html+='</select></div><div class="row"><span>다음</span><select data-next="'+id+'" aria-label="'+esc(nameOf(id))+' 다음">';
+        html+='<option value="">아직 없음</option><option value="goal"'+(it.next==='goal'?' selected':'')+'>바로 '+esc(st.goal)+'</option>';
+        ids.forEach(function(o){if(o===id)return;html+='<option value="'+o+'"'+(it.next===o?' selected':'')+'>'+st.sel[o].stage+'. '+esc(nameOf(o))+'</option>'});
+        html+='</select></div>';
+        if(dead)html+='<div class="warnline">여기서 다음 갈 곳이 없습니다</div>';
+        else html+='<div class="row" style="display:block;color:var(--ink)">→ '+esc(nextLabel(it.next))+'</div>';
+        html+='</div>';
+      });
+      html+='<p class="mlabel">이 단계에서 할 말</p><textarea data-msg="'+S.n+'" placeholder="'+esc(MSG_PH[S.n])+'">'+esc(st.msg[S.n]||'')+'</textarea></div>';
+    });
+    $('map').innerHTML=html;
+  }
+
+  function computePaths(){
+    var ids=selIds();if(!ids.length)return [];
+    var incoming={};ids.forEach(function(id){var n=st.sel[id].next;if(n&&n!=='goal')incoming[n]=1});
+    var starts=ids.filter(function(id){return !incoming[id]});
+    if(!starts.length){starts=[ids.slice().sort(function(a,b){return st.sel[a].stage-st.sel[b].stage})[0]]}
+    starts.sort(function(a,b){return st.sel[a].stage-st.sel[b].stage});
+    var visited={},res=[];
+    function walk(s){
+      var p=[],seen={},cur=s,end='cut';
+      while(cur){
+        if(seen[cur]){end='loop';break}
+        seen[cur]=1;p.push(cur);
+        var n=st.sel[cur].next;
+        if(n==='goal'){end='goal';break}
+        if(!n||!st.sel[n]){end='cut';break}
+        cur=n;
+      }
+      p.forEach(function(id){visited[id]=1});
+      res.push({nodes:p,end:end});
+    }
+    starts.forEach(walk);
+    ids.slice().sort(function(a,b){return st.sel[a].stage-st.sel[b].stage}).forEach(function(id){if(!visited[id])walk(id)});
+    return res;
+  }
+
+  function renderPaths(){
+    var ps=computePaths(),html='';
+    if(!ps.length){$('paths').innerHTML='<p class="empty-msg">②에서 지금 하고 있는 것을 고르면 길이 나타납니다.</p>';return}
+    ps.forEach(function(p){
+      html+='<div class="path">';
+      p.nodes.forEach(function(id,i){if(i)html+='<span class="a">→</span>';html+='<span class="p">'+esc(nameOf(id))+'</span>'});
+      html+='<span class="a">→</span>';
+      if(p.end==='goal')html+='<span class="g">'+esc(st.goal)+' ✓</span>';
+      else if(p.end==='loop')html+='<span class="x">제자리로 돌아옴</span>';
+      else html+='<span class="x">끊김</span>';
+      html+='</div>';
+    });
+    $('paths').innerHTML=html;
+  }
+
+  function diagnose(){
+    var ids=selIds(),out=[];
+    if(!ids.length)return [{c:'y',t:'아직 고른 것이 없습니다',d:'②에서 지금 하고 있는 것, 또는 해보고 싶은 것을 골라 주세요.'}];
+    var cnt={1:0,2:0,3:0,4:0};ids.forEach(function(id){cnt[st.sel[id].stage]++});
+    var inflow=cnt[1]+cnt[2],conv=cnt[3]+cnt[4];
+    if(inflow&&!cnt[4])out.push({c:'r',t:'조회는 생겨도 '+st.goal+'까지 이어지지 않는 구조입니다',d:'4단계(연락·예약·구매하는 곳)가 비어 있습니다. 카카오톡 채널이나 예약 페이지처럼 고객이 누르자마자 '+st.goal+'할 수 있는 곳을 하나 정하세요.'});
+    if(conv&&!inflow)out.push({c:'r',t:'이미 사려는 고객만 만나고 있습니다',d:'이런 고객은 가격과 성분부터 비교해서 다른 곳으로 가기 쉽습니다. 나를 모르는 사람을 데려올 유입 칸(1·2단계)을 하나만 추가해 보세요.'});
+    STAGES.forEach(function(S){
+      if(cnt[S.n])return;
+      if(S.n===4&&inflow)return;
+      if(!inflow&&(S.n===1||S.n===2))return;
+      out.push({c:'r',t:S.n+'단계 「'+S.t+'」 칸이 비었습니다',d:EMPTY_HINT[S.n].replace(/^비었습니다\. /,'')});
+    });
+    var dead=ids.filter(function(id){return !st.sel[id].next});
+    if(dead.length)out.push({c:'r',t:'다음 갈 곳이 없는 곳: '+dead.map(nameOf).join(', '),d:'여기서 나를 본 사람은 관심이 생겨도 어디로 가야 할지 모릅니다. 지도에서 "다음"을 골라 주세요. 아직 그런 곳이 없다면 그게 지금 만들 것입니다.'});
+    computePaths().forEach(function(p){if(p.end==='loop')out.push({c:'y',t:'돌고 도는 길이 있습니다: '+p.nodes.map(nameOf).join(' → '),d:'서로가 서로를 가리키고 끝이 없습니다. 한 곳은 "바로 '+st.goal+'"로 끝나게 해 주세요.'})});
+    var off=ids.filter(function(id){return OFFLINE[id]&&st.sel[id].next});
+    if(off.length)out.push({c:'y',t:'오프라인('+off.map(nameOf).join(', ')+')은 QR로 이어 주세요',d:'인쇄물에 "다음" 곳으로 가는 QR을 넣고, 인쇄물 전용 주소(또는 QR)를 따로 만들면 이걸 보고 몇 명이 들어왔는지 셀 수 있습니다.'});
+    var salesy=/사세요|구매하세요|할인|특가|\d+\s*%|최저가|가격/;
+    [1,2].forEach(function(n){if(salesy.test(st.msg[n]||''))out.push({c:'y',t:n+'단계 할 말에 판매 문구가 있습니다',d:'유입 단계 고객은 아직 살 생각이 없습니다. "사세요"보다 고객이 궁금해하고 듣고 싶은 말을 먼저 하세요.'})});
+    if(cnt[4]&&!(st.msg[4]||'').trim())out.push({c:'y',t:'4단계 할 말이 비었습니다',d:'"무엇을 누르면 무엇을 받는지" 한 문장으로 적어 보세요. 예: 카톡 채널 추가하면 이번 주 시간표를 보내드려요.'});
+    if(ids.length>6)out.push({c:'y',t:'고른 곳이 '+ids.length+'개입니다',d:'혼자 다 하면 다 어설퍼지기 쉽습니다. 처음에는 유입 1곳 → 전환 1곳, 끊김 없는 길 하나를 먼저 완성하세요.'});
+    if(!out.some(function(o){return o.c==='r'}))out.unshift({c:'ok',t:'끊긴 곳이 없습니다',d:'이제 가장 많이 들어오는 길 하나를 정해 그 길의 할 말부터 다듬어 보세요.'});
+    return out;
+  }
+
+  function renderDiag(){
+    $('diag').innerHTML=diagnose().map(function(o){return '<li class="'+o.c+'"><b>'+esc(o.t)+'</b>'+esc(o.d)+'</li>'}).join('');
+  }
+
+  function renderTop(){
+    ['biz','who','goal'].forEach(function(k){$(k).value=st[k]||(k==='goal'?'구매':'')});
+    $('ptLeft').textContent=(st.biz||'내 사업')+(st.who?' · 고객: '+st.who:'');
+  }
+
+  function renderAll(){renderTop();renderGroups();renderMap();renderPaths();renderDiag()}
+  function renderLive(){renderPaths();renderDiag();$('ptLeft').textContent=(st.biz||'내 사업')+(st.who?' · 고객: '+st.who:'')}
+
+  $('groups').addEventListener('click',function(e){var b=e.target.closest('.chip');if(b)toggle(b.dataset.id)});
+  $('map').addEventListener('change',function(e){
+    var t=e.target;
+    if(t.dataset.stage){st.sel[t.dataset.stage].stage=+t.value;persist();renderMap();renderLive()}
+    else if(t.dataset.next){st.sel[t.dataset.next].next=t.value;persist();renderMap();renderLive()}
+  });
+  $('map').addEventListener('input',function(e){var t=e.target;if(t.dataset.msg){st.msg[t.dataset.msg]=t.value;persist();renderDiag()}});
+  ['biz','who'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;persist();renderLive()})});
+  $('goal').addEventListener('change',function(){st.goal=this.value;persist();renderMap();renderLive()});
+  function addCustom(){
+    var v=$('customName').value.trim();if(!v)return;
+    var id='c'+Date.now();st.custom[id]=v;st.sel[id]={stage:1,next:''};st.order.push(id);
+    $('customName').value='';persist();renderAll();saved.textContent='추가했습니다. 지도에서 단계를 맞춰 주세요.';
+  }
+  $('btnAdd').addEventListener('click',addCustom);
+  $('customName').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addCustom()}});
+
+  function summaryText(){
+    var t='[마케팅 경로 지도]\n무엇을: '+(st.biz||'-')+'\n누가: '+(st.who||'-')+'\n마지막 행동: '+st.goal+'\n';
+    STAGES.forEach(function(S){
+      var l=byStage(S.n);
+      t+='\n'+S.n+'. '+S.t+' ('+S.s+')\n- 하는 곳: '+(l.length?l.map(function(id){return nameOf(id)+' → '+(st.sel[id].next?nextLabel(st.sel[id].next):'(다음 없음)')}).join(' / '):'(비어 있음)')+'\n- 할 말: '+((st.msg[S.n]||'').trim()||'(비어 있음)')+'\n';
+    });
+    t+='\n[고객이 걷는 길]\n';
+    computePaths().forEach(function(p){t+='- '+p.nodes.map(nameOf).join(' → ')+' → '+(p.end==='goal'?st.goal:p.end==='loop'?'(제자리)':'(끊김)')+'\n'});
+    t+='\n[진단]\n';
+    diagnose().forEach(function(o){t+='- '+o.t+'\n'});
+    return t;
+  }
+  function copy(btn,text,label){
+    function done(){btn.textContent='복사했습니다';setTimeout(function(){btn.textContent=label},1500)}
+    function fallback(){var a=document.createElement('textarea');a.value=text;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback)}else fallback();
+  }
+  $('btnCopy').addEventListener('click',function(){copy(this,summaryText(),'글로 복사')});
+  $('btnPrompt').addEventListener('click',function(){
+    var p='너는 소상공인·1인 사업자를 돕는 마케팅 코치야. 아래는 내가 그린 마케팅 경로 지도야.\n\n'+summaryText()+
+      '\n\n아래 순서로 도와줘.\n1. 끊긴 곳과 빈 단계를 채울 방법을 내 사업에 맞게 2가지씩 제안해줘. 돈이 덜 들고 혼자 할 수 있는 것부터.\n2. 단계별로 고객에게 할 말을 3개씩 써줘. 1·2단계는 "사세요" 없이 고객이 듣고 싶은 말, 3단계는 믿을 근거, 4단계는 "무엇을 누르면 무엇을 받는지" 한 문장.\n3. 앞으로 2주 동안 할 일을 하루 30분 기준으로 순서대로 정리해줘.\n\n지키기: 내가 적지 않은 숫자·후기·성과는 지어내지 말고, 모르는 건 나에게 먼저 물어봐줘. 쉬운 말로 써줘.';
+    copy(this,p,'AI에게 물어볼 글 복사');
+  });
+  var baseTitle=document.title;
+  $('btnPrint').addEventListener('click',function(){document.title='마케팅경로지도_'+(st.biz||'내사업').slice(0,20);window.print()});
+  window.addEventListener('afterprint',function(){document.title=baseTitle});
+  var armed=false;
+  $('btnReset').addEventListener('click',function(){
+    var b=this;
+    if(!armed){armed=true;b.textContent='한 번 더 누르면 지워집니다';setTimeout(function(){armed=false;b.textContent='처음부터'},3000);return}
+    armed=false;b.textContent='처음부터';st=blank();persist();renderAll();saved.textContent='지웠습니다';
+  });
+  $('btnExample').addEventListener('click',function(){
+    if(selIds().length||st.biz||st.who){saved.textContent='이미 쓴 내용이 있습니다. "처음부터"로 지운 뒤 예시를 눌러 주세요.';return}
+    st={biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',custom:{},
+      sel:{shorts:{stage:1,next:'insta'},flyer:{stage:1,next:'kakao'},insta:{stage:2,next:'place'},place:{stage:3,next:'booking'},booking:{stage:4,next:'goal'},kakao:{stage:4,next:'goal'}},
+      order:['shorts','flyer','insta','place','booking','kakao'],
+      msg:{1:'흙 만지는 40초 영상 — "퇴근 후 2시간, 내 그릇이 생깁니다"',2:'처음이어도 되는지, 몇 시간 걸리는지, 완성품은 언제 받는지',3:'수강생 작품 사진과 후기, 공방 내부 사진',4:'토요일·일요일 시간표 + 예약 버튼 / 카톡 채널 추가하면 이번 달 시간표 안내'}};
+    persist();renderAll();saved.textContent='예시입니다. "처음부터"로 지울 수 있습니다.';
+  });
+  renderAll();
+})();
+</script>
+</body>
+</html>
