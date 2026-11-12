@@ -108,6 +108,19 @@ details.cases ul{margin:6px 0 0;padding-left:18px}
 .path .x{background:var(--redbg);color:var(--red);border-radius:6px;padding:3px 8px;font-weight:700}
 .path .a{color:var(--mute)}
 .report h3{font-size:16px;margin:16px 0 4px}
+.weekly{margin-top:18px;border-top:2px solid var(--navy);padding-top:12px}
+.weekly .why{font-size:13.5px;color:var(--mute);margin:0 0 8px}
+.weekly .prep label{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;font-weight:400;color:var(--ink);margin:4px 0}
+.weekly .prep input{margin-top:4px}
+.wk{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.wk th,.wk td{border:1px solid var(--line);padding:6px;vertical-align:top;text-align:left}
+.wk th{background:var(--bg);font-size:12.5px;white-space:nowrap}
+.wk input,.wk textarea{width:100%;border:none;font-size:14px;padding:2px;background:transparent;color:var(--ink);font-family:inherit;resize:vertical}
+.wk textarea{min-height:40px}
+.wk input:focus,.wk textarea:focus{outline:none;background:var(--hl)}
+.weekly .where{font-size:13px;color:var(--mute);margin:8px 0 0}
+.weekly .again{margin-top:10px;font-weight:700;font-size:15px}
+@media(max-width:700px){.wk thead{display:none}.wk,.wk tbody,.wk tr,.wk td{display:block;width:100%}.wk tr{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;padding:6px}.wk td{border:none;padding:3px 0}.wk td::before{content:attr(data-h);display:block;font-size:12px;font-weight:700;color:var(--mute)}.wk textarea{border:1px dashed var(--line);border-radius:6px;padding:6px;background:#fcfdff}}
 .endbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .endbar .big{font-size:16px;padding:12px 20px}
 .empty-msg{color:var(--mute);font-size:14px;margin:0}
@@ -303,6 +316,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   <section class="box report" id="report">
     <h2><span><span class="step">6</span>진단서</span></h2>
     <div id="reportBody"></div>
+    <div id="weekly" class="weekly"></div>
     <div class="endbar">
       <button class="pri big" id="btnPrint">진단서 PDF로 받기</button>
       <button id="btnCopy">글로 복사</button>
@@ -334,6 +348,19 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   })();
 
   /* ---------- 입구 ---------- */
+  /* 신청 보내기: 서버 장애·한도 초과면 도구는 열고, 신청은 이 기기에 잠시 보관했다가 다음에 다시 보낸다(최대 14일). */
+  var PENDING='bcc_tool_lead_pending';
+  function postLead(payload){
+    return fetch('/api/tool-leads',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(payload)})
+      .then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{status:r.status,ok:r.ok,j:j}})});
+  }
+  function flushPending(){
+    var p;try{p=JSON.parse(lsGet(PENDING)||'null')}catch(e){p=null}
+    if(!p||!p.payload){return}
+    if(Date.now()-(p.at||0)>14*86400000){try{localStorage.removeItem(PENDING)}catch(e){}return}
+    postLead(p.payload).then(function(x){if(x.ok||(x.status>=400&&x.status<500&&x.status!==429)){try{localStorage.removeItem(PENDING)}catch(e){}}}).catch(function(){});
+  }
+  flushPending();
   function hasAccess(){try{var a=JSON.parse(lsGet(ACCESS)||'null');return !!(a&&a.ok)}catch(e){return false}}
   if(hasAccess())$('tool').hidden=false;else $('gate').hidden=false;
   $('gPhone').addEventListener('input',function(){
@@ -352,16 +379,15 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     if(!$('gC1').checked||!$('gC2').checked){show('[필수] 동의 2개에 체크해 주세요.');return}
     var src={};try{src=JSON.parse(lsGet(TOUCH)||'{}')||{}}catch(x){}
     btn.disabled=true;btn.textContent='확인하는 중…';
-    fetch('/api/tool-leads',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',
-      body:JSON.stringify({action:'submit',tool:TOOL,name:name,phone:phone,email:email,consent:true,overseas_consent:true,marketing_consent:$('gC3').checked,consent_version:CONSENT,website:$('gWeb').value,source:src})})
-    .then(function(r){return r.json().catch(function(){return{}}).then(function(d){return{ok:r.ok,d:d}})})
-    .then(function(x){
-      if(!x.ok){show(x.d.error||'신청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');return}
-      lsSet(ACCESS,JSON.stringify({ok:true,at:new Date().toISOString(),tool:TOOL}));
-      $('gate').hidden=true;$('tool').hidden=false;renderAll();window.scrollTo(0,0);
-      toast('신청이 완료됐습니다. 진단을 시작해 보세요.',false);
+    var payload={action:'submit',tool:TOOL,name:name,phone:phone,email:email,consent:true,overseas_consent:true,marketing_consent:$('gC3').checked,consent_version:CONSENT,website:$('gWeb').value,source:src};
+    function open(){lsSet(ACCESS,JSON.stringify({ok:true,at:new Date().toISOString(),tool:TOOL}));$('gate').hidden=true;$('tool').hidden=false;renderAll();window.scrollTo(0,0);toast('신청이 완료됐습니다. 진단을 시작해 보세요.',false)}
+    function queue(){lsSet(PENDING,JSON.stringify({at:Date.now(),payload:payload}));open()}
+    postLead(payload).then(function(x){
+      if(x.ok){open();return}
+      if(x.status>=500||x.status===429){queue();return}
+      show(x.j.error||'신청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
     })
-    .catch(function(){show('인터넷 연결을 확인한 뒤 다시 눌러 주세요.')})
+    .catch(function(){queue()})
     .then(function(){btn.disabled=false;btn.textContent='무료 진단 시작하기'});
   });
 
@@ -388,10 +414,10 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   var COUNT=[['','고르세요'],['yes','셀 수 있다'],['no','못 센다']];
   function howLabel(v){for(var i=0;i<HOW.length;i++)if(HOW[i][0]===v)return HOW[i][1];return ''}
 
-  function blank(){return {version:2,biz:'',who:'',goal:'구매',goalPick:'구매',goalCustom:'',goalDetail:'',nodes:{},order:[],edges:[],checks:{}}}
+  function blank(){return {version:2,biz:'',who:'',goal:'구매',goalPick:'구매',goalCustom:'',goalDetail:'',nodes:{},order:[],edges:[],checks:{},prep:[],weeks:[{},{},{},{}],start:''}}
   function migrate(o){
     if(!o||typeof o!=='object')return blank();
-    if(o.version===2){var b=blank();for(var k in b)if(o[k]==null)o[k]=b[k];for(var nid in o.nodes){var nd=o.nodes[nid];if(!nd||typeof nd!=='object'){delete o.nodes[nid];continue}nd.stage=Math.min(4,Math.max(1,+nd.stage||1))}if(!Array.isArray(o.edges))o.edges=[];if(!Array.isArray(o.order))o.order=Object.keys(o.nodes);return o}
+    if(o.version===2){var b=blank();for(var k in b)if(o[k]==null)o[k]=b[k];for(var nid in o.nodes){var nd=o.nodes[nid];if(!nd||typeof nd!=='object'){delete o.nodes[nid];continue}nd.stage=Math.min(4,Math.max(1,+nd.stage||1))}if(!Array.isArray(o.edges))o.edges=[];if(!Array.isArray(o.weeks))o.weeks=[{},{},{},{}];if(!Array.isArray(o.prep))o.prep=[];if(!Array.isArray(o.order))o.order=Object.keys(o.nodes);return o}
     var s=blank();
     ['biz','who','goal','goalPick','goalCustom','goalDetail'].forEach(function(k){if(typeof o[k]==='string')s[k]=o[k]});
     if(!o.goalPick){s.goalPick=GOALS.indexOf(s.goal)>=0?s.goal:'__custom';s.goalCustom=s.goalPick==='__custom'?s.goal:''}
@@ -656,7 +682,30 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     h+='</div><p class="tip">'+new Date().toLocaleDateString('ko-KR')+' 작성</p>';
     $('reportBody').innerHTML=h;
   }
-  function renderAll(){var d=diagnose();renderTop();renderGroups();renderMap(d);renderDiagram(d);renderCheck();renderReport(d)}
+  /* 4주 실천표 — 짐작으로 그린 지도를 4주 동안 확인하고, 한 곳만 고친 뒤 다시 그린다 */
+  var PREP=['문의·예약 받을 때 "어디서 보고 오셨어요?"라고 묻고 적기 시작','몇 명 왔는지 못 세는 길에 채널별 전용 링크·QR 만들기','진단서 "먼저 할 1번"을 이번 주에 고치기'];
+  var WK=[['src','"어디서 보셨어요?" 답 (채널별 몇 건)'],['cnt','문의·예약·구매 건수'],['fix','이번 주 고친 것 (한 곳만)'],['memo','눈에 띈 점']];
+  function addDays(iso,n){var d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+  function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+  function renderWeekly(){
+    if(!ids().length){$('weekly').innerHTML='';return}
+    if(!st.start){st.start=today();persist()}
+    var h='<h3>4주 실천표</h3><p class="why">지도는 처음엔 짐작입니다. 실제 숫자로 확인하고, 가장 많이 빠지는 곳 <b>한 곳만</b> 고친 뒤 4주 뒤에 다시 그리세요. 판단은 조회수가 아니라 문의·예약 건수로 합니다.</p>';
+    h+='<div class="prep"><b>시작 전 (0주차)</b>';
+    PREP.forEach(function(t,i){h+='<label><input type="checkbox" data-prep="'+i+'"'+(st.prep[i]?' checked':'')+'> <span>'+esc(t)+'</span></label>'});
+    h+='</div><table class="wk"><thead><tr><th>주차</th>'+WK.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'</tr></thead><tbody>';
+    for(var w=0;w<4;w++){
+      var row=st.weeks[w]||{};
+      h+='<tr><td data-h="주차"><b>'+(w+1)+'주차</b><br><small>'+addDays(st.start,w*7).slice(5).replace('-','/')+'~</small></td>';
+      WK.forEach(function(c){h+='<td data-h="'+esc(c[1])+'"><textarea rows="2" data-wk="'+w+'" data-f="'+c[0]+'">'+esc(row[c[0]]||'')+'</textarea></td>'});
+      h+='</tr>';
+    }
+    h+='</tbody></table>';
+    h+='<p class="where">숫자 찾는 곳: 네이버 스마트플레이스 통계(유입·전화·예약), 네이버 블로그 통계(유입 검색어), 인스타그램 인사이트(프로필 방문·링크 클릭), 카카오톡 채널 통계(친구·채팅). 앱마다 메뉴 이름은 다를 수 있습니다.</p>';
+    h+='<p class="again">다시 진단할 날: '+addDays(st.start,28).replace(/-/g,'.')+' — 고객이 실제로 말한 경로로 지도를 다시 그리고, 아무도 말하지 않은 채널은 줄일지 검토하세요.</p>';
+    $('weekly').innerHTML=h;
+  }
+  function renderAll(){var d=diagnose();renderTop();renderGroups();renderMap(d);renderDiagram(d);renderCheck();renderReport(d);renderWeekly()}
   function renderLive(){var d=diagnose();renderMap(d);renderDiagram(d);renderReport(d);setTitle()}
 
   /* 이벤트 */
@@ -673,6 +722,8 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     var p=k.split('|'),ed=st.edges.filter(function(x){return x.from===p[0]&&x.to===p[1]})[0];if(!ed)return;
     snap();if(t.dataset.how!=null)ed.how=t.value;else ed.count=t.value;persist();renderLive();
   });
+  $('weekly').addEventListener('change',function(e){var t=e.target;if(t.dataset.prep==null)return;st.prep[+t.dataset.prep]=t.checked;persist()});
+  $('weekly').addEventListener('input',function(e){var t=e.target;if(t.dataset.wk==null)return;var w=+t.dataset.wk;st.weeks[w]=st.weeks[w]||{};st.weeks[w][t.dataset.f]=t.value;persist()});
   $('reportBody').addEventListener('change',function(e){var t=e.target;if(t.dataset.chk==null)return;var a=st.checks[t.dataset.chk]||[];a[+t.dataset.k]=t.checked;st.checks[t.dataset.chk]=a;persist()});
   ['biz','who','goalDetail'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;grow(this);persist();setTitle();renderReport(diagnose())})});
   $('goal').addEventListener('change',function(){snap();st.goalPick=this.value;$('goalCustom').hidden=this.value!=='__custom';if(this.value==='__custom')$('goalCustom').focus();syncGoal();persist();renderAll()});
@@ -701,6 +752,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
       if(d.probs.length>3){t+='\n[그 밖에]\n';d.probs.slice(3).forEach(function(p){t+='- '+p.title+'\n'})}
       t+='\n[고객이 걷는 길]\n';d.paths.forEach(function(p){t+='- '+p.nodes.map(nameOf).join(' → ')+' → '+(p.end==='goal'?st.goal:p.end==='loop'?'(제자리)':'(끊김)')+'\n'});
     }
+    if(st.start){t+='\n[4주 실천표] 시작 '+st.start+' · 다시 진단할 날 '+addDays(st.start,28)+'\n';(st.weeks||[]).forEach(function(r,i){r=r||{};var v=WK.map(function(c){return (r[c[0]]||'').trim()?c[1]+': '+r[c[0]].trim():''}).filter(Boolean);if(v.length)t+='- '+(i+1)+'주차 '+v.join(' / ')+'\n'})}
     return t;
   }
   function copy(btn,text,label){
@@ -728,7 +780,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
       nodes:{shorts:{stage:1,custom:false,name:'',msg:'흙 만지는 40초 영상 — "퇴근 후 2시간, 내 그릇이 생깁니다"'},flyer:{stage:1,custom:false,name:'',msg:''},insta:{stage:2,custom:false,name:'',msg:'처음이어도 되는지, 몇 시간 걸리는지, 완성품은 언제 받는지'},blog:{stage:2,custom:false,name:'',msg:'원데이 클래스 처음 가는 날 준비물'},place:{stage:3,custom:false,name:'',msg:'수강생 작품 사진과 후기, 공방 내부 사진'},booking:{stage:4,custom:false,name:'',msg:'토요일·일요일 시간표 + 예약 버튼'},kakao:{stage:4,custom:false,name:'',msg:''}},
       order:['shorts','flyer','insta','blog','place','booking','kakao'],
       edges:[{from:'shorts',to:'insta',how:'link',count:'no'},{from:'flyer',to:'kakao',how:'word',count:'no'},{from:'insta',to:'place',how:'unknown',count:''},{from:'blog',to:'place',how:'link',count:'yes'},{from:'place',to:'booking',how:'link',count:'yes'},{from:'place',to:'kakao',how:'',count:''},{from:'booking',to:'goal',how:'link',count:'yes'},{from:'kakao',to:'goal',how:'link',count:'yes'}]};
-    persist();renderAll();toast('예시입니다. 되돌리기로 돌아갈 수 있습니다.',true);
+    st=migrate(st);persist();renderAll();toast('예시입니다. 되돌리기로 돌아갈 수 있습니다.',true);
   });
 
   if(!$('tool').hidden)renderAll();

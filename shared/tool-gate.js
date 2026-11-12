@@ -23,6 +23,21 @@
     } catch (e) {}
   })();
 
+
+  /* 신청 보내기: 서버 장애·한도 초과면 도구는 열고, 신청은 이 기기에 잠시 보관했다가 다음에 다시 보낸다(최대 14일). */
+  var PENDING='bcc_tool_lead_pending';
+  function postLead(payload){
+    return fetch('/api/tool-leads',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(payload)})
+      .then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{status:r.status,ok:r.ok,j:j}})});
+  }
+  function flushPending(){
+    var p;try{p=JSON.parse(lsGet(PENDING)||'null')}catch(e){p=null}
+    if(!p||!p.payload){return}
+    if(Date.now()-(p.at||0)>14*86400000){try{localStorage.removeItem(PENDING)}catch(e){}return}
+    postLead(p.payload).then(function(x){if(x.ok||(x.status>=400&&x.status<500&&x.status!==429)){try{localStorage.removeItem(PENDING)}catch(e){}}}).catch(function(){});
+  }
+  flushPending();
+
   function hasAccess() { try { var a = JSON.parse(lsGet(ACCESS) || 'null'); return !!(a && a.ok); } catch (e) { return false; } }
   if (hasAccess()) return;
 
@@ -133,18 +148,22 @@
       if (!box.querySelector('#bccgC1').checked || !box.querySelector('#bccgC2').checked) { show('[필수] 동의 2개에 체크해 주세요.'); return; }
       var src = {}; try { src = JSON.parse(lsGet(TOUCH) || '{}') || {}; } catch (x) {}
       btn.disabled = true; btn.textContent = '확인하는 중…';
-      fetch('/api/tool-leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
-        body: JSON.stringify({ action: 'submit', tool: tool, name: name, phone: ph, email: email, consent: true, overseas_consent: true,
-          marketing_consent: box.querySelector('#bccgC3').checked, consent_version: CONSENT, website: box.querySelector('#bccgWeb').value, source: src }) })
-        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+      var payload = { action: 'submit', tool: tool, name: name, phone: ph, email: email, consent: true, overseas_consent: true,
+          marketing_consent: box.querySelector('#bccgC3').checked, consent_version: CONSENT, website: box.querySelector('#bccgWeb').value, source: src };
+      function open() {
+        lsSet(ACCESS, JSON.stringify({ ok: true, at: new Date().toISOString(), tool: tool }));
+        box.parentNode.removeChild(box);
+        if (lockStyle.parentNode) lockStyle.parentNode.removeChild(lockStyle);
+        window.scrollTo(0, 0);
+      }
+      function queue() { lsSet(PENDING, JSON.stringify({ at: Date.now(), payload: payload })); open(); }
+      postLead(payload)
         .then(function (x) {
-          if (!x.ok) { show(x.j.error || '신청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'); return; }
-          lsSet(ACCESS, JSON.stringify({ ok: true, at: new Date().toISOString(), tool: tool }));
-          box.parentNode.removeChild(box);
-          if (lockStyle.parentNode) lockStyle.parentNode.removeChild(lockStyle);
-          window.scrollTo(0, 0);
+          if (x.ok) { open(); return; }
+          if (x.status >= 500 || x.status === 429) { queue(); return; }
+          show(x.j.error || '신청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
         })
-        .catch(function () { show('인터넷 연결을 확인한 뒤 다시 눌러 주세요.'); })
+        .catch(function () { queue(); })
         .then(function () { btn.disabled = false; btn.textContent = '무료로 시작하기'; });
     });
   }

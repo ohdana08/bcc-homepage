@@ -73,7 +73,7 @@ test('stores a lead, dedups same phone+tool within a day', async () => {
 
 test('rate limits per ip per day', async () => {
   const db = fakeDb();
-  for (let i = 0; i < 10; i++) { const r = res(); await handleToolLeads(req({ ...valid(), phone: '0101234' + String(5000 + i) }), r, { db, rateSecret: 's' }); assert.equal(r.code, 200); }
+  for (let i = 0; i < 80; i++) { const r = res(); await handleToolLeads(req({ ...valid(), phone: '0101234' + String(5000 + i) }), r, { db, rateSecret: 's' }); assert.equal(r.code, 200); }
   const r = res(); await handleToolLeads(req({ ...valid(), phone: '01099998888' }), r, { db, rateSecret: 's' });
   assert.equal(r.code, 429);
 });
