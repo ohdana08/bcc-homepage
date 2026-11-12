@@ -38,7 +38,7 @@
     const $=(id)=>document.getElementById(id);
     const esc=(v='')=>String(v??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const state={sb:null,leads:[],q:'',armed:null};
-    const TOOL_NAMES={'funnel-map':'마케팅 경로 지도'};
+    const TOOL_NAMES={"funnel-map": "마케팅 경로 지도", "bmc": "비즈니스 모델 캔버스", "business-process": "사업프로세스 설계", "customer-persona": "고객 페르소나 만들기", "customer-interview": "고객 인터뷰 10단계", "business-filter": "사업 필터링 (전문가 프레임)", "ppt-plan": "PPT 기획 도우미", "press-release": "보도자료 작성", "cardnews-plan": "카드뉴스 기획", "instagram-profile": "인스타 프로필 설계", "video-storyboard": "영상 기획 콘티 작성", "storyboard-caption": "숏폼 자막 코치", "customer-psychology": "고객 심리 심층분석", "detail-page": "상세페이지 기획", "cover-motivation": "자기소개서 · 지원동기", "cover-aspiration": "자기소개서 · 입사 후 포부", "cover-growth": "자기소개서 · 직무 성장과정", "cover-strength": "자기소개서 · 성격의 장점", "self-development": "자기소개서 · 자기개발 경험", "issue-opinion": "자기소개서 · 국내외 이슈에 대한 생각", "conflict-collab": "자기소개서 · 협업과 갈등 극복", "job-analysis": "직무분석 5요소 + 매핑표", "ksa-extract": "KSA 추출", "value-worldcup": "직업가치관 월드컵", "self-awareness": "창업 자의식 해체"};
     function deny(m){state.leads=[];$('rows').replaceChildren();$('app').classList.add('hidden');$('boot').classList.add('hidden');$('denied').classList.remove('hidden');if(m)$('deniedText').textContent=m}
     function error(t){$('adminError').textContent=t||'';$('adminError').classList.toggle('hidden',!t)}
     async function api(action,payload={}){
