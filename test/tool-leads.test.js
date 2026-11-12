@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { handleToolLeads, normalizeLead, TOOL_LEAD_CONSENT_VERSION } from '../lib/tool-leads.js';
+import { handleToolLeads, normalizeLead, TOOL_LEAD_CONSENT_VERSION, resetSelfLimit } from '../lib/tool-leads.js';
 
 function fakeDb({ rows = [], admin = false, failInsert = false } = {}) {
   const ops = [];
@@ -17,14 +17,16 @@ function fakeDb({ rows = [], admin = false, failInsert = false } = {}) {
         eq(k, v) { q.filters.push(['eq', k, v]); return b; },
         gte(k, v) { q.filters.push(['gte', k, v]); return b; },
         lt(k, v) { q.filters.push(['lt', k, v]); return b; },
+        in(k, v) { q.filters.push(['in', k, v]); return b; },
         not() { return b; }, order() { return b; }, limit() { return b; },
         maybeSingle() { q.single = true; return b; },
         then(resolve) {
           ops.push(q);
           if (table === 'profiles') return resolve({ data: { is_admin: admin } });
-          const match = (r) => q.filters.every(([op, k, v]) => op === 'eq' ? r[k] === v : op === 'gte' ? r[k] >= v : r[k] < v);
+          const match = (r) => q.filters.every(([op, k, v]) => op === 'eq' ? r[k] === v : op === 'in' ? v.includes(r[k]) : op === 'gte' ? r[k] >= v : r[k] < v);
           if (q.op === 'insert') { if (failInsert) return resolve({ error: new Error('db') }); rows.push({ ...q.value, created_at: new Date().toISOString(), id: rows.length + 1 }); return resolve({ data: null }); }
-          if (q.op === 'update' || q.op === 'delete') return resolve({ data: null });
+          if (q.op === 'update') { if (q.value.marketing_optout_at && db.noOptoutColumn) return resolve({ error: new Error('column') }); rows.filter(match).forEach((r) => Object.assign(r, q.value)); return resolve({ data: null }); }
+          if (q.op === 'delete') { for (let i = rows.length - 1; i >= 0; i--) if (match(rows[i])) rows.splice(i, 1); return resolve({ data: null }); }
           const found = rows.filter(match);
           if (q.opts.head) return resolve({ count: found.length, data: null });
           return resolve({ data: found });
@@ -88,4 +90,43 @@ test('admin list requires admin', async () => {
   const r2 = res(); await handleToolLeads(req({ action: 'list' }, { authorization: 'Bearer good' }), r2, { db: fakeDb({ admin: false }) }); assert.equal(r2.code, 403);
   const db = fakeDb({ admin: true, rows: [{ id: 1, tool: 'funnel-map', name: 'a', phone: '01011112222' }] });
   const r3 = res(); await handleToolLeads(req({ action: 'list' }, { authorization: 'Bearer good' }), r3, { db }); assert.equal(r3.code, 200); assert.equal(r3.body.leads.length, 1);
+});
+
+test('recall, optout, erase need matching name and phone', async () => {
+  resetSelfLimit();
+  const db = fakeDb({ rows: [
+    { id: 1, tool: 'bmc', name: '홍 길동', phone: '01012345678', marketing_consent: true, ip_bucket: 'x' },
+    { id: 2, tool: 'funnel-map', name: '홍길동', phone: '01012345678', marketing_consent: true },
+    { id: 3, tool: 'bmc', name: '김철수', phone: '01012345678', marketing_consent: true },
+  ] });
+  const call = async (body) => { const r = res(); await handleToolLeads(req(body), r, { db }); return r; };
+  assert.equal((await call({ action: 'recall', name: '홍길동', phone: '010-1234-5678' })).code, 200);
+  assert.equal((await call({ action: 'recall', name: '이영희', phone: '010-1234-5678' })).code, 404);
+  assert.equal((await call({ action: 'recall', name: '홍길동', phone: '02-123' })).code, 400);
+  assert.equal((await call({ action: 'optout', name: '홍길동', phone: '01012345678' })).code, 200);
+  assert.deepEqual(db.rows.map((r) => r.marketing_consent), [false, false, true]);
+  assert.ok(db.rows[0].marketing_optout_at);
+  assert.equal((await call({ action: 'erase', name: '홍길동', phone: '01012345678' })).code, 200);
+  assert.deepEqual(db.rows.map((r) => r.id), [3]);
+  assert.equal((await call({ action: 'recall', name: '홍길동', phone: '01012345678' })).code, 404);
+});
+
+test('optout works before the optout column exists; list hides ip hash', async () => {
+  resetSelfLimit();
+  const db = fakeDb({ admin: true, rows: [{ id: 1, tool: 'bmc', name: 'a', phone: '01011112222', marketing_consent: true, ip_bucket: 'secret' }] });
+  db.noOptoutColumn = true;
+  const r = res(); await handleToolLeads(req({ action: 'optout', name: 'a', phone: '01011112222' }), r, { db });
+  assert.equal(r.code, 200); assert.equal(db.rows[0].marketing_consent, false);
+  const r2 = res(); await handleToolLeads(req({ action: 'list' }, { authorization: 'Bearer good' }), r2, { db });
+  assert.equal(r2.body.leads[0].ip_bucket, undefined);
+});
+
+test('wrong name/phone guesses are throttled per ip', async () => {
+  resetSelfLimit();
+  const db = fakeDb();
+  for (let i = 0; i < 30; i++) { const r = res(); await handleToolLeads(req({ action: 'recall', name: 'x', phone: '0101234' + String(5000 + i) }), r, { db }); assert.equal(r.code, 404); }
+  const r = res(); await handleToolLeads(req({ action: 'recall', name: 'x', phone: '01099998888' }), r, { db });
+  assert.equal(r.code, 429);
+  const r2 = res(); await handleToolLeads(req({ action: 'recall', name: 'x', phone: '01099998888' }, { 'x-forwarded-for': '5.6.7.8' }), r2, { db });
+  assert.equal(r2.code, 404);
 });

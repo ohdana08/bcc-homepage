@@ -104,6 +104,9 @@
     '.bccg .sm .ln i{display:block;height:8px;border-radius:4px;background:#eef1f7;margin-top:7px;width:80%}.bccg .sm .ln i+i{width:55%}' +
     '.bccg .sm .bl{filter:blur(3px);user-select:none}' +
     '.bccg .sm .fd{position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(255,255,255,0),#fff 75%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;font-weight:700;color:#14213d;font-size:14.5px;text-align:center}' +
+    '.bccg .alt{margin:14px 0 0;text-align:center;font-size:14.5px;color:#4a5368}' +
+    '.bccg .lnk{background:none;border:none;padding:4px 2px;color:#2457d6;font-weight:700;font-size:inherit;text-decoration:underline;cursor:pointer;font-family:inherit}' +
+    '.bccg .mi{margin:10px 0 0;text-align:center;font-size:13px}.bccg .mi a{color:#667089}' +
     '@media(max-width:700px){.bccg h2.hero{font-size:23px}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -126,16 +129,56 @@
       '<label class="ag"><input type="checkbox" id="bccgC1"> <span>[필수] 개인정보 수집·이용에 동의합니다.</span></label>' +
       '<label class="ag"><input type="checkbox" id="bccgC2"> <span>[필수] 신청 내용이 미국 Vercel 서버를 거쳐 처리되는 국외 처리에 동의합니다.</span></label>' +
       '<label class="ag"><input type="checkbox" id="bccgC3"> <span>[선택] BCC 강의·무료 도구 소식을 문자·이메일로 받겠습니다. 동의하지 않아도 도구를 쓸 수 있습니다.</span></label>' +
-      '<button type="submit" class="go">무료로 시작하기</button><p class="err" role="alert" hidden></p></form>' +
+      '<button type="submit" class="go">무료로 시작하기</button><p class="err" role="alert" hidden></p>' +
+      '<p class="alt">이미 신청하셨나요? <button type="button" class="lnk" data-to="rc">이름·번호로 바로 열기</button></p></form>' +
+      '<form class="rc" novalidate hidden><h3>이미 신청하셨나요?</h3><p class="once">신청할 때 넣은 이름과 휴대전화 번호를 넣으면 이 기기에서도 바로 열립니다.</p>' +
+      '<div class="f"><label for="bccgRName">이름</label><input id="bccgRName" autocomplete="name" maxlength="40"></div>' +
+      '<div class="f"><label for="bccgRPhone">휴대전화 번호</label><input id="bccgRPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678" maxlength="13"></div>' +
+      '<button type="submit" class="go">확인하고 열기</button><p class="err" role="alert" hidden></p>' +
+      '<p class="alt">처음이신가요? <button type="button" class="lnk" data-to="new">새로 신청하기</button></p></form>' +
+      '<p class="mi"><a href="/tools/my-info/">소식 그만 받기 · 내 정보 지우기</a></p>' +
       '<div class="tz"><h3>시작하면 이런 걸 받아요</h3><p>' + esc(P) + '. 휴대폰으로도 됩니다.</p><ol class="toc">' + toc + '</ol>' +
       '<div class="sm" aria-label="결과 화면 예시"><span class="tag">결과 화면 예시</span><h4>' + esc(d[3]) + '</h4>' + lines.slice(0, 2).join('') + '<div class="bl">' + lines.slice(2).join('') + '</div><div class="fd">시작하면 내 결과물이 바로 만들어집니다 ↑</div></div></div>';
     host.parentNode.insertBefore(box, host);
 
-    var form = box.querySelector('form'), err = box.querySelector('.err'), btn = box.querySelector('.go');
+    var form = box.querySelector('form'), err = form.querySelector('.err'), btn = form.querySelector('.go');
+    var rc = box.querySelector('form.rc');
     var phone = box.querySelector('#bccgPhone');
-    phone.addEventListener('input', function () {
+    function fmt() {
       var v = this.value.replace(/\D/g, '').slice(0, 11);
       this.value = v.length < 4 ? v : v.length < 8 ? v.slice(0, 3) + '-' + v.slice(3) : v.slice(0, 3) + '-' + v.slice(3, v.length - 4) + '-' + v.slice(-4);
+    }
+    phone.addEventListener('input', fmt);
+    box.querySelector('#bccgRPhone').addEventListener('input', fmt);
+    function open(how) {
+      lsSet(ACCESS, JSON.stringify({ ok: true, at: new Date().toISOString(), tool: tool, how: how || 'new' }));
+      box.parentNode.removeChild(box);
+      if (lockStyle.parentNode) lockStyle.parentNode.removeChild(lockStyle);
+      window.scrollTo(0, 0);
+    }
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-to]') : null;
+      if (!b) return;
+      var toRc = b.getAttribute('data-to') === 'rc';
+      form.hidden = toRc; rc.hidden = !toRc;
+      (toRc ? box.querySelector('#bccgRName') : box.querySelector('#bccgName')).focus();
+    });
+    rc.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var rerr = rc.querySelector('.err'), rbtn = rc.querySelector('.go');
+      function show(m) { rerr.textContent = m; rerr.hidden = false; }
+      rerr.hidden = true;
+      var name = box.querySelector('#bccgRName').value.trim(), ph = box.querySelector('#bccgRPhone').value.replace(/\D/g, '');
+      if (!name) { show('이름을 입력해 주세요.'); return; }
+      if (!/^01[0-9]{8,9}$/.test(ph)) { show('휴대전화 번호를 확인해 주세요. 예: 010-1234-5678'); return; }
+      rbtn.disabled = true; rbtn.textContent = '확인하는 중…';
+      postLead({ action: 'recall', name: name, phone: ph })
+        .then(function (x) {
+          if (x.ok || x.status >= 500) { open('recall'); return; } // 서버 장애 때는 수업이 멈추지 않게 연다
+          show(x.j.error || '확인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        })
+        .catch(function () { open('recall'); })
+        .then(function () { rbtn.disabled = false; rbtn.textContent = '확인하고 열기'; });
     });
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -150,12 +193,6 @@
       btn.disabled = true; btn.textContent = '확인하는 중…';
       var payload = { action: 'submit', tool: tool, name: name, phone: ph, email: email, consent: true, overseas_consent: true,
           marketing_consent: box.querySelector('#bccgC3').checked, consent_version: CONSENT, website: box.querySelector('#bccgWeb').value, source: src };
-      function open() {
-        lsSet(ACCESS, JSON.stringify({ ok: true, at: new Date().toISOString(), tool: tool }));
-        box.parentNode.removeChild(box);
-        if (lockStyle.parentNode) lockStyle.parentNode.removeChild(lockStyle);
-        window.scrollTo(0, 0);
-      }
       function queue() { lsSet(PENDING, JSON.stringify({ at: Date.now(), payload: payload })); open(); }
       postLead(payload)
         .then(function (x) {

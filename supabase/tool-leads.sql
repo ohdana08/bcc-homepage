@@ -23,3 +23,6 @@ alter table tool_leads enable row level security;
 revoke all on tool_leads from public, anon, authenticated;
 grant all on tool_leads to service_role;
 grant all on sequence tool_leads_id_seq to service_role;
+
+-- 2026-11-12 추가: 신청자가 직접 소식 수신을 끊은 시각
+alter table tool_leads add column if not exists marketing_optout_at timestamptz;

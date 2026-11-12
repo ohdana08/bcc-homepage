@@ -26,10 +26,10 @@
     <header class="admin-header"><a class="brand" href="/"><span class="brand-mark">BCC<span>↗</span></span><span>잇툴즈 이용 신청<small>Business Career Consulting</small></span></a><nav class="admin-nav" aria-label="관리 메뉴"><a href="/admin-lecture-requests.html">강의 의뢰 기록</a><a href="/admin.html">BCC 관리</a></nav></header>
     <main class="admin-main">
       <h1>잇툴즈 도구 이용 신청</h1>
-      <p>도구 입구에서 이름·연락처를 남긴 분들입니다. 신청일부터 1년이 지나면 자동으로 삭제됩니다. 소식 받기에 동의한 분에게만 홍보 문자를 보낼 수 있습니다.</p>
+      <p>도구 입구에서 이름·연락처를 남긴 분들입니다. 신청일부터 1년이 지나면 자동으로 삭제됩니다. 소식 받기에 동의한 분에게만 홍보 문자를 보낼 수 있습니다. 신청자는 <a href="/tools/my-info/" target="_blank" rel="noopener">내 정보 관리</a>에서 직접 소식을 끊거나 기록을 지울 수 있고, 지운 기록은 이 화면에서도 사라집니다.</p>
       <div id="adminError" class="notice error hidden" role="alert"></div>
       <div class="stats"><div class="stat"><span>전체 신청</span><strong id="total">—</strong></div><div class="stat"><span>최근 7일</span><strong id="week">—</strong></div><div class="stat"><span>소식 받기 동의</span><strong id="mkt">—</strong></div><div class="stat"><span>스레드에서 온 신청</span><strong id="threads">—</strong></div></div>
-      <div class="bar"><input id="search" type="search" placeholder="이름·전화·이메일·유입 검색" autocomplete="off"><button id="reload" class="small" type="button">새로고침</button><button id="csv" class="small" type="button">CSV 내려받기</button></div>
+      <div class="bar"><input id="search" type="search" placeholder="이름·전화·이메일·유입 검색" autocomplete="off"><button id="reload" class="small" type="button">새로고침</button><button id="csv" class="small" type="button">CSV 내려받기</button><button id="csvMkt" class="small" type="button" title="소식 받기 동의자만, 같은 번호는 한 줄로">문자 명단 CSV</button></div>
       <div class="wrap"><table><thead><tr><th>신청 시각</th><th>도구</th><th>이름</th><th>휴대전화</th><th>이메일</th><th>소식 받기</th><th>유입</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
       <p id="note" style="font-size:12.5px;color:#667"></p>
     </main>
@@ -57,7 +57,7 @@
     function render(){
       const q=state.q.toLowerCase();
       const list=state.leads.filter(l=>!q||[l.name,l.phone,l.email,srcText(l.source)].join(' ').toLowerCase().includes(q));
-      $('rows').innerHTML=list.map(l=>`<tr><td>${esc(when(l.created_at))}</td><td>${esc(TOOL_NAMES[l.tool]||l.tool)}</td><td>${esc(l.name)}</td><td>${esc(fmtPhone(l.phone))}</td><td>${esc(l.email||'')}</td><td>${l.marketing_consent?'동의':'—'}</td><td class="src">${esc(srcText(l.source))}</td><td><button class="small del" data-id="${l.id}" type="button">${state.armed===l.id?'한 번 더':'삭제'}</button></td></tr>`).join('')||'<tr><td colspan="8">아직 신청이 없습니다.</td></tr>';
+      $('rows').innerHTML=list.map(l=>`<tr><td>${esc(when(l.created_at))}</td><td>${esc(TOOL_NAMES[l.tool]||l.tool)}</td><td>${esc(l.name)}</td><td>${esc(fmtPhone(l.phone))}</td><td>${esc(l.email||'')}</td><td>${l.marketing_consent?'동의':l.marketing_optout_at?'<span style="color:#b3261e">수신거부</span> '+esc(when(l.marketing_optout_at)):'—'}</td><td class="src">${esc(srcText(l.source))}</td><td><button class="small del" data-id="${l.id}" type="button">${state.armed===l.id?'한 번 더':'삭제'}</button></td></tr>`).join('')||'<tr><td colspan="8">아직 신청이 없습니다.</td></tr>';
       const week=Date.now()-7*86400000;
       $('total').textContent=state.leads.length;
       $('week').textContent=state.leads.filter(l=>Date.parse(l.created_at)>=week).length;
@@ -71,6 +71,17 @@
       const b=e.target.closest('button[data-id]');if(!b)return;const id=Number(b.dataset.id);
       if(state.armed!==id){state.armed=id;render();setTimeout(()=>{if(state.armed===id){state.armed=null;render()}},3000);return}
       state.armed=null;try{await api('delete',{id});await load()}catch(err){error(err.message)}
+    });
+    function download(name,head,rows){
+      const cell=(v)=>'"'+String(v??'').replace(/"/g,'""').replace(/^[=+\-@]/,"'$&")+'"';
+      const lines=[head.map(cell).join(',')].concat(rows.map(r=>r.map(cell).join(',')));
+      const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    }
+    // 문자 명단: 소식 받기에 동의한 줄만, 같은 번호는 가장 최근 한 줄. 수신거부하면 그 번호의 모든 줄이 동의 해제되므로 자동으로 빠진다.
+    $('csvMkt').addEventListener('click',()=>{
+      const seen=new Set(),rows=[];
+      for(const l of state.leads){if(!l.marketing_consent||seen.has(l.phone))continue;seen.add(l.phone);rows.push([l.name,fmtPhone(l.phone),l.email||'',new Date(l.created_at).toISOString().slice(0,10)])}
+      download('itools-sms-list.csv',['이름','휴대전화','이메일','동의일'],rows);
     });
     $('csv').addEventListener('click',()=>{
       const head=['신청시각','도구','이름','휴대전화','이메일','소식받기','유입'];

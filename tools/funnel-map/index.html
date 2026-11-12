@@ -128,6 +128,17 @@ details.cases ul{margin:6px 0 0;padding-left:18px}
 .toast button{flex:none;white-space:nowrap;padding:5px 12px;font-size:13px;background:#fff;color:var(--navy);border:none}
 footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
 .print-title,.print-foot{display:none}
+/* PDF 파일 만들기: 인쇄용 모양을 화면 복사본에만 입힌다 */
+body.pdfmode{background:#fff}
+body.pdfmode #tool .noprint,body.pdfmode .endbar{display:none!important}
+body.pdfmode main{padding:16px;max-width:900px}
+body.pdfmode .print-title{display:flex;justify-content:space-between;font-size:15px;font-weight:700;margin:0 0 8px}
+body.pdfmode .print-title span:last-child{font-weight:400;font-size:12px}
+body.pdfmode .box{border-color:#999;border-radius:0;box-shadow:none}
+body.pdfmode .diagram svg{display:block!important}body.pdfmode .edgelist{display:none!important}body.pdfmode .legend{display:flex!important}
+body.pdfmode .print-foot{display:block;font-size:11px;color:#555;text-align:right}
+body.pdfmode .pdfval{white-space:pre-wrap;min-height:20px;font-size:14px}
+body.pdfmode .pdfck{display:inline-block;width:18px;font-size:15px;line-height:1.2}
 .gate{max-width:760px;margin:0 auto}
 .gate .eyebrow{font-size:13px;font-weight:700;color:var(--blue);margin:10px 0 4px}
 .gate h2.hero{font-size:28px;line-height:1.3;margin:0 0 10px}
@@ -145,6 +156,9 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
 .gate .go{width:100%;font-size:18px;padding:15px;border-radius:10px;background:var(--navy);border-color:var(--navy);color:#fff;margin-top:8px}
 .gate .err{color:var(--red);font-size:14px;font-weight:700;margin:8px 0 0}
 .gate .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.gate .alt{margin:14px 0 0;text-align:center;font-size:14.5px;color:#4a5368}
+.gate .lnk{background:none;border:none;padding:4px 2px;color:var(--blue);font-weight:700;font-size:inherit;text-decoration:underline}
+.gate .mi{margin:10px 0 0;text-align:center;font-size:13px}.gate .mi a{color:var(--mute)}
 .teaser{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:14px}
 .teaser h3{font-size:20px;margin:0 0 4px}
 .teaser>p{font-size:14px;color:var(--mute);margin:0 0 10px}
@@ -219,7 +233,18 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     <label class="agree"><input type="checkbox" id="gC3"> <span>[선택] BCC 강의·무료 도구 소식을 문자·이메일로 받겠습니다. 동의하지 않아도 진단을 쓸 수 있습니다.</span></label>
     <button type="submit" class="go" id="gGo">무료 진단 시작하기</button>
     <p class="err" id="gErr" role="alert" hidden></p>
+    <p class="alt">이미 신청하셨나요? <button type="button" class="lnk" data-to="rc">이름·번호로 바로 열기</button></p>
   </form>
+  <form id="recallForm" novalidate hidden>
+    <h3>이미 신청하셨나요?</h3>
+    <p style="font-size:13.5px;color:var(--mute);margin:-8px 0 14px">신청할 때 넣은 이름과 휴대전화 번호를 넣으면 이 기기에서도 바로 열립니다. 다른 AI 코치에서 신청했어도 됩니다.</p>
+    <div class="f"><label for="rName">이름</label><input id="rName" autocomplete="name" maxlength="40"></div>
+    <div class="f"><label for="rPhone">휴대전화 번호</label><input id="rPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678" maxlength="13"></div>
+    <button type="submit" class="go" id="rGo">확인하고 열기</button>
+    <p class="err" id="rErr" role="alert" hidden></p>
+    <p class="alt">처음이신가요? <button type="button" class="lnk" data-to="new">새로 신청하기</button></p>
+  </form>
+  <p class="mi"><a href="/tools/my-info/">소식 그만 받기 · 내 정보 지우기</a></p>
 
   <div class="teaser">
     <h3>진단을 마치면 이런 걸 받아요</h3>
@@ -318,7 +343,8 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     <div id="reportBody"></div>
     <div id="weekly" class="weekly"></div>
     <div class="endbar">
-      <button class="pri big" id="btnPrint">진단서 PDF로 받기</button>
+      <button class="pri big" id="btnPdf">진단서 PDF로 받기</button>
+      <button id="btnPrint">인쇄하기</button>
       <button id="btnCopy">글로 복사</button>
       <button id="btnPrompt">AI에게 물어볼 글 복사</button>
     </div>
@@ -363,9 +389,32 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   flushPending();
   function hasAccess(){try{var a=JSON.parse(lsGet(ACCESS)||'null');return !!(a&&a.ok)}catch(e){return false}}
   if(hasAccess())$('tool').hidden=false;else $('gate').hidden=false;
-  $('gPhone').addEventListener('input',function(){
+  function fmtPhone(){
     var d=this.value.replace(/\D/g,'').slice(0,11);
     this.value=d.length<4?d:d.length<8?d.slice(0,3)+'-'+d.slice(3):d.slice(0,3)+'-'+d.slice(3,d.length-4)+'-'+d.slice(-4);
+  }
+  $('gPhone').addEventListener('input',fmtPhone);
+  $('rPhone').addEventListener('input',fmtPhone);
+  function openTool(how,msg){lsSet(ACCESS,JSON.stringify({ok:true,at:new Date().toISOString(),tool:TOOL,how:how}));$('gate').hidden=true;$('tool').hidden=false;renderAll();window.scrollTo(0,0);toast(msg,false)}
+  $('gate').addEventListener('click',function(e){
+    var b=e.target.closest?e.target.closest('[data-to]'):null;if(!b)return;
+    var rc=b.getAttribute('data-to')==='rc';$('gateForm').hidden=rc;$('recallForm').hidden=!rc;$(rc?'rName':'gName').focus();
+  });
+  $('recallForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var err=$('rErr'),btn=$('rGo');
+    function show(m){err.textContent=m;err.hidden=false}
+    err.hidden=true;
+    var name=$('rName').value.trim(),phone=$('rPhone').value.replace(/\D/g,'');
+    if(!name){show('이름을 입력해 주세요.');return}
+    if(!/^01[0-9]{8,9}$/.test(phone)){show('휴대전화 번호를 확인해 주세요. 예: 010-1234-5678');return}
+    btn.disabled=true;btn.textContent='확인하는 중…';
+    postLead({action:'recall',name:name,phone:phone}).then(function(x){
+      if(x.ok||x.status>=500){openTool('recall','다시 오신 걸 환영합니다. 진단을 시작해 보세요.');return} // 서버 장애 때는 수업이 멈추지 않게 연다
+      show(x.j.error||'확인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    })
+    .catch(function(){openTool('recall','다시 오신 걸 환영합니다. 진단을 시작해 보세요.')})
+    .then(function(){btn.disabled=false;btn.textContent='확인하고 열기'});
   });
   $('gateForm').addEventListener('submit',function(e){
     e.preventDefault();
@@ -380,7 +429,7 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     var src={};try{src=JSON.parse(lsGet(TOUCH)||'{}')||{}}catch(x){}
     btn.disabled=true;btn.textContent='확인하는 중…';
     var payload={action:'submit',tool:TOOL,name:name,phone:phone,email:email,consent:true,overseas_consent:true,marketing_consent:$('gC3').checked,consent_version:CONSENT,website:$('gWeb').value,source:src};
-    function open(){lsSet(ACCESS,JSON.stringify({ok:true,at:new Date().toISOString(),tool:TOOL}));$('gate').hidden=true;$('tool').hidden=false;renderAll();window.scrollTo(0,0);toast('신청이 완료됐습니다. 진단을 시작해 보세요.',false)}
+    function open(){openTool('new','신청이 완료됐습니다. 진단을 시작해 보세요.')}
     function queue(){lsSet(PENDING,JSON.stringify({at:Date.now(),payload:payload}));open()}
     postLead(payload).then(function(x){
       if(x.ok){open();return}
@@ -766,6 +815,60 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   });
   var baseTitle=document.title;
   $('btnPrint').addEventListener('click',function(){document.title='마케팅경로진단서_'+(short(st.biz,20)||'내사업');window.print()});
+  /* 진단서 PDF 파일 바로 받기: 화면 복사본을 그림으로 찍어 A4 쪽으로 나눈다. 실패하면 인쇄 창으로 대신한다. */
+  var LIBS=[['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H'],
+            ['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk']];
+  var libsReady=null;
+  function loadLibs(){
+    if(libsReady)return libsReady;
+    libsReady=Promise.all(LIBS.map(function(l){return new Promise(function(ok,no){
+      var sc=document.createElement('script');sc.src=l[0];sc.integrity=l[1];sc.crossOrigin='anonymous';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc);
+    })})).catch(function(e){libsReady=null;throw e});
+    return libsReady;
+  }
+  function pdfName(){return '마케팅경로진단서_'+((short(st.biz,20)||'내사업').replace(/[\\\/:*?"<>|\s]+/g,'_'))+'.pdf'}
+  function makePdf(){
+    var root=$('tool'),W=900,breaks=[];
+    var liveChecks=root.querySelectorAll('input[type=checkbox]'),liveTexts=root.querySelectorAll('textarea');
+    var est=Math.max(root.scrollHeight,1500)*1.3,scale=Math.max(1,Math.min(2,Math.sqrt(14e6/(W*est))));
+    return window.html2canvas(root,{scale:scale,windowWidth:W,width:W,backgroundColor:'#ffffff',useCORS:true,logging:false,scrollX:0,scrollY:-window.scrollY,
+      onclone:function(doc){
+        doc.body.classList.add('pdfmode');
+        var r=doc.getElementById('tool');r.style.width=W+'px';
+        doc.querySelectorAll('#tool input[type=checkbox]').forEach(function(c,i){var sp=doc.createElement('span');sp.className='pdfck';sp.textContent=liveChecks[i]&&liveChecks[i].checked?'☑':'☐';c.parentNode.replaceChild(sp,c)});
+        doc.querySelectorAll('#tool textarea').forEach(function(t,i){var d=doc.createElement('div');d.className='pdfval';d.textContent=liveTexts[i]?liveTexts[i].value:'';t.parentNode.replaceChild(d,t)});
+        // 그림은 복사본 폭에 맞춰 크기를 못 박아야 오른쪽이 잘리지 않는다
+        doc.querySelectorAll('#svgWrap svg').forEach(function(g){var vb=(g.getAttribute('viewBox')||'').split(/\s+/).map(Number),w=g.parentNode.getBoundingClientRect().width;if(vb.length===4&&w){g.setAttribute('width',Math.floor(w));g.setAttribute('height',Math.floor(w*vb[3]/vb[2]));g.style.width=Math.floor(w)+'px';g.style.height=Math.floor(w*vb[3]/vb[2])+'px'}});
+        var top=r.getBoundingClientRect().top;
+        r.querySelectorAll('.box:not(.noprint),.box:not(.noprint) h3,.green,.prob,.tip,.weekly,.wk tr,.where,.again,.print-foot').forEach(function(el){if(el.offsetParent)breaks.push(el.getBoundingClientRect().top-top)});
+      }
+    }).then(function(cv){
+      var jsPDF=window.jspdf.jsPDF,pdf=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+      var M=10,PW=190,PH=277,pxmm=cv.width/PW,pageH=Math.floor(PH*pxmm),H=cv.height,y=0,page=0;
+      var cuts=breaks.map(function(b){return Math.round(b*scale)-6}).filter(function(b){return b>0}).sort(function(a,b){return a-b});
+      while(y<H-2){
+        var limit=y+pageH,cut;
+        if(limit>=H)cut=H;
+        else{cut=0;cuts.forEach(function(b){if(b>y+pageH*0.3&&b<=limit)cut=b});if(!cut)cut=limit}
+        var sl=document.createElement('canvas');sl.width=cv.width;sl.height=cut-y;
+        var cx=sl.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,sl.width,sl.height);cx.drawImage(cv,0,y,cv.width,cut-y,0,0,cv.width,cut-y);
+        if(page)pdf.addPage();
+        pdf.addImage(sl.toDataURL('image/jpeg',0.88),'JPEG',M,M,PW,(cut-y)/pxmm);
+        page++;y=cut;
+      }
+      var n=pdf.getNumberOfPages();
+      for(var i=1;i<=n;i++){pdf.setPage(i);pdf.setFontSize(8);pdf.setTextColor(120);pdf.text(i+' / '+n,200,292,{align:'right'})}
+      pdf.save(pdfName());
+    });
+  }
+  $('btnPdf').addEventListener('click',function(){
+    var b=this;if(b.disabled)return;
+    b.disabled=true;b.textContent='PDF 만드는 중…';
+    loadLibs().then(makePdf).then(function(){toast('진단서 PDF를 내려받았습니다.',false)}).catch(function(){
+      toast('PDF를 바로 만들지 못해 인쇄 창을 엽니다. 대상에서 "PDF로 저장"을 고르세요.',false);
+      setTimeout(function(){document.title='마케팅경로진단서_'+(short(st.biz,20)||'내사업');window.print()},600);
+    }).then(function(){b.disabled=false;b.textContent='진단서 PDF로 받기'});
+  });
   window.addEventListener('afterprint',function(){document.title=baseTitle});
   var armed=false;
   $('btnReset').addEventListener('click',function(){

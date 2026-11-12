@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>내 정보 관리 | BCC 잇툴즈</title>
+<link rel="icon" href="/logo.png">
+<style>
+:root{--ink:#1b2333;--mute:#667089;--line:#cfd6e4;--bg:#f4f6fb;--navy:#14213d;--blue:#2457d6;--red:#b3261e;--green:#2b6b3f;--greenbg:#e8f4ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.55}
+header{background:#fff;border-bottom:1px solid var(--line)}
+header .in{max-width:640px;margin:0 auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header h1{font-size:18px;margin:0}
+header a{color:var(--blue);font-size:14px;text-decoration:none}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+h2{font-size:21px;margin:0 0 6px}
+p.lead{margin:0 0 16px;color:#3a4357;font-size:15px}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:14px;font-weight:700;margin-bottom:4px}
+.f input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:17px;background:#fff;color:var(--ink);font-family:inherit}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.acts{display:grid;gap:10px;margin-top:6px}
+.acts button{width:100%;font-size:17px;font-weight:700;padding:14px;border-radius:10px;cursor:pointer;font-family:inherit}
+#btnOptout{background:#fff;border:1px solid var(--navy);color:var(--navy)}
+#btnErase{background:#fff;border:1px solid var(--red);color:var(--red)}
+#btnErase.armed{background:var(--red);color:#fff}
+.acts button:disabled{opacity:.6}
+.acts small{display:block;font-size:13px;font-weight:400;margin-top:2px}
+.msg{margin:14px 0 0;padding:12px 14px;border-radius:10px;font-size:15px;font-weight:700}
+.msg.ok{background:var(--greenbg);color:var(--green)}
+.msg.no{background:#fdecea;color:var(--red)}
+ul.help{margin:0;padding-left:18px;font-size:14px;color:#3a4357}
+ul.help li{margin-bottom:6px}
+ul.help a{color:var(--blue)}
+</style>
+</head>
+<body>
+<header><div class="in"><h1>내 정보 관리</h1><a href="/tools.html">← 잇툴즈</a></div></header>
+<main>
+  <section class="box">
+    <h2>소식 그만 받기 · 내 정보 지우기</h2>
+    <p class="lead">잇툴즈 AI 코치를 쓸 때 넣은 이름과 휴대전화 번호를 그대로 넣어 주세요.</p>
+    <form id="f" novalidate>
+      <div class="f"><label for="name">이름</label><input id="name" autocomplete="name" maxlength="40"></div>
+      <div class="f"><label for="phone">휴대전화 번호</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678" maxlength="13"></div>
+      <div class="hp" aria-hidden="true"><label for="web">웹사이트</label><input id="web" tabindex="-1" autocomplete="off"></div>
+      <div class="acts">
+        <button type="button" id="btnOptout">소식 그만 받기<small>정보는 남기고, 강의·도구 소식 문자·이메일만 끊습니다</small></button>
+        <button type="button" id="btnErase">내 정보 지우기<small>신청 기록을 모두 지웁니다. 다음에 쓰려면 다시 신청합니다</small></button>
+      </div>
+      <p class="msg" id="msg" role="status" hidden></p>
+    </form>
+  </section>
+  <section class="box">
+    <ul class="help">
+      <li>지우면 이 기기의 "신청함" 표시도 함께 지워집니다. 다른 휴대폰·PC에서는 도구가 그대로 열릴 수 있지만, 서버에는 기록이 남지 않습니다.</li>
+      <li>소식을 끊은 뒤에도 AI 코치는 지금처럼 쓸 수 있습니다. 다시 신청하면서 소식 받기에 체크하면 그때부터 다시 받습니다.</li>
+      <li>이름·번호가 기억나지 않거나 처리가 안 되면 BCC 카카오톡 채널로 알려 주세요. 자세한 내용은 <a href="/privacy.html#tool-leads">개인정보처리방침</a>에 있습니다.</li>
+    </ul>
+  </section>
+</main>
+<script>
+(function(){
+  'use strict';
+  var $=function(id){return document.getElementById(id)};
+  var ACCESS='bcc_tool_access_v1',PENDING='bcc_tool_lead_pending';
+  function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+  $('phone').addEventListener('input',function(){
+    var d=this.value.replace(/\D/g,'').slice(0,11);
+    this.value=d.length<4?d:d.length<8?d.slice(0,3)+'-'+d.slice(3):d.slice(0,3)+'-'+d.slice(3,d.length-4)+'-'+d.slice(-4);
+  });
+  $('f').addEventListener('submit',function(e){e.preventDefault()});
+  function say(ok,t){var m=$('msg');m.className='msg '+(ok?'ok':'no');m.textContent=t;m.hidden=false}
+  function read(){
+    var name=$('name').value.trim(),phone=$('phone').value.replace(/\D/g,'');
+    if(!name){say(false,'이름을 입력해 주세요.');$('name').focus();return null}
+    if(!/^01[0-9]{8,9}$/.test(phone)){say(false,'휴대전화 번호를 확인해 주세요. 예: 010-1234-5678');$('phone').focus();return null}
+    return {name:name,phone:phone};
+  }
+  function send(action,id,btn,label){
+    btn.disabled=true;var keep=btn.innerHTML;btn.textContent='처리하는 중…';
+    return fetch('/api/tool-leads',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',
+      body:JSON.stringify({action:action,name:id.name,phone:id.phone,website:$('web').value})})
+      .then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{ok:r.ok,j:j}})})
+      .catch(function(){return{ok:false,j:{error:'인터넷 연결을 확인한 뒤 다시 눌러 주세요.'}}})
+      .then(function(x){btn.disabled=false;btn.innerHTML=keep;return x});
+  }
+  $('btnOptout').addEventListener('click',function(){
+    var id=read();if(!id)return;
+    send('optout',id,this).then(function(x){
+      if(x.ok)say(true,'소식 받기를 끊었습니다. 앞으로 BCC 강의·도구 소식 문자·이메일을 보내지 않습니다.');
+      else say(false,x.j.error||'처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    });
+  });
+  var armed=false,timer;
+  $('btnErase').addEventListener('click',function(){
+    var b=this,id=read();if(!id)return;
+    if(!armed){
+      armed=true;b.classList.add('armed');b.firstChild.nodeValue='한 번 더 누르면 지워집니다';
+      timer=setTimeout(function(){armed=false;b.classList.remove('armed');b.firstChild.nodeValue='내 정보 지우기'},5000);return;
+    }
+    clearTimeout(timer);armed=false;b.classList.remove('armed');b.firstChild.nodeValue='내 정보 지우기';
+    lsDel(PENDING);
+    send('erase',id,b).then(function(x){
+      if(x.ok){lsDel(ACCESS);say(true,'신청 기록을 모두 지웠습니다. 이 기기에서 AI 코치를 다시 쓰려면 입구에서 새로 신청해 주세요.')}
+      else say(false,x.j.error||'처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    });
+  });
+})();
+</script>
+</body>
+</html>
