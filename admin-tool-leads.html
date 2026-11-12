@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+  <title>잇툴즈 이용 신청 | BCC 관리자</title><link rel="icon" href="/logo.png"><link rel="stylesheet" href="/lecture-request/style.css">
+  <style>
+    body{background:#f3f4ee}
+    .admin-header{padding:20px 32px;background:#fffefb;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .admin-nav{display:flex;gap:8px;flex-wrap:wrap}.admin-nav a{font-size:12px;text-decoration:none;padding:10px;border:1px solid var(--line);border-radius:7px}
+    .admin-main{max-width:1300px;margin:0 auto;padding:30px 24px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}.stat span{display:block;font-size:12px;color:#667}.stat strong{font-size:24px}
+    .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.bar input{flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:14px}
+    th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}th{background:#f7f7f2;font-size:12.5px;white-space:nowrap}
+    td.src{font-size:12px;color:#556;max-width:260px;word-break:break-all}
+    button.small{font-size:12px;padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer}
+    button.del{color:#b3261e}
+    .wrap{overflow-x:auto}
+    @media(max-width:700px){.stats{grid-template-columns:1fr 1fr}.admin-header{padding:16px}.admin-main{padding:20px 12px}}
+  </style>
+</head>
+<body>
+  <div id="boot" class="boot-screen"><div><div class="brand-mark">BCC</div><h1>잇툴즈 이용 신청을 여는 중입니다</h1><p>관리자 권한을 확인하고 있습니다.</p></div></div>
+  <div id="denied" class="boot-screen hidden"><div><div class="brand-mark">BCC</div><h1>관리자 로그인이 필요합니다</h1><p id="deniedText">BCC 관리자 계정으로 로그인한 뒤 다시 열어주세요.</p><a class="button primary" href="/admin.html">관리자 로그인</a></div></div>
+  <div id="app" class="hidden">
+    <header class="admin-header"><a class="brand" href="/"><span class="brand-mark">BCC<span>↗</span></span><span>잇툴즈 이용 신청<small>Business Career Consulting</small></span></a><nav class="admin-nav" aria-label="관리 메뉴"><a href="/admin-lecture-requests.html">강의 의뢰 기록</a><a href="/admin.html">BCC 관리</a></nav></header>
+    <main class="admin-main">
+      <h1>잇툴즈 도구 이용 신청</h1>
+      <p>도구 입구에서 이름·연락처를 남긴 분들입니다. 신청일부터 1년이 지나면 자동으로 삭제됩니다. 소식 받기에 동의한 분에게만 홍보 문자를 보낼 수 있습니다.</p>
+      <div id="adminError" class="notice error hidden" role="alert"></div>
+      <div class="stats"><div class="stat"><span>전체 신청</span><strong id="total">—</strong></div><div class="stat"><span>최근 7일</span><strong id="week">—</strong></div><div class="stat"><span>소식 받기 동의</span><strong id="mkt">—</strong></div><div class="stat"><span>스레드에서 온 신청</span><strong id="threads">—</strong></div></div>
+      <div class="bar"><input id="search" type="search" placeholder="이름·전화·이메일·유입 검색" autocomplete="off"><button id="reload" class="small" type="button">새로고침</button><button id="csv" class="small" type="button">CSV 내려받기</button></div>
+      <div class="wrap"><table><thead><tr><th>신청 시각</th><th>도구</th><th>이름</th><th>휴대전화</th><th>이메일</th><th>소식 받기</th><th>유입</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+      <p id="note" style="font-size:12.5px;color:#667"></p>
+    </main>
+  </div>
+  <script type="module">
+    const $=(id)=>document.getElementById(id);
+    const esc=(v='')=>String(v??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const state={sb:null,leads:[],q:'',armed:null};
+    const TOOL_NAMES={'funnel-map':'마케팅 경로 지도'};
+    function deny(m){state.leads=[];$('rows').replaceChildren();$('app').classList.add('hidden');$('boot').classList.add('hidden');$('denied').classList.remove('hidden');if(m)$('deniedText').textContent=m}
+    function error(t){$('adminError').textContent=t||'';$('adminError').classList.toggle('hidden',!t)}
+    async function api(action,payload={}){
+      const send=(token)=>fetch('/api/tool-leads',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({action,...payload}),cache:'no-store',referrerPolicy:'no-referrer'});
+      const {data:{session}}=await state.sb.auth.getSession();
+      if(!session?.access_token){deny();throw new Error('관리자 로그인이 만료되었습니다.')}
+      let r=await send(session.access_token);
+      if(r.status===401){const {data,error:e}=await state.sb.auth.refreshSession();if(!e&&data?.session)r=await send(data.session.access_token)}
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){if(r.status===401||r.status===403)deny();throw new Error(d.error||'요청을 처리하지 못했습니다.')}
+      return d;
+    }
+    const fmtPhone=(p)=>p&&p.length===11?p.slice(0,3)+'-'+p.slice(3,7)+'-'+p.slice(7):(p||'');
+    const srcText=(s)=>{s=s||{};return [s.utm_source,s.utm_medium,s.utm_campaign].filter(Boolean).join(' / ')+(s.ref?' · '+s.ref:'')};
+    const when=(t)=>new Date(t).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    function render(){
+      const q=state.q.toLowerCase();
+      const list=state.leads.filter(l=>!q||[l.name,l.phone,l.email,srcText(l.source)].join(' ').toLowerCase().includes(q));
+      $('rows').innerHTML=list.map(l=>`<tr><td>${esc(when(l.created_at))}</td><td>${esc(TOOL_NAMES[l.tool]||l.tool)}</td><td>${esc(l.name)}</td><td>${esc(fmtPhone(l.phone))}</td><td>${esc(l.email||'')}</td><td>${l.marketing_consent?'동의':'—'}</td><td class="src">${esc(srcText(l.source))}</td><td><button class="small del" data-id="${l.id}" type="button">${state.armed===l.id?'한 번 더':'삭제'}</button></td></tr>`).join('')||'<tr><td colspan="8">아직 신청이 없습니다.</td></tr>';
+      const week=Date.now()-7*86400000;
+      $('total').textContent=state.leads.length;
+      $('week').textContent=state.leads.filter(l=>Date.parse(l.created_at)>=week).length;
+      $('mkt').textContent=state.leads.filter(l=>l.marketing_consent).length;
+      $('threads').textContent=state.leads.filter(l=>/thread/i.test(srcText(l.source))).length;
+    }
+    async function load(){const d=await api('list');state.leads=d.leads||[];$('note').textContent=d.limited?'최근 1000건만 표시합니다.':'';render()}
+    $('search').addEventListener('input',e=>{state.q=e.target.value;render()});
+    $('reload').addEventListener('click',()=>load().then(()=>error('')).catch(e=>error(e.message)));
+    $('rows').addEventListener('click',async e=>{
+      const b=e.target.closest('button[data-id]');if(!b)return;const id=Number(b.dataset.id);
+      if(state.armed!==id){state.armed=id;render();setTimeout(()=>{if(state.armed===id){state.armed=null;render()}},3000);return}
+      state.armed=null;try{await api('delete',{id});await load()}catch(err){error(err.message)}
+    });
+    $('csv').addEventListener('click',()=>{
+      const head=['신청시각','도구','이름','휴대전화','이메일','소식받기','유입'];
+      const cell=(v)=>'"'+String(v??'').replace(/"/g,'""').replace(/^[=+\-@]/,"'$&")+'"';
+      const lines=[head.map(cell).join(',')].concat(state.leads.map(l=>[new Date(l.created_at).toISOString(),TOOL_NAMES[l.tool]||l.tool,l.name,fmtPhone(l.phone),l.email||'',l.marketing_consent?'동의':'',srcText(l.source)].map(cell).join(',')));
+      const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='itools-leads.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    });
+    (async()=>{try{
+      const [{createClient},cr]=await Promise.all([import('https://esm.sh/@supabase/supabase-js@2'),fetch('/api/config',{cache:'no-store'})]);
+      if(!cr.ok)throw new Error('홈페이지 연결 설정을 불러오지 못했습니다.');
+      const c=await cr.json();if(!c.supabaseUrl||!c.supabaseAnonKey)throw new Error('홈페이지 연결 설정을 확인해 주세요.');
+      state.sb=createClient(c.supabaseUrl,c.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage}});
+      const {data:{session}}=await state.sb.auth.getSession();if(!session){deny();return}
+      await load();$('boot').classList.add('hidden');$('app').classList.remove('hidden');
+    }catch(err){deny(err.message||'관리자 연결을 확인해 주세요.')}})();
+  </script>
+</body>
+</html>

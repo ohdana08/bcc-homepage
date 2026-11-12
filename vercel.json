@@ -10,6 +10,10 @@
       "destination": "/api/claude101-suite?fn=lecture-request-attachments"
     },
     {
+      "source": "/api/tool-leads",
+      "destination": "/api/claude101-suite?fn=tool-leads"
+    },
+    {
       "source": "/api/lecture-request",
       "destination": "/api/claude101-suite?fn=lecture-request"
     },

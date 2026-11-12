@@ -10,6 +10,7 @@ import { handleProjectInstructionUsage } from '../lib/project-instruction/teleme
 import { handleLectureOperations } from '../lib/lecture-operations.js';
 import { handleLectureRequest } from '../lib/lecture-request.js';
 import { handleLectureRequestAttachments } from '../lib/lecture-request-attachments.js';
+import { handleToolLeads } from '../lib/tool-leads.js';
 
 const HANDLERS = {
   'lecture-operations': handleLectureOperations,
@@ -20,6 +21,7 @@ const HANDLERS = {
   'project-instruction': handleProjectInstruction,
   'saju-admin': (req, res) => handleSajuAdmin(req, res, { loadHtml: loadPrivateSajuHtml }),
   'project-instruction-usage': handleProjectInstructionUsage,
+  'tool-leads': handleToolLeads,
 };
 
 export default async function handler(req, res) {

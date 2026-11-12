@@ -4,225 +4,375 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>마케팅 경로 지도 | BCC 잇툴즈</title>
-<meta name="description" content="지금 하고 있는 채널을 고르면 고객이 나를 처음 알게 되는 곳부터 구매까지의 길을 그리고, 끊긴 곳을 빨간색으로 보여줍니다. 유튜브·블로그·전단지·AI 검색 모두 해당.">
+<meta name="description" content="지금 하는 채널을 고르면 고객이 나를 처음 알게 되는 곳부터 구매까지의 길을 그리고, 끊긴 곳과 먼저 할 일을 진단서로 드립니다. 유튜브·블로그·전단지·AI 검색 모두 해당.">
 <link rel="canonical" href="https://bccconsulting.kr/tools/funnel-map/">
 <style>
-:root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6;--red:#b3261e;--redbg:#fdecea;--green:#1e7b45;--greenbg:#e8f5ec;--amber:#8a5a00;--amberbg:#fff4d6;--in:#e9f0ff;--out:#e8f5ec}
+:root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6;--red:#b3261e;--redbg:#fdecea;--green:#1e7b45;--greenbg:#e8f5ec;--amber:#8a5a00;--amberbg:#fff4d6;--in:#e9f0ff;--out:#e8f5ec;--orange:#d9730d;--grey:#8a93a6}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-header{background:var(--navy);color:#fff;padding:12px 16px}
-header .in{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-header a{color:#fff;text-decoration:none;font-weight:700}
-header h1{font-size:18px;margin:0}
+[hidden]{display:none!important}
+header.top{background:var(--navy);color:#fff;padding:12px 16px}
+header.top .in{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header.top a{color:#fff;text-decoration:none;font-weight:700}
+header.top h1{font-size:18px;margin:0}
 main{max-width:1200px;margin:0 auto;padding:14px 16px}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 button,select,input,textarea{font-family:inherit}
 button{font-size:14px;font-weight:700;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
 button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
 button.warn{color:var(--red)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .saved{font-size:13px;color:var(--mute);margin-left:auto}
 .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
-.box>h2{font-size:17px;margin:0 0 4px}
+.box>h2{font-size:17px;margin:0 0 4px;display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
 .box>.q{font-size:14px;color:var(--mute);margin:0 0 10px}
-.lead{font-size:15px;margin:0}
-.lead b{color:var(--blue)}
-.top{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.top .full{grid-column:1/-1}
-.goalrow{display:flex;gap:8px;flex-wrap:wrap}
-.goalrow select{width:auto;min-width:150px}
-.goalrow input{flex:1;min-width:160px}
-.top textarea{width:100%;min-height:68px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;line-height:1.5;resize:vertical;background:#fff;color:var(--ink);overflow:hidden}
-.top .tip{font-size:12.5px;color:var(--mute);margin:4px 0 0}
+.step{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;align-items:center;justify-content:center;margin-right:6px;vertical-align:1px}
 label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:4px}
-.top input,.top select{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;background:#fff;color:var(--ink)}
-.groups{display:grid;gap:10px}
-.grp h3{font-size:13px;color:var(--mute);margin:0 0 6px}
+textarea.grow{width:100%;min-height:64px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;line-height:1.5;resize:vertical;background:#fff;color:var(--ink);overflow:hidden}
+.top2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.top2 .full{grid-column:1/-1}
+.goalrow{display:flex;gap:8px;flex-wrap:wrap}
+.goalrow select,.goalrow input{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;background:#fff;color:var(--ink)}
+.goalrow input{flex:1;min-width:160px}
+.tip{font-size:12.5px;color:var(--mute);margin:4px 0 0}
+.grp h3{font-size:13px;color:var(--mute);margin:10px 0 6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font-weight:600;font-size:14px;padding:7px 12px;border-radius:999px;background:#fff}
 .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-.chip small{font-weight:400;opacity:.75;margin-left:2px}
-.add{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.add input{flex:1;min-width:180px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+.add{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.add input,.add select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:#fff;color:var(--ink)}
+.add input{flex:1;min-width:180px}
+.maptools{display:flex;gap:10px;align-items:center}
+.undo2{font-size:13px;padding:6px 12px;border-color:var(--blue);color:var(--blue)}
+.backlink{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap}
 .bands{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;font-size:13px;font-weight:700;text-align:center}
 .bands div{border-radius:8px;padding:5px}
 .bands .bi{background:var(--in);color:#1d3f99}.bands .bo{background:var(--out);color:var(--green)}
 .map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.col{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.col.empty{border:2px dashed var(--red);background:var(--redbg)}
+.col{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0;position:relative}
+.col.empty{border:2px dashed #e0a4a0;background:#fdf6f5}
 .col h3{font-size:15px;margin:0;display:flex;gap:6px;align-items:center}
 .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
 .col .sub{font-size:12.5px;color:var(--mute);margin:0}
+.col .hint{font-size:13px;color:#8d3a33;margin:0}
+.band{display:none;font-size:11.5px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:auto}
+.band.i{background:var(--in);color:#1d3f99}.band.o{background:var(--out);color:var(--green)}
 .node{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}
-.node.dead{border-color:var(--red);box-shadow:0 0 0 2px rgba(179,38,30,.15)}
-.node b{display:block;font-size:14.5px;margin-bottom:4px}
+.node.wait{border-style:dashed;border-color:var(--grey);background:#fafbfd}
+.node.crowd{border:2px solid var(--orange)}
 .node .nh{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.node b{font-size:14.5px}
 .node .rm{flex:none;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;color:var(--mute)}
 .node .rm:hover{color:var(--red);border-color:var(--red)}
-button:disabled{opacity:.45;cursor:default}
-.maptools{display:flex;gap:10px;align-items:center}
-.undo2{font-size:13px;padding:6px 12px;border-color:var(--blue);color:var(--blue)}
-.backlink{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:10;width:max-content;max-width:calc(100% - 32px)}
-.toast[hidden]{display:none}
-.toast button{flex:none;white-space:nowrap;padding:6px 12px;font-size:13px;background:#fff;color:var(--navy);border:none}
-.node .row{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:4px}
-.node .row span{flex:none;width:34px}
+.node .row{display:flex;gap:4px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:5px}
+.node .row span{flex:none;width:40px}
 .node select{flex:1;min-width:0;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
-.node .warnline{color:var(--red);font-size:12.5px;font-weight:700;margin-top:4px}
-.hint{font-size:13px;color:var(--red);margin:0}
-.col textarea{width:100%;min-height:72px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:14px;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
-.col textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
-.col .mlabel{font-size:12.5px;font-weight:700;color:var(--mute);margin:2px 0 -4px}
-.paths{display:grid;gap:6px}
+.node .state{font-size:12.5px;margin-top:5px;font-weight:700}
+.node .state.wait{color:var(--grey)}
+.node .state.ok{color:var(--ink);font-weight:400}
+.node .badge{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;background:var(--orange);border-radius:6px;padding:1px 6px;margin-top:5px}
+.node textarea{width:100%;min-height:44px;margin-top:6px;border:1px dashed var(--line);border-radius:6px;padding:6px 8px;font-size:13.5px;line-height:1.45;resize:vertical;background:#fcfdff;color:var(--ink);overflow:hidden}
+.node textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
+details.cases{margin-top:10px;font-size:14px}
+details.cases summary{cursor:pointer;font-weight:700;color:var(--mute)}
+details.cases ul{margin:6px 0 0;padding-left:18px}
+.diagram svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--mute);margin-top:6px}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid;vertical-align:middle;margin-right:4px}
+.edgelist{display:none;margin:0;padding:0;list-style:none}
+.edgelist li{font-size:14px;padding:6px 0;border-bottom:1px solid #eef0f5}
+.check{display:grid;gap:8px}
+.ck{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ck .t{font-size:14.5px;font-weight:700}
+.ck .t small{display:block;font-weight:400;color:var(--mute);font-size:12.5px}
+.ck select{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;font-size:14px;background:#fff;color:var(--ink)}
+.ck.deadrow{background:#fdf6f5;border-color:#e0a4a0;grid-template-columns:1fr}
+.report .sum{background:var(--bg);border-radius:10px;padding:10px 14px;font-size:14.5px}
+.report .sum p{margin:2px 0}
+.report .status{margin-top:8px;font-weight:700}
+.green{background:var(--greenbg);color:var(--green);border-radius:10px;padding:10px 14px;margin-top:10px;font-weight:700}
+.prob{border:1px solid var(--line);border-left:5px solid var(--red);border-radius:10px;padding:12px 14px;margin-top:10px}
+.prob h4{margin:0 0 6px;font-size:16px}
+.prob dl{margin:0;display:grid;grid-template-columns:64px 1fr;gap:4px 8px;font-size:14.5px}
+.prob dt{font-weight:700;color:var(--mute)}
+.prob dd{margin:0}
+.prob .todo{margin-top:8px;font-size:14.5px}
+.prob .todo label{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;font-weight:400;color:var(--ink);margin:4px 0}
+.prob .todo input{margin-top:4px}
+.others{margin:8px 0 0;padding-left:18px;font-size:14.5px}
+.others li{margin-bottom:4px}
+.paths{display:grid;gap:6px;margin-top:6px}
 .path{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:14.5px}
 .path .p{background:var(--in);border-radius:6px;padding:3px 8px;font-weight:600}
 .path .g{background:var(--greenbg);color:var(--green);border-radius:6px;padding:3px 8px;font-weight:700}
 .path .x{background:var(--redbg);color:var(--red);border-radius:6px;padding:3px 8px;font-weight:700}
 .path .a{color:var(--mute)}
-.diag{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.diag li{border-radius:8px;padding:8px 12px;font-size:14.5px}
-.diag .r{background:var(--redbg);color:#7d1b15}
-.diag .y{background:var(--amberbg);color:var(--amber)}
-.diag .ok{background:var(--greenbg);color:var(--green)}
-.diag li b{display:block}
-.cases{margin:0;padding-left:18px;font-size:14px}
-.cases li{margin-bottom:3px}
+.report h3{font-size:16px;margin:16px 0 4px}
+.endbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.endbar .big{font-size:16px;padding:12px 20px}
 .empty-msg{color:var(--mute);font-size:14px;margin:0}
+.toast{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:8px 10px 8px 14px;display:flex;gap:12px;align-items:center;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:10;width:max-content;max-width:calc(100% - 32px)}
+.toast button{flex:none;white-space:nowrap;padding:5px 12px;font-size:13px;background:#fff;color:var(--navy);border:none}
 footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
 .print-title,.print-foot{display:none}
+.gate{max-width:760px;margin:0 auto}
+.gate .eyebrow{font-size:13px;font-weight:700;color:var(--blue);margin:10px 0 4px}
+.gate h2.hero{font-size:28px;line-height:1.3;margin:0 0 10px}
+.gate .lead{font-size:16px;color:#3a4357;margin:0 0 16px}
+.gate form{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.gate form h3{font-size:19px;margin:0 0 14px}
+.gate .f{margin-bottom:12px}
+.gate .f input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:17px;background:#fff;color:var(--ink)}
+.gate .f label{font-size:14px;color:var(--ink)}
+.gate .f label em{font-style:normal;color:var(--mute);font-weight:400}
+.gate .notice{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:13px;color:#4a5368;margin:4px 0 12px}
+.gate .notice b{color:var(--ink)}
+.gate .agree{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;font-weight:400;color:var(--ink);margin:8px 0;cursor:pointer}
+.gate .agree input{width:18px;height:18px;margin-top:2px;flex:none}
+.gate .go{width:100%;font-size:18px;padding:15px;border-radius:10px;background:var(--navy);border-color:var(--navy);color:#fff;margin-top:8px}
+.gate .err{color:var(--red);font-size:14px;font-weight:700;margin:8px 0 0}
+.gate .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.teaser{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:14px}
+.teaser h3{font-size:20px;margin:0 0 4px}
+.teaser>p{font-size:14px;color:var(--mute);margin:0 0 10px}
+.toc{list-style:none;margin:0;padding:0}
+.toc li{display:grid;grid-template-columns:30px 1fr;gap:8px;padding:11px 0;border-bottom:1px solid #eef0f5}
+.toc li b{display:block;font-size:15.5px}
+.toc li span{font-size:14px;color:var(--mute)}
+.toc .n{width:26px;height:26px;border-radius:50%;background:var(--in);color:#1d3f99;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.sample{position:relative;margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:14px;overflow:hidden;max-height:340px;background:#fff}
+.sample .tag{position:absolute;right:10px;top:10px;font-size:12px;font-weight:700;background:var(--amberbg);color:var(--amber);border-radius:6px;padding:2px 8px}
+.sample .fade{position:absolute;left:0;right:0;bottom:0;height:150px;background:linear-gradient(rgba(255,255,255,0),#fff 75%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;font-weight:700;color:var(--navy);font-size:14.5px;text-align:center}
+.sample .blur{filter:blur(3px);user-select:none}
+.mini-path{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:13.5px;margin:8px 0}
+.mini-path span{background:var(--in);border-radius:6px;padding:2px 7px;font-weight:600}
+.mini-path span.x{background:var(--redbg);color:var(--red)}
+.mini-path span.g{background:var(--greenbg);color:var(--green)}
+.mini-path i{font-style:normal;color:var(--mute)}
 @media(max-width:900px){
-  .top{grid-template-columns:1fr}
+  .top2{grid-template-columns:1fr}
   .bands{display:none}
-  .map{grid-template-columns:1fr}
-  .col{position:relative}
-  .col:not(:last-child)::after{content:"↓";position:absolute;left:50%;bottom:-18px;transform:translateX(-50%);color:var(--mute);font-weight:700}
-  .map{gap:22px}
-  .col .band{display:inline-block}
+  .map{grid-template-columns:1fr;gap:22px}
+  .col:not(:last-child)::after{content:"↓";position:absolute;left:50%;bottom:-19px;transform:translateX(-50%);color:var(--mute);font-weight:700}
+  .band{display:inline-block}
   .saved{margin-left:0;width:100%}
+  .ck{grid-template-columns:1fr}
 }
-.band{display:none;font-size:11.5px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:auto}
-.band.i{background:var(--in);color:#1d3f99}.band.o{background:var(--out);color:var(--green)}
-@media(max-width:900px){.band{display:inline-block}}
+@media(max-width:700px){
+  .diagram svg,.legend{display:none}
+  .edgelist{display:block}
+  .gate h2.hero{font-size:23px}
+}
 @media print{
   @page{size:A4 portrait;margin:10mm}
   body{background:#fff}
-  header,.bar,footer,.toast,.undo2,.node .rm,.backlink,#introBox,#pickBox,#caseBox,.add,.node select,.node .row,.lead{display:none}
+  header.top,.bar,footer,.toast,#gate,.noprint{display:none!important}
   main{padding:0;max-width:none}
   .print-title{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin:0 0 6px}
   .print-title span:last-child{font-weight:400;font-size:11px}
-  .box{border-color:#999;border-radius:0;padding:8px 10px;margin-bottom:6px;break-inside:avoid}
-  .box>.q{display:none}
-  .map{grid-template-columns:repeat(4,1fr);gap:4px}
-  .col{border-radius:0;padding:6px}
-  .col:not(:last-child)::after{display:none}
-  .col textarea{border:none;background:#fff;min-height:0;resize:none;font-size:11px;padding:2px}
-  .top{grid-template-columns:1fr 1fr;gap:4px}
-  .top textarea,.top input,.top select{border:none;padding:2px;font-size:11px;min-height:0;resize:none}
-  .top .tip,.goalrow input[hidden]{display:none}
-  .node{padding:4px 6px}
-  .node b{font-size:12px;margin:0}
-  .bands{display:grid}
+  .box{border-color:#999;border-radius:0;padding:8px 10px;margin-bottom:6px}
+  .diagram svg{display:block!important}.edgelist{display:none!important}.legend{display:flex!important}
+  .prob{break-inside:avoid;border-radius:0}
+  .endbar{display:none}
   .print-foot{display:block;font-size:9px;color:#555;text-align:right}
 }
 </style>
 </head>
 <body>
-<header><div class="in">
+<header class="top"><div class="in">
   <h1>마케팅 경로 지도</h1>
   <a href="https://bccconsulting.kr/tools.html">← 잇툴즈</a>
 </div></header>
+
 <main>
-  <div class="bar">
+<section id="gate" class="gate" hidden>
+  <p class="eyebrow">무료 진단 · BCC 잇툴즈</p>
+  <h2 class="hero">내 마케팅, 고객이 어디서 끊기는지<br>15분 만에 진단하세요</h2>
+  <p class="lead">유튜브·블로그·인스타·전단지·AI 검색까지. 지금 하는 것을 고르면 고객이 나를 처음 알게 되는 곳부터 구매까지의 길을 그리고, <b>끊긴 곳과 먼저 할 일</b>을 진단서로 드립니다. 오예림 강사의 마케팅 강의에서 교육생이 쓰는 도구입니다.</p>
+  <form id="gateForm" novalidate>
+    <h3>무료 진단 시작하기</h3>
+    <div class="f"><label for="gName">이름 (필수)</label><input id="gName" autocomplete="name" maxlength="40" required></div>
+    <div class="f"><label for="gPhone">휴대전화 번호 (필수)</label><input id="gPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678" maxlength="13" required></div>
+    <div class="f"><label for="gEmail">이메일 <em>(선택)</em></label><input id="gEmail" type="email" autocomplete="email" maxlength="254"></div>
+    <div class="hp" aria-hidden="true"><label for="gWeb">웹사이트</label><input id="gWeb" tabindex="-1" autocomplete="off"></div>
+    <div class="notice">
+      <b>개인정보 수집·이용 안내</b><br>
+      수집 항목: 이름, 휴대전화 번호, 이메일(선택), 들어온 경로 표시. 이용 목적: 도구 이용자 확인, 이용 안내·문의 응대, 도구 개선 통계. 보유 기간: 신청일부터 1년(삭제 요청 시 바로 삭제). 동의를 거부할 수 있으며, 거부하면 이 도구를 이용할 수 없습니다.<br>
+      신청 내용은 미국 Vercel 서버를 거쳐 처리되고 대한민국 서울의 Supabase DB에 저장됩니다. 진단에 입력하는 사업 내용은 서버로 보내지 않고 이 기기에만 저장됩니다. <a href="/privacy.html#tool-leads" target="_blank" rel="noopener">개인정보처리방침</a>
+    </div>
+    <label class="agree"><input type="checkbox" id="gC1"> <span>[필수] 개인정보 수집·이용에 동의합니다.</span></label>
+    <label class="agree"><input type="checkbox" id="gC2"> <span>[필수] 신청 내용이 미국 Vercel 서버를 거쳐 처리되는 국외 처리에 동의합니다.</span></label>
+    <label class="agree"><input type="checkbox" id="gC3"> <span>[선택] BCC 강의·무료 도구 소식을 문자·이메일로 받겠습니다. 동의하지 않아도 진단을 쓸 수 있습니다.</span></label>
+    <button type="submit" class="go" id="gGo">무료 진단 시작하기</button>
+    <p class="err" id="gErr" role="alert" hidden></p>
+  </form>
+
+  <div class="teaser">
+    <h3>진단을 마치면 이런 걸 받아요</h3>
+    <p>15분 정도 걸립니다. 휴대폰으로도 됩니다.</p>
+    <ol class="toc">
+      <li><span class="n">1</span><div><b>내 사업 마케팅 경로 지도</b><span>지금 하는 채널이 고객 4단계(모르는 고객 → 문제를 아는 고객 → 알아보는 고객 → 바로 사는 고객) 위에 놓이고 화살표로 이어집니다.</span></div></li>
+      <li><span class="n">2</span><div><b>고객이 사라지는 곳 표시</b><span>다음 갈 곳이 없는 채널, 여러 길이 몰려 한 번에 막힐 수 있는 곳을 바로 보여줍니다.</span></div></li>
+      <li><span class="n">3</span><div><b>"정말 이어져 있나?" 연결 확인</b><span>링크·QR이 실제로 있는지, 몇 명이 왔는지 셀 수 있는지 하나씩 점검합니다.</span></div></li>
+      <li><span class="n">4</span><div><b>먼저 할 3가지 대책</b><span>무엇이 문제인지, 왜 문제인지, 어떻게 고칠지, 이번 주 할 일까지 체크리스트로 드립니다.</span></div></li>
+      <li><span class="n">5</span><div><b>진단서 PDF</b><span>A4로 저장해 두고 직원·동업자와 함께 보세요.</span></div></li>
+    </ol>
+    <div class="sample" aria-label="진단서 예시 미리보기">
+      <span class="tag">예시 · 생활 도자기 공방</span>
+      <b style="font-size:15px">먼저 할 3가지</b>
+      <div class="prob" style="margin-top:8px">
+        <h4>1. 카카오톡 채널에 길 3개가 몰립니다</h4>
+        <dl><dt>왜</dt><dd>여기가 막히면 쇼츠·전단지·블로그에서 온 손님이 한 번에 막힙니다.</dd><dt>대책</dt><dd>카카오톡 채널의 연결과 할 말을 가장 먼저 다듬으세요.</dd></dl>
+      </div>
+      <div class="mini-path"><span>쇼츠</span><i>→</i><span>인스타그램</span><i>→</i><span>네이버 플레이스</span><i>→</i><span class="g">예약 ✓</span></div>
+      <div class="mini-path"><span>전단지</span><i>→</i><span>카카오톡 채널</span><i>→</i><span class="g">예약 ✓</span></div>
+      <div class="blur">
+        <div class="prob"><h4>2. 인스타그램 → 네이버 플레이스: 이어져 있는지 모릅니다</h4><dl><dt>왜</dt><dd>이어져 있다고 생각하지만 확인이 안 됐습니다.</dd><dt>대책</dt><dd>고객처럼 직접 따라가 보세요.</dd></dl></div>
+        <div class="prob"><h4>3. 전단지 → 카카오톡 채널: 종이에서 다음으로 가는 길이 약합니다</h4></div>
+      </div>
+      <div class="fade">신청하면 내 사업 진단서를 바로 만들 수 있습니다 ↑</div>
+    </div>
+  </div>
+</section>
+
+<div id="tool" hidden>
+  <div class="bar noprint">
     <button id="btnUndo" disabled title="방금 한 선택·연결·빼기를 되돌립니다">↩ 되돌리기</button>
     <button id="btnExample">예시 보기</button>
-    <button class="pri" id="btnPrint">PDF로 저장</button>
-    <button id="btnCopy">글로 복사</button>
-    <button id="btnPrompt">AI에게 물어볼 글 복사</button>
     <button class="warn" id="btnReset">처음부터</button>
     <span class="saved" id="saved">쓰는 대로 이 기기에 자동 저장됩니다</span>
   </div>
+  <p class="print-title"><span id="ptLeft"></span><span>BCC 잇툴즈 · 마케팅 경로 진단서</span></p>
 
-  <p class="print-title"><span id="ptLeft"></span><span>BCC 잇툴즈 · 마케팅 경로 지도</span></p>
-
-  <section class="box" id="introBox">
-    <p class="lead">채널보다 중요한 건 <b>고객이 걷는 길</b>입니다. 지금 하고 있는 것을 고르면, 고객이 나를 처음 알게 되는 곳부터 돈을 내는 곳까지 길을 그리고 <b>끊긴 곳</b>을 빨간색으로 보여줍니다.</p>
-  </section>
-
-  <section class="box">
-    <h2>① 내 사업</h2>
-    <p class="q">한 줄로 짧게 써도 되고, 생각나는 대로 길게 설명해도 됩니다. 길게 쓸수록 "AI에게 물어볼 글"의 답이 구체적으로 나옵니다. 고객은 "모든 사람" 말고 얼굴이 떠오르는 한 사람으로 적어 주세요.</p>
-    <div class="top">
-      <div><label for="biz">무엇을 파나요</label><textarea id="biz" rows="2" placeholder="예: 생활 도자기 원데이 클래스&#10;(길게) 2시간 동안 컵이나 접시를 직접 만들고, 2주 뒤 구워서 택배로 보내드려요. 1인 5만 원, 커플 할인도 있어요."></textarea></div>
-      <div><label for="who">누가 사나요 (한 사람)</label><textarea id="who" rows="2" placeholder="예: 주말 취미를 찾는 30대 직장인&#10;(길게) 평일엔 야근이 많아 주말엔 손으로 뭔가 해보고 싶어 해요. 인스타에서 공방 사진을 자주 저장하지만 혼자 가기는 망설여요."></textarea></div>
+  <section class="box noprint">
+    <h2><span><span class="step">1</span>내 사업</span></h2>
+    <p class="q">한 줄로 짧게 써도 되고, 생각나는 대로 길게 설명해도 됩니다. 고객은 "모든 사람" 말고 얼굴이 떠오르는 한 사람으로 적어 주세요.</p>
+    <div class="top2">
+      <div><label for="biz">무엇을 파나요</label><textarea id="biz" class="grow" rows="2" placeholder="예: 생활 도자기 원데이 클래스&#10;(길게) 2시간 동안 컵이나 접시를 직접 만들고, 2주 뒤 구워서 택배로 보내드려요."></textarea></div>
+      <div><label for="who">누가 사나요 (한 사람)</label><textarea id="who" class="grow" rows="2" placeholder="예: 주말 취미를 찾는 30대 직장인&#10;(길게) 인스타에서 공방 사진을 자주 저장하지만 혼자 가기는 망설여요."></textarea></div>
       <div class="full"><label for="goal">마지막에 고객이 할 행동</label>
         <div class="goalrow">
           <select id="goal"><option>구매</option><option>예약</option><option>상담 신청</option><option>수강 신청</option><option>매장 방문</option><option>문의</option><option value="__custom">직접 적기</option></select>
           <input id="goalCustom" maxlength="20" placeholder="짧게 이름 붙이기 (예: 체험 신청)" hidden>
         </div>
-        <textarea id="goalDetail" rows="2" style="margin-top:8px" placeholder="(선택) 고객이 실제로 하는 일을 자세히. 예: 카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 1만 원 입금하면 확정"></textarea>
-        <p class="tip">지도와 길에는 위에서 고른 짧은 이름이 쓰이고, 자세한 설명은 글 복사·AI 질문에 들어갑니다.</p>
+        <textarea id="goalDetail" class="grow" rows="2" style="margin-top:8px" placeholder="(선택) 고객이 실제로 하는 일을 자세히. 예: 카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 입금하면 확정"></textarea>
+        <p class="tip">지도와 길에는 짧은 이름이 쓰이고, 자세한 설명은 진단서 글·AI 질문에 들어갑니다.</p>
       </div>
     </div>
   </section>
 
-  <section class="box" id="pickBox">
-    <h2>② 지금 하고 있는 것 모두 고르기</h2>
+  <section class="box noprint" id="pickBox">
+    <h2><span><span class="step">2</span>지금 하고 있는 것 모두 고르기</span></h2>
     <p class="q">온라인이든 오프라인이든 손님을 부르려고 하는 건 다 고르세요. 아직 아무것도 안 한다면 해보고 싶은 것을 고르세요.</p>
-    <div class="groups" id="groups"></div>
+    <div id="groups"></div>
     <div class="add">
       <input id="customName" placeholder="목록에 없으면 직접 적기 (예: 동네 맘카페)" maxlength="30">
-      <button id="btnAdd">추가</button>
+      <select id="customStage" aria-label="직접 적은 곳의 단계"><option value="1">1. 모르는 고객</option><option value="2">2. 문제를 아는 고객</option><option value="3">3. 알아보는 고객</option><option value="4">4. 바로 사는 고객</option></select>
+      <button id="btnAdd" type="button">추가</button>
     </div>
   </section>
 
-  <section class="box">
-    <h2 style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">③ 경로 지도 <span class="maptools"><button type="button" id="btnUndo2" class="undo2" disabled>↩ 되돌리기</button><a class="backlink" href="#pickBox">↑ 채널 더 고르기</a></span></h2>
-    <p class="q">고른 것이 고객 단계별로 놓입니다. 칸이 틀렸으면 "단계"를, 그걸 본 고객이 다음에 어디로 가는지는 "다음"을 고르세요. 아래 칸에는 그 단계에서 고객에게 할 말을 적습니다. 잘못 골랐으면 "빼기", 방금 한 걸 취소하려면 오른쪽 위 "↩ 되돌리기"를 누르세요.</p>
-    <div class="bands"><div class="bi">유입 · 사세요 말고 고객이 듣고 싶은 말</div><div class="bo">전환 · 믿게 한 뒤 분명한 행동 하나</div></div>
+  <section class="box noprint">
+    <h2><span><span class="step">3</span>연결하기</span><span class="maptools"><button type="button" id="btnUndo2" class="undo2" disabled>↩ 되돌리기</button><a class="backlink" href="#pickBox">↑ 채널 더 고르기</a></span></h2>
+    <p class="q">고른 것이 고객 단계별로 놓입니다. 그걸 본 고객이 <b>다음에 어디로 가는지</b> 골라 주세요(2곳까지). 칸이 틀렸으면 "단계"를 바꾸고, 잘못 골랐으면 "빼기"를 누르세요.</p>
+    <div class="bands"><div class="bi">처음 만나는 단계 · "사세요" 말고 고객이 듣고 싶은 말</div><div class="bo">믿고 행동하는 단계 · 믿게 한 뒤 분명한 행동 하나</div></div>
     <div class="map" id="map"></div>
-  </section>
-
-  <section class="box">
-    <h2>④ 고객이 걷는 길</h2>
-    <p class="q">"다음"을 따라 이어 본 길입니다. 빨간 칸에서 고객이 사라집니다.</p>
-    <div class="paths" id="paths"></div>
-  </section>
-
-  <section class="box">
-    <h2>⑤ 진단</h2>
-    <ul class="diag" id="diag"></ul>
-  </section>
-
-  <section class="box" id="caseBox">
-    <h2>참고: 수업에서 본 길</h2>
-    <ul class="cases">
+    <details class="cases"><summary>참고: 수업에서 본 길</summary><ul>
       <li>매일 30초 정보 영상 → 블로그 → 카카오톡 상담 (세무사)</li>
       <li>쇼츠 → 긴 영상 → 홈페이지 → 무료 강의 → 유료 서비스</li>
       <li>"이런 고민 있으세요?" 쇼츠 → 긴 영상 → 블로그·홈페이지 → 상담 → 방문 (병원)</li>
       <li>유행 챌린지 영상에 객실·조식을 자연스럽게 → 홈페이지 예약 (호텔)</li>
-    </ul>
+    </ul></details>
   </section>
-  <p class="print-foot">BCC · bccconsulting.kr/tools/funnel-map/</p>
+
+  <section class="box diagram">
+    <h2><span><span class="step">4</span>연결 그림</span></h2>
+    <p class="q noprint">고객이 실제로 걷는 길입니다. 주황 테두리는 서로 다른 출발점 여러 곳에서 온 손님이 몰리는 곳, 빨간 점선은 다음 갈 곳이 없는 곳입니다.</p>
+    <div id="svgWrap"></div>
+    <ul class="edgelist" id="edgeList"></ul>
+    <div class="legend"><span><i style="border-color:#2b6b3f"></i>링크·QR로 이어짐</span><span><i style="border-color:#b3261e;border-top-style:dashed"></i>말로만·방법 없음</span><span><i style="border-color:#8a93a6;border-top-style:dashed"></i>아직 확인 안 함·모름</span></div>
+  </section>
+
+  <section class="box noprint">
+    <h2><span><span class="step">5</span>연결 확인</span></h2>
+    <p class="q">화살표 하나마다 실제로 이어져 있는지 확인해 주세요. 고객 입장에서 휴대폰으로 직접 눌러 보면 가장 정확합니다.</p>
+    <div class="check" id="check"></div>
+  </section>
+
+  <section class="box report" id="report">
+    <h2><span><span class="step">6</span>진단서</span></h2>
+    <div id="reportBody"></div>
+    <div class="endbar">
+      <button class="pri big" id="btnPrint">진단서 PDF로 받기</button>
+      <button id="btnCopy">글로 복사</button>
+      <button id="btnPrompt">AI에게 물어볼 글 복사</button>
+    </div>
+    <p class="print-foot">BCC · bccconsulting.kr/tools/funnel-map/</p>
+  </section>
+</div>
 </main>
 <div class="toast" id="toast" hidden role="status"><span id="toastMsg"></span><button type="button" id="toastUndo">되돌리기</button></div>
-<footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 수업이 끝나면 PDF로 저장해 두세요.</footer>
+<footer>진단에 입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 진단서는 PDF로 저장해 두세요.</footer>
 
 <script>
 (function(){
-  var KEY='bcc_funnelmap_v1';
+  'use strict';
+  var KEY='bcc_funnelmap_v1', ACCESS='bcc_tool_access_v1', TOUCH='bcc_first_touch', TOOL='funnel-map', CONSENT='2026-11-12-v1';
+  var $=function(id){return document.getElementById(id)};
+  function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+  /* 처음 들어온 경로 기록 (잇툴즈 목록에서 이미 기록했으면 그대로 둔다) */
+  (function(){
+    if(lsGet(TOUCH))return;
+    var p=new URLSearchParams(location.search),t={landing:location.pathname};
+    ['utm_source','utm_medium','utm_campaign'].forEach(function(k){var v=p.get(k);if(v)t[k]=v.slice(0,100)});
+    try{var r=document.referrer?new URL(document.referrer).hostname:'';if(r&&!/(^|\.)bccconsulting\.kr$/.test(r))t.ref=r}catch(e){}
+    lsSet(TOUCH,JSON.stringify(t));
+  })();
+
+  /* ---------- 입구 ---------- */
+  function hasAccess(){try{var a=JSON.parse(lsGet(ACCESS)||'null');return !!(a&&a.ok)}catch(e){return false}}
+  if(hasAccess())$('tool').hidden=false;else $('gate').hidden=false;
+  $('gPhone').addEventListener('input',function(){
+    var d=this.value.replace(/\D/g,'').slice(0,11);
+    this.value=d.length<4?d:d.length<8?d.slice(0,3)+'-'+d.slice(3):d.slice(0,3)+'-'+d.slice(3,d.length-4)+'-'+d.slice(-4);
+  });
+  $('gateForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var err=$('gErr'),btn=$('gGo');
+    function show(m){err.textContent=m;err.hidden=false}
+    err.hidden=true;
+    var name=$('gName').value.trim(),phone=$('gPhone').value.replace(/\D/g,''),email=$('gEmail').value.trim();
+    if(!name){show('이름을 입력해 주세요.');$('gName').focus();return}
+    if(!/^01[0-9]{8,9}$/.test(phone)){show('휴대전화 번호를 확인해 주세요. 예: 010-1234-5678');$('gPhone').focus();return}
+    if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){show('이메일 주소를 확인해 주세요.');$('gEmail').focus();return}
+    if(!$('gC1').checked||!$('gC2').checked){show('[필수] 동의 2개에 체크해 주세요.');return}
+    var src={};try{src=JSON.parse(lsGet(TOUCH)||'{}')||{}}catch(x){}
+    btn.disabled=true;btn.textContent='확인하는 중…';
+    fetch('/api/tool-leads',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',
+      body:JSON.stringify({action:'submit',tool:TOOL,name:name,phone:phone,email:email,consent:true,overseas_consent:true,marketing_consent:$('gC3').checked,consent_version:CONSENT,website:$('gWeb').value,source:src})})
+    .then(function(r){return r.json().catch(function(){return{}}).then(function(d){return{ok:r.ok,d:d}})})
+    .then(function(x){
+      if(!x.ok){show(x.d.error||'신청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');return}
+      lsSet(ACCESS,JSON.stringify({ok:true,at:new Date().toISOString(),tool:TOOL}));
+      $('gate').hidden=true;$('tool').hidden=false;renderAll();window.scrollTo(0,0);
+      toast('신청이 완료됐습니다. 진단을 시작해 보세요.',false);
+    })
+    .catch(function(){show('인터넷 연결을 확인한 뒤 다시 눌러 주세요.')})
+    .then(function(){btn.disabled=false;btn.textContent='무료 진단 시작하기'});
+  });
+
+  /* ---------- 기본 데이터 ---------- */
   var STAGES=[
     {n:1,t:'모르는 고객',s:'처음 알게 되는 곳',band:'i'},
     {n:2,t:'문제를 아는 고객',s:'"나 이거 필요하네" 느끼는 곳',band:'i'},
     {n:3,t:'알아보는 고객',s:'비교하고 믿게 되는 곳',band:'o'},
     {n:4,t:'바로 사는 고객',s:'연락·예약·구매하는 곳',band:'o'}
   ];
-  var MSG_PH={1:'예: "퇴근 후 2시간, 내 그릇이 생깁니다" 40초 영상',2:'예: 처음이어도 되는지, 몇 시간 걸리는지',3:'예: 수강생 작품 사진과 후기',4:'예: 토요일·일요일 시간표 + 예약 버튼'};
-  var EMPTY_HINT={
-    1:'비었습니다. 나를 모르는 사람을 데려올 곳이 없어, 이미 아는 사람만 만나게 됩니다. 예: 쇼츠·릴스, 전단지, 행사 부스',
-    2:'비었습니다. 고객이 필요를 느끼게 할 정보가 없습니다. 예: 블로그 정보글, 유튜브 설명 영상, 스레드',
-    3:'비었습니다. 비교하는 고객이 확인할 후기·사례·소개가 없습니다. 예: 네이버 플레이스 후기, 홈페이지, 체험단',
-    4:'비었습니다. 마음먹은 고객이 연락하거나 살 곳이 없습니다. 예: 카카오톡 채널, 예약 페이지, 스마트스토어'
-  };
+  var EMPTY_HINT={1:'비었습니다. 예: 쇼츠·릴스, 전단지, 행사 부스',2:'비었습니다. 예: 블로그 정보글, 유튜브 설명 영상, 스레드',3:'비었습니다. 예: 네이버 플레이스 후기, 홈페이지, 체험단',4:'비었습니다. 예: 카카오톡 채널, 예약 페이지, 스마트스토어'};
+  var MSG_PH={1:'이곳에서 할 말 (예: 퇴근 후 2시간, 내 그릇이 생깁니다)',2:'이곳에서 할 말 (예: 처음이어도 되는지, 몇 시간 걸리는지)',3:'이곳에서 할 말 (예: 수강생 작품 사진과 후기)',4:'이곳에서 할 말 (예: 카톡 채널 추가하면 이번 달 시간표를 보내드려요)'};
   var CH=[
     ['shorts','쇼츠·릴스·틱톡','영상',1],['youtube','유튜브 긴 영상','영상',2],
     ['insta','인스타그램 게시물','SNS·광고',1],['threads','스레드','SNS·광고',1],['facebook','페이스북·밴드','SNS·광고',1],['ads','유료 광고','SNS·광고',1],
@@ -230,234 +380,357 @@ footer{max-width:1200px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     ['flyer','전단지·팜플렛','오프라인',1],['banner','현수막·간판','오프라인',1],['booth','행사·플리마켓 부스','오프라인',1],['refer','지인 소개·입소문','오프라인',3],['card','명함','오프라인',3],
     ['kakao','카카오톡 채널','연결·판매',4],['openchat','오픈채팅·단톡방','연결·판매',3],['store','스마트스토어·쇼핑몰','연결·판매',4],['booking','예약 페이지','연결·판매',4],['phone','전화·문자','연결·판매',4],['shop','매장·공방 방문','연결·판매',4]
   ];
-  var OFFLINE={flyer:1,banner:1,booth:1,card:1};
   var GROUPS=['영상','SNS·광고','검색','오프라인','연결·판매'];
   var BASE={};CH.forEach(function(c){BASE[c[0]]={name:c[1],group:c[2],stage:c[3]}});
-
   var GOALS=['구매','예약','상담 신청','수강 신청','매장 방문','문의'];
-  function blank(){return {biz:'',who:'',goal:'구매',goalPick:'구매',goalCustom:'',goalDetail:'',sel:{},order:[],custom:{},msg:{1:'',2:'',3:'',4:''}}}
+  var HOW=[['','고르세요'],['link','링크·버튼이 있다'],['qr','QR이 있다'],['word','말로만 안내한다'],['none','방법이 없다'],['unknown','모르겠다']];
+  var COUNT=[['','고르세요'],['yes','셀 수 있다'],['no','못 센다']];
+  function howLabel(v){for(var i=0;i<HOW.length;i++)if(HOW[i][0]===v)return HOW[i][1];return ''}
+
+  function blank(){return {version:2,biz:'',who:'',goal:'구매',goalPick:'구매',goalCustom:'',goalDetail:'',nodes:{},order:[],edges:[],checks:{}}}
+  function migrate(o){
+    if(!o||typeof o!=='object')return blank();
+    if(o.version===2){var b=blank();for(var k in b)if(o[k]==null)o[k]=b[k];for(var nid in o.nodes){var nd=o.nodes[nid];if(!nd||typeof nd!=='object'){delete o.nodes[nid];continue}nd.stage=Math.min(4,Math.max(1,+nd.stage||1))}if(!Array.isArray(o.edges))o.edges=[];if(!Array.isArray(o.order))o.order=Object.keys(o.nodes);return o}
+    var s=blank();
+    ['biz','who','goal','goalPick','goalCustom','goalDetail'].forEach(function(k){if(typeof o[k]==='string')s[k]=o[k]});
+    if(!o.goalPick){s.goalPick=GOALS.indexOf(s.goal)>=0?s.goal:'__custom';s.goalCustom=s.goalPick==='__custom'?s.goal:''}
+    var sel=o.sel||{},custom=o.custom||{},msg=o.msg||{},order=(o.order||Object.keys(sel)).filter(function(id){return sel[id]});
+    var used={};
+    order.forEach(function(id){
+      var stg=Math.min(4,Math.max(1,+sel[id].stage||1));
+      s.nodes[id]={stage:stg,custom:!BASE[id],name:BASE[id]?'':String(custom[id]||'직접 추가'),msg:''};
+      if(!used[stg]&&msg[stg]){s.nodes[id].msg=String(msg[stg]);used[stg]=1}
+      s.order.push(id);
+    });
+    order.forEach(function(id){var n=sel[id].next;if(n&&(n==='goal'||sel[n]))s.edges.push({from:id,to:n,how:'',count:''})});
+    return s;
+  }
   var st=blank();
-  try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.sel){st=s;st.msg=st.msg||{1:'',2:'',3:'',4:''};st.custom=st.custom||{};st.order=st.order||Object.keys(st.sel);st.goal=st.goal||'구매';if(!st.goalPick){st.goalPick=GOALS.indexOf(st.goal)>=0?st.goal:'__custom';st.goalCustom=st.goalPick==='__custom'?st.goal:''}st.goalCustom=st.goalCustom||'';st.goalDetail=st.goalDetail||''}}catch(e){}
+  try{st=migrate(JSON.parse(lsGet(KEY)||'null'))}catch(e){st=blank()}
 
-  var $=function(id){return document.getElementById(id)};
   var saved=$('saved');
-  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-  function nameOf(id){return BASE[id]?BASE[id].name:(st.custom[id]||'')}
-  function persist(){try{localStorage.setItem(KEY,JSON.stringify(st));saved.textContent='저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}catch(e){saved.textContent='이 브라우저는 자동 저장이 안 됩니다. PDF로 저장해 주세요.'}}
-  function selIds(){return st.order.filter(function(id){return st.sel[id]})}
-  function byStage(n){return selIds().filter(function(id){return st.sel[id].stage===n})}
+  function persist(){if(lsSet(KEY,JSON.stringify(st)))saved.textContent='저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});else saved.textContent='이 브라우저는 자동 저장이 안 됩니다. 진단서를 PDF로 저장해 주세요.'}
+  function ids(){return st.order.filter(function(id){return st.nodes[id]})}
+  function nameOf(id){if(id==='goal')return st.goal;var n=st.nodes[id];if(n&&n.custom)return n.name;return BASE[id]?BASE[id].name:(n&&n.name)||''}
+  function toName(id){return id==='goal'?'바로 '+st.goal:nameOf(id)}
+  function plain(id){return id==='goal'?st.goal:nameOf(id).replace(/ \(.*\)$/,'')}
+  function outs(id){return st.edges.filter(function(e){return e.from===id})}
+  function kind(id){
+    var b=BASE[id];
+    if(b){if(b.group==='영상'||b.group==='SNS·광고')return 'sns';if(b.group==='검색')return 'search';if(b.group==='오프라인')return 'offline';return 'conv'}
+    var s=st.nodes[id].stage;return s===1?'sns':s===4?'conv':'search';
+  }
+  function stageOf(id){return id==='goal'?5:st.nodes[id].stage}
+  function syncGoal(){st.goal=st.goalPick==='__custom'?((st.goalCustom||'').trim()||'행동'):st.goalPick}
 
+  /* 조사: 받침에 맞게 */
+  function batchim(w){w=String(w);var c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return null;return (c-0xAC00)%28}
+  function j(w,a,b){var x=batchim(w);if(x===null)return w+a+'('+b+')';return w+(x?a:b)}
+  function ro(w){var x=batchim(w);if(x===null)return w+'(으)로';return w+(x&&x!==8?'으로':'로')}
+
+  /* 되돌리기·알림 */
   var hist=[],toastTimer=null;
   function updUndo(){$('btnUndo').disabled=$('btnUndo2').disabled=!hist.length}
   function snap(){hist.push(JSON.stringify(st));if(hist.length>30)hist.shift();updUndo()}
-  function toast(msg,canUndo){
-    $('toastMsg').textContent=msg;$('toastUndo').hidden=!canUndo;$('toast').hidden=false;
-    clearTimeout(toastTimer);toastTimer=setTimeout(function(){$('toast').hidden=true},6000);
-  }
-  function undo(){
-    if(!hist.length)return;
-    try{st=JSON.parse(hist.pop())}catch(e){return}
-    persist();renderAll();updUndo();toast('되돌렸습니다',false);
+  function toast(msg,canUndo){$('toastMsg').textContent=msg;$('toastUndo').hidden=!canUndo;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){$('toast').hidden=true},6000)}
+  function undo(){if(!hist.length)return;try{st=migrate(JSON.parse(hist.pop()))}catch(e){return}persist();renderAll();updUndo();toast('되돌렸습니다',false)}
+
+  /* 상태 변경 */
+  function removeNode(id){
+    delete st.nodes[id];st.order=st.order.filter(function(x){return x!==id});
+    st.edges=st.edges.filter(function(e){return e.from!==id&&e.to!==id});
   }
   function toggle(id){
-    snap();var nm=nameOf(id),was=!!st.sel[id];
-    if(st.sel[id]){
-      delete st.sel[id];st.order=st.order.filter(function(x){return x!==id});
-      Object.keys(st.sel).forEach(function(k){if(st.sel[k].next===id)st.sel[k].next=''});
-      if(st.custom[id])delete st.custom[id];
-    }else{
-      var stg=BASE[id]?BASE[id].stage:1;
-      st.sel[id]={stage:stg,next:stg===4?'goal':''};st.order.push(id);
-    }
+    var nm=nameOf(id),was=!!st.nodes[id];
+    if(!was&&!BASE[id])return;
+    snap();
+    if(was)removeNode(id);
+    else{var s=BASE[id].stage;st.nodes[id]={stage:s,custom:false,name:'',msg:''};st.order.push(id);if(s===4)st.edges.push({from:id,to:'goal',how:'',count:''})}
     persist();renderAll();
-    toast(was?'「'+nm+'」을(를) 뺐습니다':'「'+nm+'」을(를) '+st.sel[id].stage+'단계에 넣었습니다',true);
+    toast(was?j('「'+nm+'」','을','를')+' 뺐습니다':j('「'+nm+'」','을','를')+' '+st.nodes[id].stage+'단계에 넣었습니다',true);
+  }
+  function setNext(id,slot,to){
+    var list=outs(id),cur=list[slot];
+    if(cur&&cur.to===to)return;
+    if(to&&list.some(function(e,i){return i!==slot&&e.to===to})){toast('이미 고른 곳입니다',false);renderAll();return}
+    snap();
+    if(cur){
+      if(to)cur.to=to,cur.how='',cur.count='';
+      else st.edges.splice(st.edges.indexOf(cur),1);
+    }else if(to)st.edges.push({from:id,to:to,how:'',count:''});
+    persist();renderAll();
   }
 
-  function renderGroups(){
-    var html='';
-    GROUPS.forEach(function(g){
-      html+='<div class="grp"><h3>'+g+'</h3><div class="chips">';
-      CH.forEach(function(c){if(c[2]!==g)return;html+='<button type="button" class="chip" data-id="'+c[0]+'" aria-pressed="'+(st.sel[c[0]]?'true':'false')+'">'+esc(c[1])+'</button>'});
-      html+='</div></div>';
-    });
-    var cs=Object.keys(st.custom);
-    if(cs.length){html+='<div class="grp"><h3>직접 추가한 것</h3><div class="chips">';cs.forEach(function(id){html+='<button type="button" class="chip" data-id="'+id+'" aria-pressed="true">'+esc(st.custom[id])+' <small>✕</small></button>'});html+='</div></div>'}
-    $('groups').innerHTML=html;
-  }
-
-  function nextLabel(id){return id==='goal'?'바로 '+st.goal:nameOf(id)}
-
-  function renderMap(){
-    var ids=selIds(),html='';
-    STAGES.forEach(function(S){
-      var list=byStage(S.n);
-      html+='<div class="col'+(list.length?'':' empty')+'"><h3><span class="num">'+S.n+'</span>'+S.t+'<span class="band '+S.band+'">'+(S.band==='i'?'유입':'전환')+'</span></h3><p class="sub">'+S.s+'</p>';
-      if(!list.length)html+='<p class="hint">'+EMPTY_HINT[S.n]+'</p>';
-      list.forEach(function(id){
-        var it=st.sel[id],dead=!it.next;
-        html+='<div class="node'+(dead?' dead':'')+'"><div class="nh"><b>'+esc(nameOf(id))+'</b><button type="button" class="rm" data-rm="'+id+'" aria-label="'+esc(nameOf(id))+' 빼기">✕ 빼기</button></div>';
-        html+='<div class="row"><span>단계</span><select data-stage="'+id+'" aria-label="'+esc(nameOf(id))+' 단계">';
-        STAGES.forEach(function(T){html+='<option value="'+T.n+'"'+(T.n===it.stage?' selected':'')+'>'+T.n+'. '+T.t+'</option>'});
-        html+='</select></div><div class="row"><span>다음</span><select data-next="'+id+'" aria-label="'+esc(nameOf(id))+' 다음">';
-        html+='<option value="">아직 없음</option><option value="goal"'+(it.next==='goal'?' selected':'')+'>바로 '+esc(st.goal)+'</option>';
-        ids.forEach(function(o){if(o===id)return;html+='<option value="'+o+'"'+(it.next===o?' selected':'')+'>'+st.sel[o].stage+'. '+esc(nameOf(o))+'</option>'});
-        html+='</select></div>';
-        if(dead)html+='<div class="warnline">여기서 다음 갈 곳이 없습니다</div>';
-        else html+='<div class="row" style="display:block;color:var(--ink)">→ '+esc(nextLabel(it.next))+'</div>';
-        html+='</div>';
-      });
-      html+='<p class="mlabel">이 단계에서 할 말</p><textarea data-msg="'+S.n+'" placeholder="'+esc(MSG_PH[S.n])+'">'+esc(st.msg[S.n]||'')+'</textarea></div>';
-    });
-    $('map').innerHTML=html;
-  }
-
+  /* 경로 계산 */
   function computePaths(){
-    var ids=selIds();if(!ids.length)return [];
-    var incoming={};ids.forEach(function(id){var n=st.sel[id].next;if(n&&n!=='goal')incoming[n]=1});
-    var starts=ids.filter(function(id){return !incoming[id]});
-    if(!starts.length){starts=[ids.slice().sort(function(a,b){return st.sel[a].stage-st.sel[b].stage})[0]]}
-    starts.sort(function(a,b){return st.sel[a].stage-st.sel[b].stage});
-    var visited={},res=[];
-    function walk(s){
-      var p=[],seen={},cur=s,end='cut';
-      while(cur){
-        if(seen[cur]){end='loop';break}
-        seen[cur]=1;p.push(cur);
-        var n=st.sel[cur].next;
-        if(n==='goal'){end='goal';break}
-        if(!n||!st.sel[n]){end='cut';break}
-        cur=n;
-      }
-      p.forEach(function(id){visited[id]=1});
-      res.push({nodes:p,end:end});
+    var all=ids();if(!all.length)return [];
+    var incoming={};st.edges.forEach(function(e){if(e.to!=='goal'&&st.nodes[e.to])incoming[e.to]=1});
+    var res=[],visited={};
+    function walk(path,seen){
+      if(res.length>=40)return;
+      var cur=path[path.length-1],o=outs(cur).filter(function(e){return e.to==='goal'||st.nodes[e.to]});
+      if(!o.length){res.push({nodes:path,end:'cut'});return}
+      o.forEach(function(e){
+        if(e.to==='goal'){res.push({nodes:path,end:'goal'});return}
+        if(seen[e.to]){res.push({nodes:path,end:'loop'});return}
+        var s2={};for(var k in seen)s2[k]=1;s2[e.to]=1;
+        walk(path.concat([e.to]),s2);
+      });
     }
-    starts.forEach(walk);
-    ids.slice().sort(function(a,b){return st.sel[a].stage-st.sel[b].stage}).forEach(function(id){if(!visited[id])walk(id)});
+    function start(id){var s={};s[id]=1;walk([id],s);res.forEach(function(p){p.nodes.forEach(function(x){visited[x]=1})})}
+    all.filter(function(id){return !incoming[id]}).sort(function(a,b){return stageOf(a)-stageOf(b)}).forEach(start);
+    all.slice().sort(function(a,b){return stageOf(a)-stageOf(b)}).forEach(function(id){if(!visited[id])start(id)});
     return res;
   }
+  /* 몰림 = 서로 다른 출발점 몇 곳에서 온 손님이 이곳을 지나가는지 */
+  function passCounts(paths){var seen={};paths.forEach(function(p){var s0=p.nodes[0];p.nodes.forEach(function(id){(seen[id]=seen[id]||{})[s0]=1})});var c={};for(var k in seen)c[k]=Object.keys(seen[k]).length;return c}
 
-  function renderPaths(){
-    var ps=computePaths(),html='';
-    if(!ps.length){$('paths').innerHTML='<p class="empty-msg">②에서 지금 하고 있는 것을 고르면 길이 나타납니다.</p>';return}
-    ps.forEach(function(p){
-      html+='<div class="path">';
-      p.nodes.forEach(function(id,i){if(i)html+='<span class="a">→</span>';html+='<span class="p">'+esc(nameOf(id))+'</span>'});
-      html+='<span class="a">→</span>';
-      if(p.end==='goal')html+='<span class="g">'+esc(st.goal)+' ✓</span>';
-      else if(p.end==='loop')html+='<span class="x">제자리로 돌아옴</span>';
-      else html+='<span class="x">끊김</span>';
-      html+='</div>';
-    });
-    $('paths').innerHTML=html;
-  }
-
+  /* 진단 */
   function diagnose(){
-    var ids=selIds(),out=[];
-    if(!ids.length)return [{c:'y',t:'아직 고른 것이 없습니다',d:'②에서 지금 하고 있는 것, 또는 해보고 싶은 것을 골라 주세요.'}];
-    var cnt={1:0,2:0,3:0,4:0};ids.forEach(function(id){cnt[st.sel[id].stage]++});
-    var inflow=cnt[1]+cnt[2],conv=cnt[3]+cnt[4];
-    if(inflow&&!cnt[4])out.push({c:'r',t:'조회는 생겨도 '+st.goal+'까지 이어지지 않는 구조입니다',d:'4단계(연락·예약·구매하는 곳)가 비어 있습니다. 카카오톡 채널이나 예약 페이지처럼 고객이 누르자마자 '+st.goal+'할 수 있는 곳을 하나 정하세요.'});
-    if(conv&&!inflow)out.push({c:'r',t:'이미 사려는 고객만 만나고 있습니다',d:'이런 고객은 가격과 성분부터 비교해서 다른 곳으로 가기 쉽습니다. 나를 모르는 사람을 데려올 유입 칸(1·2단계)을 하나만 추가해 보세요.'});
-    STAGES.forEach(function(S){
-      if(cnt[S.n])return;
-      if(S.n===4&&inflow)return;
-      if(!inflow&&(S.n===1||S.n===2))return;
-      out.push({c:'r',t:S.n+'단계 「'+S.t+'」 칸이 비었습니다',d:EMPTY_HINT[S.n].replace(/^비었습니다\. /,'')});
+    var all=ids(),probs=[],paths=computePaths(),pc=passCounts(paths);
+    if(!all.length)return {probs:[],paths:paths,pc:pc,empty:true};
+    var cnt={1:0,2:0,3:0,4:0};all.forEach(function(id){cnt[st.nodes[id].stage]++});
+    var G=st.goal;
+    all.forEach(function(id){if((pc[id]||0)>=3){var A=nameOf(id);probs.push({id:'crowd:'+id,rank:1,w:pc[id],title:A+'에 길 '+pc[id]+'개가 몰립니다',why:'여기가 막히면 길 '+pc[id]+'개가 한 번에 막힙니다.',fix:A+'의 연결과 할 말을 가장 먼저 다듬으세요.',todo:['휴대폰으로 '+A+'에서 다음 갈 곳 버튼·링크가 잘 보이는지 확인',A+'에서 할 말을 고객이 듣고 싶은 말로 다시 쓰기']})}});
+    var dead=all.filter(function(id){return !outs(id).length});
+    dead.forEach(function(id){var A=nameOf(id);probs.push({id:'dead:'+id,rank:2,w:pc[id]||1,title:'끊김: '+j(A,'은','는')+' 다음 갈 곳이 없습니다',why:A+'에서 나를 본 사람은 관심이 생겨도 어디로 갈지 모릅니다.',fix:A+' 다음에 갈 곳을 하나 정하세요. 아직 그런 곳이 없다면 그게 지금 만들 것입니다.',todo:[A+' 다음 갈 곳 정하기 (③ 연결하기)','그곳으로 가는 링크나 QR 넣기']})});
+    st.edges.forEach(function(e){
+      if(!st.nodes[e.from]||['word','none','unknown'].indexOf(e.how)<0)return;
+      var A=nameOf(e.from),B=toName(e.to),Bp=plain(e.to),k=kind(e.from),fromS=st.nodes[e.from].stage,toS=stageOf(e.to);
+      var p={id:'how:'+e.from+'>'+e.to,rank:3,w:pc[e.from]||1};
+      if(e.how==='unknown'){p.title=A+' → '+B+': 이어져 있는지 모릅니다';p.why='이어져 있다고 생각하지만 확인이 안 됐습니다.';p.fix='고객처럼 직접 따라가 보세요.';p.todo=['휴대폰으로 '+A+'에서 '+Bp+'까지 직접 눌러 보기']}
+      else if(fromS===3&&toS>=4){p.title=A+' → '+B+': 바로 행동할 버튼이 없습니다';p.why='믿게 된 사람이 바로 행동할 버튼이 없습니다.';p.fix=ro(Bp)+' 가는 버튼을 눈에 띄는 곳에, "누르면 무엇을 받는지"와 함께 두세요.';p.todo=[A+'에 '+Bp+' 버튼 넣기','버튼 옆 문구 한 문장 쓰기']}
+      else if(k==='offline'){p.title=A+' → '+B+': 종이에서 다음으로 가는 길이 약합니다';p.why='종이를 본 사람이 나중에 찾아오기 어렵습니다.';p.fix=ro(Bp)+' 바로 가는 QR을 인쇄물에 넣고, 인쇄물 전용 QR을 따로 만들어 몇 명이 왔는지 세세요.';p.todo=['QR 만들기 (인쇄물 전용 주소로)','다음 인쇄물에 QR 넣기']}
+      else if(k==='sns'&&e.how==='none'){p.title=A+' → '+B+': 갈 길이 없습니다';p.why=A+'에서 관심이 생겨도 갈 길이 없습니다.';p.fix='프로필에 '+Bp+' 링크를 걸고, 글·영상 끝에 "자세한 건 프로필 링크" 한 줄을 넣으세요.';p.todo=['프로필 링크 걸기','최근 글 3개 끝에 안내 한 줄 넣기']}
+      else if(k==='search'&&e.how==='none'){p.title=A+' → '+B+': 다 읽은 사람이 갈 곳이 없습니다';p.why='다 읽은 사람이 어디로 가야 할지 모릅니다.';p.fix='글 맨 아래에 '+ro(Bp)+' 가는 버튼이나 링크를 넣으세요.';p.todo=['가장 많이 읽힌 글 3개에 링크 넣기']}
+      else{p.title=A+' → '+B+': '+(e.how==='word'?'말로만 안내합니다':'가는 방법이 없습니다');p.why='말로만 들은 고객은 나중에 다시 찾기 어렵습니다.';p.fix=ro(Bp)+' 바로 가는 링크·버튼이나 QR을 하나 만드세요.';p.todo=[A+'에 '+Bp+' 링크나 QR 넣기']}
+      probs.push(p);
     });
-    var dead=ids.filter(function(id){return !st.sel[id].next});
-    if(dead.length)out.push({c:'r',t:'다음 갈 곳이 없는 곳: '+dead.map(nameOf).join(', '),d:'여기서 나를 본 사람은 관심이 생겨도 어디로 가야 할지 모릅니다. 지도에서 "다음"을 골라 주세요. 아직 그런 곳이 없다면 그게 지금 만들 것입니다.'});
-    computePaths().forEach(function(p){if(p.end==='loop')out.push({c:'y',t:'돌고 도는 길이 있습니다: '+p.nodes.map(nameOf).join(' → '),d:'서로가 서로를 가리키고 끝이 없습니다. 한 곳은 "바로 '+st.goal+'"로 끝나게 해 주세요.'})});
-    var off=ids.filter(function(id){return OFFLINE[id]&&st.sel[id].next});
-    if(off.length)out.push({c:'y',t:'오프라인('+off.map(nameOf).join(', ')+')은 QR로 이어 주세요',d:'인쇄물에 "다음" 곳으로 가는 QR을 넣고, 인쇄물 전용 주소(또는 QR)를 따로 만들면 이걸 보고 몇 명이 들어왔는지 셀 수 있습니다.'});
-    var salesy=/사세요|구매하세요|할인|특가|\d+\s*%|최저가|가격/;
-    [1,2].forEach(function(n){if(salesy.test(st.msg[n]||''))out.push({c:'y',t:n+'단계 할 말에 판매 문구가 있습니다',d:'유입 단계 고객은 아직 살 생각이 없습니다. "사세요"보다 고객이 궁금해하고 듣고 싶은 말을 먼저 하세요.'})});
-    if(cnt[4]&&!(st.msg[4]||'').trim())out.push({c:'y',t:'4단계 할 말이 비었습니다',d:'"무엇을 누르면 무엇을 받는지" 한 문장으로 적어 보세요. 예: 카톡 채널 추가하면 이번 주 시간표를 보내드려요.'});
-    if(ids.length>6)out.push({c:'y',t:'고른 곳이 '+ids.length+'개입니다',d:'혼자 다 하면 다 어설퍼지기 쉽습니다. 처음에는 유입 1곳 → 전환 1곳, 끊김 없는 길 하나를 먼저 완성하세요.'});
-    if(!out.some(function(o){return o.c==='r'}))out.unshift({c:'ok',t:'끊긴 곳이 없습니다',d:'이제 가장 많이 들어오는 길 하나를 정해 그 길의 할 말부터 다듬어 보세요.'});
-    return out;
+    var inflow=cnt[1]+cnt[2],conv=cnt[3]+cnt[4],noConv=inflow&&!cnt[4],noIn=conv&&!inflow;
+    if(noConv)probs.push({id:'s:noconv',rank:4,w:1,title:'조회는 생겨도 '+G+'까지 못 갑니다',why:'연락·예약·구매하는 곳(4단계)이 없습니다.',fix:'카카오톡 채널이나 예약 페이지처럼 누르자마자 '+G+'할 수 있는 곳을 하나 정하세요.',todo:[G+'할 곳 하나 정하기','그곳으로 가는 링크를 앞 단계 채널에 넣기']});
+    if(noIn)probs.push({id:'s:noin',rank:4,w:1,title:'이미 사려는 사람만 만나고 있습니다',why:'이런 고객은 가격부터 비교해서 다른 곳으로 가기 쉽습니다.',fix:'나를 모르는 사람을 데려올 곳(1·2단계)을 하나만 추가하세요.',todo:['고객이 자주 보는 곳 하나 고르기','그곳에 고객이 궁금해할 정보 1편 올리기']});
+    if(!noIn){
+      if(!cnt[1])probs.push({id:'s:e1',rank:4,w:1,title:'1단계 「모르는 고객」 칸이 비었습니다',why:'나를 모르는 사람을 데려올 곳이 없습니다.',fix:'고객이 자주 보는 곳 하나를 골라 시작하세요.',todo:['고객이 하루에 가장 오래 보는 앱 하나 정하기']});
+      if(!cnt[2])probs.push({id:'s:e2',rank:4,w:1,title:'2단계 「문제를 아는 고객」 칸이 비었습니다',why:'고객이 "나 이거 필요하네" 느낄 정보가 없습니다.',fix:'고객이 자주 묻는 질문 3개로 글 3편을 쓰세요.',todo:['자주 묻는 질문 3개 적기','질문 하나로 글 1편 쓰기']});
+    }
+    if(!noConv&&!cnt[3])probs.push({id:'s:e3',rank:4,w:1,title:'3단계 「알아보는 고객」 칸이 비었습니다',why:'비교하는 고객이 믿을 근거가 없습니다.',fix:'후기 3개, 사례 1개부터 모으세요.',todo:['최근 고객 3명에게 후기 부탁하기','사례 1개를 사진과 함께 정리하기']});
+    var salesy=/사세요|구매하세요|할인|특가|\d+\s*%|최저가/;
+    all.forEach(function(id){var n=st.nodes[id];if(n.stage<=2&&salesy.test(n.msg||''))probs.push({id:'m:sales:'+id,rank:5,w:pc[id]||1,title:nameOf(id)+'의 할 말에 판매 문구가 있습니다',why:'처음 만나는 단계의 고객은 아직 살 생각이 없습니다.',fix:'"사세요" 대신 고객이 궁금해하는 말로 바꾸세요.',todo:[nameOf(id)+' 할 말 다시 쓰기']})});
+    var noMsg4=all.filter(function(id){return st.nodes[id].stage===4&&!(st.nodes[id].msg||'').trim()});
+    if(noMsg4.length)probs.push({id:'m:empty4',rank:5,w:1,title:'4단계 할 말이 비었습니다: '+noMsg4.map(nameOf).join(', '),why:'고객이 무엇을 누르면 무엇을 받는지 모릅니다.',fix:'"무엇을 누르면 무엇을 받는지" 한 문장으로 쓰세요. 예: 카톡 채널 추가하면 이번 달 시간표를 보내드려요.',todo:['한 문장 쓰기']});
+    var noCount=st.edges.filter(function(e){return e.count==='no'&&st.nodes[e.from]});
+    if(noCount.length)probs.push({id:'c:no',rank:6,w:1,title:'몇 명이 왔는지 셀 수 없는 길 '+noCount.length+'개',why:'어느 길이 효과 있는지 모르면 엉뚱한 곳에 시간을 씁니다.',fix:'돈 안 드는 방법: 문의·주문 받을 때 "어디서 보셨어요?" 한 줄 묻고 적어 두세요. 채널마다 전용 링크·QR을 쓰면 더 정확합니다.',todo:['문의 받을 때 "어디서 보셨어요?" 묻고 적기 시작']});
+    probs.sort(function(a,b){return a.rank-b.rank||b.w-a.w});
+    return {probs:probs,paths:paths,pc:pc,cnt:cnt,dead:dead};
   }
 
-  function renderDiag(){
-    $('diag').innerHTML=diagnose().map(function(o){return '<li class="'+o.c+'"><b>'+esc(o.t)+'</b>'+esc(o.d)+'</li>'}).join('');
-  }
-
+  /* 그리기 */
+  function grow(el){el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
   function short(v,n){v=(v||'').trim().split('\n')[0];return v.length>n?v.slice(0,n)+'…':v}
-  function grow(el){el.style.height='auto';el.style.height=el.scrollHeight+2+'px'}
-  function syncGoal(){st.goal=st.goalPick==='__custom'?((st.goalCustom||'').trim()||'행동'):st.goalPick}
-  function setTitle(){$('ptLeft').textContent=(short(st.biz,40)||'내 사업')+(st.who?' · 고객: '+short(st.who,40):'')}
+  function setTitle(){$('ptLeft').textContent=(short(st.biz,40)||'내 사업')+(st.who?' · 고객: '+short(st.who,30):'')}
   function renderTop(){
     $('biz').value=st.biz||'';$('who').value=st.who||'';$('goal').value=st.goalPick||'구매';
     $('goalCustom').value=st.goalCustom||'';$('goalCustom').hidden=st.goalPick!=='__custom';$('goalDetail').value=st.goalDetail||'';
-    ['biz','who','goalDetail'].forEach(function(k){grow($(k))});
-    setTitle();
+    ['biz','who','goalDetail'].forEach(function(k){grow($(k))});setTitle();
   }
+  function renderGroups(){
+    var h='';
+    GROUPS.forEach(function(g){
+      h+='<div class="grp"><h3>'+g+'</h3><div class="chips">';
+      CH.forEach(function(c){if(c[2]!==g)return;h+='<button type="button" class="chip" data-id="'+c[0]+'" aria-pressed="'+(st.nodes[c[0]]?'true':'false')+'">'+esc(c[1])+'</button>'});
+      h+='</div></div>';
+    });
+    var cs=ids().filter(function(id){return st.nodes[id].custom});
+    if(cs.length){h+='<div class="grp"><h3>직접 추가한 것 (누르면 빠집니다)</h3><div class="chips">';cs.forEach(function(id){h+='<button type="button" class="chip" data-id="'+esc(id)+'" aria-pressed="true">'+esc(nameOf(id))+' ✕</button>'});h+='</div></div>'}
+    $('groups').innerHTML=h;
+  }
+  function renderMap(d){
+    var all=ids(),h='';
+    STAGES.forEach(function(S){
+      var list=all.filter(function(id){return st.nodes[id].stage===S.n});
+      h+='<div class="col'+(list.length?'':' empty')+'"><h3><span class="num">'+S.n+'</span>'+S.t+'<span class="band '+S.band+'">'+(S.band==='i'?'처음 만남':'믿고 행동')+'</span></h3><p class="sub">'+S.s+'</p>';
+      if(!list.length)h+='<p class="hint">'+EMPTY_HINT[S.n]+'</p>';
+      list.forEach(function(id){
+        var n=st.nodes[id],o=outs(id),pc=d.pc[id]||0,wait=!o.length,nm=esc(nameOf(id));
+        h+='<div class="node'+(wait?' wait':'')+(pc>=2?' crowd':'')+'"><div class="nh"><b>'+nm+'</b><button type="button" class="rm" data-rm="'+esc(id)+'" aria-label="'+nm+' 빼기">✕ 빼기</button></div>';
+        h+='<div class="row"><span>단계</span><select data-stage="'+esc(id)+'" aria-label="'+nm+' 단계">';
+        STAGES.forEach(function(T){h+='<option value="'+T.n+'"'+(T.n===n.stage?' selected':'')+'>'+T.n+'. '+T.t+'</option>'});
+        h+='</select></div>';
+        [0,1].forEach(function(slot){
+          if(slot===1&&!o.length)return;
+          var cur=o[slot]?o[slot].to:'';
+          h+='<div class="row"><span>'+(slot?'또는':'다음')+'</span><select data-next="'+esc(id)+'" data-slot="'+slot+'" aria-label="'+nm+' 다음 갈 곳 '+(slot+1)+'">';
+          h+='<option value="">'+(slot?'(선택) 한 곳 더':'다음 갈 곳 고르기')+'</option><option value="goal"'+(cur==='goal'?' selected':'')+'>바로 '+esc(st.goal)+'</option>';
+          all.forEach(function(x){if(x===id)return;h+='<option value="'+esc(x)+'"'+(cur===x?' selected':'')+'>'+st.nodes[x].stage+'. '+esc(nameOf(x))+'</option>'});
+          h+='</select></div>';
+        });
+        if(wait)h+='<div class="state wait">다음 갈 곳을 골라 주세요</div>';
+        else h+='<div class="state ok">→ '+o.map(function(e){return esc(toName(e.to))}).join(', ')+'</div>';
+        if(pc>=2)h+='<span class="badge">길 '+pc+'개가 지나감</span>';
+        h+='<textarea data-msg="'+esc(id)+'" rows="1" placeholder="'+esc(MSG_PH[n.stage])+'" aria-label="'+nm+'에서 할 말">'+esc(n.msg||'')+'</textarea></div>';
+      });
+      h+='</div>';
+    });
+    $('map').innerHTML=h;
+    [].forEach.call($('map').querySelectorAll('textarea'),grow);
+  }
+  function edgeColor(e){return e.how==='link'||e.how==='qr'?'#2b6b3f':e.how==='word'||e.how==='none'?'#b3261e':'#8a93a6'}
+  function renderDiagram(d){
+    var all=ids();
+    if(!all.length){$('svgWrap').innerHTML='<p class="empty-msg">②에서 채널을 고르면 그림이 나타납니다.</p>';$('edgeList').innerHTML='';return}
+    var colX=function(s){return 14+(s-1)*196},W=160,H=46,GAP=62,pos={},rows={1:0,2:0,3:0,4:0};
+    all.forEach(function(id){var s=st.nodes[id].stage;pos[id]={x:colX(s),y:40+rows[s]*GAP};rows[s]++});
+    var maxRows=Math.max(1,rows[1],rows[2],rows[3],rows[4]),height=40+maxRows*GAP+34;
+    pos.goal={x:colX(5),y:40+(maxRows-1)*GAP/2};
+    var s='<svg viewBox="0 0 980 '+height+'" role="img" aria-label="연결 그림" xmlns="http://www.w3.org/2000/svg"><defs>';
+    ['#2b6b3f','#b3261e','#8a93a6'].forEach(function(c,i){s+='<marker id="ar'+i+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="'+c+'"/></marker>'});
+    s+='</defs>';
+    STAGES.concat([{n:5,t:'마지막 행동'}]).forEach(function(S){s+='<text x="'+(colX(S.n)+W/2)+'" y="18" text-anchor="middle" font-size="12.5" fill="#667089">'+(S.n<5?S.n+'. ':'')+esc(S.t)+'</text>'});
+    st.edges.forEach(function(e){
+      var a=pos[e.from],b=pos[e.to];if(!a||!b)return;
+      var c=edgeColor(e),mi=c==='#2b6b3f'?0:c==='#b3261e'?1:2,dash=mi?' stroke-dasharray="6 5"':'',path,x1=a.x+W,y1=a.y+H/2,x2=b.x,y2=b.y+H/2;
+      if(x2>x1)path='M'+x1+' '+y1+' C'+(x1+40)+' '+y1+' '+(x2-40)+' '+y2+' '+x2+' '+y2;
+      else{var low=Math.max(a.y,b.y)+H+22;path='M'+(a.x+W/2)+' '+(a.y+H)+' C'+(a.x+W/2)+' '+low+' '+(b.x+W/2)+' '+low+' '+(b.x+W/2)+' '+(b.y+H)}
+      s+='<path d="'+path+'" fill="none" stroke="'+c+'" stroke-width="2"'+dash+' marker-end="url(#ar'+mi+')"/>';
+    });
+    all.forEach(function(id){
+      var p=pos[id],pc=d.pc[id]||0,dead=!outs(id).length,nm=plain(id);
+      if(nm.length>11)nm=nm.slice(0,10)+'…';
+      var stroke=dead?'#b3261e':pc>=2?'#d9730d':'#9aa5bd',sw=pc>=2?3:1.5,dash=dead?' stroke-dasharray="5 4"':'';
+      s+='<rect x="'+p.x+'" y="'+p.y+'" width="'+W+'" height="'+H+'" rx="9" fill="#fff" stroke="'+stroke+'" stroke-width="'+sw+'"'+dash+'/>';
+      s+='<text x="'+(p.x+W/2)+'" y="'+(p.y+(pc>=2||dead?20:28))+'" text-anchor="middle" font-size="14" font-weight="700" fill="#1b2333">'+esc(nm)+'</text>';
+      if(pc>=2)s+='<text x="'+(p.x+W/2)+'" y="'+(p.y+37)+'" text-anchor="middle" font-size="11.5" font-weight="700" fill="#d9730d">길 '+pc+'개가 지나감</text>';
+      else if(dead)s+='<text x="'+(p.x+W/2)+'" y="'+(p.y+37)+'" text-anchor="middle" font-size="11.5" font-weight="700" fill="#b3261e">다음 없음</text>';
+    });
+    var g=pos.goal;
+    s+='<rect x="'+g.x+'" y="'+g.y+'" width="'+W+'" height="'+H+'" rx="23" fill="#e8f5ec" stroke="#1e7b45" stroke-width="2"/><text x="'+(g.x+W/2)+'" y="'+(g.y+28)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#1e7b45">'+esc(short(st.goal,10))+'</text></svg>';
+    $('svgWrap').innerHTML=s;
+    var lh='';
+    all.forEach(function(id){
+      var o=outs(id);
+      if(!o.length)lh+='<li><b>'+esc(nameOf(id))+'</b> → <span style="color:#b3261e;font-weight:700">다음 없음</span></li>';
+      o.forEach(function(e){lh+='<li><b>'+esc(nameOf(id))+'</b> → '+esc(plain(e.to))+' <span style="color:'+edgeColor(e)+';font-size:12.5px">('+(e.how?howLabel(e.how):'아직 확인 안 함')+')</span></li>'});
+    });
+    $('edgeList').innerHTML=lh;
+  }
+  function renderCheck(){
+    var all=ids(),h='';
+    if(!all.length){$('check').innerHTML='<p class="empty-msg">③에서 연결하면 확인할 항목이 생깁니다.</p>';return}
+    all.forEach(function(id){
+      var o=outs(id);
+      if(!o.length){h+='<div class="ck deadrow"><div class="t">'+esc(nameOf(id))+' → (다음 없음)<small>③ 연결하기에서 다음 갈 곳을 먼저 골라 주세요.</small></div></div>';return}
+      o.forEach(function(e){
+        var k=esc(e.from)+'|'+esc(e.to);
+        h+='<div class="ck"><div class="t">'+esc(nameOf(id))+' → '+esc(toName(e.to))+'<small>고객이 '+esc(nameOf(id))+'에서 '+esc(plain(e.to))+'까지 어떻게 가나요?</small></div>';
+        h+='<select data-how="'+k+'" aria-label="가는 방법">'+HOW.map(function(x){return '<option value="'+x[0]+'"'+(e.how===x[0]?' selected':'')+'>'+(x[0]?x[1]:'가는 방법 고르기')+'</option>'}).join('')+'</select>';
+        h+='<select data-count="'+k+'" aria-label="몇 명 왔는지 셀 수 있나요">'+COUNT.map(function(x){return '<option value="'+x[0]+'"'+(e.count===x[0]?' selected':'')+'>'+(x[0]?'몇 명 왔는지 '+x[1]:'몇 명 왔는지 셀 수 있나요?')+'</option>'}).join('')+'</select></div>';
+      });
+    });
+    $('check').innerHTML=h;
+  }
+  function renderReport(d){
+    if(d.empty){$('reportBody').innerHTML='<p class="empty-msg">②에서 지금 하고 있는 것을 고르고 ③에서 연결하면 진단서가 만들어집니다.</p>';return}
+    var edges=st.edges.filter(function(e){return st.nodes[e.from]}),h='';
+    var ok=edges.filter(function(e){return e.how==='link'||e.how==='qr'}).length,cnt=edges.filter(function(e){return e.count==='yes'}).length,un=edges.filter(function(e){return !e.how}).length;
+    h+='<div class="sum"><p><b>무엇을</b> '+esc(short(st.biz,80)||'-')+'</p><p><b>누가</b> '+esc(short(st.who,80)||'-')+'</p><p><b>마지막 행동</b> '+esc(st.goal)+((st.goalDetail||'').trim()?' — '+esc(short(st.goalDetail,80)):'')+'</p>';
+    h+='<p class="status">연결 '+edges.length+'개 중 확인됨 '+ok+'개 · 셀 수 있음 '+cnt+'개'+(un?' · 아직 확인 안 한 연결 '+un+'개':'')+'</p></div>';
+    if(!d.dead.length&&edges.length&&ok===edges.length&&d.cnt[4])h+='<div class="green">연결은 모두 확인됐습니다. 이제 가장 많이 지나가는 곳의 할 말부터 다듬어 보세요.</div>';
+    var top=d.probs.slice(0,3),rest=d.probs.slice(3);
+    if(top.length){
+      h+='<h3>먼저 할 '+top.length+'가지</h3>';
+      top.forEach(function(p,i){
+        var checks=st.checks[p.id]||[];
+        h+='<div class="prob"><h4>'+(i+1)+'. '+esc(p.title)+'</h4><dl><dt>왜</dt><dd>'+esc(p.why)+'</dd><dt>대책</dt><dd>'+esc(p.fix)+'</dd></dl><div class="todo"><b>이번 주 할 일</b>';
+        p.todo.forEach(function(t,k){h+='<label><input type="checkbox" data-chk="'+esc(p.id)+'" data-k="'+k+'"'+(checks[k]?' checked':'')+'> <span>'+esc(t)+'</span></label>'});
+        h+='</div></div>';
+      });
+    }else h+='<div class="green">지금 눈에 띄는 문제가 없습니다.</div>';
+    if(rest.length){h+='<h3>그 밖에 확인할 것</h3><ul class="others">';rest.forEach(function(p){h+='<li><b>'+esc(p.title)+'</b> — '+esc(p.fix)+'</li>'});h+='</ul>'}
+    if(un)h+='<p class="tip">⑤ 연결 확인에서 아직 답하지 않은 연결이 '+un+'개 있습니다. 답할수록 진단이 정확해집니다.</p>';
+    h+='<h3>고객이 걷는 길</h3><div class="paths">';
+    d.paths.forEach(function(p){
+      h+='<div class="path">';p.nodes.forEach(function(id,i){if(i)h+='<span class="a">→</span>';h+='<span class="p">'+esc(nameOf(id))+'</span>'});
+      h+='<span class="a">→</span>'+(p.end==='goal'?'<span class="g">'+esc(st.goal)+' ✓</span>':p.end==='loop'?'<span class="x">제자리로 돌아옴</span>':'<span class="x">끊김</span>')+'</div>';
+    });
+    h+='</div><p class="tip">'+new Date().toLocaleDateString('ko-KR')+' 작성</p>';
+    $('reportBody').innerHTML=h;
+  }
+  function renderAll(){var d=diagnose();renderTop();renderGroups();renderMap(d);renderDiagram(d);renderCheck();renderReport(d)}
+  function renderLive(){var d=diagnose();renderMap(d);renderDiagram(d);renderReport(d);setTitle()}
 
-  function renderAll(){renderTop();renderGroups();renderMap();renderPaths();renderDiag()}
-  function renderLive(){renderPaths();renderDiag();setTitle()}
-
+  /* 이벤트 */
   $('groups').addEventListener('click',function(e){var b=e.target.closest('.chip');if(b)toggle(b.dataset.id)});
+  $('map').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b)toggle(b.dataset.rm)});
   $('map').addEventListener('change',function(e){
     var t=e.target;
-    if(t.dataset.stage||t.dataset.next)snap();
-    if(t.dataset.stage){st.sel[t.dataset.stage].stage=+t.value;persist();renderMap();renderLive()}
-    else if(t.dataset.next){st.sel[t.dataset.next].next=t.value;persist();renderMap();renderLive()}
+    if(t.dataset.stage){snap();st.nodes[t.dataset.stage].stage=+t.value;persist();renderAll()}
+    else if(t.dataset.next){setNext(t.dataset.next,+t.dataset.slot,t.value)}
   });
-  $('map').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b)toggle(b.dataset.rm)});
-  $('btnUndo').addEventListener('click',undo);$('btnUndo2').addEventListener('click',undo);$('toastUndo').addEventListener('click',undo);
-  $('map').addEventListener('input',function(e){var t=e.target;if(t.dataset.msg){st.msg[t.dataset.msg]=t.value;persist();renderDiag()}});
-  ['biz','who','goalDetail'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;grow(this);persist();renderLive()})});
-  $('goal').addEventListener('change',function(){st.goalPick=this.value;$('goalCustom').hidden=this.value!=='__custom';if(this.value==='__custom')$('goalCustom').focus();syncGoal();persist();renderMap();renderLive()});
-  $('goalCustom').addEventListener('input',function(){st.goalCustom=this.value;syncGoal();persist();renderMap();renderLive()});
+  $('map').addEventListener('input',function(e){var t=e.target;if(t.dataset.msg&&st.nodes[t.dataset.msg]){st.nodes[t.dataset.msg].msg=t.value;grow(t);persist();renderReport(diagnose())}});
+  $('check').addEventListener('change',function(e){
+    var t=e.target,k=t.dataset.how||t.dataset.count;if(!k)return;
+    var p=k.split('|'),ed=st.edges.filter(function(x){return x.from===p[0]&&x.to===p[1]})[0];if(!ed)return;
+    snap();if(t.dataset.how!=null)ed.how=t.value;else ed.count=t.value;persist();renderLive();
+  });
+  $('reportBody').addEventListener('change',function(e){var t=e.target;if(t.dataset.chk==null)return;var a=st.checks[t.dataset.chk]||[];a[+t.dataset.k]=t.checked;st.checks[t.dataset.chk]=a;persist()});
+  ['biz','who','goalDetail'].forEach(function(k){$(k).addEventListener('input',function(){st[k]=this.value;grow(this);persist();setTitle();renderReport(diagnose())})});
+  $('goal').addEventListener('change',function(){snap();st.goalPick=this.value;$('goalCustom').hidden=this.value!=='__custom';if(this.value==='__custom')$('goalCustom').focus();syncGoal();persist();renderAll()});
+  $('goalCustom').addEventListener('input',function(){st.goalCustom=this.value;syncGoal();persist();var d=diagnose();renderMap(d);renderDiagram(d);renderCheck();renderReport(d)});
   window.addEventListener('resize',function(){['biz','who','goalDetail'].forEach(function(k){grow($(k))})});
   function addCustom(){
     var v=$('customName').value.trim();if(!v)return;
-    snap();var id='c'+Date.now();st.custom[id]=v;st.sel[id]={stage:1,next:''};st.order.push(id);
-    $('customName').value='';persist();renderAll();saved.textContent='추가했습니다. 지도에서 단계를 맞춰 주세요.';
+    snap();var id='c'+Date.now(),s=+$('customStage').value||1;
+    st.nodes[id]={stage:s,custom:true,name:v,msg:''};st.order.push(id);if(s===4)st.edges.push({from:id,to:'goal',how:'',count:''});
+    $('customName').value='';persist();renderAll();toast(j('「'+v+'」','을','를')+' '+s+'단계에 넣었습니다',true);
   }
   $('btnAdd').addEventListener('click',addCustom);
   $('customName').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addCustom()}});
+  $('btnUndo').addEventListener('click',undo);$('btnUndo2').addEventListener('click',undo);$('toastUndo').addEventListener('click',undo);
 
   function summaryText(){
-    var t='[마케팅 경로 지도]\n무엇을: '+((st.biz||'').trim()||'-')+'\n누가: '+((st.who||'').trim()||'-')+'\n마지막 행동: '+st.goal+((st.goalDetail||'').trim()?'\n마지막 행동 자세히: '+st.goalDetail.trim():'')+'\n';
+    var d=diagnose(),t='[마케팅 경로 진단서]\n무엇을: '+((st.biz||'').trim()||'-')+'\n누가: '+((st.who||'').trim()||'-')+'\n마지막 행동: '+st.goal+((st.goalDetail||'').trim()?'\n마지막 행동 자세히: '+st.goalDetail.trim():'')+'\n';
     STAGES.forEach(function(S){
-      var l=byStage(S.n);
-      t+='\n'+S.n+'. '+S.t+' ('+S.s+')\n- 하는 곳: '+(l.length?l.map(function(id){return nameOf(id)+' → '+(st.sel[id].next?nextLabel(st.sel[id].next):'(다음 없음)')}).join(' / '):'(비어 있음)')+'\n- 할 말: '+((st.msg[S.n]||'').trim()||'(비어 있음)')+'\n';
+      var l=ids().filter(function(id){return st.nodes[id].stage===S.n});
+      t+='\n'+S.n+'. '+S.t+' ('+S.s+')\n';
+      if(!l.length)t+='- (비어 있음)\n';
+      l.forEach(function(id){var o=outs(id);t+='- '+nameOf(id)+' → '+(o.length?o.map(function(e){return plain(e.to)+(e.how?' ['+howLabel(e.how)+']':'')}).join(', '):'(다음 없음)')+((st.nodes[id].msg||'').trim()?' / 할 말: '+st.nodes[id].msg.trim():'')+'\n'});
     });
-    t+='\n[고객이 걷는 길]\n';
-    computePaths().forEach(function(p){t+='- '+p.nodes.map(nameOf).join(' → ')+' → '+(p.end==='goal'?st.goal:p.end==='loop'?'(제자리)':'(끊김)')+'\n'});
-    t+='\n[진단]\n';
-    diagnose().forEach(function(o){t+='- '+o.t+'\n'});
+    if(!d.empty){
+      t+='\n[먼저 할 일]\n';d.probs.slice(0,3).forEach(function(p,i){t+=(i+1)+'. '+p.title+' — '+p.fix+'\n'});
+      if(d.probs.length>3){t+='\n[그 밖에]\n';d.probs.slice(3).forEach(function(p){t+='- '+p.title+'\n'})}
+      t+='\n[고객이 걷는 길]\n';d.paths.forEach(function(p){t+='- '+p.nodes.map(nameOf).join(' → ')+' → '+(p.end==='goal'?st.goal:p.end==='loop'?'(제자리)':'(끊김)')+'\n'});
+    }
     return t;
   }
   function copy(btn,text,label){
     function done(){btn.textContent='복사했습니다';setTimeout(function(){btn.textContent=label},1500)}
     function fallback(){var a=document.createElement('textarea');a.value=text;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback)}else fallback();
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,fallback);else fallback();
   }
   $('btnCopy').addEventListener('click',function(){copy(this,summaryText(),'글로 복사')});
   $('btnPrompt').addEventListener('click',function(){
-    var p='너는 소상공인·1인 사업자를 돕는 마케팅 코치야. 아래는 내가 그린 마케팅 경로 지도야. 내가 길게 설명한 부분이 있으면 거기서 고객의 상황과 망설이는 이유를 찾아 답에 활용해줘.\n\n'+summaryText()+
-      '\n\n아래 순서로 도와줘.\n1. 끊긴 곳과 빈 단계를 채울 방법을 내 사업에 맞게 2가지씩 제안해줘. 돈이 덜 들고 혼자 할 수 있는 것부터.\n2. 단계별로 고객에게 할 말을 3개씩 써줘. 1·2단계는 "사세요" 없이 고객이 듣고 싶은 말, 3단계는 믿을 근거, 4단계는 "무엇을 누르면 무엇을 받는지" 한 문장.\n3. 앞으로 2주 동안 할 일을 하루 30분 기준으로 순서대로 정리해줘.\n\n지키기: 내가 적지 않은 숫자·후기·성과는 지어내지 말고, 모르는 건 나에게 먼저 물어봐줘. 쉬운 말로 써줘.';
-    copy(this,p,'AI에게 물어볼 글 복사');
+    copy(this,'너는 소상공인·1인 사업자를 돕는 마케팅 코치야. 아래는 내 마케팅 경로 진단서야. 내가 길게 설명한 부분이 있으면 거기서 고객의 상황과 망설이는 이유를 찾아 활용해줘.\n\n'+summaryText()+'\n\n1. "먼저 할 일"을 내 사업에 맞게 구체적인 실행 방법으로 바꿔줘. 돈이 덜 들고 혼자 할 수 있는 것부터.\n2. 채널마다 고객에게 할 말을 3개씩 써줘. 1·2단계는 "사세요" 없이 고객이 듣고 싶은 말, 3단계는 믿을 근거, 4단계는 "무엇을 누르면 무엇을 받는지" 한 문장.\n3. 앞으로 2주 동안 할 일을 하루 30분 기준으로 정리해줘.\n\n지키기: 내가 적지 않은 숫자·후기·성과는 지어내지 말고, 모르는 건 먼저 물어봐줘. 쉬운 말로 써줘.','AI에게 물어볼 글 복사');
   });
   var baseTitle=document.title;
-  $('btnPrint').addEventListener('click',function(){document.title='마케팅경로지도_'+(st.biz||'내사업').slice(0,20);window.print()});
+  $('btnPrint').addEventListener('click',function(){document.title='마케팅경로진단서_'+(short(st.biz,20)||'내사업');window.print()});
   window.addEventListener('afterprint',function(){document.title=baseTitle});
   var armed=false;
   $('btnReset').addEventListener('click',function(){
     var b=this;
     if(!armed){armed=true;b.textContent='한 번 더 누르면 지워집니다';setTimeout(function(){armed=false;b.textContent='처음부터'},3000);return}
-    armed=false;b.textContent='처음부터';snap();st=blank();persist();renderAll();saved.textContent='지웠습니다';toast('모두 지웠습니다',true);
+    armed=false;b.textContent='처음부터';snap();st=blank();persist();renderAll();toast('모두 지웠습니다',true);
   });
   $('btnExample').addEventListener('click',function(){
-    if(selIds().length||st.biz||st.who){saved.textContent='이미 쓴 내용이 있습니다. "처음부터"로 지운 뒤 예시를 눌러 주세요.';return}
-    snap();st={biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',goalPick:'예약',goalCustom:'',goalDetail:'카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 입금하면 확정',custom:{},
-      sel:{shorts:{stage:1,next:'insta'},flyer:{stage:1,next:'kakao'},insta:{stage:2,next:'place'},place:{stage:3,next:'booking'},booking:{stage:4,next:'goal'},kakao:{stage:4,next:'goal'}},
-      order:['shorts','flyer','insta','place','booking','kakao'],
-      msg:{1:'흙 만지는 40초 영상 — "퇴근 후 2시간, 내 그릇이 생깁니다"',2:'처음이어도 되는지, 몇 시간 걸리는지, 완성품은 언제 받는지',3:'수강생 작품 사진과 후기, 공방 내부 사진',4:'토요일·일요일 시간표 + 예약 버튼 / 카톡 채널 추가하면 이번 달 시간표 안내'}};
-    persist();renderAll();saved.textContent='예시입니다. "처음부터"로 지울 수 있습니다.';
+    if(ids().length||st.biz||st.who){toast('이미 쓴 내용이 있습니다. "처음부터"로 지운 뒤 눌러 주세요.',false);return}
+    snap();
+    st={version:2,biz:'생활 도자기 원데이 클래스',who:'주말 취미를 찾는 30대 직장인',goal:'예약',goalPick:'예약',goalCustom:'',goalDetail:'카톡 채널 추가 → 원하는 날짜 보내기 → 예약금 입금하면 확정',checks:{},
+      nodes:{shorts:{stage:1,custom:false,name:'',msg:'흙 만지는 40초 영상 — "퇴근 후 2시간, 내 그릇이 생깁니다"'},flyer:{stage:1,custom:false,name:'',msg:''},insta:{stage:2,custom:false,name:'',msg:'처음이어도 되는지, 몇 시간 걸리는지, 완성품은 언제 받는지'},blog:{stage:2,custom:false,name:'',msg:'원데이 클래스 처음 가는 날 준비물'},place:{stage:3,custom:false,name:'',msg:'수강생 작품 사진과 후기, 공방 내부 사진'},booking:{stage:4,custom:false,name:'',msg:'토요일·일요일 시간표 + 예약 버튼'},kakao:{stage:4,custom:false,name:'',msg:''}},
+      order:['shorts','flyer','insta','blog','place','booking','kakao'],
+      edges:[{from:'shorts',to:'insta',how:'link',count:'no'},{from:'flyer',to:'kakao',how:'word',count:'no'},{from:'insta',to:'place',how:'unknown',count:''},{from:'blog',to:'place',how:'link',count:'yes'},{from:'place',to:'booking',how:'link',count:'yes'},{from:'place',to:'kakao',how:'',count:''},{from:'booking',to:'goal',how:'link',count:'yes'},{from:'kakao',to:'goal',how:'link',count:'yes'}]};
+    persist();renderAll();toast('예시입니다. 되돌리기로 돌아갈 수 있습니다.',true);
   });
-  renderAll();
+
+  if(!$('tool').hidden)renderAll();
 })();
 </script>
 </body>

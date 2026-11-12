@@ -74,7 +74,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <p class="eyebrow">잇툴즈 · BCC 도구 모음</p>
     <p class="it-hero-small">혼자 하면 하루, 도구 쓰면 10분.</p>
     <h1 id="tools-title"><span class="it-rotate" id="itRotate" aria-live="polite">지원사업 찾기</span><span class="it-rotate-tail">, 지금 바로.</span></h1>
-    <p class="it-hero-lead">수업에서 교육생이 쓰는 도구를 그대로 열어뒀습니다. 가입 없이 씁니다. 로그인이 필요한 도구는 카드에 따로 적어뒀습니다.</p>
+    <p class="it-hero-lead">수업에서 교육생이 쓰는 도구를 그대로 열어뒀습니다. 대부분 가입 없이 씁니다. 로그인이나 이름·연락처 입력이 필요한 도구는 카드에 따로 적어뒀습니다.</p>
     <div class="it-hero-cta"><a href="#free" class="btn btn-white">무료 도구부터 써보기</a><a href="#coach" class="btn btn-outline">AI 코치 24개</a></div>
   </div>
 </section>
@@ -261,8 +261,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <p class="it-sub-desc">마케팅 경로·보도자료·카드뉴스·프로필·상세페이지</p>
         <div class="it-bot-grid">
         <a class="it-bot" href="tools/funnel-map/">
-          <div><b>마케팅 경로 지도</b><span>지금 하는 채널(유튜브·블로그·전단지·AI 검색 등)을 고르면 고객이 오다 끊기는 곳을 빨간색으로 보여줍니다.</span></div>
-          <small>4단계 · 15분 · 사장님·예비창업자·1인 사업자</small>
+          <div><b>마케팅 경로 지도</b><span>지금 하는 채널(유튜브·블로그·전단지·AI 검색 등)을 고르면 고객이 끊기는 곳과 먼저 할 3가지를 진단서로 드립니다.</span></div>
+          <small>무료 · 이름·연락처 입력 후 이용 · 15분 · 사장님·예비창업자</small>
         </a>
         <a class="it-bot" href="tools/chatbots/?bot=press-release">
           <div><b>보도자료 작성</b><span>기관·행사 정보를 단계별로 묻고 기사체 보도자료를 완성합니다.</span></div>
@@ -420,6 +420,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <script>
 (function(){var el=document.getElementById('itRotate');if(!el)return;var words=['지원사업 찾기','공고 진단','사업계획서 초안','한 달 손익 계산','면접 연습','AI 업무지시서'];var i=0;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;setInterval(function(){el.classList.add('is-out');setTimeout(function(){i=(i+1)%words.length;el.textContent=words[i];el.classList.remove('is-out');},380);},2600);})();
+</script>
+<script>
+/* 처음 들어온 경로(스레드 등)를 기억해 도구 이용 신청에 함께 남긴다. 이름·연락처는 여기서 다루지 않는다. */
+(function(){try{if(localStorage.getItem('bcc_first_touch'))return;var p=new URLSearchParams(location.search),t={landing:location.pathname};['utm_source','utm_medium','utm_campaign'].forEach(function(k){var v=p.get(k);if(v)t[k]=v.slice(0,100)});var r=document.referrer?new URL(document.referrer).hostname:'';if(r&&!/(^|\.)bccconsulting\.kr$/.test(r))t.ref=r;localStorage.setItem('bcc_first_touch',JSON.stringify(t))}catch(e){}})();
 </script>
 </body>
 </html>
