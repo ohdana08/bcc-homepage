@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>비즈니스 모델 캔버스 | BCC 잇툴즈</title>
 <meta name="description" content="멘토링하면서 함께 채우는 비즈니스 모델 캔버스. 팀별로 저장하고 PDF 한 장으로 전달합니다.">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K94NGCTP');</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5TN5XW0T2J');
+</script>
 <style>
 :root{--navy:#14213d;--blue:#2457d6;--line:#cfd6e4;--bg:#f4f6fb;--ink:#1b2333;--mute:#667089;--card:#fff;--hl:#fff7d6}
 *{box-sizing:border-box}
@@ -32,7 +46,7 @@ h2{font-size:15px;margin:0 0 2px;display:flex;gap:6px;align-items:center}
 .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
 .en{font-size:11px;color:var(--mute);font-weight:400}
 .q{font-size:12.5px;color:var(--mute);margin:2px 0 6px}
-textarea{flex:1;width:100%;min-height:90px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:15px;font-family:inherit;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
+textarea{flex:1;width:100%;min-height:90px;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:16px;font-family:inherit;line-height:1.5;resize:vertical;background:#fcfdff;color:var(--ink)}
 textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
 .kp{grid-column:1/3;grid-row:1/3}.ka{grid-column:3/5;grid-row:1}.kr{grid-column:3/5;grid-row:2}
 .vp{grid-column:5/7;grid-row:1/3}.cr{grid-column:7/9;grid-row:1}.ch{grid-column:7/9;grid-row:2}
@@ -44,31 +58,42 @@ textarea:focus{outline:none;border-color:var(--blue);background:var(--hl)}
 .notes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .note textarea{min-height:80px}
 footer{max-width:1500px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;color:var(--mute)}
-.print-title,.print-foot{display:none}
+.print-title,.print-foot,.pv,.more,.appendix{display:none}
 @media(max-width:900px){
   .top,.notes{grid-template-columns:1fr}
   .canvas{display:flex;flex-direction:column}
   .cell{order:var(--o)}
   .saved{margin-left:0;width:100%}
 }
+/* 인쇄 배치: PDF 버튼·Ctrl+P 직전에 body.printing을 붙여 같은 크기로 미리 맞춰 봅니다 */
+body.printing main{width:283mm;max-width:none;padding:0;margin:0}
+body.printing header,body.printing .bar,body.printing .guide,body.printing footer,body.printing .top,body.printing .q,body.printing textarea{display:none}
+body.printing .print-title{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin:0 0 4px;height:6mm}
+body.printing .print-title span:last-child{font-weight:400;font-size:11px}
+body.printing .canvas{display:grid;grid-template-rows:50mm 50mm 31mm;gap:3px}
+body.printing .cell,body.printing .note{border-radius:0;border-color:#444;padding:4px 5px;overflow:hidden;order:0;min-height:0}
+body.printing .cell.now{box-shadow:none;border-color:#444}
+body.printing h2{font-size:11px;flex:none}
+body.printing .num{width:15px;height:15px;font-size:9px}
+body.printing .more{display:inline;font-size:9px;font-weight:700;color:#b3261e;margin-left:auto}
+body.printing .more:empty{display:none}
+body.printing .pv{display:block;flex:1;min-height:0;overflow:hidden;white-space:pre-wrap;word-break:break-all;font-size:10.5px;line-height:1.4;padding:2px}
+body.printing .one{border-color:#444;border-radius:0;margin-top:3px;padding:3px 5px;height:13mm;overflow:hidden}
+body.printing .one h3{font-size:11px;margin:0}
+body.printing .one p{font-size:10.5px;line-height:1.35}
+body.printing .one .blank{color:#888}
+body.printing .notes{grid-template-columns:1fr 1fr;gap:3px;margin-top:3px}
+body.printing .note{height:25mm}
+body.printing .print-foot{display:block;font-size:9px;color:#555;margin:3px 0 0;text-align:right}
+body.printing .appendix.on{display:block;break-before:page;page-break-before:always;font-size:11px;column-count:2;column-gap:8mm}
+body.printing .appendix h3{column-span:all}
+body.printing .appendix h3{font-size:13px;margin:0 0 6px}
+body.printing .appendix h4{font-size:11.5px;margin:8px 0 2px;border-bottom:1px solid #999}
+body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-height:1.45}
 @media print{
   @page{size:A4 landscape;margin:7mm}
   body{background:#fff}
-  header,.bar,.guide,footer,.top{display:none}
-  main{padding:0;max-width:none}
-  .print-title{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin:0 0 4px}
-  .print-title span:last-child{font-weight:400;font-size:11px}
-  .canvas{display:grid;grid-template-rows:50mm 50mm 32mm;gap:3px}
-  .cell,.note{border-radius:0;border-color:#444;padding:4px 5px;overflow:hidden;order:0}
-  .cell.now{box-shadow:none;border-color:#444}
-  h2{font-size:11px}.q{display:none}.num{width:15px;height:15px;font-size:9px}
-  textarea{border:none;background:#fff;font-size:10.5px;line-height:1.4;padding:2px;resize:none;min-height:0;overflow:hidden}
-  .one{border-color:#444;border-radius:0;margin-top:3px;padding:4px 5px}
-  .one h3{font-size:11px;margin:0}.one p{font-size:10.5px}
-  .one .blank{color:#888}
-  .notes{gap:3px;margin-top:3px}
-  .note{height:24mm}
-  .print-foot{display:block;font-size:9px;color:#555;margin-top:3px;text-align:right}
+  .canvas{display:grid}
 }
 </style>
 </head>
@@ -116,6 +141,7 @@ footer{max-width:1500px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
     <section class="note"><h2>다음 만남까지 할 일</h2><p class="q">"아직 모름"인 칸을 확인할 방법. 누구에게 무엇을 물어볼지.</p><textarea data-k="todo"></textarea></section>
   </div>
   <p class="print-foot">BCC · bccconsulting.kr</p>
+  <section class="appendix" id="appendix"></section>
 </main>
 <footer>입력한 내용은 이 기기의 브라우저에만 저장되고 서버로 보내지 않습니다. 브라우저 기록을 지우면 사라지니 멘토링이 끝나면 PDF로 저장해 두세요.</footer>
 
@@ -165,12 +191,44 @@ footer{max-width:1500px;margin:0 auto;padding:8px 16px 30px;font-size:12.5px;col
   fields.forEach(function(f){f.addEventListener('input',save)});
   pick.addEventListener('change',function(){store.cur=pick.value;data=store.items[store.cur];persist();render()});
   document.getElementById('btnNew').addEventListener('click',function(){newTeam();persist();render();document.getElementById('team').focus();saved.textContent='새 팀을 만들었습니다'});
-  var baseTitle=document.title;
+  var baseTitle=document.title,app=document.getElementById('appendix');
+  // 각 칸에 인쇄용 글 상자(.pv)와 "2쪽에 이어짐" 표시(.more)를 붙임
+  document.querySelectorAll('.cell,.note').forEach(function(c){
+    var pv=document.createElement('div');pv.className='pv';c.appendChild(pv);
+    var m=document.createElement('span');m.className='more';c.querySelector('h2').appendChild(m);
+  });
+  function fits(el){return el.scrollHeight<=el.clientHeight+1}
+  function preparePrint(){
+    document.body.classList.add('printing');
+    var over=[];
+    document.querySelectorAll('.cell,.note').forEach(function(c){
+      var k=c.querySelector('textarea').dataset.k,pv=c.querySelector('.pv'),m=c.querySelector('.more'),t=val(k);
+      m.textContent='';pv.textContent=t;
+      var fs=10.5;pv.style.fontSize=fs+'px';
+      while(!fits(pv)&&fs>7.5){fs-=0.5;pv.style.fontSize=fs+'px'}
+      if(fits(pv))return;
+      // 가장 작은 글씨로도 넘치면 줄 단위로 줄이고 나머지는 2쪽에 전체를 싣습니다
+      var lines=t.split('\n');
+      while(lines.length>1){lines.pop();pv.textContent=lines.join('\n')+'\n… 2쪽에 이어짐';if(fits(pv))break}
+      m.textContent='2쪽에 이어짐';
+      over.push({name:names[k]||{memo:'멘토 의견',todo:'다음 만남까지 할 일'}[k],text:t});
+    });
+    var p=document.getElementById('pitch'),pf=10.5;p.style.fontSize='';
+    while(!fits(p.parentNode)&&pf>7.5){pf-=0.5;p.style.fontSize=pf+'px'}
+    app.innerHTML='';app.classList.toggle('on',over.length>0);
+    if(over.length){
+      var h=document.createElement('h3');h.textContent='이어지는 내용 — 1쪽 칸에 다 들어가지 않은 글 전체';app.appendChild(h);
+      over.forEach(function(o){var a=document.createElement('h4');a.textContent=o.name;var b=document.createElement('div');b.textContent=o.text;app.appendChild(a);app.appendChild(b)});
+    }
+  }
+  function endPrint(){document.body.classList.remove('printing');document.title=baseTitle;document.getElementById('pitch').style.fontSize=''}
   document.getElementById('btnPrint').addEventListener('click',function(){
     document.title='BMC_'+(val('team')||'팀')+'_'+(val('date')||today());
+    try{if(typeof gtag==='function')gtag('event','bmc_pdf',{filled:order.filter(function(k){return val(k)}).length})}catch(e){}
     window.print();
   });
-  window.addEventListener('afterprint',function(){document.title=baseTitle});
+  window.addEventListener('beforeprint',preparePrint);
+  window.addEventListener('afterprint',endPrint);
   document.getElementById('btnCopy').addEventListener('click',function(){
     var b=this,t='[비즈니스 모델 캔버스]\n팀: '+val('team')+'\n아이디어: '+val('idea')+'\n날짜: '+val('date')+'\n';
     order.forEach(function(k,i){t+='\n'+(i+1)+'. '+names[k]+'\n'+(val(k)||'(아직 비어 있음)')+'\n'});
