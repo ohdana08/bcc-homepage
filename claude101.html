@@ -11,6 +11,17 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5TN5XW0T2J"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TN5XW0T2J');</script>
 <script defer src="/assets/bcc-analytics.js?v=20261116a"></script>
 <script defer src="/assets/bcc-inquiry.js?v=20261116a"></script>
+<style>
+  .institution-consult { margin: 40px 0 56px; padding: clamp(22px, 4vw, 36px); border: 1px solid var(--line-strong); border-radius: 18px; background: var(--surface); }
+  .institution-consult h2 { margin: 0 0 12px; font-size: clamp(22px, 3vw, 29px); line-height: 1.4; word-break: keep-all; }
+  .institution-consult p { margin: 0 0 20px; color: var(--text-soft); }
+  .institution-consult-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .institution-consult-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 20px; border-radius: 10px; background: var(--coral-strong); color: var(--bg); font-weight: 800; }
+  .institution-consult-secondary, .institution-consult-end a { color: var(--coral-strong); text-decoration: underline; text-underline-offset: 4px; }
+  .institution-consult a:focus-visible, .institution-consult-end a:focus-visible { outline: 3px solid var(--text); outline-offset: 5px; }
+  .institution-consult-end { margin: 28px 0; color: var(--text-soft); }
+  @media (max-width: 620px) { .institution-consult-actions { align-items: stretch; flex-direction: column; } }
+</style>
 </head>
 <body>
   <header class="site-header"><div class="header-inner"><a class="brand" href="index.html" aria-label="BCC 홈페이지"><img src="logo.png?v=3" alt="BCC 로고"><div><strong>BCC</strong><span>비즈니스커리어컨설팅</span></div></a><nav class="header-nav" aria-label="자료실 메뉴"><a href="#levels">전체 실습</a><a class="home-link" href="index.html#itschool">잇스쿨로 돌아가기</a></nav></div></header>
@@ -40,6 +51,15 @@
             <div class="lesson-output"><span>완성 결과물</span> · 사용 습관 점검표</div>
             <div class="lesson-arrow">실습 시작하기 →</div>
           </a></div>
+      </section>
+
+      <section class="institution-consult" id="institution-consult" aria-labelledby="institution-consult-title">
+        <h2 id="institution-consult-title">이 실습을 우리 기관 교육으로 진행하고 싶으신가요?</h2>
+        <p>교육생의 수준과 업무에 맞춰 실습 구성을 상담합니다.<br>대상과 수업에서 만들고 싶은 결과물을 알려주세요.</p>
+        <div class="institution-consult-actions">
+          <a class="institution-consult-primary" href="/?education=institution&amp;inquiry_from=claude_intro#contact">기관 Claude 교육 상담</a>
+          <a class="institution-consult-secondary" href="/ai-automation-education/">교육 구성 살펴보기 →</a>
+        </div>
       </section>
 
       <section class="level-section" aria-labelledby="level-2-title">
@@ -159,6 +179,7 @@
           </a></div>
       </section>
       <aside class="library-note"><strong>프롬프트를 찾는 데서 끝내지 않고 실제 파일을 만들고 싶다면</strong><p>입력 샘플과 복사형 프롬프트로 Word 보고서, Excel 분석표, PowerPoint 발표자료를 완성하는 <a href="claude101-pro.html" style="color:var(--coral-strong);font-weight:800">9,900원 AI 업무 결과물 실습팩 →</a></p></aside>
+      <p class="institution-consult-end">우리 기관에 맞는 실습 교육이 필요하신가요? <a href="/?education=institution&amp;inquiry_from=claude_intro#contact">기관 Claude 교육 상담 →</a></p>
       <aside class="library-note"><strong>번역 자료가 아니라, BCC의 업무 실습자료입니다.</strong><p>해외 자료의 문장을 옮기지 않고 주제만 참고해 한국의 업무 장면, 실습 프롬프트, 결과 검수 기준으로 다시 구성했습니다. 기능 정보는 Anthropic 공식 문서로 확인했습니다.</p></aside>
     </div>
   </main>
