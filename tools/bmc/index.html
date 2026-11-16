@@ -31,6 +31,7 @@ main{max-width:1500px;margin:0 auto;padding:14px 16px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
 button,select{font-family:inherit;font-size:14px;font-weight:700;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
 select{max-width:260px}
+@media (max-width:820px){select{font-size:16px}}
 button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
 button.warn{color:var(--red)}
 button.sm{font-size:13px;padding:6px 10px}
@@ -246,7 +247,7 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
   </div>
 
   <div class="one">
-    <h3>한 문장으로 말하기</h3>
+    <h3>한 줄로 정리</h3>
     <p id="pitch"></p>
   </div>
   <div class="notes">
@@ -432,8 +433,8 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     $('btnUndo').hidden=!data.prev;$('applyMsg').textContent='';$('applyMsg').className='msg';
   }
   function update(){
-    function slot(k,l){var v=first(k);return v?'<b>'+esc(v)+'</b>':'<span class="blank">['+l+']</span>'}
-    $('pitch').innerHTML='우리는 '+slot('cs','① 고객')+'에게 '+slot('vp','② 가치')+'을(를) '+slot('ch','③ 채널')+'(으)로 전하고, '+slot('rv','⑤ 수익')+'(으)로 돈을 법니다.';
+    function slot(k,l){var v=first(k).replace(/^(.*?[.?!])\s.*$/,'$1').replace(/[.。]$/,'');return v?'<b>'+esc(v)+'</b>':'<span class="blank">(비어 있음)</span>'}
+    $('pitch').innerHTML='누구에게: '+slot('cs')+' · 무엇을: '+slot('vp')+' · 어떻게 만나나: '+slot('ch')+' · 돈은: '+slot('rv');
     $('ptLeft').textContent='비즈니스 모델 캔버스 — '+(val('team')||'팀 이름')+(val('idea')?' | '+val('idea'):'');
     var okN=order.filter(function(k){return stOf(k)==='ok'}).length;
     $('ptRight').textContent=(val('date')||'')+' · 확인됨 '+okN+'칸 / 9칸 · BCC';
@@ -549,9 +550,14 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     if(!got.length){msg.className='msg bad';msg.textContent='[1 고객] 같은 칸 이름표를 찾지 못했습니다. AI에게 "답 형식 그대로 다시 써 줘"라고 한 뒤 다시 붙여넣어 주세요.';track('bmc_ai_apply',{cells:0});return}
     var snap={st:JSON.parse(JSON.stringify(data.st)),ev:JSON.parse(JSON.stringify(data.ev)),focus:data.focus?data.focus.slice():null};
     order.forEach(function(k){snap[k]=data[k]||''});
-    var ch=[],kept=[];
+    var ch=[],kept=[],down=[];
     got.forEach(function(k){
       var c=r.cells[k],oldT=val(k),oldS=stOf(k);
+      if(c.st==='ok'&&c.text){
+        var strong=false,mm,re2=/자료\s*(\d+)/g;
+        while((mm=re2.exec(c.ev||''))){var sr=data.sources[+mm[1]-1];if(sr&&typeOf(sr.type).lv===3)strong=true}
+        if(!strong){c.st='guess';down.push(names[k])}
+      }
       if(!c.text&&oldT){kept.push(names[k]);return}
       if(!c.text&&!oldT)return;
       if(c.text!==oldT)ch.push(names[k]+(oldT?': 내용 바뀜':': 새로 채움'));
@@ -566,9 +572,9 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     fields.forEach(function(f){f.value=data[f.dataset.k]||''});update();$('btnUndo').hidden=false;
     var miss=order.filter(function(k){return got.indexOf(k)<0}).map(function(k){return names[k]});
     msg.className='msg'+(miss.length?' bad':'');
-    msg.textContent=got.length+'칸을 읽었습니다. 확인됨 '+okN+'칸 / 추측 '+gN+'칸.'+(miss.length?' 못 읽은 칸: '+miss.join(', ')+' — 손으로 채워 주세요.':'')+(kept.length?' AI가 비움으로 답한 '+kept.join(', ')+' 칸은 기존 내용을 그대로 두었습니다.':'')+' 아래 캔버스를 확인하고, ④에서 이번 주에 확인할 칸을 고르세요.';
+    msg.textContent=got.length+'칸을 읽었습니다. 확인됨 '+okN+'칸 / 추측 '+gN+'칸.'+(miss.length?' 못 읽은 칸: '+miss.join(', ')+' — 손으로 채워 주세요.':'')+(kept.length?' AI가 비움으로 답한 '+kept.join(', ')+' 칸은 기존 내용을 그대로 두었습니다.':'')+(down.length?' AI가 확인됨이라고 했지만 근거에 판매·인터뷰 자료 번호가 없어 추측으로 바꾼 칸: '+down.join(', ')+'.':'')+' 아래 캔버스를 확인하고, ④에서 이번 주에 확인할 칸을 고르세요.';
     var ver=data.history.filter(function(h){return !h.manual&&/^AI/.test(h.note||'')}).length;
-    track('bmc_ai_apply',{cells:got.length,ok:okN,version:ver});
+    track('bmc_ai_apply',{cells:got.length,ok:okN,version:ver,down:down.length});
     if(ver>=2)track('bmc_version',{ok:okN});
   });
   $('btnUndo').addEventListener('click',function(){
