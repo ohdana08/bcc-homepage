@@ -56,7 +56,7 @@
   try {
     const url = new URL(window.location.href);
     if (!['https://bccconsulting.kr', 'https://www.bccconsulting.kr'].includes(url.origin) ||
-        !['/ddakfit/', '/ddakfit/index.html'].includes(url.pathname) || url.username || url.password) return;
+        !['/ddakfit', '/ddakfit/', '/ddakfit/index.html'].includes(url.pathname) || url.username || url.password) return;
     const hashParameters = new URLSearchParams(url.hash.slice(1));
     if (url.searchParams.has('qa') || hashParameters.has('qa')) return;
     const values = url.searchParams.getAll('bcc_analytics_debug');

@@ -23,7 +23,10 @@
   var NO_REPLAY = false; // 회원·결제 페이지 제거(2026-11-12)로 녹화 제외 대상 없음
 
   /* ---------- GA4 ---------- */
-  if (!document.querySelector('script[src*="gtag/js?id=' + GA4_ID + '"]')) {
+  // The directory owns its GA setup, URL sanitization and QA event namespace.
+  // All directory entry paths use that loader; PostHog stays shared.
+  var DIRECTORY_GA = /^\/ddakfit(?:\/(?:index\.html)?)?$/.test(path);
+  if (!DIRECTORY_GA && !document.querySelector('script[src*="gtag/js?id=' + GA4_ID + '"]')) {
     var g = document.createElement('script');
     g.async = true;
     g.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA4_ID;
