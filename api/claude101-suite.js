@@ -12,7 +12,10 @@ import { handleLectureRequest } from '../lib/lecture-request.js';
 import { handleLectureRequestAttachments } from '../lib/lecture-request-attachments.js';
 import { handleToolLeads } from '../lib/tool-leads.js';
 
+import { handleInquiryNotifications } from '../lib/inquiry-notifications.js';
+
 const HANDLERS = {
+  'inquiry-notifications': handleInquiryNotifications,
   'lecture-operations': handleLectureOperations,
   'lecture-request': handleLectureRequest,
   'lecture-request-attachments': handleLectureRequestAttachments,
