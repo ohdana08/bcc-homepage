@@ -36,7 +36,8 @@
 }
 </script>
 <script defer src="/assets/education.js?v=20261107"></script>
-<script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
+<script defer src="/assets/bcc-analytics.js?v=20261116a"></script>
+<script defer src="/assets/bcc-inquiry.js?v=20261116a"></script>
 </head>
 <body class="has-hero">
 <nav class="nav">
@@ -351,26 +352,29 @@
       return ('page=geo-education&' + src).slice(0, 200);
     } catch (e) { return 'page=geo-education'; }
   }
+  function inquiry(stage) { try { window.BCCInquiry?.simple(stage); } catch (e) {} }
   function setStatus(msg, kind) { if (!statusEl) return; statusEl.textContent = msg; statusEl.className = 'lf-status' + (kind ? ' lf-' + kind : ''); }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var btn = form.querySelector('.lf-submit');
-    if (!form.name.value.trim() || !form.contact.value.trim()) { setStatus('이름과 연락처를 입력해 주세요.', 'err'); return; }
-    if (!form.consent.checked) { setStatus('개인정보 수집·이용 동의가 필요합니다.', 'err'); return; }
+    if (!form.name.value.trim() || !form.contact.value.trim()) { inquiry('validation_error'); setStatus('이름과 연락처를 입력해 주세요.', 'err'); return; }
+    if (!form.consent.checked) { inquiry('validation_error'); setStatus('개인정보 수집·이용 동의가 필요합니다.', 'err'); return; }
     var payload = {
       name: form.name.value.trim(), contact: form.contact.value.trim(), request_type: form.request_type.value,
       message: '문의 분야: AI 검색노출(GEO) 교육\n' + form.message.value.trim(),
       source: collectSource(), consent: true, website: form.website.value
     };
+    inquiry('submit_attempt');
     btn.disabled = true; setStatus('보내는 중…', '');
     fetch(LEAD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     .then(function (res) {
       if (res.status === 201) {
+        inquiry('submit_success');
         setStatus('문의가 접수되었습니다. 남겨주신 연락처로 안내드릴게요.', 'ok'); form.reset();
-        try { if (typeof gtag === 'function') gtag('event', 'lead_form_submitted', { request_type: payload.request_type, education_topic: 'geo' }); } catch (e) {}
-      } else if (res.status === 429) { setStatus('요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.', 'err'); }
-      else { return res.json().then(function (d) { setStatus(d && d.error ? d.error : '전송에 실패했습니다. 다시 시도해 주세요.', 'err'); }).catch(function () { setStatus('전송에 실패했습니다. 다시 시도해 주세요.', 'err'); }); }
-    }).catch(function () { setStatus('네트워크 오류로 전송하지 못했습니다.', 'err'); })
+        try { if (typeof gtag === 'function') gtag('event', window.BCCInquiry?.isTest ? 'qa_lead_form_submitted' : 'lead_form_submitted', { request_type: payload.request_type, education_topic: 'geo' }); } catch (e) {}
+      } else if (res.status === 429) { inquiry('submit_error'); setStatus('요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.', 'err'); }
+      else { inquiry('submit_error'); return res.json().then(function (d) { setStatus(d && d.error ? d.error : '전송에 실패했습니다. 다시 시도해 주세요.', 'err'); }).catch(function () { setStatus('전송에 실패했습니다. 다시 시도해 주세요.', 'err'); }); }
+    }).catch(function () { inquiry('submit_error'); setStatus('네트워크 오류로 전송하지 못했습니다.', 'err'); })
     .finally(function () { btn.disabled = false; });
   });
 })();

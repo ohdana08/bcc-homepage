@@ -71,6 +71,8 @@
 
   try {
     const url = new URL(window.location.href);
+    const from = url.searchParams.get('inquiry_from');
+    if (['home','claude_intro','tools','automation','geo'].includes(from)) window.BCCInquiryEntryFrom = from;
     const allowedOrigin = ['https://bccconsulting.kr', 'https://www.bccconsulting.kr'].includes(url.origin) && !url.username && !url.password;
     const allowedPath = ['/lecture-request/', '/lecture-request/index.html'].includes(url.pathname);
     const hash = new URLSearchParams(url.hash.slice(1));

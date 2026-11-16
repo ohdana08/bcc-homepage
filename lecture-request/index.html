@@ -10,8 +10,10 @@
   <link rel="icon" href="/logo.png">
   <link rel="stylesheet" href="./style.css">
   <script src="./analytics.js" defer></script>
-  <script src="./app.js" defer></script>
-<script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
+
+<script defer src="/assets/bcc-analytics.js?v=20261116a"></script>
+<script defer src="/assets/bcc-inquiry.js?v=20261116a"></script>
+<script src="./app.js" defer></script>
 </head>
 <body class="bcc-lecture-request">
   <a class="skip" href="#requestForm">입력으로 바로 가기</a>
@@ -78,7 +80,7 @@
               <details class="field full budget-examples"><summary>예산별 교육 구성 예시 보기</summary><dl><div><dt>100만원 미만</dt><dd>단일 주제 특강·AI 기초 체험</dd></div><div><dt>100~500만원</dt><dd>AI 기초 → 업무 문서 실습 → 기관 업무 결과물 1종</dd></div><div><dt>500~1,000만원</dt><dd>사전 수요조사 → 기초·심화 여러 회차 → 팀별 과제 피드백 → 결과 공유</dd></div><div><dt>1,000만원 이상</dt><dd>직무별 프로젝트 중심 교육 구성</dd></div></dl><p>상담을 돕기 위한 구성 예시입니다. 대상·인원·회차·실습 범위에 따라 조정하며, 확정 견적이나 제공 범위를 의미하지 않습니다.</p></details>
               <div class="field"><label for="lecturer_fee">책정 강사료</label><div class="input-unit"><input id="lecturer_fee" name="lecturer_fee" type="number" min="0" max="2147483647" step="1" inputmode="numeric" placeholder="예: 600000"><span>원</span></div></div>
               <div class="field full"><label for="required_documents">필요한 서류</label><textarea id="required_documents" name="required_documents" maxlength="1000" placeholder="예: 강사 프로필, 견적서, 강의계획서, 기관 지정 양식"></textarea><small>기관 지정 양식은 아래 파일 첨부로 전달해 주세요.</small></div>
-              <div class="field full attachment-field"><label for="attachmentFiles">기관 양식·참고자료 첨부</label><input id="attachmentFiles" type="file" multiple accept=".pdf,.hwp,.hwpx,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg"><small>파일당 2MB, 최대 3개 · PDF, 한글, Word, Excel, PowerPoint, PNG·JPG<br>접수가 완료된 뒤 파일을 전송합니다. 비공개로 보관하며, 불필요한 개인정보는 지워주세요.</small><ul id="attachmentList" class="attachment-list"></ul><p id="attachmentStatus" class="attachment-note" role="status"></p><button id="reloadAttachmentsBtn" type="button" class="button secondary hidden">첨부 목록 다시 불러오기</button></div>
+              <div data-ph-block class="field full attachment-field"><label for="attachmentFiles">기관 양식·참고자료 첨부</label><input id="attachmentFiles" type="file" multiple accept=".pdf,.hwp,.hwpx,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg"><small>파일당 2MB, 최대 3개 · PDF, 한글, Word, Excel, PowerPoint, PNG·JPG<br>접수가 완료된 뒤 파일을 전송합니다. 비공개로 보관하며, 불필요한 개인정보는 지워주세요.</small><ul id="attachmentList" class="attachment-list"></ul><p id="attachmentStatus" class="attachment-note" role="status"></p><button id="reloadAttachmentsBtn" type="button" class="button secondary hidden">첨부 목록 다시 불러오기</button></div>
               <div class="field full"><label for="deadline_notes">회신·서류 제출 기한</label><input id="deadline_notes" name="deadline_notes" maxlength="300" placeholder="예: 다음 주 금요일까지 견적서가 필요해요"></div>
               <div class="field full"><label for="parking">주차·출입 안내</label><input id="parking" name="parking" maxlength="500" placeholder="예: 지하주차장 이용 가능, 사전 차량등록 필요"></div>
               <div class="field full"><label for="special_notes">그 밖의 특이사항</label><textarea id="special_notes" name="special_notes" maxlength="2000" placeholder="접근성 지원, 실습 보안규정, 세금·교통비 포함 여부 등 미리 알아야 할 내용을 알려주세요."></textarea></div>
@@ -86,7 +88,7 @@
           </section>
           <section class="step hidden" data-step="4" aria-labelledby="step4Title">
             <p class="section-kicker">마지막으로 한 번 확인해 주세요.</p><h2 id="step4Title" tabindex="-1">이 내용으로 문의할게요.</h2><p class="section-help">접수는 강의 일정·비용의 확정을 의미하지 않습니다. 내용을 확인한 뒤 개별 상담을 진행합니다.</p>
-            <div id="reviewSummary" class="review-summary"></div>
+            <div data-ph-block id="reviewSummary" class="review-summary"></div>
             <div class="consent-box">
               <p><strong>강의 상담을 위한 개인정보 수집·이용</strong></p><p>수집자: 비즈니스커리어컨설팅(BCC)<br>항목: 기관명, 담당자 성함·이메일, 입력한 연락처와 의뢰 내용, 첨부한 파일<br>목적: 강의 상담·교육 운영 및 의뢰 이력 관리<br>보관: 상담·교육 운영 목적 달성 시까지. 삭제 요청은 BCC에서 확인 후 처리합니다.</p><p>동의를 거부하면 온라인 접수는 제한되며 전화로 문의하실 수 있습니다. 의뢰 내용은 공개 포트폴리오에 자동 게시되지 않습니다. <a href="/privacy.html#lecture-request" target="_blank" rel="noopener noreferrer">자세한 처리 안내</a></p>
               <label class="consent"><input id="consent" type="checkbox" required><span><b>[필수]</b> 개인정보 수집·이용에 동의합니다.</span></label>
@@ -98,7 +100,7 @@
           <p class="save-note">입력 내용은 제출할 때, 첨부 파일은 접수 성공 후 전송됩니다. 창을 닫으면 아직 전송하지 않은 내용과 파일은 사라집니다.</p>
         </form>
       </div>
-      <section id="success" class="success hidden" aria-labelledby="successTitle"><div class="success-icon" aria-hidden="true">✓</div><p class="section-kicker">THANK YOU</p><h2 id="successTitle" tabindex="-1">강의 의뢰가 접수되었습니다.</h2><p>보내주신 내용을 확인한 뒤 연락드리겠습니다.<br>아래 링크로 제출 내용을 확인하고 보완할 수 있어요.</p><div class="receipt"><span>접수번호</span><strong id="receiptNumber"></strong></div><div class="private-link-box"><label for="privateLink">이 의뢰의 개인 수정 링크</label><textarea id="privateLink" readonly rows="3" spellcheck="false"></textarea><div class="success-actions"><button id="copyLinkBtn" type="button" class="button primary">수정 링크 복사</button><button id="downloadBtn" type="button" class="button secondary">접수 확인서 저장</button></div><p><strong>링크를 가진 사람은 의뢰 내용을 볼 수 있습니다.</strong><br>본인만 보관하고 교육생에게 공유하지 마세요. 수정 링크는 최초 접수일부터 90일 동안 유효합니다.</p></div><section id="successAttachments" class="success-attachments hidden" aria-label="첨부 전송 결과"><h3>첨부 파일</h3><p id="attachmentOutcome" class="attachment-note" role="status"></p><ul id="successAttachmentList" class="attachment-list"></ul><button id="retryAttachmentsBtn" type="button" class="button secondary hidden">실패한 첨부 다시 보내기</button></section><button id="continueEditBtn" type="button" class="text-button">제출한 내용 다시 확인·수정하기 →</button><a class="text-button new-request" href="./">다른 강의 의뢰하기 →</a></section>
+      <section data-ph-block id="success" class="success hidden" aria-labelledby="successTitle"><div class="success-icon" aria-hidden="true">✓</div><p class="section-kicker">THANK YOU</p><h2 id="successTitle" tabindex="-1">강의 의뢰가 접수되었습니다.</h2><p>보내주신 내용을 확인한 뒤 연락드리겠습니다.<br>아래 링크로 제출 내용을 확인하고 보완할 수 있어요.</p><div class="receipt"><span>접수번호</span><strong id="receiptNumber"></strong></div><div class="private-link-box"><label for="privateLink">이 의뢰의 개인 수정 링크</label><textarea id="privateLink" readonly rows="3" spellcheck="false"></textarea><div class="success-actions"><button id="copyLinkBtn" type="button" class="button primary">수정 링크 복사</button><button id="downloadBtn" type="button" class="button secondary">접수 확인서 저장</button></div><p><strong>링크를 가진 사람은 의뢰 내용을 볼 수 있습니다.</strong><br>본인만 보관하고 교육생에게 공유하지 마세요. 수정 링크는 최초 접수일부터 90일 동안 유효합니다.</p></div><section id="successAttachments" class="success-attachments hidden" aria-label="첨부 전송 결과"><h3>첨부 파일</h3><p id="attachmentOutcome" class="attachment-note" role="status"></p><ul id="successAttachmentList" class="attachment-list"></ul><button id="retryAttachmentsBtn" type="button" class="button secondary hidden">실패한 첨부 다시 보내기</button></section><button id="continueEditBtn" type="button" class="text-button">제출한 내용 다시 확인·수정하기 →</button><a class="text-button new-request" href="./">다른 강의 의뢰하기 →</a></section>
       <p id="status" role="status" aria-live="polite" class="status"></p>
     </section>
   </main>

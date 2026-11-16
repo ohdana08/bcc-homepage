@@ -15,6 +15,13 @@
   var POSTHOG_HOST = 'https://us.i.posthog.com'; // EU 리전이면 https://eu.i.posthog.com
 
   var path = location.pathname;
+  var INTAKE = /^\/lecture-request(?:\/(?:index\.html)?)?$/.test(path);
+  if (INTAKE) {
+    var intakeUrl = new URL(location.href);
+    var intakeKeys = Array.from(intakeUrl.searchParams.keys()).concat(Array.from(new URLSearchParams(intakeUrl.hash.slice(1)).keys()));
+    if (intakeKeys.some(function (k) { return /^(receipt|key)$/i.test(k); }) || intakeUrl.searchParams.get('mode') === 'edit') return;
+  }
+
 
   // 어드민·내부 페이지는 측정 자체를 하지 않는다.
   if (/^\/admin/.test(path) || /^\/gyeol\//.test(path)) return;
@@ -22,11 +29,19 @@
   // 로그인·구매자 전용 영역: 페이지뷰만 보내고 세션 리플레이는 끈다.
   var NO_REPLAY = false; // 회원·결제 페이지 제거(2026-11-12)로 녹화 제외 대상 없음
 
+  // QA state survives the dedicated intake loader's canonical URL cleanup.
+  var inquiryTest = false;
+  try {
+    var testUrl = new URL(location.href);
+    inquiryTest = testUrl.searchParams.has('qa') || new URLSearchParams(testUrl.hash.slice(1)).has('qa') || testUrl.searchParams.has('bcc_analytics_debug') || sessionStorage.getItem('bcc-inquiry-test') === '1' || sessionStorage.getItem('bcc-lecture-request-ga4-debug-v1') === '1';
+    if (inquiryTest) sessionStorage.setItem('bcc-inquiry-test', '1');
+  } catch (e) { /* Explicit URL test detection above still applies. */ }
+
   /* ---------- GA4 ---------- */
   // The directory owns its GA setup, URL sanitization and QA event namespace.
   // All directory entry paths use that loader; PostHog stays shared.
   var DIRECTORY_GA = /^\/ddakfit(?:\/(?:index\.html)?)?$/.test(path);
-  if (!DIRECTORY_GA && !document.querySelector('script[src*="gtag/js?id=' + GA4_ID + '"]')) {
+  if (!INTAKE && !DIRECTORY_GA && !document.querySelector('script[src*="gtag/js?id=' + GA4_ID + '"]')) {
     var g = document.createElement('script');
     g.async = true;
     g.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA4_ID;
@@ -64,7 +79,7 @@
     capture_pageleave: true,              // 체류시간·이탈 계산용
     respect_dnt: true,
     disable_session_recording: NO_REPLAY,
-    autocapture: {
+    autocapture: INTAKE ? false : {
       capture_copied_text: false,
       element_allowlist: ['a', 'button', 'form', 'input', 'select', 'textarea', 'label']
     },
@@ -77,6 +92,7 @@
       recordCrossOriginIframes: false
     },
     sanitize_properties: function (props) {
+      props.is_test = inquiryTest;
       if (props.$current_url) props.$current_url = scrubUrl(props.$current_url);
       if (props.$referrer) props.$referrer = scrubUrl(props.$referrer);
       if (props.$pathname && /\/(mypage|course-)/.test(props.$pathname)) props.$title = '[masked]';

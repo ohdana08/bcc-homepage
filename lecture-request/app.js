@@ -4,6 +4,7 @@
   const form = $('requestForm');
   // Analytics is optional and receives no answers, field labels or DOM values.
   function track(method, value) {
+    try { window.BCCInquiry?.detail(method, value); } catch { /* Optional analytics. */ }
     try { window.BCCLectureAnalytics?.[method]?.(value); } catch { /* The form must work when analytics is blocked. */ }
   }
   const steps = [...document.querySelectorAll('.step')];
@@ -466,7 +467,7 @@
       for (const row of scheduleRows) {
         if (scheduleTime(row).length > 100) {
           showStep(index); message('한 날짜의 시간대와 직접 입력 내용을 합쳐 100자 이내로 적어주세요.');
-          row.customArea.classList.remove('hidden'); row.custom.disabled = false; row.custom.focus(); return false;
+          row.customArea.classList.remove('hidden'); row.custom.disabled = false; row.custom.focus(); if (!edit) track('validation_error', index + 1); return false;
         }
       }
     }
@@ -476,7 +477,7 @@
       const hasAnswer = checked.some((input) => input.value !== '__custom') || (checked.some((input) => input.value === '__custom') && group.original.value.trim());
       if (!hasAnswer) {
         showStep(index); message('교육대상과 교육 목적을 하나 이상 선택해 주세요. 미정·추천 선택도 괜찮습니다.');
-        group.inputs[0].focus(); return false;
+        group.inputs[0].focus(); if (!edit) track('validation_error', index + 1); return false;
       }
     }
     for (const input of steps[index].querySelectorAll('input,textarea,select')) {
@@ -490,7 +491,7 @@
         message(input.type === 'checkbox' ? '접수를 위해 두 항목에 동의해 주세요.' : '필수 항목과 입력 형식을 확인해 주세요.');
         input.reportValidity();
         input.focus();
-        return false;
+        if (!edit) track('validation_error', index + 1); return false;
       }
     }
     return true;
@@ -599,14 +600,16 @@
     const originalLabel = $('submitBtn').textContent;
     $('submitBtn').textContent = '저장하는 중…';
     message('');
+    if (!edit) track('submit_attempt');
     let currentPayload = payload();
+    let accepted = false;
     try {
       const identifiers = edit || identity();
       const data = await api({ action: edit ? 'update' : 'submit', ...identifiers, expected_revision: edit?.revision, payload: currentPayload, consent: $('consent').checked, overseas_consent: $('overseas_consent').checked, consent_version: '2026-10-21-v1', website: form.elements.website.value });
       if (!data.receipt) throw new Error('접수 확인번호가 없습니다. 다시 시도하거나 전화로 문의해 주세요.');
       // A successful new submission (including recovered duplicate) is the
       // conversion boundary. An update, button click or failed request is not.
-      if (!edit && data.ok === true) track('complete', data.receipt);
+      if (!edit && data.ok === true) { accepted = true; track('complete', data.receipt); }
       // A retry after an interrupted response refers to the original stored payload.
       if (data.duplicate) {
         const saved = await api({ action: 'get', receipt: data.receipt, key: identifiers.key });
@@ -617,6 +620,7 @@
       } else changedRetryDraft = null;
       showSuccess(data, identifiers.key, currentPayload, Boolean(edit));
     } catch (error) {
+      if (!edit && !accepted) track('submit_error');
       message(error.message);
       if (error.status === 409 && edit) {
         const button = document.createElement('button');
