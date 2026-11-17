@@ -190,3 +190,26 @@ test('recommendation tracking accepts only fixed states and counts; QA is preser
   assert.ok(!JSON.stringify(actual).includes('private-value'));
   assert.equal(app.window.location.href, LIVE + '#recommend');
 });
+
+test('AIMAX campaign survives cleanup, reload and recommendation events without arbitrary data', async () => {
+  const query = '?utm_source=aimax&utm_medium=partner&utm_campaign=launch';
+  for (const href of [LIVE + query + '&email=private-value&utm_content=private-value#recommend', LIVE + query]) {
+    const app = await run({ href });
+    app.window.BCCDdakfitAnalytics.recommendation('results', 3);
+    assert.equal(new URL(app.window.location.href).search, query);
+    assert.ok(app.events().every(e => e.params.campaign_source === 'aimax' && e.params.campaign_medium === 'partner' && e.params.campaign_name === 'launch'));
+    assert.ok(!JSON.stringify(app.commands()).includes('private-value'));
+    assert.equal(app.events().find(e => e.name === 'ddakfit_recommendation_results').params.result_count, 3);
+    const reload = await run({ href: app.window.location.href });
+    assert.equal(reload.events()[0].params.campaign_source, 'aimax');
+  }
+  for (const query of ['?utm_source=aimax', '?utm_source=aimax&utm_source=other&utm_medium=partner&utm_campaign=launch', '?utm_source=aimax&utm_medium=partner&utm_campaign=private-value']) {
+    const app = await run({ href: LIVE + query });
+    assert.equal(app.window.location.href, LIVE);
+    assert.ok(app.events().every(e => !e.params.campaign_source));
+  }
+  const qa = await run({ href: LIVE + query + '&qa=1' });
+  assert.equal(qa.events().length, 0);
+  const debug = await run({ href: LIVE + query + '&bcc_analytics_debug=1' });
+  assert.ok(debug.events().every(e => e.params.campaign_source === 'codex' && e.params.traffic_type === 'qa'));
+});

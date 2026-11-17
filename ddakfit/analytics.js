@@ -79,13 +79,18 @@
         document.querySelector('script[src*="googletagmanager.com"], script[src*="google-analytics.com"]')) return;
     if (window.dataLayer && (!Array.isArray(window.dataLayer) || window.dataLayer.length)) return;
 
+    // Only this fixed public partner campaign survives URL sanitization.
+    const aimax = [['utm_source', 'aimax'], ['utm_medium', 'partner'], ['utm_campaign', 'launch']]
+      .every(([key, value]) => url.searchParams.getAll(key).length === 1 && url.searchParams.get(key) === value);
+    const campaignQuery = aimax && !debug ? '?utm_source=aimax&utm_medium=partner&utm_campaign=launch' : '';
     // Keep only known in-page navigation, never search text or arbitrary URL data.
     const safeHash = /^#(?:main|recommend|links|find|diagnosis|plan|presentation|continue-title|region=(?:national|busan|gyeongnam|ulsan))$/.test(url.hash) ? url.hash : '';
-    window.history.replaceState(null, '', '/ddakfit/' + safeHash);
+    window.history.replaceState(null, '', '/ddakfit/' + campaignQuery + safeHash);
     const clean = new URL(window.location.href);
-    if (clean.search || clean.hash !== safeHash) return;
+    if (clean.search !== campaignQuery || clean.hash !== safeHash) return;
     context = {
-      page_location: CANONICAL, page_title: TITLE, page_referrer: '',
+      page_location: CANONICAL + campaignQuery, page_title: TITLE, page_referrer: '',
+      ...(aimax && !debug ? { campaign_source: 'aimax', campaign_medium: 'partner', campaign_name: 'launch' } : {}),
       ...(debug ? { debug_mode: true, traffic_type: 'qa', campaign_source: 'codex', campaign_medium: 'test', campaign_name: 'ddakfit_directory_qa' } : {}),
     };
     const dataLayer = window.dataLayer || [];
