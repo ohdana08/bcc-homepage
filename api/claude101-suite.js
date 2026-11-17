@@ -11,11 +11,13 @@ import { handleLectureOperations } from '../lib/lecture-operations.js';
 import { handleLectureRequest } from '../lib/lecture-request.js';
 import { handleLectureRequestAttachments } from '../lib/lecture-request-attachments.js';
 import { handleToolLeads } from '../lib/tool-leads.js';
+import { handleDdakfitRecommendations } from '../lib/ddakfit-recommendations.js';
 
 import { handleInquiryNotifications } from '../lib/inquiry-notifications.js';
 
 const HANDLERS = {
   'inquiry-notifications': handleInquiryNotifications,
+  'ddakfit-recommendations': handleDdakfitRecommendations,
   'lecture-operations': handleLectureOperations,
   'lecture-request': handleLectureRequest,
   'lecture-request-attachments': handleLectureRequestAttachments,

@@ -259,11 +259,11 @@ test('HTTP, network, JSON and schema failures are not counted as successful view
 test('HTML explains login scope and preserves every product entry URL', () => {
   assert.match(html, /기관 사이트 60곳/);
   assert.match(html, /공고 사이트 모음은 로그인 없이 이용할 수 있습니다/);
-  assert.match(html, /AI 공고 찾기·진단·사업계획서·IR 기능은 Google 로그인이 필요합니다/);
+  assert.match(html, /공고 진단·사업계획서·IR 기능은 Google 로그인이 필요합니다/);
   assert.match(html, /<body class="bcc-ddakfit-directory bcc-lecture-request">/);
   const productLinks = [...html.matchAll(/href="(https:\/\/ddakfit\.bccconsulting\.kr[^\"]*)"/g)].map((m) => m[1]);
   assert.deepEqual(productLinks, [
-    'https://ddakfit.bccconsulting.kr/embed', 'https://ddakfit.bccconsulting.kr/embed?start=find',
+    'https://ddakfit.bccconsulting.kr/discover', 'https://ddakfit.bccconsulting.kr/embed', 'https://ddakfit.bccconsulting.kr/embed?start=find',
     'https://ddakfit.bccconsulting.kr/embed?start=direct', 'https://ddakfit.bccconsulting.kr/embed',
     'https://ddakfit.bccconsulting.kr/embed', 'https://ddakfit.bccconsulting.kr/embed',
     'https://ddakfit.bccconsulting.kr/embed', 'https://ddakfit.bccconsulting.kr/',
@@ -276,7 +276,7 @@ test('all directory inputs inherit the existing Google automatic-user-data exclu
   assert.match(body[1], /<input\b[^>]*id="links-q"/);
   assert.equal((body[1].match(/<(?:input|select|textarea)\b/g) || []).length, (html.match(/<(?:input|select|textarea)\b/g) || []).length);
   const styles = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(styles, ['/ddakfit/style.css?v=20261031']);
+  assert.deepEqual(styles, ['/ddakfit/style.css?v=20261117']);
   const css = readFileSync(new URL('ddakfit/style.css', ROOT), 'utf8');
   assert.doesNotMatch(css, /bcc-lecture-request/);
   assert.doesNotMatch(html, /(?:src|href)="\/lecture-request\//);

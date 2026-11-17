@@ -8,7 +8,7 @@
   if (window.BCCDdakfitAnalytics) return;
   const ID = 'G-5TN5XW0T2J';
   const CANONICAL = 'https://bccconsulting.kr/ddakfit/';
-  const TITLE = '딱지원핏 | 정부지원사업 공고 사이트 모음부터 사업계획서·IR까지 | BCC';
+  const TITLE = '딱지원핏 | 내 조건으로 지원사업 찾기·공고 사이트 모음 | BCC';
   const DEBUG_KEY = 'bcc-ddakfit-directory-ga4-debug-v1';
   const REGIONS = ['national', 'busan', 'gyeongnam', 'ulsan'];
   let active = false;
@@ -29,6 +29,12 @@
   function validRegion(value) { return REGIONS.includes(value); }
   function validCount(value) { return Number.isInteger(value) && value >= 0; }
   window.BCCDdakfitAnalytics = Object.freeze({
+    recommendation(state, count) {
+      // Enum + aggregate count only: never profile answers, notice URLs or text.
+      if (!['start', 'results', 'error', 'notice', 'diagnosis'].includes(state)) return;
+      if (state === 'results' && !validCount(count)) return;
+      send('ddakfit_recommendation_' + state, state === 'results' ? { result_count: count } : {});
+    },
     view(count) {
       if (viewed || !validCount(count)) return;
       viewed = true;
@@ -74,7 +80,7 @@
     if (window.dataLayer && (!Array.isArray(window.dataLayer) || window.dataLayer.length)) return;
 
     // Keep only known in-page navigation, never search text or arbitrary URL data.
-    const safeHash = /^#(?:main|links|find|diagnosis|plan|presentation|continue-title|region=(?:national|busan|gyeongnam|ulsan))$/.test(url.hash) ? url.hash : '';
+    const safeHash = /^#(?:main|recommend|links|find|diagnosis|plan|presentation|continue-title|region=(?:national|busan|gyeongnam|ulsan))$/.test(url.hash) ? url.hash : '';
     window.history.replaceState(null, '', '/ddakfit/' + safeHash);
     const clean = new URL(window.location.href);
     if (clean.search || clean.hash !== safeHash) return;

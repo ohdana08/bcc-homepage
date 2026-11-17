@@ -27,3 +27,33 @@
 .text-link{font-size:13px;color:#59676b;text-decoration:underline;margin-left:10px}
 @media (max-width:900px){.links-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:600px){.links-list{grid-template-columns:1fr}}
+
+/* First-screen matching; existing directory layout stays intact. */
+.hero h1{font-size:clamp(30px,4vw,48px);line-height:1.35}
+.recommendation{margin-top:24px;padding:28px;background:#fff;border:1px solid #d0dace;border-radius:14px;scroll-margin-top:120px}
+.recommendation h2{font-size:22px;margin-bottom:20px}
+.recommendation-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px}
+.recommendation-fields label{display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:700;min-width:0}
+.recommendation-fields select{width:100%;min-height:48px;padding:10px 12px;background:#fff;color:#172b32;border:1px solid #aabbaf;border-radius:7px;font:inherit;font-size:16px}
+.recommendation select:focus-visible,.recommendation button:focus-visible,.recommendation-status:focus-visible{outline:3px solid #a37416;outline-offset:3px}
+.recommendation-form-actions{display:flex;align-items:center;flex-wrap:wrap;gap:18px;margin:22px 0 10px}
+.recommendation-form-actions a{font-size:14px;color:#246451;text-underline-offset:4px}
+.recommendation button{font:inherit;font-weight:700;cursor:pointer}
+.recommendation button:disabled{opacity:.65;cursor:wait}
+.recommendation-scope{color:#59676b;font-size:13px;margin-bottom:0;padding-top:12px;border-top:1px solid #e2e7df}
+.recommendation-status{margin:20px 0 0;font-weight:700;scroll-margin-top:130px}
+.recommendation-notice{font-size:14px;background:#fbf4dc;color:#66531b;padding:12px;border-radius:7px}
+.recommendation-list{list-style:none;padding:0;margin:18px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.recommendation-card{border:1px solid #d0dace;border-radius:10px;padding:20px;display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
+.recommendation-label{font-size:12px;color:#246451;margin-bottom:8px}
+.recommendation-card h3{font-size:18px;line-height:1.55;margin:0 0 12px}
+.recommendation-description{font-size:14px;color:#59676b}
+.recommendation-card dl{font-size:14px;margin:0 0 18px;padding-top:12px;border-top:1px solid #e2e7df}
+.recommendation-card dt{font-weight:700;margin-top:8px}
+.recommendation-card dd{margin:0;color:#59676b}
+.recommendation-actions{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.recommendation-card .hint{margin:12px 0 0;font-size:12px}
+#recommendation-results[hidden]{display:none}
+#recommendation-selection{margin:12px 0}
+@media(max-width:900px){.recommendation-list{grid-template-columns:1fr}}
+@media(max-width:580px){.hero{padding-top:28px}.recommendation{padding:20px 16px;scroll-margin-top:150px}.recommendation h2{font-size:20px}.recommendation-fields{grid-template-columns:1fr;gap:14px}.recommendation-form-actions{align-items:stretch;flex-direction:column}.recommendation-form-actions .button{width:100%}.recommendation-status{scroll-margin-top:150px}}

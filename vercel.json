@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/api/ddakfit-recommendations",
+      "destination": "/api/claude101-suite?fn=ddakfit-recommendations"
+    },
+    {
       "source": "/api/lecture-operations",
       "destination": "/api/claude101-suite?fn=lecture-operations"
     },

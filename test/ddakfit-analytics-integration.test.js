@@ -11,7 +11,7 @@ const catalog = JSON.parse(readFileSync(new URL('ddakfit/links.json', ROOT), 'ut
 const html = readFileSync(new URL('ddakfit/index.html', ROOT), 'utf8');
 const pageScripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g)]
   .map((match) => new URL(match[1], 'https://bccconsulting.kr').pathname);
-const sources = { '/assets/bcc-analytics.js': common, '/ddakfit/analytics.js': analytics, '/ddakfit/directory.js': directory };
+const sources = { '/assets/bcc-analytics.js': common, '/ddakfit/analytics.js': analytics, '/ddakfit/directory.js': directory, '/ddakfit/recommendations.js': readFileSync(new URL('ddakfit/recommendations.js', ROOT), 'utf8') };
 const LIVE = 'https://bccconsulting.kr/ddakfit/';
 const ID = 'G-5TN5XW0T2J';
 const customNames = ['ddakfit_directory_view', 'ddakfit_links_region', 'ddakfit_links_search', 'ddakfit_search_no_results', 'ddakfit_link_out'];
@@ -170,4 +170,23 @@ test('slashless directory canonicalizes in-page and preserves a safe region sele
   assert.equal(gaScripts(app).length, 1);
   assert.equal(app.events().filter(e => e.name === 'ddakfit_directory_view').length, 1);
   assertPostHogUnchanged(app);
+});
+
+// Recommendation events must not carry the selected profile, source URLs, or text.
+test('recommendation tracking accepts only fixed states and counts; QA is preserved', async () => {
+  const app = await run({ href: LIVE + '?bcc_analytics_debug=1#recommend' });
+  const tracker = app.window.BCCDdakfitAnalytics;
+  tracker.recommendation('start');
+  tracker.recommendation('results', 31);
+  tracker.recommendation('results', 'private-value');
+  tracker.recommendation('private-value', 99);
+  tracker.recommendation('error');
+  tracker.recommendation('notice');
+  tracker.recommendation('diagnosis');
+  const actual = app.events().filter(e => e.name.includes('recommendation'));
+  assert.equal(actual.length, 5);
+  assert.ok(actual.every(e => e.name.startsWith('qa_')));
+  assert.equal(actual[1].params.result_count, 31);
+  assert.ok(!JSON.stringify(actual).includes('private-value'));
+  assert.equal(app.window.location.href, LIVE + '#recommend');
 });
