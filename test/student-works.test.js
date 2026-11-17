@@ -19,6 +19,11 @@ test('registered works have distinct anchors and readable existing images', () =
       assert.ok(existsSync(resolve(root, image.src.slice(1))), image.src);
       assert.ok(page.includes(`href="${image.src}"`), 'image must remain accessible without JavaScript');
     }
+    if (work.download) {
+      const pdf = readFileSync(resolve(root, work.download.src.slice(1)));
+      assert.equal(pdf.subarray(0, 5).toString(), '%PDF-');
+      assert.ok(page.includes(`href="${work.download.src}" download`));
+    }
     if (work.record) assert.ok(existsSync(resolve(root, work.record.slice(1))));
   }
 });

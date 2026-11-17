@@ -1,58 +1,138 @@
 [
   {
-    "id":"hug-homepage",
-    "title":"HUG 안심중개 홈페이지",
-    "category":"홈페이지",
-    "course":"주택도시보증공사 · AI 활용 교육",
-    "description":"안심 매물 탐색과 중개사 안내 등 업무 아이디어를 웹 화면으로 정리했습니다.",
-    "images":[{"src":"/assets/results/hug-result-01.png","alt":"HUG 안심중개 홈페이지 실습 작품 첫 화면"}],
-    "record":"/cases/hug-antigravity-netlify-20260828.html",
-    "featured":true
+    "id": "hug-homepage",
+    "title": "HUG 안심중개 홈페이지",
+    "category": "홈페이지",
+    "course": "주택도시보증공사 · AI 활용 교육",
+    "description": "안심 매물 탐색과 중개사 안내 등 업무 아이디어를 웹 화면으로 정리했습니다.",
+    "images": [
+      {
+        "src": "/assets/results/hug-result-01.png",
+        "alt": "HUG 안심중개 홈페이지 실습 작품 첫 화면"
+      }
+    ],
+    "record": "/cases/hug-antigravity-netlify-20260828.html",
+    "featured": true
   },
   {
-    "id":"craft-blog",
-    "title":"곰인형을 소개하는 블로그 이미지",
-    "category":"홍보 콘텐츠",
-    "course":"공예창작자양성과정",
-    "description":"공예품의 이야기와 제작 순서를 대표 이미지와 단계별 설명으로 구성했습니다.",
-    "images":[{"src":"/assets/results/craft-blog-teddy-01.jpg","alt":"곰인형의 아이디어부터 완성까지 소개하는 블로그 대표 이미지"},{"src":"/assets/results/craft-blog-teddy-02.jpg","alt":"곰인형 제작 과정을 다섯 단계로 설명하는 이미지"}],
-    "featured":true
+    "id": "craft-blog",
+    "title": "곰인형을 소개하는 블로그 이미지",
+    "category": "홍보 콘텐츠",
+    "course": "공예창작자양성과정",
+    "description": "공예품의 이야기와 제작 순서를 대표 이미지와 단계별 설명으로 구성했습니다.",
+    "images": [
+      {
+        "src": "/assets/results/craft-blog-teddy-01.jpg",
+        "alt": "곰인형의 아이디어부터 완성까지 소개하는 블로그 대표 이미지"
+      },
+      {
+        "src": "/assets/results/craft-blog-teddy-02.jpg",
+        "alt": "곰인형 제작 과정을 다섯 단계로 설명하는 이미지"
+      }
+    ],
+    "featured": true
   },
   {
-    "id":"gtep-strategy",
-    "title":"K-뷰티 해외 진출 전략 슬라이드",
-    "category":"기획서·슬라이드",
-    "course":"GTEP 청년무역전문가과정",
-    "description":"일본과 싱가포르 시장의 고객 특성을 비교하고 진출 방향을 슬라이드로 정리했습니다.",
-    "images":[{"src":"/assets/results/gtep20-kbeauty-slide-01.jpg","alt":"K-뷰티 해외 진출 국가 선정의 배경과 핵심 과제를 정리한 슬라이드"},{"src":"/assets/results/gtep20-kbeauty-slide-02.jpg","alt":"일본과 싱가포르 고객 페르소나를 비교한 슬라이드"}],
-    "featured":true
+    "id": "gtep-strategy",
+    "title": "K-뷰티 해외 진출 전략 슬라이드",
+    "category": "기획서·슬라이드",
+    "course": "GTEP 청년무역전문가과정",
+    "description": "일본과 싱가포르 시장의 고객 특성을 비교하고 진출 방향을 슬라이드로 정리했습니다.",
+    "images": [
+      {
+        "src": "/assets/results/gtep20-kbeauty-slide-01.jpg",
+        "alt": "K-뷰티 해외 진출 국가 선정의 배경과 핵심 과제를 정리한 슬라이드"
+      },
+      {
+        "src": "/assets/results/gtep20-kbeauty-slide-02.jpg",
+        "alt": "일본과 싱가포르 고객 페르소나를 비교한 슬라이드"
+      }
+    ],
+    "featured": true
   },
   {
-    "id":"shorts-paris",
-    "title":"파리 카페를 배경으로 한 숏폼 장면",
-    "category":"영상 기획",
-    "course":"AI 숏폼 크리에이터 과정",
-    "description":"인물, 장소, 시간대와 빛을 조합해 영상에 사용할 한 장면을 구성했습니다.",
-    "images":[{"src":"/assets/results/shorts-4cut-01.jpg","alt":"해질 무렵 파리 카페에 앉아 있는 인물을 표현한 숏폼 장면 이미지"}],
-    "featured":true
+    "id": "shorts-paris",
+    "title": "파리 카페를 배경으로 한 숏폼 장면",
+    "category": "영상 기획",
+    "course": "AI 숏폼 크리에이터 과정",
+    "description": "인물, 장소, 시간대와 빛을 조합해 영상에 사용할 한 장면을 구성했습니다.",
+    "images": [
+      {
+        "src": "/assets/results/shorts-4cut-01.jpg",
+        "alt": "해질 무렵 파리 카페에 앉아 있는 인물을 표현한 숏폼 장면 이미지"
+      }
+    ],
+    "featured": true
   },
   {
-    "id":"hug-strategy-portal",
-    "title":"채권회수 쉼표 전략 포털",
-    "category":"홈페이지",
-    "course":"주택도시보증공사 · AI 활용 교육",
-    "description":"신사업 소개와 전략 로드맵을 한 웹 화면에 담아 발표할 수 있도록 구성했습니다.",
-    "images":[{"src":"/assets/results/hug-result-02.png","alt":"채권회수 쉼표 신사업 전략 포털 실습 작품 첫 화면"}],
-    "record":"/cases/hug-antigravity-netlify-20260828.html",
-    "featured":false
+    "id": "hug-strategy-portal",
+    "title": "채권회수 쉼표 전략 포털",
+    "category": "홈페이지",
+    "course": "주택도시보증공사 · AI 활용 교육",
+    "description": "신사업 소개와 전략 로드맵을 한 웹 화면에 담아 발표할 수 있도록 구성했습니다.",
+    "images": [
+      {
+        "src": "/assets/results/hug-result-02.png",
+        "alt": "채권회수 쉼표 신사업 전략 포털 실습 작품 첫 화면"
+      }
+    ],
+    "record": "/cases/hug-antigravity-netlify-20260828.html",
+    "featured": false
   },
   {
-    "id":"shorts-health",
-    "title":"건강 주제를 표현한 숏폼 장면",
-    "category":"영상 기획",
-    "course":"AI 숏폼 크리에이터 과정",
-    "description":"건강이라는 주제를 인물과 공간, 시각 요소로 전달하는 장면 이미지입니다.",
-    "images":[{"src":"/assets/results/shorts-4cut-02.jpg","alt":"건강을 주제로 인물과 신체 구조 시각 요소를 조합한 숏폼 장면 이미지"}],
-    "featured":false
+    "id": "shorts-health",
+    "title": "건강 주제를 표현한 숏폼 장면",
+    "category": "영상 기획",
+    "course": "AI 숏폼 크리에이터 과정",
+    "description": "건강이라는 주제를 인물과 공간, 시각 요소로 전달하는 장면 이미지입니다.",
+    "images": [
+      {
+        "src": "/assets/results/shorts-4cut-02.jpg",
+        "alt": "건강을 주제로 인물과 신체 구조 시각 요소를 조합한 숏폼 장면 이미지"
+      }
+    ],
+    "featured": false
+  },
+  {
+    "id": "changwon-restaurant-cardnews",
+    "title": "창원 음식점 소개 카드뉴스",
+    "category": "홍보 콘텐츠",
+    "course": "AI 크리에이터 양성과정",
+    "description": "지역 음식점 소개를 표지부터 장소별 안내까지 7장으로 구성한 교육생 카드뉴스 작품입니다.",
+    "images": [
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-01.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 1쪽"
+      },
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-02.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 2쪽"
+      },
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-03.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 3쪽"
+      },
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-04.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 4쪽"
+      },
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-05.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 5쪽"
+      },
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-06.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 6쪽"
+      },
+      {
+        "src": "/assets/results/changwon-restaurant-cardnews-07.jpg",
+        "alt": "창원 음식점 소개 카드뉴스 7쪽"
+      }
+    ],
+    "download": {
+      "src": "/assets/results/changwon-restaurant-cardnews.pdf",
+      "label": "카드뉴스 PDF 다운로드 (7쪽)"
+    },
+    "featured": false
   }
 ]
