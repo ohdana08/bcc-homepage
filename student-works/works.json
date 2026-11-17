@@ -134,5 +134,19 @@
       "label": "카드뉴스 PDF 다운로드 (7쪽)"
     },
     "featured": false
+  },
+  {
+    "id": "fashion-catalog-copy",
+    "title": "패션 카탈로그 문구 편집",
+    "category": "홍보 콘텐츠",
+    "course": "AI 크리에이터 양성과정",
+    "description": "제공된 카탈로그 이미지의 여백에 영문 제목과 소개 문구를 배치한 교육생 편집 작업입니다.",
+    "images": [
+      {
+        "src": "/assets/results/fashion-catalog-copy.png",
+        "alt": "카탈로그 이미지 여백에 영문 제목과 소개 문구를 배치한 편집 작업"
+      }
+    ],
+    "featured": false
   }
 ]
