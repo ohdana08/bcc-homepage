@@ -44,6 +44,9 @@
   var raw = me.getAttribute('data-tool') || '';
   var tool = raw.indexOf('query:') === 0 ? (new URLSearchParams(location.search).get(raw.slice(6)) || '') : raw;
   if (!/^[a-z0-9-]{1,40}$/.test(tool)) return; // 도구를 알 수 없는 화면(목록 오류 등)은 막지 않는다
+  // 교육생용 창업 준비 코치·캠프 프롬프트는 개인정보 없이 바로 쓴다(2026-11-19 대표 지시).
+  var OPEN = ['business-process','customer-persona','customer-interview','business-filter','business-validation-basic','bmc','ppt-plan','startup-plan-prompt','ir-pitch-prompt'];
+  if (OPEN.indexOf(tool) !== -1) return;
   var hideSel = me.getAttribute('data-hide') || 'main';
 
   var lockStyle = document.createElement('style');

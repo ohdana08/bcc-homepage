@@ -1,7 +1,7 @@
 {
  "id": "customer-interview",
  "gpt_id": "g-69d199ba3f108191acbc9ebf40f89c0c",
- "name": "고객 인터뷰 10단계",
+ "name": "고객인터뷰코치",
  "tagline": "AI가 고객이 되어 10단계로 내 아이템의 빈틈을 찔러줍니다.",
  "group": "startup",
  "group_label": "창업 준비",

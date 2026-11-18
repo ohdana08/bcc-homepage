@@ -1,7 +1,7 @@
 {
  "id": "business-filter",
  "gpt_id": "g-69d13cd58a488191a2806206dd8fb901",
- "name": "사업 필터링 (전문가 프레임)",
+ "name": "사업필터링코치",
  "tagline": "고객이 \"돈 내고 해결할 문제인가?\"라고 볼지, 현실 기준으로 걸러줍니다.",
  "group": "startup",
  "group_label": "창업 준비",

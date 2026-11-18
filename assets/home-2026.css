@@ -560,7 +560,7 @@ body.has-hero .nav.is-top .nav-signup{background:#fff;border-color:#fff;color:va
 .it-bot{display:flex;flex-direction:column;gap:10px;padding:16px 16px 14px;background:#fff;border:1px solid var(--line);border-radius:14px;color:inherit;text-decoration:none;transition:border-color .18s,transform .18s,box-shadow .18s}
 .it-bot:hover{border-color:var(--green);transform:translateY(-3px);box-shadow:var(--shadow-sm)}
 .it-bot b{display:block;font-size:16.5px;line-height:1.3}.it-bot div>span{display:block;margin-top:5px;font-size:13.5px;color:var(--ink-2);line-height:1.55}
-.it-bot small{margin-top:auto;font-size:12px;color:var(--mute)}
+.it-bot small .it-price{margin-right:6px}.it-bot small{margin-top:auto;font-size:12px;color:var(--mute)}
 .it-bot-note{margin:22px 0 0;font-size:13px;color:var(--mute)}
 @media (max-width:980px){.it-bot-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.it-bot-grid{grid-template-columns:1fr}}
