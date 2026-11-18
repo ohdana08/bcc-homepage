@@ -178,6 +178,7 @@ test('사업계획서·IR 프롬프트: 질문 없이 완성·🔒·지어내기
   assert.ok(pp.includes('추가 질문 없이 첫 응답에서') && !pp.includes('한 번에 질문 하나씩') && pp.endsWith(FOOTER));
   assert.ok(pp.includes('[작성자 확인 필요]') && pp.includes('만들어 쓰지 마세요'));
   const pe = buildPrompt(plan, { results__attach: 'x' });
+  for (const h of ['문제 인식', '실현가능성', '성장전략', '향후 발전방안']) assert.ok(pe.includes(h), '기본 구조 항목: ' + h);
   assert.ok(pe.includes('미제공') && pe.includes('모름'), '양식·팀 없음은 미제공/모름');
   assert.ok(!/\{\{[^}]*\}\}/.test(pp) && !/\{\{[^}]*\}\}/.test(pe));
   const a = { plan__attach: '사업계획서 본문 CCC', audience: '정부지원사업 심사위원', time: '5분 내외', focus: '' };
