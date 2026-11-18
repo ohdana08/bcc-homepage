@@ -8,6 +8,7 @@ import { handleSajuAdmin } from '../lib/saju-preview/handler.js';
 import { handleProjectInstructionUsage } from '../lib/project-instruction/telemetry-handler.js';
 
 import { handleLectureOperations } from '../lib/lecture-operations.js';
+import { handleLectureDesk } from '../lib/lecture-desk.js';
 import { handleLectureRequest } from '../lib/lecture-request.js';
 import { handleLectureRequestAttachments } from '../lib/lecture-request-attachments.js';
 import { handleToolLeads } from '../lib/tool-leads.js';
@@ -16,6 +17,7 @@ import { handleDdakfitRecommendations } from '../lib/ddakfit-recommendations.js'
 import { handleInquiryNotifications } from '../lib/inquiry-notifications.js';
 
 const HANDLERS = {
+  'lecture-desk': handleLectureDesk,
   'inquiry-notifications': handleInquiryNotifications,
   'ddakfit-recommendations': handleDdakfitRecommendations,
   'lecture-operations': handleLectureOperations,

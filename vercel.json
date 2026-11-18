@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/api/lecture-desk",
+      "destination": "/api/claude101-suite?fn=lecture-desk"
+    },
+    {
       "source": "/api/ddakfit-recommendations",
       "destination": "/api/claude101-suite?fn=ddakfit-recommendations"
     },
@@ -48,6 +52,15 @@
     }
   },
   "headers": [
+    {
+      "source": "/admin-lecture-desk.html",
+      "headers": [
+        {"key":"Cache-Control","value":"private, no-store, max-age=0"},
+        {"key":"X-Robots-Tag","value":"noindex, nofollow"},
+        {"key":"Referrer-Policy","value":"no-referrer"},
+        {"key":"X-Content-Type-Options","value":"nosniff"}
+      ]
+    },
     {
       "source": "/admin-saju.html",
       "headers": [

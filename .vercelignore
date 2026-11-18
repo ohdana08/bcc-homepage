@@ -30,3 +30,10 @@ supabase/lecture-operations*.sql
 # Backup/old-version pages are local only; never deploy (duplicate-content index risk).
 *.backup-*.html
 **/*.backup-*.html
+
+# Private workflow tooling, SQL, tests and local fixture are never public assets.
+supabase/lecture-desk.sql
+docs/lecture-desk*.md
+scripts/lecture-desk*.mjs
+scripts/verify-lecture-desk.mjs
+test/lecture-desk*.test.js
