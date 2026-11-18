@@ -73,15 +73,15 @@ async function run(options = {}) {
   return { elements, scripts, requests, window, storage, context, events, input, flushTimers, select, outbound, timers };
 }
 
-test('production loads one homepage tag and one view for the 60-site catalog', async () => {
+test('production loads one homepage tag and one view for the 74-site catalog', async () => {
   const app = await run();
   assert.equal(app.scripts.length, 1);
   assert.equal(app.scripts[0].src, 'https://www.googletagmanager.com/gtag/js?id=' + ID);
   assert.equal(app.events().filter((e) => e.name === 'page_view').length, 1);
   assert.equal(app.events().filter((e) => e.name === 'ddakfit_directory_view').length, 1);
-  assert.equal(app.events().find((e) => e.name === 'ddakfit_directory_view').parameters.site_count, 60);
-  assert.match(app.elements['links-count'].textContent, /전체 60곳.*22곳/);
-  assert.deepEqual(app.requests, ['/ddakfit/links.json?v=20261101']);
+  assert.equal(app.events().find((e) => e.name === 'ddakfit_directory_view').parameters.site_count, 74);
+  assert.match(app.elements['links-count'].textContent, /전체 74곳.*22곳/);
+  assert.deepEqual(app.requests, ['/ddakfit/links.json?v=20261117']);
   vm.runInContext(analytics, app.context);
   assert.equal(app.scripts.length, 1);
 });
@@ -205,6 +205,33 @@ test('known navigation hash survives sanitizing and initializes the requested re
   assert.match(app.elements['links-count'].textContent, /10곳 표시/);
 });
 
+test('every regional tab, direct link, search and outbound event remains usable', async () => {
+  assert.equal(catalog.regions.length, 18);
+  assert.equal(new Set(catalog.regions.map(r => r.id)).size, 18);
+  for (const region of catalog.regions) {
+    const sites = catalog.sites.filter(s => s.region === region.id);
+    assert.ok(sites.length > 0, region.id);
+    const app = await run({ url: LIVE + '#region=' + region.id });
+    assert.equal(app.window.location.href, LIVE + '#region=' + region.id);
+    assert.ok(app.elements['links-groups'].innerHTML.includes(sites[0].name));
+    app.select(region.id);
+    app.outbound(sites[0].name);
+    app.input(sites[0].name);
+    app.flushTimers();
+    assert.equal(app.events().find(e => e.name === 'ddakfit_links_region').parameters.region, region.id);
+    assert.equal(app.events().find(e => e.name === 'ddakfit_link_out').parameters.site_region, region.id);
+    assert.equal(app.events().find(e => e.name === 'ddakfit_links_search').parameters.selected_region, region.id);
+  }
+});
+
+test('unknown region hashes cannot bypass URL privacy filtering', async () => {
+  for (const hash of ['#region=unknown', '#region=seoul&private=secret', '#region=seoul-secret']) {
+    const app = await run({ url: LIVE + hash });
+    assert.equal(app.window.location.href, LIVE);
+    assert.match(app.elements['links-count'].textContent, /22곳 표시/);
+  }
+});
+
 test('local, preview, wrong path, explicit QA exclusion and invalid debug flags load no Google tag', async () => {
   for (const url of ['http://localhost:8765/ddakfit/', 'https://bcc-preview.vercel.app/ddakfit/',
     'https://ddakfit.bccconsulting.kr/embed', 'https://bccconsulting.kr/lecture-request/',
@@ -212,7 +239,7 @@ test('local, preview, wrong path, explicit QA exclusion and invalid debug flags 
     LIVE + '?bcc_analytics_debug=1&bcc_analytics_debug=1']) {
     const app = await run({ url });
     assert.equal(app.scripts.length, 0, url);
-    assert.match(app.elements['links-count'].textContent, /전체 60곳/, url);
+    assert.match(app.elements['links-count'].textContent, /전체 74곳/, url);
   }
 });
 
@@ -257,7 +284,7 @@ test('HTTP, network, JSON and schema failures are not counted as successful view
 });
 
 test('HTML explains login scope and preserves every product entry URL', () => {
-  assert.match(html, /기관 사이트 60곳/);
+  assert.match(html, /기관 사이트 74곳/);
   assert.match(html, /공고 사이트 모음은 로그인 없이 이용할 수 있습니다/);
   assert.match(html, /공고 진단·사업계획서·IR 기능은 Google 로그인이 필요합니다/);
   assert.match(html, /<body class="bcc-ddakfit-directory bcc-lecture-request">/);

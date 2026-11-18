@@ -1,21 +1,77 @@
 {
-  "updated": "2026-11-01",
+  "updated": "2026-11-17",
   "regions": [
     {
       "id": "national",
       "label": "전국·중앙부처"
     },
     {
+      "id": "seoul",
+      "label": "서울"
+    },
+    {
       "id": "busan",
       "label": "부산"
+    },
+    {
+      "id": "daegu",
+      "label": "대구"
+    },
+    {
+      "id": "incheon",
+      "label": "인천"
+    },
+    {
+      "id": "gwangju",
+      "label": "광주"
+    },
+    {
+      "id": "daejeon",
+      "label": "대전"
+    },
+    {
+      "id": "ulsan",
+      "label": "울산"
+    },
+    {
+      "id": "sejong",
+      "label": "세종"
+    },
+    {
+      "id": "gyeonggi",
+      "label": "경기"
+    },
+    {
+      "id": "gangwon",
+      "label": "강원"
+    },
+    {
+      "id": "chungbuk",
+      "label": "충북"
+    },
+    {
+      "id": "chungnam",
+      "label": "충남"
+    },
+    {
+      "id": "jeonbuk",
+      "label": "전북"
+    },
+    {
+      "id": "jeonnam",
+      "label": "전남"
+    },
+    {
+      "id": "gyeongbuk",
+      "label": "경북"
     },
     {
       "id": "gyeongnam",
       "label": "경남"
     },
     {
-      "id": "ulsan",
-      "label": "울산"
+      "id": "jeju",
+      "label": "제주"
     }
   ],
   "sites": [
@@ -558,6 +614,132 @@
       "who": "울산 예술인·문화기획자",
       "what": "문화예술 창작·기획 지원 공모",
       "tip": "공모 시기가 연초에 몰립니다"
+    },
+    {
+      "name": "서울경제진흥원",
+      "url": "https://www.sba.seoul.kr/",
+      "region": "seoul",
+      "cat": "중소기업",
+      "who": "서울 중소기업·창업기업",
+      "what": "서울 기업의 창업·판로·수출·기술 지원사업 안내",
+      "tip": "사업신청 메뉴에서 모집 중인 사업을 확인하세요"
+    },
+    {
+      "name": "대구테크노파크 사업공고",
+      "url": "https://www.dgtp.or.kr/bbs/BoardControll.do?bbsId=BBSMSTR_000000000003",
+      "region": "daegu",
+      "cat": "중소기업",
+      "who": "대구 기술·제조·창업기업",
+      "what": "대구 기업의 기술개발·사업화·기업성장 지원 공고",
+      "tip": "공고마다 대상 업종과 사업장 소재지를 확인하세요"
+    },
+    {
+      "name": "인천 비즈오케이(BizOK)",
+      "url": "https://bizok.incheon.go.kr/open_content/support/application.jsp",
+      "region": "incheon",
+      "cat": "중소기업",
+      "who": "인천 중소기업·소상공인·창업기업",
+      "what": "인천 기업지원사업 모집 공고와 온라인 신청",
+      "tip": "분야와 접수 상태로 공고를 골라보세요"
+    },
+    {
+      "name": "광주테크노파크 사업공고",
+      "url": "https://www.gjtp.or.kr/home/sub.cs?m=8",
+      "region": "gwangju",
+      "cat": "중소기업",
+      "who": "광주 기술·제조·창업기업",
+      "what": "광주 기업의 기술사업화·기업육성·판로 지원 공고",
+      "tip": "공고의 지원 대상 지역과 접수기간을 확인하세요"
+    },
+    {
+      "name": "대전일자리경제진흥원 사업공고",
+      "url": "https://djbea.or.kr/mps/bizTskPbnc?menuKey=TOfnnvp207",
+      "region": "daejeon",
+      "cat": "중소기업",
+      "who": "대전 중소기업·소상공인·창업기업",
+      "what": "대전 기업의 경영·판로·수출 지원사업 공고와 신청",
+      "tip": "진행 중인 공고에서 지원 조건과 첨부파일을 확인하세요"
+    },
+    {
+      "name": "세종일자리경제진흥원 사업공고",
+      "url": "https://www.sjepa.or.kr/news-announcement",
+      "region": "sejong",
+      "cat": "중소기업",
+      "who": "세종 기업·소상공인·구직자",
+      "what": "세종 기업지원·일자리·교육 관련 모집 공고",
+      "tip": "기업 대상 사업인지 개인 대상 사업인지 먼저 확인하세요"
+    },
+    {
+      "name": "경기기업비서",
+      "url": "https://www.egbiz.or.kr/index.do",
+      "region": "gyeonggi",
+      "cat": "중소기업",
+      "who": "경기도 중소기업·소상공인·창업기업",
+      "what": "경기 지역 지원사업을 분야·지역·일정별로 찾는 포털",
+      "tip": "지역별 지원사업에서 내 사업장이 있는 시·군을 선택하세요"
+    },
+    {
+      "name": "강원특별자치도경제진흥원 사업공고",
+      "url": "https://gwep.or.kr/bbs/board.php?bo_table=gw_sub21",
+      "region": "gangwon",
+      "cat": "중소기업",
+      "who": "강원 중소기업·소상공인",
+      "what": "강원 지역 기업의 판로·수출·경영 지원사업 공고",
+      "tip": "특정 시·군만 대상인 사업인지 확인하세요"
+    },
+    {
+      "name": "충청북도기업진흥원 사업공고·신청",
+      "url": "https://www.cba.ne.kr/home/sub.php?menukey=172",
+      "region": "chungbuk",
+      "cat": "중소기업",
+      "who": "충북 중소기업·소상공인",
+      "what": "충북 자금·판로·수출·일자리 지원사업 공고",
+      "tip": "지원 분야별 공고와 접수기간을 확인하세요"
+    },
+    {
+      "name": "충남경제진흥원",
+      "url": "https://www.cepa.or.kr/main/main.do",
+      "region": "chungnam",
+      "cat": "중소기업",
+      "who": "충남 중소기업·소상공인",
+      "what": "충남 기업의 경영·마케팅·소상공인·일자리 지원 안내",
+      "tip": "첫 화면 지원사업에서 진행 중인 모집 공고를 확인하세요"
+    },
+    {
+      "name": "전북특별자치도경제통상진흥원 지원사업공고",
+      "url": "https://www.jbba.kr/bbs/board.php?bo_table=sub01_09",
+      "region": "jeonbuk",
+      "cat": "중소기업",
+      "who": "전북 중소기업·소상공인·예비창업자",
+      "what": "전북 자금·판로·수출·창업·일자리 지원사업 공고",
+      "tip": "지원분야와 지원대상 필터로 필요한 공고를 찾으세요"
+    },
+    {
+      "name": "전남중소기업일자리경제진흥원",
+      "url": "https://www.jepa.kr/",
+      "region": "jeonnam",
+      "cat": "중소기업",
+      "who": "전남 지역 중소기업·소상공인",
+      "what": "전남 지역 기업의 자금·판로·일자리·교육 지원 공고",
+      "tip": "첫 화면 분야별 공고에서 지원 대상 지역을 확인하세요"
+    },
+    {
+      "name": "경상북도경제진흥원 지원사업안내",
+      "url": "https://www.gepa.kr/?page_id=36",
+      "region": "gyeongbuk",
+      "cat": "중소기업",
+      "who": "경북 중소기업·소상공인",
+      "what": "경북 자금·마케팅·수출·일자리·소상공인 지원사업 공고",
+      "tip": "진행상태를 진행중으로 선택하고 시·군 조건도 확인하세요"
+    },
+    {
+      "name": "제주경제통상진흥원 사업공고",
+      "url": "https://www.jba.or.kr/bbs/board.php?bo_table=2_1_1_1",
+      "region": "jeju",
+      "cat": "중소기업",
+      "who": "제주 중소기업·소상공인",
+      "what": "제주 기업의 경영·판로·통상 관련 지원사업 공고",
+      "tip": "모집 공고의 대상 업종과 신청방법을 확인하세요"
     }
   ]
 }

@@ -7,7 +7,7 @@
   if (!wrap || !tabs || !q || !count) return;
   let data;
   try {
-    const response = await fetch('/ddakfit/links.json?v=20261101');
+    const response = await fetch('/ddakfit/links.json?v=20261117');
     if (!response.ok) throw new Error('Directory unavailable');
     data = await response.json();
     if (!Array.isArray(data.regions) || !data.regions.length || !Array.isArray(data.sites) || !data.sites.length ||

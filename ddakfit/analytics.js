@@ -10,7 +10,7 @@
   const CANONICAL = 'https://bccconsulting.kr/ddakfit/';
   const TITLE = '딱지원핏 | 내 조건으로 지원사업 찾기·공고 사이트 모음 | BCC';
   const DEBUG_KEY = 'bcc-ddakfit-directory-ga4-debug-v1';
-  const REGIONS = ['national', 'busan', 'gyeongnam', 'ulsan'];
+  const REGIONS = ["national", "seoul", "busan", "daegu", "incheon", "gwangju", "daejeon", "ulsan", "sejong", "gyeonggi", "gangwon", "chungbuk", "chungnam", "jeonbuk", "jeonnam", "gyeongbuk", "gyeongnam", "jeju"];
   let active = false;
   let debug = false;
   let command;
@@ -84,7 +84,9 @@
       .every(([key, value]) => url.searchParams.getAll(key).length === 1 && url.searchParams.get(key) === value);
     const campaignQuery = aimax && !debug ? '?utm_source=aimax&utm_medium=partner&utm_campaign=launch' : '';
     // Keep only known in-page navigation, never search text or arbitrary URL data.
-    const safeHash = /^#(?:main|recommend|links|find|diagnosis|plan|presentation|continue-title|region=(?:national|busan|gyeongnam|ulsan))$/.test(url.hash) ? url.hash : '';
+    const regionHash = url.hash.match(/^#region=([a-z]+)$/);
+    const safeHash = /^#(?:main|recommend|links|find|diagnosis|plan|presentation|continue-title)$/.test(url.hash) ||
+      (regionHash && validRegion(regionHash[1])) ? url.hash : '';
     window.history.replaceState(null, '', '/ddakfit/' + campaignQuery + safeHash);
     const clean = new URL(window.location.href);
     if (clean.search !== campaignQuery || clean.hash !== safeHash) return;

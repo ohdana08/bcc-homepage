@@ -50,7 +50,7 @@ async function run({ href = LIVE, commonOnly = false, storage = new Map(), block
     window, document, location, URL, URLSearchParams,
     fetch: async url => {
       requests.push(url);
-      assert.equal(url, '/ddakfit/links.json?v=20261101');
+      assert.equal(url, '/ddakfit/links.json?v=20261117');
       return { ok: true, json: async () => catalog };
     },
     setTimeout(fn) { const id = timers.size + 1; timers.set(id, fn); return id; },
@@ -98,10 +98,10 @@ for (const path of ['/ddakfit/', '/ddakfit/index.html', '/ddakfit']) {
     assert.equal(app.window.location.href, LIVE);
     assert.equal(gaScripts(app).length, 1);
     assert.deepEqual(app.events().map(e => e.name).sort(), ['page_view', ...customNames].sort());
-    assert.equal(app.events().find(e => e.name === 'ddakfit_directory_view').params.site_count, 60);
+    assert.equal(app.events().find(e => e.name === 'ddakfit_directory_view').params.site_count, 74);
     assert.equal(app.commands().filter(row => row[0] === 'config').length, 1);
     assert.equal(app.commands().find(row => row[0] === 'config')[2].send_page_view, false);
-    app.window.BCCDdakfitAnalytics.view(60);
+    app.window.BCCDdakfitAnalytics.view(74);
     vm.runInContext(analytics, app.context);
     assert.equal(app.events().filter(e => e.name === 'ddakfit_directory_view').length, 1);
     assert.equal(gaScripts(app).length, 1);
@@ -142,7 +142,7 @@ test('directory privacy and explicit QA exclusion remain effective with the comm
     excluded.exercise();
     assert.equal(gaScripts(excluded).length, 0);
     assert.equal(excluded.events().length, 0);
-    assert.match(excluded.elements['links-count'].textContent, /전체 60곳/);
+    assert.match(excluded.elements['links-count'].textContent, /전체 74곳/);
   }
 });
 
@@ -166,7 +166,7 @@ test('other pages keep common GA and PostHog behavior; internal exclusions stay 
 test('slashless directory canonicalizes in-page and preserves a safe region selection', async () => {
   const app = await run({ href: 'https://bccconsulting.kr/ddakfit#' + 'region=busan' });
   assert.equal(app.window.location.href, LIVE + '#region=busan');
-  assert.match(app.elements['links-count'].textContent, /전체 60곳.*19곳/);
+  assert.match(app.elements['links-count'].textContent, /전체 74곳.*19곳/);
   assert.equal(gaScripts(app).length, 1);
   assert.equal(app.events().filter(e => e.name === 'ddakfit_directory_view').length, 1);
   assertPostHogUnchanged(app);
