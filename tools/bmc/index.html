@@ -154,6 +154,36 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
   body{background:#fff}
   .canvas{display:grid}
 }
+
+/* 2026-11-18 개편: 자료 먼저 → 자료 현황 → 쉬운 질문 → 기존 9칸 */
+.tabs button{min-width:200px}
+.tagrow{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12.5px;color:var(--mute)}
+.tagrow button{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.tagrow button[aria-pressed="true"]{background:#e9f0ff;border-color:var(--blue);color:#1d3f99}
+.filein{display:flex;flex-direction:column;gap:4px}
+.filein input[type=file]{font-size:14px;max-width:100%}
+ul.status{list-style:none;margin:6px 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px 12px;font-size:13.5px}
+ul.status li{padding:4px 0;border-bottom:1px dashed var(--line)}
+ul.status li.top{grid-column:1/-1;font-weight:700;border-bottom:1px solid var(--line)}
+.wz{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcff;max-width:860px}
+.wz-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:13.5px}
+.wz-bar{flex:1;height:6px;background:#e3e8f3;border-radius:6px;overflow:hidden}.wz-bar i{display:block;height:100%;background:var(--blue);width:0}
+.wz h3{font-size:20px;line-height:1.35;margin:6px 0 4px}
+.wz .fld{margin:12px 0}.wz .fld>label{font-size:14.5px;color:var(--ink)}.wz .fld>label em{font-style:normal;font-weight:400;color:var(--mute)}
+.wz textarea{width:100%;min-height:64px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;font-family:inherit}
+.wz .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.wz .chips button{font-weight:500;font-size:13px;padding:5px 10px;border-radius:999px;color:#3a4357}
+.wz .opts{display:flex;flex-wrap:wrap;gap:8px}
+.wz .opts button{text-align:left;font-weight:600;padding:9px 12px;line-height:1.35}
+.wz .opts button small{display:block;font-weight:400;color:var(--mute);font-size:12px}
+.wz .opts button[aria-pressed="true"]{border-color:var(--blue);background:#eef3ff;box-shadow:0 0 0 2px rgba(36,87,214,.18)}
+.wz .note1{background:#fff7e6;border:1px solid #f0d9a8;border-radius:8px;padding:8px 10px;font-size:13px;margin:8px 0}
+.wz .linked{background:#eef7f0;border:1px solid #b9dcc3;border-radius:8px;padding:8px 10px;font-size:13px;margin:8px 0}
+.wz .linked pre{white-space:pre-wrap;font-family:inherit;margin:4px 0 0;max-height:120px;overflow:auto}
+.wz-kind{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.wz-kind label{margin:0}
+.wz-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.wz-nav .pri{margin-left:auto}
+#wzUnkBox{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:820px){.wz h3{font-size:18px}.addsrc{grid-template-columns:1fr}.addsrc .row{grid-column:1}.qs{grid-template-columns:1fr}.wz-nav .pri{margin-left:0;width:100%}}
 </style>
 <script src="/shared/tool-gate.js?v=20261112b" data-tool="bmc" data-hide="main"></script>
 </head>
@@ -180,16 +210,18 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     <div><label for="idea">아이디어 한 줄</label><input id="idea" data-k="idea" placeholder="예: 혼자 사는 대학생을 위한 반찬 소분 배달"></div>
     <div><label for="date">날짜</label><input id="date" type="date" data-k="date"></div>
   </div>
-  <div class="guide"><b>처음 쓴 캔버스는 '추측 9개'입니다.</b> 고객을 만나 확인한 칸이 늘어날수록 사업이 단단해집니다. 순서: ① 내 자료 넣기 → ② 내 AI에게 9칸 초안 받기 → ③ 칸마다 🟢확인됨 / 🟠추측 보기 → ④ 추측인 칸을 고객 5명에게 물어보고 다시 넣기.</div>
+  <div class="guide" id="guideGuided"><b>자료부터 모으고, 쉬운 질문으로 9칸을 채웁니다.</b> ① 가진 자료를 넣고 → ② 자료가 부족한 칸을 확인하고 → ③ 쉬운 질문에 답하면 → 아래 비즈니스 모델 캔버스 9칸이 채워집니다. 칸마다 🟠추측 / 🟢확인됨을 직접 표시하세요. 고객을 만나 확인한 칸이 늘어날수록 사업이 단단해집니다.</div>
+  <div class="guide" id="guideAi" hidden><b>처음 쓴 캔버스는 '추측 9개'입니다.</b> 고객을 만나 확인한 칸이 늘어날수록 사업이 단단해집니다. 순서: ① 내 자료 넣기 → ② 내 AI에게 9칸 초안 받기 → ③ 칸마다 🟢확인됨 / 🟠추측 보기 → ④ 추측인 칸을 고객 5명에게 물어보고 다시 넣기.</div>
 
   <div class="tabs" role="group" aria-label="시작 방법">
-    <button id="tabAi" aria-pressed="true">내 자료로 시작<small>한 일·인터뷰·ChatGPT 대화를 넣으면 내 AI가 9칸 초안을 만듭니다</small></button>
+    <button id="tabGuided" aria-pressed="true">쉬운 질문으로 시작 <b style="color:var(--blue)">(권장)</b><small>가진 자료를 먼저 넣고, 쉬운 질문에 답하면 9칸이 채워집니다</small></button>
+    <button id="tabAi" aria-pressed="false">AI에게 9칸 초안 맡기기 (고급)<small>한 일·인터뷰·ChatGPT 대화를 넣으면 내 AI가 9칸 초안을 만듭니다</small></button>
     <button id="tabManual" aria-pressed="false">직접 채우기<small>멘토와 함께 칸마다 질문에 답하며 손으로 채웁니다</small></button>
   </div>
 
   <section class="step" id="step1">
-    <h2><span class="sn">1</span>내 자료 넣기</h2>
-    <p class="desc">파일이 아니어도 됩니다. 글이면 무엇이든 붙여넣으세요. 판매 기록이나 고객 인터뷰처럼 <b>실제로 있었던 일</b>일수록 근거가 강합니다.</p>
+    <h2><span class="sn">1</span><span id="s1Title">내 자료 넣기</span></h2>
+    <p class="desc" id="s1Desc">파일이 아니어도 됩니다. 글이면 무엇이든 붙여넣으세요. 판매 기록이나 고객 인터뷰처럼 <b>실제로 있었던 일</b>일수록 근거가 강합니다.</p>
     <div class="qs">
       <div><label for="qDid">지금까지 해 본 것 (선택)</label><textarea id="qDid" data-k="qDid" placeholder="예: 친구 5명에게 반찬을 만들어 2주 동안 보내 봄"></textarea></div>
       <div><label for="qWill">앞으로 하려는 것 (선택)</label><textarea id="qWill" data-k="qWill" placeholder="예: 학교 앞에서 주 1회 정기 배달 시작"></textarea></div>
@@ -205,6 +237,11 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
         <label for="srcText">자료 붙여넣기</label>
         <textarea id="srcText" placeholder="예: ChatGPT와 나눈 대화 전체, 고객 인터뷰 메모, 경쟁 업체 가격표, 판매·문의 기록을 그대로 붙여넣으세요."></textarea>
       </div>
+      <div class="filein" id="fileBox" hidden>
+        <label for="srcFiles">파일로 한꺼번에 넣기 (.md · .txt, 여러 개 가능)</label>
+        <input type="file" id="srcFiles" accept=".md,.txt,text/plain,text/markdown" multiple>
+        <p class="hint" id="srcFileMsg" aria-live="polite">고른 종류(위 '자료 종류')로 모두 들어갑니다. 파일마다 종류가 다르면 나눠서 넣어 주세요.</p>
+      </div>
       <div class="row">
         <button class="pri" id="btnAddSrc">자료 추가</button>
         <span class="warnbox">고객 이름·연락처는 지우고 넣으세요. 이 자료는 ②에서 내 AI에게 그대로 전달됩니다.</span>
@@ -212,6 +249,31 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     </div>
     <ul class="srcs" id="srcList"></ul>
     <p class="empty" id="srcEmpty">아직 넣은 자료가 없습니다. 위 질문 3개만 답해도 초안은 만들 수 있지만, 모두 '추측'으로 나옵니다.</p>
+  </section>
+
+  <section class="step" id="stepStatus" hidden>
+    <h2><span class="sn">2</span>자료 현황과 부족한 자료</h2>
+    <p class="desc">넣은 자료가 어느 칸에 쓰이는지 보여 줍니다. 위 자료 아래의 칸 이름을 눌러 연결을 바꿀 수 있어요. 자료도 내용도 없는 칸은 외부 AI에게 조사를 맡길 수 있습니다.</p>
+    <ul class="status" id="statusList"></ul>
+    <p class="hint" id="gapHint"></p>
+    <p style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0"><button class="pri" id="btnGap">부족한 자료 찾기 프롬프트 복사</button></p>
+    <p class="hint">웹 검색은 이 페이지가 아니라 내 AI(ChatGPT·Claude·Gemini)에서 합니다. 검색한 결과는 위 ①에 자료로 다시 넣으세요. 검색이 안 되는 AI에서는 "확인할 수 없습니다"라고 답하도록 지시되어 있습니다. 고객 이름·연락처는 지우고 붙여넣으세요.</p>
+  </section>
+
+  <section class="step" id="stepQ" hidden>
+    <h2><span class="sn">3</span>쉬운 질문으로 채우기</h2>
+    <p class="desc" id="wzDesc">한 번에 하나씩 답하면 아래 캔버스 9칸에 반영됩니다. 모르는 것은 "잘 모르겠어요"를 누르세요. 답은 모두 🟠추측으로 들어가며, 확인됨은 고객을 만난 뒤 직접 바꿉니다.</p>
+    <div class="wz">
+      <div class="wz-top"><b id="wzProg"></b><div class="wz-bar"><i id="wzBar"></i></div></div>
+      <h3 id="wzQ"></h3><p class="hint" id="wzHelp"></p>
+      <div id="wzLinked"></div><div id="wzExisting"></div>
+      <div id="wzBody"></div>
+      <div class="wz-kind"><label for="wzKind">이 답은 어떤 종류인가요?</label>
+        <select id="wzKind"><option>검증 전 가설</option><option>창업자 계획</option><option>자료로 확인</option><option>추가 확인 필요</option></select></div>
+      <p class="msg" id="wzMsg" aria-live="polite"></p>
+      <div class="wz-nav"><button id="wzPrev" type="button">← 이전</button><button id="wzUnk" type="button">잘 모르겠어요</button><button id="wzSkip" type="button">건너뛰기</button><button class="pri" id="wzNext" type="button">다음 →</button></div>
+      <div id="wzUnkBox" hidden></div>
+    </div>
   </section>
 
   <section class="step" id="step2">
@@ -292,7 +354,13 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     {id:'competitor',name:'경쟁사 가격·리뷰 조사',lv:2,hint:'비슷한 상품의 가격표, 후기, 판매 페이지 내용입니다.'},
     {id:'stats',name:'공공 통계·기사',lv:2,hint:'통계·상권 정보·기사 같은 숫자 자료입니다. 출처도 같이 적어 주세요.'},
     {id:'chat',name:'ChatGPT 대화',lv:1,hint:'AI와 나눈 대화입니다. 생각을 정리하는 데는 좋지만 고객의 실제 행동은 아니라서 근거가 약합니다.'},
-    {id:'memo',name:'내 메모·아이디어',lv:1,hint:'내가 한 일, 하려는 일, 떠오른 생각입니다. 근거가 약합니다.'}
+    {id:'memo',name:'내 메모·아이디어',lv:1,hint:'내가 한 일, 하려는 일, 떠오른 생각입니다. 근거가 약합니다.'},
+    {id:'problemdoc',name:'창업아이디어·고객 문제 정의서',lv:1,hint:'「창업아이디어검증코치」에서 만든 고객 문제 정의서입니다. 내 경험 기반이라 근거가 약합니다.'},
+    {id:'customer',name:'잠재 고객·고객 불편 조사',lv:2,hint:'「고객문제검증코치」 보고서처럼 고객과 불편을 조사한 자료입니다. 출처 URL이 있는지 확인하세요.'},
+    {id:'validate',name:'사업성 검토·가격 실험 자료',lv:2,hint:'「사업성검증코치」 보고서나 가격·결제 실험 기록입니다. 의향과 실제 결제는 다릅니다.'},
+    {id:'market',name:'시장 규모·산업 동향',lv:2,hint:'시장 규모와 동향을 담은 자료입니다. 출처와 기준 연도를 같이 적어 주세요.'},
+    {id:'cost',name:'견적서·구매 가격·운영비 기록',lv:2,hint:'견적서, 공식 요금표, 실제로 쓴 비용 기록입니다.'},
+    {id:'plan',name:'사업계획서·프로토타입·기타',lv:1,hint:'이미 써 둔 사업계획서, 시제품 설명, 그 밖의 자료입니다.'}
   ];
   var LV={3:'근거 강함',2:'근거 중간',1:'근거 약함'};
   function typeOf(id){for(var i=0;i<TYPES.length;i++)if(TYPES[i].id===id)return TYPES[i];return TYPES[5]}
@@ -325,7 +393,7 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     if(!it.mode)it.mode=order.some(function(k){return (it[k]||'').trim()})?'manual':'ai';
     return it;
   }
-  function newTeam(){var id='t'+Date.now();store.items[id]=norm({date:today(),mode:'ai'});store.cur=id;data=store.items[id]}
+  function newTeam(){var id='t'+Date.now();store.items[id]=norm({date:today(),mode:'guided'});store.cur=id;data=store.items[id]}
   if(!store.cur||!store.items[store.cur]){var ids=Object.keys(store.items);if(ids.length){store.cur=ids[ids.length-1]}else newTeam()}
   Object.keys(store.items).forEach(function(id){norm(store.items[id])});
   data=store.items[store.cur];
@@ -356,9 +424,13 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     Object.keys(store.items).forEach(function(id){var op=document.createElement('option');op.value=id;op.textContent=label(store.items[id]);if(id===store.cur)op.selected=true;pick.appendChild(op)});
   }
   function renderMode(){
-    var ai=data.mode!=='manual';
-    $('tabAi').setAttribute('aria-pressed',ai?'true':'false');$('tabManual').setAttribute('aria-pressed',ai?'false':'true');
-    $('step1').hidden=!ai;$('step2').hidden=!ai;
+    var m=data.mode==='manual'?'manual':(data.mode==='guided'?'guided':'ai');
+    $('tabGuided').setAttribute('aria-pressed',m==='guided'?'true':'false');$('tabAi').setAttribute('aria-pressed',m==='ai'?'true':'false');$('tabManual').setAttribute('aria-pressed',m==='manual'?'true':'false');
+    $('step1').hidden=m==='manual';$('step2').hidden=m!=='ai';$('stepStatus').hidden=m!=='guided';$('stepQ').hidden=m!=='guided';
+    $('guideGuided').hidden=m!=='guided';$('guideAi').hidden=m!=='ai';
+    $('fileBox').hidden=m!=='guided';
+    if(m==='guided'){$('s1Title').textContent='내 사업 자료부터 모아볼까요?';$('s1Desc').textContent='이미 만든 결과물과 조사 자료를 가능한 한 많이 넣어 주세요. 자료가 많을수록 같은 질문을 다시 하지 않아도 됩니다. 판매 기록이나 고객 인터뷰처럼 실제로 있었던 일일수록 근거가 강합니다.'}
+    else{$('s1Title').textContent='내 자료 넣기';$('s1Desc').textContent='파일이 아니어도 됩니다. 글이면 무엇이든 붙여넣으세요. 판매 기록이나 고객 인터뷰처럼 실제로 있었던 일일수록 근거가 강합니다.'}
   }
   function renderCells(){
     order.forEach(function(k){
@@ -374,7 +446,7 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
       var t=typeOf(sr.type),li=el('li');
       li.appendChild(el('b',null,'자료'+(i+1)));
       li.appendChild(el('span','tag s'+t.lv,t.name+' · '+LV[t.lv]));
-      li.appendChild(el('span','hint',sr.d||''));
+      li.appendChild(el('span','hint',(sr.name?sr.name+' · ':'')+(sr.d||'')));
       var del=el('button','sm warn del','삭제');del.type='button';var armed=false;
       del.addEventListener('click',function(){
         if(!armed){armed=true;del.textContent='한 번 더 누르면 삭제';setTimeout(function(){armed=false;del.textContent='삭제'},3000);return}
@@ -383,11 +455,19 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
       li.appendChild(del);
       var dt=el('details');dt.appendChild(el('summary',null,sr.text.slice(0,80).replace(/\s+/g,' ')+(sr.text.length>80?' …':'')));
       dt.appendChild(el('pre',null,sr.text));li.appendChild(dt);
+      var tr=el('div','tagrow');tr.appendChild(el('span',null,'쓰일 칸:'));
+      order.forEach(function(k){
+        var on=tagsOf(sr).indexOf(k)>=0,tb=el('button',null,CELLNO[k]+' '+names[k]);tb.type='button';tb.setAttribute('aria-pressed',on?'true':'false');
+        tb.addEventListener('click',function(){var cur=tagsOf(sr).slice(),ix=cur.indexOf(k);if(ix>=0)cur.splice(ix,1);else cur.push(k);sr.cells=cur;persist();renderSources()});
+        tr.appendChild(tb);
+      });
+      li.appendChild(tr);
       ul.appendChild(li);
     });
     $('srcEmpty').hidden=data.sources.length>0;
     var strong=data.sources.filter(function(s){return typeOf(s.type).lv===3}).length;
     $('promptInfo').textContent='넣은 자료 '+data.sources.length+'개 (강한 근거 '+strong+'개)'+(order.some(val)?' · 지금 캔버스 내용도 함께 보냅니다.':'');
+    renderStatus();
   }
   function defaultFocus(){return ['cs','vp','rv'].filter(function(k){return stOf(k)!=='ok'})}
   function focusKeys(){return (data.focus&&data.focus.length)?data.focus.slice(0,3):defaultFocus()}
@@ -429,7 +509,7 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
   }
   function render(){
     fields.forEach(function(f){f.value=data[f.dataset.k]||''});
-    buildPick();renderMode();renderSources();update();
+    buildPick();renderMode();renderSources();update();renderWizard();
     $('btnUndo').hidden=!data.prev;$('applyMsg').textContent='';$('applyMsg').className='msg';
   }
   function update(){
@@ -463,6 +543,7 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
   fields.forEach(function(f){f.addEventListener('input',save)});
   pick.addEventListener('change',function(){store.cur=pick.value;data=norm(store.items[store.cur]);persist();render()});
   $('btnNew').addEventListener('click',function(){newTeam();persist();render();$('team').focus();saved.textContent='새 팀을 만들었습니다'});
+  $('tabGuided').addEventListener('click',function(){data.mode='guided';persist();renderMode();renderWizard()});
   $('tabAi').addEventListener('click',function(){data.mode='ai';persist();renderMode()});
   $('tabManual').addEventListener('click',function(){data.mode='manual';persist();renderMode()});
 
@@ -698,6 +779,207 @@ body.printing .appendix div{white-space:pre-wrap;word-break:break-all;line-heigh
     data.focus=['vp','rv'];data.mode='ai';
     data.history=[{d:nowLabel(),ch:['고객: 새로 채움','가치 제안: 새로 채움','수익: 새로 채움'],note:'예시'}];
     persist();render();saved.textContent='예시입니다. "이 팀 지우기"로 지울 수 있습니다.';
+  });
+
+  // ===== 2026-11-18 개편: 자료 먼저 → 자료 현황 → 쉬운 질문 → 기존 9칸 =====
+  var CELLNO={cs:'①',vp:'②',ch:'③',cr:'④',rv:'⑤',kr:'⑥',ka:'⑦',kp:'⑧',co:'⑨'};
+  var DEF_TAGS={sale:['rv','cs'],interview:['cs','vp','ch'],competitor:['vp','rv','ch'],stats:['cs'],market:['cs'],cost:['co'],customer:['cs','vp'],validate:['rv'],problemdoc:['cs','vp'],chat:[],memo:[],plan:[]};
+  var GAPHINT={cs:'실제 고객이 남긴 불편·후기·커뮤니티 글',vp:'기존 제품·서비스의 기능, 가격, 한계',ch:'경쟁사의 판매·홍보 채널, 고객이 정보를 찾는 곳',cr:'재구매·상담·AS 운영 사례',rv:'비슷한 곳의 공식 가격과 과금 방식',kr:'시작에 필요한 사람·장비·자격·인허가',ka:'제작·서비스 제공·운영 방식 사례',kp:'제조·유통·제휴 후보와 협력 조건',co:'공식 요금표·견적 기준·운영비'};
+  function tagsOf(sr){return Array.isArray(sr.cells)?sr.cells:(DEF_TAGS[sr.type]||[])}
+  function linkedCells(){var m={};data.sources.forEach(function(sr){tagsOf(sr).forEach(function(k){m[k]=(m[k]||0)+1})});return m}
+  function gapCells(){var lk=linkedCells();return order.filter(function(k){return !val(k)&&!lk[k]})}
+  function renderStatus(){
+    var box=$('statusList');if(!box)return;box.innerHTML='';
+    var n=data.sources.length,lk=linkedCells(),strong=data.sources.filter(function(x){return typeOf(x.type).lv===3}).length;
+    box.appendChild(el('li','top','넣은 자료 '+n+'개'+(n?' (강한 근거 '+strong+'개)':'')+' · 채워진 칸 '+order.filter(val).length+'/9'));
+    order.forEach(function(k){
+      var li=el('li');li.appendChild(el('b',null,CELLNO[k]+' '+names[k]+'  '));
+      var t=val(k)?('칸에 내용 있음'+(lk[k]?' · 연결 자료 '+lk[k]+'개':'')):(lk[k]?'연결 자료 '+lk[k]+'개 (칸은 비어 있음)':'자료 없음 → 더 필요');
+      li.appendChild(document.createTextNode(t));box.appendChild(li);
+    });
+    var g=gapCells();
+    $('gapHint').textContent=g.length?('더 필요한 자료: '+g.map(function(k){return CELLNO[k]+' '+names[k]}).join(', ')+'. 아래 버튼으로 외부 AI에게 조사를 맡긴 뒤 결과를 ①에 자료로 다시 넣으세요. 없는 자료를 지어내서 채우지는 않습니다.'):'모든 칸에 자료가 연결되었거나 내용이 있습니다. 부족한 부분은 ③ 쉬운 질문에서 채우세요.';
+  }
+  function gapPrompt(){
+    var g=gapCells();if(!g.length)g=order.filter(function(k){return !val(k)});if(!g.length)g=order.slice();
+    var p='당신은 창업을 준비하는 사람의 자료 조사를 돕는 리서처입니다.\n\n[현재까지 확보한 정보]\n';
+    p+='아이템 또는 문제: '+(val('idea')||val('qWho')||'-')+'\n지금까지 해 본 것: '+(val('qDid')||'-')+'\n누구를 돕고 싶은지: '+(val('qWho')||'-')+'\n기존 자료 요약:\n';
+    if(!data.sources.length)p+='- (넣은 자료 없음)\n';
+    data.sources.forEach(function(sr,i){p+='- 자료'+(i+1)+' ['+typeOf(sr.type).name+'] '+sr.text.slice(0,120).replace(/\s+/g,' ')+(sr.text.length>120?' …':'')+'\n'});
+    p+='\n[지금 추가로 필요한 자료]\n';g.forEach(function(k){p+='- '+CELLNO[k]+' '+names[k]+': '+GAPHINT[k]+'\n'});
+    p+='\n실제 웹 검색을 활용하여 위 부족한 자료를 조사하세요.\n기존 제품·서비스, 공식 가격, 공개된 고객 후기·댓글, 관련 시장 통계 중 이번 질문에 꼭 필요한 자료를 우선 조사하세요.\n각 정보에 출처 URL과 확인 날짜를 함께 표시하세요.\n출처에서 직접 확인한 사실과 AI의 추론을 나누세요.\n수치·가격·경쟁사·고객 의견을 지어내지 마세요.\n웹 검색을 실행할 수 없거나 원문을 확인하지 못하면 \'확인할 수 없습니다\'라고 쓰세요.\n추가 질문 없이 첫 응답에서 완성하세요.\n\n[출력]\n1) 확보한 자료(사실·출처·확인일)\n2) 이 자료가 알려주는 내용(해석/가설 표시)\n3) 아직 확인할 수 없는 내용\n4) BMC에서 참고할 항목(①~⑨)\n';
+    return p;
+  }
+  $('btnGap').addEventListener('click',function(){copyText(gapPrompt(),this,'복사했습니다 → 웹 검색이 되는 내 AI 새 대화창에 붙여넣으세요');track('bmc_gap_prompt',{gaps:gapCells().length})});
+
+  // 파일 여러 개 넣기(.md·.txt) — 파일 하나가 실패해도 나머지는 그대로 넣는다
+  $('srcFiles').addEventListener('change',function(){
+    var files=[].slice.call(this.files||[]),msg=$('srcFileMsg'),inp=this;if(!files.length)return;
+    var ty=$('srcType').value,added=0,fails=[],pending=files.length;
+    function done(){
+      if(--pending>0)return;
+      persist();renderSources();inp.value='';
+      msg.textContent=added+'개 추가'+(fails.length?' · 못 넣은 파일: '+fails.join(', '):'');
+      saved.textContent='자료 '+added+'개를 추가했습니다';
+      if(added)track('bmc_source_add',{type:ty,files:added});
+    }
+    files.forEach(function(f){
+      if(!/\.(md|txt)$/i.test(f.name)&&!/^text\//.test(f.type)){fails.push(f.name+'(.md·.txt만 가능)');done();return}
+      if(f.size>300*1024){fails.push(f.name+'(300KB 초과)');done();return}
+      var rd=new FileReader();
+      rd.onload=function(){
+        var t=String(rd.result||'').replace(/\u0000/g,'').trim().slice(0,30000);
+        if(!t){fails.push(f.name+'(빈 파일)')}
+        else if(data.sources.some(function(x){return x.text===t})){fails.push(f.name+'(이미 넣은 자료)')}
+        else{data.sources.push({type:ty,d:today(),text:t,name:f.name});added++}
+        done();
+      };
+      rd.onerror=function(){fails.push(f.name+'(읽지 못함)');done()};
+      rd.readAsText(f);
+    });
+  });
+
+  // ③ 쉬운 질문 (한 화면에 한 칸씩)
+  var REV=[['물건 판매','물건을 한 번 팔고 돈 받기 (예: 신발·의류·소비재)'],['이용료·사용료','쓸 때마다 또는 시간에 따라 받기 (예: 노래방·스크린골프·헬스장)'],['회원권·멤버십','가입 자격에 회비 받기 (예: 코스트코 연회원)'],['공간·시설 대여','일정 시간·기간 빌려주고 받기 (예: 공유주방·공유오피스)'],['광고·협찬','광고를 보여주거나 홍보해 주고 받기'],['중개 수수료','거래를 연결하고 수수료 받기 (예: 공인중개·결혼정보)'],['콘텐츠·커뮤니티','콘텐츠나 커뮤니티를 운영해 이용료·광고 등으로 수익 (받는 방식은 구체화 필요)'],['정기 구독','매월·매년 계속 쓰고 정기 결제 (예: 넷플릭스)'],['그 밖의 방식','다른 방법이면 아래 칸에 설명'],['아직 모르겠음','앞서 넣은 가격 조사 자료와 비교해 정하기']];
+  var WZ={
+    cs:{q:'우리 제품이나 서비스를 가장 먼저 이용할 사람은 누구인가요?',help:'모든 사람보다, 지금 이 문제로 가장 불편한 사람을 먼저 떠올려 보세요.',f:[
+      {k:'who',s:'',l:'가장 먼저 이용할 사람',t:'text',ph:'예: 요리할 시간이 없는 자취 대학생',ex:['AI로 프로그램을 만들고 싶은 비개발자 1인 창업자','자취를 시작한 대학생']},
+      {k:'when',s:'불편한 순간',l:'그 사람이 언제 어떤 일을 하다가 불편해하나요?',t:'text',opt:1,ph:'예: 퇴근 후 저녁을 챙겨 먹으려 할 때'}]},
+    vp:{q:'우리 제품을 쓰면 고객의 어떤 불편함이 줄어들까요?',help:'기능 이름보다, 쓰기 전과 후에 무엇이 달라지는지 말해 주세요.',f:[
+      {k:'change',s:'',l:'쓰기 전과 후에 무엇이 달라지나요?',t:'text',ph:'예: 반복해서 설명하던 요구사항을 질문에 답하며 정리할 수 있음',ex:['시간이 줄어든다','실수가 줄어든다']},
+      {k:'kind',s:'좋아지는 것',l:'가장 가까운 것은?',t:'choice',opt:1,o:[['시간 절약',''],['비용 절감',''],['실수·위험 감소',''],['편리함',''],['다른 변화','']]},
+      {k:'why',s:'선택할 이유',l:'기존 제품 대신 우리 것을 선택할 이유는 무엇인가요?',t:'text',opt:1}]},
+    ch:{q:'고객은 우리 제품을 처음 어디서 알게 될까요?',help:'고객이 평소 정보를 찾는 장소를 떠올려 보세요. 예시는 참고용이며 실제 데이터가 아닙니다.',f:[
+      {k:'know',s:'',l:'처음 알게 되는 곳',t:'text',ph:'예: 네이버 검색, 대학교 커뮤니티, 인스타그램',ex:['네이버 검색','대학교 커뮤니티','인스타그램','관련 기업 담당자에게 직접 소개']},
+      {k:'type',s:'알리는 방식',l:'가까운 것을 모두 고르세요',t:'multi',opt:1,o:[['검색·블로그',''],['SNS·영상',''],['온라인 판매처',''],['오프라인 매장·행사',''],['직접 영업',''],['기타','']]},
+      {k:'buy',s:'결제·신청 장소',l:'고객은 실제로 어디서 결제하거나 신청할까요?',t:'text',opt:1}]},
+    cr:{q:'처음 이용한 고객과 앞으로 어떻게 연락하고 도와줄까요?',help:'한 번 쓴 고객이 다시 오게 하려면 무엇을 할지 적어 보세요.',f:[
+      {k:'how',s:'',l:'연락하고 챙기는 방법',t:'text',ph:'예: 카카오톡 상담, 이메일 사용 가이드, 정기 업데이트 안내',ex:['카카오톡 상담','이메일 사용 가이드','회원 전용 알림']},
+      {k:'way',s:'관계 방식',l:'가장 가까운 것은?',t:'choice',opt:1,o:[['직접 상담',''],['자동 안내·메시지',''],['커뮤니티·멤버십',''],['재구매 알림',''],['기타','']]},
+      {k:'help',s:'문제가 생기면',l:'고객에게 문제가 생기면 누구에게 어떤 방식으로 도움받나요?',t:'text',opt:1}]},
+    rv:{q:'우리는 어떤 방식으로 돈을 벌까요?',help:'먼저 돈을 받는 방식을 정하고, 아래에서 받는 것·가격·결제하는 사람을 차례로 적어 보세요. 아래 예시는 참고용이며 실제 가격·매출이 아닙니다. 실제로 결제한 고객이 있는지는 마지막에 따로 적습니다.',f:[
+      {k:'type',s:'과금 방식',l:'돈 받는 방식을 고르세요',t:'choice',o:REV},
+      {k:'gets',s:'고객이 받는 것',l:'고객이 돈을 낼 때, 정확히 무엇을 받게 되나요?',t:'text',ph:'예: 반찬 5종 1세트 / 월 이용권 / 1회 사용',first:1},
+      {k:'price',s:'가격',l:'한 번에 또는 한 달에 얼마를 받을 계획인가요?',t:'text',ph:'예: 12,000원 (아직 모르면 "미정")'},
+      {k:'unit',s:'가격 단위',l:'가격 단위',t:'choice',opt:1,o:[['건당',''],['시간당',''],['월',''],['연',''],['1회',''],['모름','']]},
+      {k:'payer',s:'결제하는 사람',l:'누가 결제하나요?',t:'choice',opt:1,o:[['이용자 본인',''],['부모',''],['기업',''],['기관',''],['광고주',''],['거래 당사자',''],['모름','']]},
+      {k:'cmp',s:'비슷한 곳 가격 조사',l:'비슷한 곳의 가격을 조사한 자료가 있나요?',t:'choice',opt:1,o:[['조사한 자료가 있음','위 ①에 자료로 넣어 두세요'],['아직 없음','② 자료 현황의 검색 프롬프트로 조사하세요']]},
+      {k:'paid',s:'실제 결제',l:'아직 실제로 결제해 본 고객이 있나요? (없어도 다음으로 갈 수 있어요)',t:'choice',opt:1,o:[['실제로 결제한 고객이 있음',''],['아직 없음 (가격은 가설)','']]}]},
+    kr:{q:'시작하려면 꼭 필요한 것은 무엇인가요?',help:'사람·기술·장비·돈·자격 중 지금 가진 것과 없는 것을 나눠 적어 보세요.',f:[
+      {k:'have',s:'지금 가진 것',l:'이미 갖고 있는 것',t:'text',first:1,ph:'예: 프로그램 개발 역량, 노트북',ex:['프로그램 개발 역량','노트북','공유주방 이용권']},
+      {k:'need',s:'더 마련할 것',l:'앞으로 마련해야 하는 것',t:'text',opt:1},
+      {k:'cat',s:'종류',l:'가까운 종류를 모두 고르세요',t:'multi',opt:1,o:[['사람·기술',''],['제품·재료·장비',''],['자금',''],['콘텐츠·데이터',''],['권리·인허가',''],['기타','']]}]},
+    ka:{q:'고객이 돈을 낸 뒤, 약속한 결과를 전달하려면 우리가 실제로 해야 할 일은 무엇인가요?',help:'순서대로 적으면 좋습니다.',f:[
+      {k:'flow',s:'',l:'해야 할 일',t:'text',ph:'예: 주문 확인 → 조리 → 소분 → 배달 → 문의 응대',ex:['주문 확인 → 제작 → 전달 → 문의 응대']},
+      {k:'mine',s:'직접 할 일',l:'이 중 내가 직접 할 일',t:'text',opt:1},
+      {k:'out',s:'외부에 맡길 일',l:'외부에 맡길 일',t:'text',opt:1}]},
+    kp:{q:'혼자 하기 어렵거나 다른 사람의 도움이 필요한 일은 무엇인가요?',help:'재료·기술·홍보·배송·결제 등을 떠올려 보세요.',f:[
+      {k:'need',s:'',l:'도움이 필요한 일',t:'text',ph:'예: 제조, 디자인, 배송, 결제 서비스',ex:['배송 업체','디자이너','결제 서비스','학교·기관']},
+      {k:'type',s:'협력 종류',l:'가까운 것을 모두 고르세요',t:'multi',opt:1,o:[['제조·공급',''],['개발·디자인 외주',''],['배송·판매',''],['전문가·기관',''],['현재는 혼자 가능','']]},
+      {k:'state',s:'진행 상태',l:'이미 협의한 곳인가요, 앞으로 찾아볼 곳인가요?',t:'choice',opt:1,o:[['이미 협의한 곳이 있음',''],['앞으로 찾아볼 곳',''],['아직 없음','']]}]},
+    co:{q:'사업을 시작할 때와 계속 운영할 때, 각각 어디에 돈이 들까요?',help:'세 가지로 나눠 적습니다. 항목 / 금액 / 단위(건당·월·1회) / 근거(견적일·출처)를 적고, 모르는 것은 "모름"이라고 쓰세요. 금액을 모르면 지어내지 말고 "견적 필요"라고 적으세요.',f:[
+      {k:'init',s:'처음 한 번 준비할 때',l:'처음 시작하기 전에 준비해야 할 것과 예상 비용은?',t:'text',first:1,ph:'예: 시제품 개발 — 금액 모름 — 견적 필요',ex:['시제품 개발','장비 구매','디자인·웹사이트 구축','등록·인허가']},
+      {k:'fixed',s:'매달 정기적으로',l:'판매가 없어도 정기적으로 나가는 돈은?',t:'text',ex:['서버·도구 구독료','임대료','인건비','보험·관리비']},
+      {k:'var',s:'한 건 늘 때마다',l:'고객 한 명·판매 한 건이 늘 때 추가로 드는 돈은?',t:'text',ex:['재료비','배송비','건별 사용료','결제수수료','외주 처리비']}]}
+  };
+  var wzCur={},wzCell=null;
+  function wzAns(k){data.wz=data.wz||{};return data.wz[k]||{}}
+  function wzCompose(k){
+    var a=wzCur,out=[];
+    WZ[k].f.forEach(function(f){
+      var v=a[f.k];if(Array.isArray(v))v=v.join(', ');v=(v||'').toString().trim();if(!v)return;
+      if(f.k==='type'&&k==='rv'){out.unshift('과금 방식: '+v);return}
+      out.push(f.s?f.s+': '+v:v);
+    });
+    if(k==='rv'){ // 첫 줄은 "과금 방식 — 받는 것" 한 줄로 요약
+      var t=a.type||'',g=(a.gets||'').trim();
+      out=out.filter(function(x){return x.indexOf('과금 방식: ')!==0&&x.indexOf('고객이 받는 것: ')!==0});
+      var head=(t?t:'')+(t&&g?' — ':'')+g;if(head)out.unshift(head);
+    }
+    return out.join('\n');
+  }
+  function wzFilled(){var a=wzCur;return WZ[wzCell].f.some(function(f){var v=a[f.k];return Array.isArray(v)?v.length:!!(v&&String(v).trim())})}
+  function wzDone(){return data.wzIdx>=order.length}
+  function renderWizard(){
+    if(data.mode!=='guided'){return}
+    if(typeof data.wzIdx!=='number'||data.wzIdx<0)data.wzIdx=0;
+    var i=Math.min(data.wzIdx,order.length-1),k=order[i];wzCell=k;wzCur=JSON.parse(JSON.stringify(wzAns(k)));
+    var d=WZ[k],fin=wzDone();
+    $('wzProg').textContent=fin?'완료':('쉬운 질문 '+(i+1)+' / '+order.length+' · '+CELLNO[k]+' '+names[k]);
+    $('wzBar').style.width=(fin?100:Math.round(i/order.length*100))+'%';
+    $('wzQ').textContent=fin?'9칸에 모두 반영했습니다':d.q;
+    $('wzHelp').textContent=fin?'아래 비즈니스 모델 캔버스에서 칸마다 내용을 확인하고 고치세요. 🟠추측인 칸은 고객을 만나 확인한 뒤 🟢확인됨으로 바꾸세요. 질문을 다시 보려면 "처음부터 다시 보기"를 누르세요.':d.help;
+    var body=$('wzBody');body.innerHTML='';var lk=$('wzLinked');lk.innerHTML='';var ex=$('wzExisting');ex.innerHTML='';$('wzMsg').textContent='';$('wzUnkBox').hidden=true;
+    $('wzKind').parentNode.hidden=fin;$('wzUnk').hidden=fin;$('wzSkip').hidden=fin;
+    $('wzPrev').disabled=false;$('wzNext').textContent=fin?'처음부터 다시 보기':(i===order.length-1?'9칸 완성하기':'다음 →');
+    if(fin){return}
+    $('wzPrev').disabled=(i===0);
+    $('wzKind').value=(data.kind&&data.kind[k])||'검증 전 가설';
+    var srcs=data.sources.map(function(sr,ix){return {sr:sr,n:ix+1}}).filter(function(o){return tagsOf(o.sr).indexOf(k)>=0});
+    if(srcs.length){
+      var box=el('div','linked');box.appendChild(el('b',null,'이 칸에 연결된 자료 '+srcs.length+'개 — 같은 내용을 다시 쓰지 않아도 됩니다. 자료를 보고 달라진 점만 적으세요.'));
+      srcs.slice(0,3).forEach(function(o){var dt=el('details');dt.appendChild(el('summary',null,'자료'+o.n+' · '+typeOf(o.sr.type).name+(o.sr.name?' · '+o.sr.name:'')));dt.appendChild(el('pre',null,o.sr.text.slice(0,600)+(o.sr.text.length>600?' …':'')));box.appendChild(dt)});
+      lk.appendChild(box);
+    }
+    if(val(k)){var nb=el('div','note1');nb.appendChild(el('b',null,'이 칸에 이미 적힌 내용'));nb.appendChild(el('pre',null,val(k).slice(0,300)));nb.lastChild.style.cssText='white-space:pre-wrap;font-family:inherit;margin:4px 0 0';nb.appendChild(el('span',null,'아무것도 쓰지 않고 다음으로 가면 이 내용은 그대로 남습니다. 새로 쓰면 이 칸이 바뀌고 변경 기록에 남습니다.'));ex.appendChild(nb)}
+    repaintChoices(k);
+  }
+  function repaintChoices(k){ // 선택·입력 상태를 다시 그린다
+    var body=$('wzBody');body.innerHTML='';var d=WZ[k];
+    d.f.forEach(function(f){
+      var w=el('div','fld');var lb=el('label',null,f.l+' ');if(f.opt)lb.appendChild(el('em',null,'(선택)'));w.appendChild(lb);
+      if(f.t==='text'){
+        var ta=document.createElement('textarea');ta.value=wzCur[f.k]||'';ta.placeholder=f.ph||'';ta.maxLength=1200;ta.setAttribute('aria-label',f.l);
+        ta.addEventListener('input',function(){wzCur[f.k]=ta.value});w.appendChild(ta);
+        if(f.ex&&f.ex.length){var ch=el('div','chips');ch.appendChild(el('span','hint','예시(참고용·실제 근거 아님):'));f.ex.forEach(function(x){var b=el('button',null,x);b.type='button';b.addEventListener('click',function(){ta.value=(ta.value?ta.value.replace(/\s+$/,'')+'\n':'')+x;wzCur[f.k]=ta.value;ta.focus()});ch.appendChild(b)});w.appendChild(ch)}
+      }else{
+        var op=el('div','opts'),multi=f.t==='multi';
+        f.o.forEach(function(o){
+          var cur=wzCur[f.k],on=multi?(Array.isArray(cur)&&cur.indexOf(o[0])>=0):cur===o[0];
+          var b=el('button',null,o[0]);b.type='button';b.setAttribute('aria-pressed',on?'true':'false');if(o[1])b.appendChild(el('small',null,o[1]));
+          b.addEventListener('click',function(){
+            if(multi){var arr=Array.isArray(wzCur[f.k])?wzCur[f.k].slice():[],ix=arr.indexOf(o[0]);if(ix>=0)arr.splice(ix,1);else arr.push(o[0]);wzCur[f.k]=arr}
+            else{wzCur[f.k]=(wzCur[f.k]===o[0])?'':o[0]}
+            repaintChoices(k);
+          });op.appendChild(b);
+        });
+        w.appendChild(op);
+      }
+      body.appendChild(w);
+    });
+  }
+  function wzSave(){ // 이 화면의 답을 칸에 반영(쓴 것이 있을 때만 덮어쓴다)
+    var k=wzCell;if(!wzFilled())return false;
+    data.wz=data.wz||{};data.wz[k]=JSON.parse(JSON.stringify(wzCur));
+    data.kind=data.kind||{};data.kind[k]=$('wzKind').value;
+    var text=wzCompose(k),was=val(k);
+    if(text!==was){
+      data[k]=text;data.st[k]='guess';
+      var srcN=data.sources.map(function(sr,ix){return {sr:sr,n:ix+1}}).filter(function(o){return tagsOf(o.sr).indexOf(k)>=0}).map(function(o){return '자료'+o.n});
+      data.ev[k]='쉬운 질문 답변 · '+$('wzKind').value+(srcN.length?' · 연결 자료: '+srcN.join(', '):'');
+      logManual(names[k]+': 쉬운 질문으로 '+(was?'고침':'채움'));
+      var f=document.querySelector('textarea[data-k="'+k+'"]');if(f)f.value=text;
+    }
+    persist();update();return true;
+  }
+  $('wzNext').addEventListener('click',function(){
+    if(wzDone()){data.wzIdx=0;persist();renderWizard();return}
+    var saved1=wzSave(),last=data.wzIdx>=order.length-1;
+    data.wzIdx=(data.wzIdx||0)+1;persist();renderWizard();
+    if(wzDone()){track('bmc_wizard_done',{filled:order.filter(function(x){return val(x)}).length});var c=$('canvas');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth',block:'start'})}
+    else if(saved1)track('bmc_wizard_step',{cell:order[data.wzIdx-1]});
+  });
+  $('wzPrev').addEventListener('click',function(){wzSave();if(wzDone()){data.wzIdx=order.length-1}else data.wzIdx=Math.max(0,(data.wzIdx||0)-1);persist();renderWizard()});
+  $('wzSkip').addEventListener('click',function(){data.wzIdx=(data.wzIdx||0)+1;persist();renderWizard()});
+  $('wzKind').addEventListener('change',function(){});
+  $('wzUnk').addEventListener('click',function(){
+    var box=$('wzUnkBox');box.innerHTML='';box.hidden=!box.hidden;if(box.hidden)return;
+    var k=wzCell;
+    [['검색해서 알아보기',function(){return '② 자료 현황에서 "부족한 자료 찾기 프롬프트"를 복사해 내 AI에게 조사를 맡기세요. 결과는 ①에 자료로 다시 넣습니다.'}],
+     ['고객에게 확인할 질문으로 남기기',function(){var f=(data.focus||[]).slice();if(f.indexOf(k)<0&&f.length<3)f.push(k);data.focus=order.filter(function(x){return f.indexOf(x)>=0});persist();update();return '"이번 주 확인할 것"에 '+names[k]+' 칸을 넣었습니다.'}],
+     ['직접 시험할 방법으로 남기기',function(){var line='시험할 것: '+names[k]+' 칸 — 직접 해 보고 결과 기록 ('+today()+')';data.todo=(val('todo')?val('todo')+'\n':'')+line;var f=document.querySelector('textarea[data-k="todo"]');if(f)f.value=data.todo;persist();update();return '"다음 만남까지 할 일"에 넣었습니다.'}],
+     ['내 계획은 나중에 정하기',function(){return '이 칸은 비워 두고 넘어갑니다. 나중에 아래 캔버스에서 직접 채울 수 있어요.'}]
+    ].forEach(function(o){var b=el('button',null,o[0]);b.type='button';b.addEventListener('click',function(){$('wzMsg').textContent=o[1]();box.hidden=true});box.appendChild(b)});
   });
 
   persist();render();

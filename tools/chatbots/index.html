@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://bccconsulting.kr/tools/chatbots/">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-<link rel="stylesheet" href="./styles.css?v=20261030c">
+<link rel="stylesheet" href="./styles.css?v=20261118">
 <script src="/shared/tool-gate.js?v=20261112b" data-tool="query:bot" data-hide="#main"></script>
 <script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
 </head>
@@ -38,8 +38,17 @@
     <div class="bar"><i id="bar"></i></div>
     <h2 class="q" id="q-text"></h2>
     <p class="help" id="q-help"></p>
+    <div class="pin" id="q-pin" hidden></div>
+    <div class="qlinks" id="q-links" hidden></div>
     <div class="chips" id="q-chips"></div>
     <textarea id="q-input" rows="4" maxlength="2000"></textarea>
+    <div class="attach" id="q-attach" hidden>
+      <label for="q-attach-file" id="q-attach-label">자료 파일 첨부 (.md · .txt) 또는 붙여넣기</label>
+      <p class="help" id="q-attach-help"></p>
+      <input type="file" id="q-attach-file" accept=".md,.txt,text/plain,text/markdown">
+      <p class="attach-status" id="q-attach-status" aria-live="polite"></p>
+      <textarea id="q-attach-text" rows="6" maxlength="20000" placeholder="파일을 고르거나, 여기에 내용을 붙여넣으세요."></textarea>
+    </div>
     <p class="err" id="q-err"></p>
     <div class="row"><button class="btn ghost" id="prev-btn" type="button">← 이전</button><button class="btn primary" id="next-btn" type="button">다음 →</button></div>
   </section>
@@ -51,12 +60,21 @@
   </section>
 
   <section class="card result" id="result-card" hidden>
+    <div class="stmt-box" id="stmt-box" hidden>
+      <h2 style="margin:0 0 6px;font-size:20px">고객 문제 정의문 <small>(고칠 수 있어요)</small></h2>
+      <p class="lead">답을 이어 만든 문장입니다. 어색하면 직접 고치세요. 고친 문장이 아래 정리본과 완성 프롬프트에 그대로 들어갑니다. 아직 확인되지 않은 <b>가설</b>입니다.</p>
+      <textarea id="stmt-edit" rows="5" maxlength="2000" aria-label="고객 문제 정의문"></textarea>
+      <label class="cause-l" for="cause-edit">원인에 대한 추정 <em>(선택 · 모르면 비워 두세요)</em></label>
+      <textarea id="cause-edit" rows="2" maxlength="1000" placeholder="예: AI가 내가 원하는 기능을 충분히 파악하지 못하는 것 같다"></textarea>
+      <div class="row"><button class="btn text" id="stmt-reset" type="button">답변으로 문장 다시 만들기</button></div>
+    </div>
     <div class="res-draft"><h2 id="h-draft">1. 정리된 초안</h2>
     <p class="lead" id="p-draft">입력한 내용을 이 도구의 순서대로 정리했습니다. 그대로 복사해 쓰거나, 아래 2번으로 AI에게 완성시키세요.</p>
     <div class="out draft" id="draft-out"></div>
     <div class="row"><button class="btn ghost" id="copy-draft" type="button">초안 복사</button><button class="btn ghost" id="dl-draft" type="button">초안 파일 받기 (.md)</button></div></div>
 
     <div class="res-prompt"><h2 id="h-prompt" style="margin-top:34px">2. 내 AI에 붙여넣는 완성 프롬프트</h2>
+    <p class="notice" id="ai-note" hidden></p>
     <p class="lead" id="p-prompt">아래 전체를 복사해서 ChatGPT·Claude·Gemini 새 대화에 붙여넣으면, 이 챗봇이 하던 대화를 그대로 이어서 합니다. 무료 계정도 됩니다.</p>
     <div class="out" id="prompt-out"></div>
     <div class="row"><button class="btn primary" id="copy-prompt" type="button">프롬프트 복사</button><button class="btn ghost" id="dl-prompt" type="button">프롬프트 파일 받기 (.md)</button></div>
@@ -72,6 +90,6 @@
   </section>
 </main>
 <footer><span>© 2026 BCC 비즈니스커리어컨설팅 · <a href="../../privacy.html">개인정보 안내</a></span><a href="../../tools.html">잇툴즈로 돌아가기</a></footer>
-<script type="module" src="./engine.js?v=20261030c"></script>
+<script type="module" src="./engine.js?v=20261118"></script>
 </body>
 </html>

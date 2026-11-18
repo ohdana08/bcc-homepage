@@ -41,3 +41,14 @@ footer{max-width:860px;margin:0 auto;padding:20px;border-top:1px solid var(--lin
 
 .result{display:flex;flex-direction:column}.result .res-draft{order:1}.result .res-prompt{order:2}.result .copyright{order:3}.result>.row:last-child{order:4}
 .result.is-handoff .res-prompt{order:1}.result.is-handoff .res-draft{order:2;margin-top:34px}.result.is-handoff .res-prompt h2{margin-top:0}
+
+/* 2026-11-18 도구별 첨부·고정 표시·정의문 수정 */
+.pin{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--line,#cfd6e4);border-left:4px solid #2457d6;border-radius:10px;background:#f4f7ff;font-size:15px;display:grid;gap:4px}
+.pin b{font-size:13px;color:#2457d6}.pin span{white-space:pre-wrap;color:#1b2333}.pin em{font-style:normal;font-size:13px;color:#667089}
+.qlinks{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px}.qlinks a{text-decoration:none}
+.attach{margin:14px 0 0;padding:14px;border:1px dashed #b8c2d8;border-radius:12px;background:#fafbfe}
+.attach label{display:block;font-weight:700;font-size:15px;margin-bottom:2px}.attach .help{margin:0 0 8px;font-size:13.5px}
+.attach input[type=file]{font-size:15px;max-width:100%}.attach-status{font-size:13.5px;color:#3a4357;margin:6px 0}
+.attach textarea{width:100%;margin-top:6px}
+.stmt-box{margin:0 0 26px;padding:16px;border:1px solid #cfd6e4;border-radius:14px;background:#fff}
+.stmt-box textarea{width:100%}.stmt-box .cause-l{display:block;font-weight:700;font-size:14.5px;margin:12px 0 4px}.stmt-box .cause-l em{font-style:normal;font-weight:400;color:#667089}
