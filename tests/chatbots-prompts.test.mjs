@@ -11,7 +11,7 @@ import { buildPrompt, valueText, composeStatement, josa, fillTemplate, inputMode
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'tools', 'chatbots');
 const list = JSON.parse(fs.readFileSync(path.join(root, 'bots.json'), 'utf8'));
 const bots = Object.fromEntries(fs.readdirSync(path.join(root, 'bots')).filter(f => f.endsWith('.json')).map(f => { const b = JSON.parse(fs.readFileSync(path.join(root, 'bots', f), 'utf8')); return [b.id, b]; }));
-const CHANGED = new Set(['business-process', 'customer-persona', 'business-validation-basic']);
+const CHANGED = new Set(['business-process', 'customer-persona', 'business-validation-basic', 'startup-plan-prompt', 'ir-pitch-prompt']);
 
 // ---- 수정 전 엔진(2026-11-18 이전, tools/chatbots/engine.js)의 로직을 그대로 옮긴 기준본
 function legacyValueText(answers, s){ const v = answers[s.key]; const c = answers[s.key + '__custom']; let t = Array.isArray(v) ? v.join(', ') : (v || ''); if (s.options && c && c !== t && !t.includes(c)) t = t ? `${t} (직접 입력: ${c})` : c; return t || '(비움)'; }
@@ -169,4 +169,22 @@ test('valueText: 기존 선택형 동작 유지, custom_when 단계만 선택 �
   const nb = { steps: [{ key: 'k', options: ['가', '직접'], custom_when: '직접', custom_label: '직접 작성' }] };
   assert.equal(valueText(nb, { k: '가', k__custom: '메모' }, nb.steps[0]), '가');
   assert.equal(valueText(nb, { k: '직접', k__custom: '메모' }, nb.steps[0]), '직접 (직접 작성: 메모)');
+});
+
+test('사업계획서·IR 프롬프트: 질문 없이 완성·🔒·지어내기 금지·자료 구분', () => {
+  const plan = bots['startup-plan-prompt'], ir = bots['ir-pitch-prompt'];
+  const pp = buildPrompt(plan, { results__attach: '결과물 본문 AAA', form__attach: '양식 본문 BBB', program: '2026 모두의 창업 1R', team: '2명' });
+  assert.ok(pp.includes('결과물 본문 AAA') && pp.includes('양식 본문 BBB') && pp.includes('2026 모두의 창업 1R'));
+  assert.ok(pp.includes('추가 질문 없이 첫 응답에서') && !pp.includes('한 번에 질문 하나씩') && pp.endsWith(FOOTER));
+  assert.ok(pp.includes('[작성자 확인 필요]') && pp.includes('만들어 쓰지 마세요'));
+  const pe = buildPrompt(plan, { results__attach: 'x' });
+  assert.ok(pe.includes('미제공') && pe.includes('모름'), '양식·팀 없음은 미제공/모름');
+  assert.ok(!/\{\{[^}]*\}\}/.test(pp) && !/\{\{[^}]*\}\}/.test(pe));
+  const a = { plan__attach: '사업계획서 본문 CCC', audience: '정부지원사업 심사위원', time: '5분 내외', focus: '' };
+  const ip = buildPrompt(ir, a);
+  assert.ok(ip.includes('사업계획서 본문 CCC') && ip.includes('정부지원사업 심사위원') && ip.includes('5분 내외') && ip.includes('자료를 보고 추천'));
+  assert.ok(!ip.includes('투자자') || ip.includes('({{') === false);
+  assert.ok(ip.includes('추가 질문 없이 첫 응답에서') && ip.endsWith(FOOTER) && !/\{\{[^}]*\}\}/.test(ip));
+  // 선택한 하나만 들어간다
+  for (const o of ir.steps.find(s => s.key === 'time').options.filter(x => x !== '5분 내외')) assert.ok(!ip.includes(o), '다른 시간 선택지 누수: ' + o);
 });
