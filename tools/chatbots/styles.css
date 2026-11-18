@@ -52,3 +52,4 @@ footer{max-width:860px;margin:0 auto;padding:20px;border-top:1px solid var(--lin
 .attach textarea{width:100%;margin-top:6px}
 .stmt-box{margin:0 0 26px;padding:16px;border:1px solid #cfd6e4;border-radius:14px;background:#fff}
 .stmt-box textarea{width:100%}.stmt-box .cause-l{display:block;font-weight:700;font-size:14.5px;margin:12px 0 4px}.stmt-box .cause-l em{font-style:normal;font-weight:400;color:#667089}
+[hidden]{display:none!important}

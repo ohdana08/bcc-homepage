@@ -159,6 +159,9 @@ function renderResult(){
   $('p-prompt').textContent = handoff ? '아래 전체를 복사해서 ChatGPT·Claude·Gemini 새 대화에 붙여넣으세요. 원래 챗봇처럼 질문을 주고받으며 끝까지 완성해 줍니다. 무료 계정도 됩니다.' : '아래 전체를 복사해서 ChatGPT·Claude·Gemini 새 대화에 붙여넣으면, 이 챗봇이 하던 대화를 그대로 이어서 합니다. 무료 계정도 됩니다.';
   if (rc.h_draft) $('h-draft').textContent = rc.h_draft; if (rc.p_draft) $('p-draft').textContent = rc.p_draft; if (rc.h_prompt) $('h-prompt').textContent = rc.h_prompt; if (rc.p_prompt) $('p-prompt').textContent = rc.p_prompt;
   $('ai-note').hidden = !rc.ai_note; $('ai-note').textContent = rc.ai_note || '';
+  // 1번(초안)을 먼저 보여 주고, 완성 프롬프트(2번)는 1번을 마친 뒤 버튼으로 연다. 프롬프트가 먼저인 도구(handoff)는 바로 보인다.
+  $('res-prompt').hidden = !handoff; $('to-prompt-row').hidden = handoff;
+  $('to-prompt-btn').onclick = () => { $('res-prompt').hidden = false; $('to-prompt-row').hidden = true; $('res-prompt').scrollIntoView({ behavior: 'smooth', block: 'start' }); track('chatbot_next_step', { bot: bot.id }); };
   show('result-card'); window.scrollTo({ top: $('result-card').offsetTop - 80, behavior: 'smooth' }); track('chatbot_result', { bot: bot.id, mode: handoff ? 'handoff' : 'draft' });
 }
 async function isAdmin(){

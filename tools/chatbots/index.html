@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://bccconsulting.kr/tools/chatbots/">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-<link rel="stylesheet" href="./styles.css?v=20261118">
+<link rel="stylesheet" href="./styles.css?v=20261119a">
 <script src="/shared/tool-gate.js?v=20261119a" data-tool="query:bot" data-hide="#main"></script>
 <script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
 </head>
@@ -71,15 +71,16 @@
     <div class="res-draft"><h2 id="h-draft">1. 정리된 초안</h2>
     <p class="lead" id="p-draft">입력한 내용을 이 도구의 순서대로 정리했습니다. 그대로 복사해 쓰거나, 아래 2번으로 AI에게 완성시키세요.</p>
     <div class="out draft" id="draft-out"></div>
-    <div class="row"><button class="btn ghost" id="copy-draft" type="button">초안 복사</button><button class="btn ghost" id="dl-draft" type="button">초안 파일 받기 (.md)</button></div></div>
+    <div class="row"><button class="btn ghost" id="copy-draft" type="button">초안 복사</button><button class="btn ghost" id="dl-draft" type="button">초안 파일 받기 (.md)</button></div>
+    <div class="row next-step" id="to-prompt-row" hidden><button class="btn primary" id="to-prompt-btn" type="button">다음 단계: 내 AI에 붙여넣을 완성 프롬프트 보기 →</button></div></div>
 
-    <div class="res-prompt"><h2 id="h-prompt" style="margin-top:34px">2. 내 AI에 붙여넣는 완성 프롬프트</h2>
+    <div class="res-prompt" id="res-prompt"><h2 id="h-prompt" style="margin-top:34px">2. 내 AI에 붙여넣는 완성 프롬프트</h2>
     <p class="notice" id="ai-note" hidden></p>
     <p class="lead" id="p-prompt">아래 전체를 복사해서 ChatGPT·Claude·Gemini 새 대화에 붙여넣으면, 이 챗봇이 하던 대화를 그대로 이어서 합니다. 무료 계정도 됩니다.</p>
     <div class="out" id="prompt-out"></div>
     <div class="row"><button class="btn primary" id="copy-prompt" type="button">프롬프트 복사</button><button class="btn ghost" id="dl-prompt" type="button">프롬프트 파일 받기 (.md)</button></div>
     <div class="ailinks" data-x="1"><a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT 열기 ↗</a><a href="https://claude.ai/new" target="_blank" rel="noopener">Claude 열기 ↗</a><a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini 열기 ↗</a></div></div>
-    <p class="copyright">🔒 이 도구와 질문 설계는 비즈니스커리어컨설팅(대표 오예림)이 만든 콘텐츠입니다. 무단 복제·재배포·상업적 활용을 금지합니다. 문의: <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener">카카오톡 채널</a></p>
+    <p class="copyright">🔒 이 도구와 질문 설계는 비즈니스커리어컨설팅(대표 오예림)이 만든 콘텐츠입니다. 무단 복제·재배포·상업적 활용을 금지합니다. 문의: <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener">카카오톡 채널</a></p></div>
     <div class="row" style="margin-top:18px"><button class="btn text" id="again-btn" type="button">답 수정하기</button><a class="btn ghost" href="../../tools.html">다른 도구 보기</a></div>
   </section>
 
