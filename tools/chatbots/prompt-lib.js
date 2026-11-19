@@ -43,12 +43,18 @@ export function valueText(bot, answers, s){
 
 // 질문 답이 비었는지(첨부 자료가 있으면 비지 않은 것으로 본다)
 export function isFilled(answers, s){
+  if (s.fields) return s.fields.every(f => f.required === false || String(answers[f.key] || '').trim());
   const v = answers[s.key];
   const has = Array.isArray(v) ? v.length > 0 : !!(v && String(v).trim());
   return has || !!attachText(answers, s);
 }
 
-function stepByKey(bot, k){ return (bot.steps || []).find(x => x.key === k); }
+function stepByKey(bot, k){
+  const hit = (bot.steps || []).find(x => x.key === k);
+  if (hit) return hit;
+  for (const st of (bot.steps || [])) { const f = (st.fields || []).find(x => x.key === k); if (f) return { key: f.key, label: f.label || f.recap || f.key, empty_text: f.empty_text }; }
+  return undefined;
+}
 
 // 템플릿 치환: {{key}} 답 / {{key:은는}} 조사 / {{key_attach}} 첨부 / {{key_choice}} 선택 / {{key_custom}} 직접 쓴 글 / 특수값
 export function fillTemplate(bot, answers, tpl, opt){
@@ -67,7 +73,8 @@ export function fillTemplate(bot, answers, tpl, opt){
     if (kind === 'attach') return attachText(answers, s) || s.empty_text || '첨부 자료 없음';
     if (kind === 'choice') { const v = answers[s.key]; return (Array.isArray(v) ? v.join(', ') : v) || '선택 안 함'; }
     if (kind === 'custom') { const c = String(answers[s.key + '__custom'] || '').trim(); return (c && customApplies(s, answers)) ? c : '해당 없음'; }
-    const raw = Array.isArray(answers[s.key]) ? answers[s.key].join(', ') : String(answers[s.key] || '').trim();
+    let raw = Array.isArray(answers[s.key]) ? answers[s.key].join(', ') : String(answers[s.key] || '').trim();
+    if (answers.__def && typeof answers.__def[s.key] === 'string') raw = answers.__def[s.key].trim();
     const val = raw || s.empty_text || '미입력';
     return jo ? stripEnd(val) + josa(val, jo) : val;
   });
@@ -97,9 +104,25 @@ export function buildPrompt(bot, answers, opt){
   if (bot.prompt_template) {
     const body = fillTemplate(bot, answers, bot.prompt_template, opt);
     const proceed = bot.prompt_tail === 'direct' ? DIRECT_PROCEED : DEFAULT_PROCEED;
-    return `${body}\n\n---\n${proceed}\n\n[출력 규칙]\n모든 응답의 맨 마지막에 아래 문구를 그대로 붙이세요.\n---\n${FOOTER}`;
+    return `${body}\n\n---\n${proceed}\n\n[출력 규칙]\n모든 응답의 맨 마지막에 아래 문구를 그대로 붙이세요.\n---\n${bot.footer || FOOTER}`;
   }
   const inputs = bot.steps.map(s => `- ${s.label || s.question}: ${valueText(bot, answers, s)}`).join('\n');
   const proceed = bot.prompt_tail === 'direct' ? DIRECT_PROCEED : DEFAULT_PROCEED;
-  return `${bot.prompt_header}\n\n---\n[사용자가 미리 적어둔 입력]\n${inputs}\n\n${proceed}\n\n[출력 규칙]\n모든 응답의 맨 마지막에 아래 문구를 그대로 붙이세요.\n---\n${FOOTER}`;
+  return `${bot.prompt_header}\n\n---\n[사용자가 미리 적어둔 입력]\n${inputs}\n\n${proceed}\n\n[출력 규칙]\n모든 응답의 맨 마지막에 아래 문구를 그대로 붙이세요.\n---\n${bot.footer || FOOTER}`;
+}
+
+// ---- ui v2 전용: 다섯 칸 문서(고객 문제 정의서). 칸마다 고친 값(answers.__def)이 있으면 그 값을 쓴다.
+export function defValue(bot, answers, key){
+  const d = answers && answers.__def;
+  if (d && typeof d[key] === 'string') return d[key].trim();
+  return String((answers && answers[key]) || '').trim();
+}
+export function buildDefinition(bot, answers, opt){
+  const df = bot.definition; if (!df) return '';
+  const o = opt || {};
+  const origin = df.origin ? String(answers[df.origin.key] || '').trim() : '';
+  const head = [`# ${df.title}`, '', `- 작성일: ${o.date || ''}`, `- 상태: ${df.status}`];
+  if (df.origin) head.push(`- ${df.origin.label}: ${origin || '미선택'}`);
+  const cells = df.fields.map(f => `## ${f.heading}\n${defValue(bot, answers, f.key) || '(비어 있음)'}`).join('\n\n');
+  return `${head.join('\n')}\n\n${cells}\n\n---\n${df.footer}\n`;
 }

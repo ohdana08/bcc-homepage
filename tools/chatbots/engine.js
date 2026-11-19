@@ -1,20 +1,40 @@
 // BCC 챗봇 도구 공용 엔진 — 브라우저 안에서만 동작. 서버 전송 없음.
 import { generators } from './generators.js?v=20261030';
-import { valueText as vt, buildPrompt as buildPromptLib, fillTemplate, composeStatement, isFilled, attachText } from './prompt-lib.js?v=20261118';
+import { valueText as vt, buildPrompt as buildPromptLib, fillTemplate, composeStatement, isFilled, attachText, buildDefinition, defValue } from './prompt-lib.js?v=20261119b';
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const botId = (params.get('bot') || '').replace(/[^a-z0-9-]/g, '');
 const API = window.BCC_API_BASE || 'https://bcc-homepage.vercel.app';
 let bot = null; let answers = {}; let idx = 0;
+// ---- ui v2 (bot.ui === 'v2') 전용 기능: 설정이 없는 도구는 아래 분기를 전혀 타지 않는다 ----
+const V2 = () => !!(bot && bot.ui === 'v2');
+let restored = new Set();   // 지난번에 저장돼 있던 답의 키(수정하면 빠진다)
+let legacyAnswers = null;   // 질문 형식이 바뀌기 전에 저장된 답(새 칸에 섞지 않는다)
+const editing = new Set();  // 정의서에서 지금 고치는 중인 칸
 const storeKey = () => 'bcc-chatbot-' + botId;
 
 function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function save(){ try { localStorage.setItem(storeKey(), JSON.stringify({ answers, idx, t: Date.now() })); } catch {} }
-function load(){ try { const d = JSON.parse(localStorage.getItem(storeKey()) || 'null'); if (d && d.answers) { answers = d.answers; idx = Math.min(d.idx || 0, bot.steps.length - 1); } } catch {} }
+function save(){ try { localStorage.setItem(storeKey(), JSON.stringify(V2() ? { v: 2, answers, idx, t: Date.now() } : { answers, idx, t: Date.now() })); } catch {} }
+function load(){ try { const d = JSON.parse(localStorage.getItem(storeKey()) || 'null');
+  if (V2()) { // 새 형식(v:2)만 읽는다. 예전 형식(질문 5개 등)은 칸이 어긋나므로 따로 보관만 한다.
+    if (d && d.answers && typeof d.answers === 'object') { if (d.v === 2) { answers = sanitizeV2(d.answers); idx = Math.max(0, Math.min(d.idx || 0, bot.steps.length - 1)); } else legacyAnswers = d.answers; }
+    return;
+  }
+  if (d && d.answers) { answers = d.answers; idx = Math.min(d.idx || 0, bot.steps.length - 1); } } catch {} }
+function v2Keys(){ const k = new Set(); bot.steps.forEach(s => { if (s.fields) s.fields.forEach(f => k.add(f.key)); else k.add(s.key); if (s.choices) k.add(s.key); if (s.attach) { k.add(s.key + '__attach'); k.add(s.key + '__attach_name'); } if (s.options) k.add(s.key + '__custom'); }); return k; }
+function sanitizeV2(a){ // 이 도구가 아는 칸만 남긴다(다른 형식·손상된 값 제거)
+  const ok = v2Keys(); const out = {};
+  for (const k of Object.keys(a)) { if (ok.has(k) && (typeof a[k] === 'string' || Array.isArray(a[k]))) out[k] = a[k]; }
+  bot.steps.forEach(s => { if (s.choices && out[s.key] && !s.choices.some(c => c.label === out[s.key])) delete out[s.key]; });
+  if (a.__def && typeof a.__def === 'object' && a.__defbase && typeof a.__defbase === 'object') { out.__def = {}; out.__defbase = {}; for (const k of Object.keys(a.__def)) if (typeof a.__def[k] === 'string' && typeof a.__defbase[k] === 'string' && ok.has(k)) { out.__def[k] = a.__def[k]; out.__defbase[k] = a.__defbase[k]; } }
+  return out;
+}
+function hasSavedV2(){ return Object.keys(answers).some(k => !k.startsWith('__') && !k.endsWith('__attach_name') && String(Array.isArray(answers[k]) ? answers[k].join('') : answers[k] || '').trim()); }
+function legacyText(){ const a = legacyAnswers || {}; return Object.keys(a).filter(k => !k.startsWith('__') && typeof a[k] === 'string' && a[k].trim()).map(k => `${k}: ${a[k]}`).join('\n'); }
 function track(name, p){ try { if (typeof gtag === 'function') gtag('event', name, p || {}); } catch {} }
 function download(text, filename){ const b = new Blob([text], { type: 'text/markdown;charset=utf-8' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = filename; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 5000); }
 async function copy(text, btn){ try { await navigator.clipboard.writeText(text); const o = btn.textContent; btn.textContent = '복사됐어요 ✓'; setTimeout(() => btn.textContent = o, 1800); } catch { const ta = document.createElement('textarea'); ta.value = text; document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove(); btn.textContent = '복사됐어요 ✓'; } }
-function show(id){ ['intro-card','q-card','review-card','result-card','lock-card'].forEach(k => $(k).hidden = (k !== id)); }
+function show(id){ ['intro-card','q-card','review-card','result-card','result2-card','lock-card'].forEach(k => $(k).hidden = (k !== id)); }
 
 function renderHead(){
   document.title = `${bot.name} | BCC 잇툴즈`;
@@ -33,7 +53,7 @@ function currentValue(){ const s = step(); const v = answers[s.key]; return Arra
 function renderQuestion(){
   const s = step();
   $('progress-text').textContent = `${idx + 1} / ${bot.steps.length}`;
-  $('bar').style.width = `${Math.round(((idx) / bot.steps.length) * 100)}%`;
+  $('bar').style.width = `${Math.round(((idx + (V2() ? 1 : 0)) / bot.steps.length) * 100)}%`;
   $('q-text').textContent = s.question;
   $('q-help').textContent = s.help || '';
   $('q-err').textContent = '';
@@ -41,6 +61,7 @@ function renderQuestion(){
   const pinStep = bot.pin ? bot.steps.find(x => x.key === bot.pin) : null;
   const pinBox = $('q-pin');
   if (pinStep && idx > 0 && String(answers[pinStep.key] || '').trim()) { pinBox.hidden = false; pinBox.innerHTML = `<b>내가 선택한 문제</b><span>${esc(answers[pinStep.key])}</span><em>처음 선택한 문제와 관련된 내용만 적어 주세요.</em>`; } else { pinBox.hidden = true; pinBox.textContent = ''; }
+  if (V2()) renderRecap(pinBox);
   const linkBox = $('q-links'); linkBox.innerHTML = '';
   (s.links || []).forEach(l => { const a = document.createElement('a'); a.className = 'btn ghost'; a.href = l.href; a.textContent = l.label; linkBox.append(a); });
   linkBox.hidden = !(s.links && s.links.length);
@@ -50,6 +71,8 @@ function renderQuestion(){
     $('q-attach-help').textContent = s.attach.help || '파일 내용은 이 브라우저에서만 읽습니다. 아래에 보이는 내용을 직접 고칠 수 있어요.';
     $('q-attach-text').value = answers[s.key + '__attach'] || ''; $('q-attach-file').value = ''; $('q-attach-status').textContent = answers[s.key + '__attach_name'] ? `불러온 파일: ${answers[s.key + '__attach_name']}` : '';
   } else { attBox.hidden = true; }
+  attBox.classList.toggle('attach-v2', V2() && !!s.attach); $('q-attach-btn').hidden = !(V2() && s.attach); if (V2() && s.attach) checkAttach(s); else $('q-attach-check').hidden = true;
+  renderStepFields(s);
   const chips = $('q-chips'); chips.innerHTML = '';
   const multi = s.type === 'multi';
   if (s.options && s.options.length) {
@@ -66,18 +89,20 @@ function renderQuestion(){
     });
   }
   const ta = $('q-input');
-  const showText = !s.attach_only && (!s.options || (s.custom_when !== undefined ? answers[s.key] === s.custom_when : s.allow_text !== false));
+  const showText = !s.attach_only && !s.fields && !s.choices && (!s.options || (s.custom_when !== undefined ? answers[s.key] === s.custom_when : s.allow_text !== false));
   ta.hidden = !showText;
   ta.placeholder = s.placeholder || (s.options ? (s.custom_placeholder || '위에서 고르거나, 직접 적어주세요.') : '편하게 적어주세요.');
   if (s.options) { ta.value = (s.custom && answers[s.key + '__custom']) || ''; ta.rows = 2; }
   else { ta.value = typeof answers[s.key] === 'string' ? answers[s.key] : ''; ta.rows = 4; }
   $('prev-btn').disabled = idx === 0;
   $('next-btn').textContent = idx === bot.steps.length - 1 ? '확인하기 →' : '다음 →';
+  const rn = $('q-restored'); rn.hidden = !(V2() && showText && restored.has(s.key) && String(answers[s.key] || '').trim());
   if (showText && !s.options) setTimeout(() => ta.focus(), 50);
   $('q-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function commit(){
   const s = step(); const ta = $('q-input');
+  if (s.fields || s.choices) return commitFields(s);
   if (s.attach) { answers[s.key + '__attach'] = $('q-attach-text').value.trim(); if (!answers[s.key + '__attach']) delete answers[s.key + '__attach_name']; }
   if (s.options) {
     const t = ta.value.trim();
@@ -94,6 +119,117 @@ function commit(){
   const v = answers[s.key]; const empty = (!v || (Array.isArray(v) && !v.length)) && !(s.attach && attachText(answers, s));
   if (s.required !== false && empty) { $('q-err').textContent = s.required_msg || '이 질문은 답이 있어야 다음으로 갈 수 있어요. 모르면 "모르겠어요"라고 적어도 돼요.'; return false; }
   save(); return true;
+}
+
+// ===== ui v2 helpers =====
+function renderRecap(box){ // 앞에서 쓴 답을 모두 보여준다
+  const rows = [];
+  for (let j = 0; j < idx; j++) {
+    const st = bot.steps[j];
+    if (st.choices) { const v = String(answers[st.key] || '').trim(); if (v) rows.push([st.recap || '출발점', v]); }
+    if (st.fields) st.fields.forEach(f => { const v = String(answers[f.key] || '').trim(); if (v) rows.push([f.recap || f.label, v]); });
+    else if (!st.choices) { const v = String(answers[st.key] || '').trim(); if (v) rows.push([st.recap || st.label || st.question, v]); }
+  }
+  const note = step().recap_note;
+  if (!rows.length) { box.hidden = true; box.textContent = ''; return; }
+  box.hidden = false; box.className = 'pin recap';
+  box.innerHTML = `<b>앞에서 쓴 답</b><ul>${rows.map(([k, v]) => `<li><b>${esc(k)}</b>${esc(v)}</li>`).join('')}</ul>${note ? `<em>${esc(note)}</em>` : ''}`;
+}
+function renderStepFields(s){
+  const sw = $('q-start'), fb = $('q-fields');
+  sw.hidden = true; sw.innerHTML = ''; fb.hidden = true; fb.innerHTML = '';
+  if (!V2() || !(s.choices || s.fields)) return;
+  let chosen = null;
+  if (s.choices) {
+    chosen = s.choices.find(c => c.label === answers[s.key]) || null;
+    sw.hidden = false;
+    sw.innerHTML = `<div class="start-btns" role="group" aria-label="${esc(s.question)}">${s.choices.map(c => `<button type="button" aria-pressed="${c.label === answers[s.key] ? 'true' : 'false'}">${esc(c.label)}</button>`).join('')}</div>` +
+      `<p class="start-hint" ${chosen ? 'hidden' : ''}>위에서 하나를 고르면 질문이 나타납니다.</p><span class="restored-note" ${restored.has(s.key) && chosen ? '' : 'hidden'}>지난번에 쓴 답입니다</span>`;
+    [...sw.querySelectorAll('.start-btns button')].forEach((b, i) => b.addEventListener('click', () => { answers[s.key] = s.choices[i].label; restored.delete(s.key); save(); renderStepFields(s); const f0 = $('q-fields').querySelector('textarea'); if (f0) f0.focus(); }));
+  }
+  if (s.fields && (!s.choices || chosen)) {
+    fb.hidden = false;
+    s.fields.forEach((f, i) => {
+      const label = (i === 0 && chosen) ? chosen.question : f.label; const ph = (i === 0 && chosen && chosen.placeholder) || f.placeholder || '';
+      const wrap = document.createElement('div'); wrap.className = 'fld';
+      const id = 'fld-' + f.key;
+      wrap.innerHTML = `${label !== s.question ? `<label for="${id}">${esc(label)}</label>` : `<label class="sr" for="${id}" style="position:absolute;left:-9999px">${esc(label)}</label>`}${f.help ? `<p class="help">${esc(f.help)}</p>` : ''}<textarea id="${id}" rows="3" maxlength="2000" placeholder="${esc(ph)}"></textarea><span class="restored-note" hidden>지난번에 쓴 답입니다</span>`;
+      const ta = wrap.querySelector('textarea'); const rn = wrap.querySelector('.restored-note');
+      ta.value = String(answers[f.key] || ''); rn.hidden = !(restored.has(f.key) && ta.value.trim());
+      ta.addEventListener('input', () => { answers[f.key] = ta.value; restored.delete(f.key); rn.hidden = true; save(); });
+      fb.append(wrap);
+    });
+  }
+}
+function commitFields(s){
+  const err = $('q-err');
+  if (s.choices && !s.choices.some(c => c.label === answers[s.key])) { err.textContent = s.choice_required_msg || '위 버튼 중 하나를 골라 주세요.'; return false; }
+  for (const f of (s.fields || [])) { answers[f.key] = String(answers[f.key] || '').trim(); }
+  for (const f of (s.fields || [])) { if (f.required !== false && !answers[f.key]) { err.textContent = `「${f.recap || f.label}」 칸에 답을 적어 주세요. 모르면 "모르겠음"이라고 적어도 돼요.`; return false; } }
+  save(); return true;
+}
+function checkAttach(s){ // 붙여넣은 내용 확인(.attach.detect: 정해진 형식이 보이는지, .attach.warn_len: 너무 긴 글)
+  const box = $('q-attach-check'); const t = $('q-attach-text').value.trim(); const a = s.attach || {};
+  if (!t) { box.hidden = true; return; }
+  let msg = '', cls = 'ok';
+  if (a.warn_len && t.length > a.warn_len.limit) { msg = a.warn_len.msg; cls = 'warn'; }
+  else if (a.detect) { let hit = false; try { hit = new RegExp(a.detect.pattern).test(t); } catch {} msg = hit ? a.detect.ok : a.detect.miss; cls = hit ? 'ok' : 'warn'; }
+  if (!msg) { box.hidden = true; return; }
+  box.hidden = false; box.className = 'attach-check ' + cls; box.textContent = msg;
+}
+const dateStr = () => new Date().toLocaleDateString('sv-SE');
+function syncDef(){ // 정의서 칸을 고친 뒤 원래 답이 바뀌었으면 옛 수정은 버린다
+  const d = answers.__def, b = answers.__defbase; if (!d || !b) { delete answers.__def; delete answers.__defbase; return; }
+  for (const k of Object.keys(d)) if (String(answers[k] || '').trim() !== b[k]) { delete d[k]; delete b[k]; }
+  if (!Object.keys(d).length) { delete answers.__def; delete answers.__defbase; }
+}
+function setDef(key, value){ answers.__def = answers.__def || {}; answers.__defbase = answers.__defbase || {}; if (!(key in answers.__defbase)) answers.__defbase[key] = String(answers[key] || '').trim(); answers.__def[key] = value; save(); }
+function resetDef(key){ if (answers.__def) delete answers.__def[key]; if (answers.__defbase) delete answers.__defbase[key]; syncDef(); save(); }
+function isEdited(key){ return !!(answers.__def && typeof answers.__def[key] === 'string' && answers.__def[key].trim() !== String(answers[key] || '').trim()); }
+function drawCell(f, cell){
+  const ed = editing.has(f.key); const val = defValue(bot, answers, f.key);
+  cell.innerHTML = `<div class="def-h"><span><b>${esc(f.heading)}</b>${isEdited(f.key) ? '<span class="def-edited">고친 내용</span>' : ''}</span><span>${isEdited(f.key) ? '<button type="button" class="btn text" data-act="reset">원래 답으로</button>' : ''}<button type="button" class="btn text" data-act="edit">${ed ? '완료' : '고치기'}</button></span></div>` +
+    (ed ? `<textarea rows="3" maxlength="2000" aria-label="${esc(f.heading)}"></textarea>` : `<p class="def-v">${esc(val || '(비어 있음)')}</p>`);
+  if (ed) { const ta = cell.querySelector('textarea'); ta.value = val; ta.addEventListener('input', () => { setDef(f.key, ta.value); refreshOut2(); }); setTimeout(() => ta.focus(), 30); }
+  cell.querySelector('[data-act=edit]').onclick = () => { if (ed) editing.delete(f.key); else editing.add(f.key); drawCell(f, cell); };
+  const rs = cell.querySelector('[data-act=reset]'); if (rs) rs.onclick = () => { resetDef(f.key); editing.delete(f.key); drawCell(f, cell); refreshOut2(); };
+}
+function refreshOut2(){
+  const d = buildDefinition(bot, answers, { date: dateStr() }), p = buildPromptLib(bot, answers, { today: todayStr() });
+  $('r2-prompt-out').textContent = p;
+  $('r2-copy-def').onclick = (e) => copy(d, e.currentTarget); $('r2-dl-def').onclick = () => download(d, bot.definition.filename || '정의서.md');
+  $('r2-copy-prompt').onclick = (e) => copy(p, e.currentTarget); $('r2-dl-prompt').onclick = () => download(p, `${bot.name}_프롬프트.md`);
+}
+function renderResult2(){
+  syncDef(); editing.clear(); save();
+  const rc = bot.result_v2 || {}; const df = bot.definition;
+  $('r2-h-def').textContent = rc.h_def || df.title; $('r2-lead').textContent = rc.lead || '';
+  $('r2-origin').textContent = df.origin ? `${df.origin.label}: ${answers[df.origin.key] || '미선택'}` : '';
+  const grid = $('r2-def'); grid.innerHTML = '';
+  df.fields.forEach(f => { const cell = document.createElement('div'); cell.className = 'def-cell'; grid.append(cell); drawCell(f, cell); });
+  $('r2-next-h').textContent = rc.next_h || '다음 단계'; $('r2-next-text').textContent = rc.next_text || '';
+  const nb = $('r2-next-btn'); nb.textContent = rc.next_btn || '다음 도구로 가기'; nb.href = rc.next_href || '../../tools.html'; $('r2-next-hint').textContent = rc.next_hint || '';
+  $('r2-ai-summary').textContent = rc.ai_summary || '내 AI로 먼저 살펴보기 (선택)'; $('r2-ai-text').textContent = rc.ai_text || '';
+  $('r2-ai-note').hidden = !rc.ai_note; $('r2-ai-note').textContent = rc.ai_note || '';
+  $('r2-ai').open = false; refreshOut2();
+  show('result2-card'); window.scrollTo({ top: $('result2-card').offsetTop - 80, behavior: 'smooth' });
+  track('chatbot_result', { bot: bot.id, mode: 'definition' });
+}
+function startFresh(){ answers = {}; idx = 0; restored = new Set(); legacyAnswers = null; try { localStorage.removeItem(storeKey()); } catch {} save(); }
+function setupResume(){ // 시작 화면: 저장된 답이 있으면 이어서/새로 시작을 묻는다
+  const box = $('resume-box'); const legacy = legacyAnswers && legacyText();
+  if (legacy) {
+    $('resume-title').textContent = '이전 버전에서 쓰던 답이 있습니다.';
+    $('resume-desc').textContent = '질문이 바뀌어서 이전 답을 그대로 이어갈 수는 없어요. 필요하면 아래에서 확인해 복사해 두고, 새로 시작해 주세요.';
+    $('legacy-old').hidden = false; $('legacy-old-text').textContent = legacy; $('resume-continue').hidden = true;
+  } else if (hasSavedV2()) {
+    $('resume-title').textContent = '지난번에 쓰던 내용이 있습니다.';
+    $('resume-desc').textContent = '이어서 하거나, 지우고 새로 시작할 수 있어요. 새로 시작하면 이 도구에 저장된 답이 모두 지워집니다.';
+    $('legacy-old').hidden = true; $('resume-continue').hidden = false;
+  } else { box.hidden = true; $('start-row').hidden = false; return; }
+  box.hidden = false; $('start-row').hidden = true;
+  $('resume-continue').onclick = () => { restored = new Set(Object.keys(answers).filter(k => !k.startsWith('__') && String(answers[k] || '').trim())); show('q-card'); renderQuestion(); track('chatbot_resume', { bot: bot.id }); };
+  $('resume-new').onclick = () => { startFresh(); box.hidden = true; show('q-card'); renderQuestion(); track('chatbot_start', { bot: bot.id, fresh: 1 }); };
 }
 function valueText(s){ return vt(bot, answers, s); }
 function reviewText(s){ const a = attachText(answers, s); const base = valueText(s); if (!a) return base; const name = answers[s.key + '__attach_name']; const note = `[첨부 자료${name ? ' · ' + name : ''} · ${a.length.toLocaleString('ko-KR')}자]`; return base === '(비움)' ? note : `${base}\n${note}`; }
@@ -182,9 +318,9 @@ async function init(){
   if (bot.admin_only) { const ok = await isAdmin(); if (!ok) { show('lock-card'); return; } }
   load();
   $('start-btn').onclick = () => { show('q-card'); renderQuestion(); track('chatbot_start', { bot: bot.id }); };
-  $('next-btn').onclick = () => { if (!commit()) return; if (idx < bot.steps.length - 1) { idx++; save(); renderQuestion(); } else renderReview(); };
+  $('next-btn').onclick = () => { if (!commit()) return; if (idx < bot.steps.length - 1) { idx++; save(); renderQuestion(); } else if (V2()) renderResult2(); else renderReview(); };
   $('prev-btn').onclick = () => { commit(); if (idx > 0) { idx--; save(); renderQuestion(); } };
-  $('reset-btn').onclick = () => { if (!confirm('지금까지 적은 답을 지우고 처음부터 할까요?')) return; answers = {}; idx = 0; save(); renderQuestion(); };
+  $('reset-btn').onclick = () => { if (!confirm('지금까지 적은 답을 지우고 처음부터 할까요?')) return; if (V2()) { startFresh(); } else { answers = {}; idx = 0; save(); } renderQuestion(); };
   $('edit-btn').onclick = () => { idx = 0; show('q-card'); renderQuestion(); };
   $('make-btn').onclick = renderResult;
   $('q-attach-file').addEventListener('change', async (e) => {
@@ -192,11 +328,21 @@ async function init(){
     if (!/\.(md|txt)$/i.test(f.name) && !/^text\//.test(f.type)) { st.textContent = '지원하는 파일은 .md · .txt 입니다. 아래 칸에 내용을 붙여넣어도 됩니다.'; e.target.value = ''; return; }
     if (f.size > 300 * 1024) { st.textContent = '파일이 너무 커요(300KB 이하). 필요한 부분만 아래 칸에 붙여넣어 주세요.'; e.target.value = ''; return; }
     if ($('q-attach-text').value.trim() && !confirm('이미 들어 있는 자료가 있어요. 새 파일 내용으로 바꿀까요?')) { e.target.value = ''; return; }
-    try { const text = await f.text(); $('q-attach-text').value = text.replace(/\u0000/g, '').slice(0, 20000); answers[step().key + '__attach_name'] = f.name; st.textContent = `불러온 파일: ${f.name} (${f.size.toLocaleString('ko-KR')}바이트). 아래 내용을 확인하고 필요하면 고쳐 주세요.${text.length > 20000 ? ' 앞 20,000자만 사용합니다.' : ''}`; save(); }
+    try { const text = await f.text(); $('q-attach-text').value = text.replace(/\u0000/g, '').slice(0, 20000); answers[step().key + '__attach_name'] = f.name; st.textContent = `불러온 파일: ${f.name} (${f.size.toLocaleString('ko-KR')}바이트). 아래 내용을 확인하고 필요하면 고쳐 주세요.${text.length > 20000 ? ' 앞 20,000자만 사용합니다.' : ''}`; save(); if (V2()) checkAttach(step()); }
     catch { st.textContent = '파일을 읽지 못했어요. 아래 칸에 내용을 붙여넣어 주세요.'; }
   });
   $('again-btn').onclick = () => { show('q-card'); renderQuestion(); };
+  $('r2-again').onclick = () => { idx = 0; save(); show('q-card'); renderQuestion(); };
   $('q-input').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('next-btn').click(); });
+  if (V2()) {
+    $('q-input').addEventListener('input', () => { restored.delete(step().key); $('q-restored').hidden = true; });
+    $('q-attach-text').addEventListener('input', () => checkAttach(step()));
+    const ab = $('q-attach');
+    ab.addEventListener('dragover', (e) => { if (!V2() || !step().attach) return; e.preventDefault(); ab.classList.add('is-drag'); });
+    ab.addEventListener('dragleave', () => ab.classList.remove('is-drag'));
+    ab.addEventListener('drop', (e) => { ab.classList.remove('is-drag'); if (!step().attach) return; const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (!f) return; e.preventDefault(); try { $('q-attach-file').files = e.dataTransfer.files; } catch {} $('q-attach-file').dispatchEvent(new Event('change')); });
+    setupResume(); return;
+  }
   if (Object.keys(answers).length) { show('q-card'); renderQuestion(); }
 }
 init();

@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://bccconsulting.kr/tools/chatbots/">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-<link rel="stylesheet" href="./styles.css?v=20261119a">
+<link rel="stylesheet" href="./styles.css?v=20261119b">
 <script src="/shared/tool-gate.js?v=20261119a" data-tool="query:bot" data-hide="#main"></script>
 <script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
 </head>
@@ -30,7 +30,13 @@
   <section class="card" id="intro-card">
     <h2 style="margin:0 0 8px;font-size:20px">이렇게 진행돼요</h2>
     <ol class="steps-how" id="how-list"></ol>
-    <div class="row"><button class="btn primary" id="start-btn" type="button">시작하기 →</button><span style="font-size:13px;color:var(--mute)">답은 이 브라우저에만 저장됩니다. BCC 서버로 전송되지 않아요.</span></div>
+    <div class="resume-box" id="resume-box" hidden>
+      <h3 id="resume-title">지난번에 쓰던 내용이 있습니다.</h3>
+      <p id="resume-desc"></p>
+      <details id="legacy-old" hidden><summary>이전에 쓴 답 보기 (복사해 두세요)</summary><pre id="legacy-old-text"></pre></details>
+      <div class="row"><button class="btn primary" id="resume-continue" type="button">이어서 하기</button><button class="btn ghost" id="resume-new" type="button">새로 시작하기</button></div>
+    </div>
+    <div class="row" id="start-row"><button class="btn primary" id="start-btn" type="button">시작하기 →</button><span style="font-size:13px;color:var(--mute)">답은 이 브라우저에만 저장됩니다. BCC 서버로 전송되지 않아요.</span></div>
   </section>
 
   <section class="card" id="q-card" hidden aria-live="polite">
@@ -41,13 +47,18 @@
     <div class="pin" id="q-pin" hidden></div>
     <div class="qlinks" id="q-links" hidden></div>
     <div class="chips" id="q-chips"></div>
+    <div class="start-wrap" id="q-start" hidden></div>
+    <div class="fields" id="q-fields" hidden></div>
     <textarea id="q-input" rows="4" maxlength="2000"></textarea>
+    <span class="restored-note" id="q-restored" hidden>지난번에 쓴 답입니다</span>
     <div class="attach" id="q-attach" hidden>
       <label for="q-attach-file" id="q-attach-label">자료 파일 첨부 (.md · .txt) 또는 붙여넣기</label>
       <p class="help" id="q-attach-help"></p>
+      <label class="btn ghost filebtn" id="q-attach-btn" for="q-attach-file" hidden>파일 선택 (.md · .txt)</label>
       <input type="file" id="q-attach-file" accept=".md,.txt,text/plain,text/markdown">
       <p class="attach-status" id="q-attach-status" aria-live="polite"></p>
       <textarea id="q-attach-text" rows="6" maxlength="20000" placeholder="파일을 고르거나, 여기에 내용을 붙여넣으세요."></textarea>
+      <p class="attach-check" id="q-attach-check" aria-live="polite" hidden></p>
     </div>
     <p class="err" id="q-err"></p>
     <div class="row"><button class="btn ghost" id="prev-btn" type="button">← 이전</button><button class="btn primary" id="next-btn" type="button">다음 →</button></div>
@@ -84,6 +95,32 @@
     <div class="row" style="margin-top:18px"><button class="btn text" id="again-btn" type="button">답 수정하기</button><a class="btn ghost" href="../../tools.html">다른 도구 보기</a></div>
   </section>
 
+  <section class="card result2" id="result2-card" hidden>
+    <h2 id="r2-h-def" style="margin:0 0 4px;font-size:22px">고객 문제 정의서</h2>
+    <p class="lead" id="r2-lead"></p>
+    <p class="r2-origin" id="r2-origin"></p>
+    <div class="def-grid" id="r2-def"></div>
+    <div class="row"><button class="btn primary" id="r2-copy-def" type="button">정의서 복사</button><button class="btn ghost" id="r2-dl-def" type="button">정의서 파일 받기 (.md)</button></div>
+
+    <div class="next-card" id="r2-next">
+      <h3 id="r2-next-h">다음 단계</h3>
+      <p id="r2-next-text"></p>
+      <a class="btn primary" id="r2-next-btn" href="#"></a>
+      <p class="hint" id="r2-next-hint"></p>
+    </div>
+
+    <details class="ai-details" id="r2-ai">
+      <summary id="r2-ai-summary">내 AI로 먼저 살펴보기 (선택)</summary>
+      <p class="lead" id="r2-ai-text"></p>
+      <p class="notice" id="r2-ai-note" hidden></p>
+      <div class="out" id="r2-prompt-out"></div>
+      <div class="row"><button class="btn primary" id="r2-copy-prompt" type="button">프롬프트 복사</button><button class="btn ghost" id="r2-dl-prompt" type="button">프롬프트 파일 받기 (.md)</button></div>
+      <div class="ailinks"><a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT 열기 ↗</a><a href="https://claude.ai/new" target="_blank" rel="noopener">Claude 열기 ↗</a><a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini 열기 ↗</a></div>
+    </details>
+    <p class="copyright">🔒 이 도구와 질문 설계는 비즈니스커리어컨설팅(대표 오예림)이 만든 콘텐츠입니다. 무단 복제·재배포·상업적 활용을 금지합니다. 문의: <a href="https://pf.kakao.com/_xbrxjxkxj/chat" target="_blank" rel="noopener">카카오톡 채널</a></p>
+    <div class="row" style="margin-top:18px"><button class="btn text" id="r2-again" type="button">답 수정하기</button><a class="btn ghost" href="../../tools.html">다른 도구 보기</a></div>
+  </section>
+
   <section class="card lock" id="lock-card" hidden>
     <h2>관리자 전용 도구입니다</h2>
     <p style="color:var(--ink-2)">BCC 관리자 계정으로 로그인한 뒤 다시 열어주세요.</p>
@@ -91,6 +128,6 @@
   </section>
 </main>
 <footer><span>© 2026 BCC 비즈니스커리어컨설팅 · <a href="../../privacy.html">개인정보 안내</a></span><a href="../../tools.html">잇툴즈로 돌아가기</a></footer>
-<script type="module" src="./engine.js?v=20261118"></script>
+<script type="module" src="./engine.js?v=20261119b"></script>
 </body>
 </html>

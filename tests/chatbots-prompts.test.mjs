@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildPrompt, valueText, composeStatement, josa, fillTemplate, inputMode, FOOTER } from '../tools/chatbots/prompt-lib.js';
+import { buildPrompt, valueText, composeStatement, josa, fillTemplate, inputMode, FOOTER, buildDefinition, defValue, isFilled } from '../tools/chatbots/prompt-lib.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'tools', 'chatbots');
 const list = JSON.parse(fs.readFileSync(path.join(root, 'bots.json'), 'utf8'));
@@ -64,10 +64,10 @@ test('새 3개 도구: 질문 없이 완성하는 꼬리 문구 + 🔒 문구, �
     const p = buildPrompt(bot, a, { today: '2026-11-18' });
     assert.ok(!p.includes('한 번에 질문 하나씩'), id + ': 옛 꼬리 문구가 남음');
     assert.ok(p.includes('추가 질문 없이 첫 응답에서'), id);
-    assert.ok(p.endsWith(FOOTER), id + ': 🔒 문구는 마지막에');
+    assert.ok(p.endsWith(bot.footer || FOOTER), id + ': 🔒 문구는 마지막에');
     assert.ok(!/\{\{[^}]*\}\}/.test(p.replace(/\{\{x\}\}/g, '')), id + ': 미치환 {{ }} 남음 → ' + (p.replace(/\{\{x\}\}/g, '').match(/\{\{[^}]*\}\}/) || [])[0]); // {{x}} 는 테스트가 일부러 넣은 사용자 입력
     assert.ok(/웹 검색/.test(p), id + ': 웹 검색 지시');
-    assert.ok(/(창작|꾸미|만들어내지)/.test(p), id + ': 지어내기 금지');
+    assert.ok(/(창작|꾸미|만들어내지|지어내지)/.test(p), id + ': 지어내기 금지');
   }
 });
 
@@ -103,26 +103,81 @@ test('사업성검증코치: 첨부 자료와 선택·추가 설명이 구분되
   for (const t of ['기획서 본문 ABC', '정의서 본문 DEF', '월 2만원 구독 중', '조사 보고서 GHI', '네, 이미 쓰고 있어요', '예약·사전 주문·소액 유료 테스트 진행하기']) assert.ok(p.includes(t), t);
 });
 
-test('창업아이디어검증코치: 다섯 질문 답이 핵심 문장 다섯 칸에 하나씩 들어간다', () => {
+const BP = { start: '주변 사람들의 불평', problem: '부모님이 표 예매를 어려워한다', context: '지난 설 연휴 전', who: '나, 그리고 부모님 세대', workaround: '내가 대신 예매해 준다', remaining: '매번 연락이 와서 시간이 든다' };
+
+test('창업아이디어검증코치(ui v2): 질문 3개, 입력칸·출발점 구조', () => {
   const bot = bots['business-process'];
-  assert.deepEqual(bot.steps.map(s => s.key), ['problem', 'context', 'who', 'workaround', 'remaining']);
-  assert.equal(bot.steps[2].question, '이 불편함을 겪는 사람은 누구인가요?');
-  const a = { problem: 'AI가 의도를 이해하지 못한다.', context: '프로그램을 지시할 때', who: '비개발자(나 자신 포함)', workaround: '프롬프트를 다시 쓴다', remaining: '시간이 계속 든다.' };
-  const st = composeStatement(bot, a);
-  for (const v of ['비개발자(나 자신 포함)', '프로그램을 지시할 때', 'AI가 의도를 이해하지 못한다', '프롬프트를 다시 쓴다', '시간이 계속 든다']) assert.ok(st.includes(v), v);
-  assert.ok(!/은은|을을|이이|를를|\.」/.test(st), '조사·구두점 오류: ' + st);
-  assert.ok(st.includes('겪고 있으며') && st.includes('남아 있습니다'));
-  // 사용자가 문장을 고치면 프롬프트·정리본에 그 문장이 그대로 쓰인다
-  const edited = { ...a, __stmt: '내가 직접 고친 문장입니다.' };
-  assert.ok(buildPrompt(bot, edited).includes('내가 직접 고친 문장입니다.'));
-  assert.ok(fillTemplate(bot, edited, bot.draft_template, { today: 'x' }).includes('내가 직접 고친 문장입니다.'));
-  assert.ok(buildPrompt(bot, a).includes(st));
-  // 누가를 모르면 고객을 만들어 넣지 않는다
-  const none = composeStatement(bot, { ...a, who: '' });
-  assert.ok(none.includes('(추가 확인 필요)'));
-  // 원인은 선택 입력(없으면 '입력 없음')
-  assert.ok(buildPrompt(bot, a).includes('입력 없음'));
-  assert.ok(buildPrompt(bot, { ...a, __cause: 'AI가 기능을 못 파악함' }).includes('AI가 기능을 못 파악함'));
+  assert.equal(bot.ui, 'v2');
+  assert.deepEqual(bot.steps.map(s => s.key), ['start', 'who', 'now']);
+  assert.equal(bot.steps[0].choices.length, 5);
+  assert.deepEqual(bot.steps[0].fields.map(f => f.key), ['problem', 'context']);
+  assert.deepEqual(bot.steps[2].fields.map(f => f.key), ['workaround', 'remaining']);
+  assert.equal(list.find(e => e.id === 'business-process').steps, 3);
+  assert.ok(!bot.statement_template && !bot.draft_template, '다섯 답을 한 문장으로 잇는 옛 로직이 남음');
+  assert.ok(!JSON.stringify(bot).includes('대학생'), '특정 집단 표현');
+  // 뒤 질문 문구는 출발점과 무관하게 맞아야 한다("불편함" 고정 금지)
+  assert.ok(!bot.steps[1].question.includes('불편함') && !bot.steps[2].question.includes('불편함'));
+});
+
+test('창업아이디어검증코치: 정의서는 다섯 칸이고 이어 붙인 문장이 없다', () => {
+  const bot = bots['business-process'];
+  const d = buildDefinition(bot, BP, { date: '2026-11-19' });
+  assert.ok(d.startsWith('# 고객 문제 정의서\n'));
+  assert.ok(d.includes('- 상태: 개인 경험에 기반한 초기 가설 / 검증 전') && d.includes('- 출발점: 주변 사람들의 불평') && d.includes('- 작성일: 2026-11-19'));
+  const heads = d.split('\n').filter(l => l.startsWith('## '));
+  assert.deepEqual(heads, ['## 누가', '## 어떤 상황에서', '## 어떤 불편함', '## 기존 해결 방법', '## 해결되지 않은 문제']);
+  assert.ok(d.includes('## 누가\n나, 그리고 부모님 세대\n') && d.includes('## 어떤 불편함\n부모님이 표 예매를 어려워한다\n'));
+  assert.ok(!/겪고 있으며|남아 있습니다/.test(d), '이어 붙인 문장 잔존');
+  assert.ok(d.trimEnd().endsWith('이 정의서는 비즈니스커리어컨설팅 잇툴즈 「창업아이디어검증코치」에서 만들었습니다.'));
+});
+
+test('창업아이디어검증코치: 칸마다 고친 값이 정의서와 프롬프트에 그대로 들어간다', () => {
+  const bot = bots['business-process'];
+  const a = { ...BP, __def: { who: '60대 부모님과 그 자녀' }, __defbase: { who: BP.who } };
+  assert.equal(defValue(bot, a, 'who'), '60대 부모님과 그 자녀');
+  assert.equal(defValue(bot, a, 'problem'), BP.problem);
+  assert.ok(buildDefinition(bot, a, { date: 'x' }).includes('## 누가\n60대 부모님과 그 자녀'));
+  const p = buildPrompt(bot, a);
+  assert.ok(p.includes('- 누가: 60대 부모님과 그 자녀') && !p.includes(BP.who));
+});
+
+test('창업아이디어검증코치: 프롬프트 — 새 본문, 정의서 칸, 지시 중복·옛 항목 없음', () => {
+  const bot = bots['business-process'];
+  const p = buildPrompt(bot, BP, { today: 'x' });
+  for (const t of ['출발점: 주변 사람들의 불평', '누가: 나, 그리고 부모님 세대', '어떤 상황에서: 지난 설 연휴 전', '어떤 불편함: 부모님이 표 예매를 어려워한다', '기존 해결 방법: 내가 대신 예매해 준다', '해결되지 않은 문제: 매번 연락이 와서 시간이 든다']) assert.ok(p.includes(t), t);
+  assert.ok(!/\{\{[^}]*\}\}/.test(p), '미치환 변수');
+  assert.ok(!p.includes('최종 고객 문제 정의문') && !p.includes('원인에 대한 사용자 추정'), '삭제한 항목');
+  assert.ok(!p.includes('[끝]'), '[끝] 표시');
+  assert.equal((p.match(/\[역할\]/g) || []).length, 1); assert.equal((p.match(/\[출력 형식/g) || []).length, 1);
+  assert.equal((p.match(/질문부터 하지 말/g) || []).length, 0, '질문부터 하지 말라는 지시는 꼬리 한 곳에만');
+  assert.ok(p.includes('추가 질문 없이 첫 응답에서'), '꼬리 한 번');
+  assert.ok(p.includes('[대상 및 언어]') && p.includes('https:// 로 시작하는 전체 주소') && p.includes('전체를 다시 옮겨 적지는 마세요'));
+  assert.ok(p.includes('해결책이나 아이템을 제안하지 마세요') && p.includes('이미 있으니 창업할 수 없다') && p.includes('공개 자료가 적은 것은 아이디어가 나쁘다는 뜻이 아니라'));
+  assert.ok(p.includes('1. 한눈에 보는 결론 (3줄 이내)') && p.includes('7. 주변 사람에게 직접 물어볼 질문 3개'));
+  assert.ok(!/대학생/.test(p));
+});
+
+test('창업아이디어검증코치: 저작권 문구는 이 도구만 새 주어, 다른 도구는 기존 그대로', () => {
+  const bp = bots['business-process'];
+  assert.ok(bp.footer.startsWith('🔒 이 프롬프트는 **비즈니스커리어컨설팅**(대표: 오예림) 잇툴즈에서 만든 콘텐츠입니다.'));
+  assert.ok(buildPrompt(bp, BP).endsWith(bp.footer));
+  for (const id of Object.keys(bots)) if (id !== 'business-process') assert.ok(!bots[id].footer, id + ': footer 설정은 아직 1번만');
+});
+
+test('ui v2 스위치와 새 설정(fields·choices·footer·definition)은 1번 도구에만 있다', () => {
+  for (const id of Object.keys(bots)) {
+    if (id === 'business-process') continue;
+    const j = JSON.stringify(bots[id]);
+    assert.ok(!bots[id].ui, id + ': ui');
+    assert.ok(!/"fields"|"choices"|"definition"|"result_v2"/.test(j), id + ': 새 설정 잔존');
+  }
+});
+
+test('isFilled: 입력칸 여러 개 질문은 모든 칸이 차야 채워진 것', () => {
+  const st = bots['business-process'].steps[2];
+  assert.equal(isFilled({}, st), false);
+  assert.equal(isFilled({ workaround: '없음' }, st), false);
+  assert.equal(isFilled({ workaround: '없음', remaining: '시간' }, st), true);
 });
 
 test('고객문제검증코치: 정의서·아이템 입력 방식 판정과 해결 아이디어 후보 지시', () => {

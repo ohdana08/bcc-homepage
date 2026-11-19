@@ -2,13 +2,13 @@
   {
     "id": "business-process",
     "name": "창업아이디어검증코치",
-    "tagline": "일상에서 겪은 불편함 하나를 깊이 살펴보고, 고객 문제 정의서와 AI 검증 프롬프트를 완성합니다.",
+    "tagline": "일상에서 찾은 문제 하나를 깊이 살펴보고, 고객 문제 정의서를 완성합니다.",
     "group": "startup",
     "group_label": "창업 준비",
-    "audience": "아이템 없는 예비창업자·대학생",
-    "time": "10분",
+    "audience": "아이템 없는 예비창업자",
+    "time": "5분",
     "admin_only": false,
-    "steps": 5
+    "steps": 3
   },
   {
     "id": "customer-persona",

@@ -53,3 +53,31 @@ footer{max-width:860px;margin:0 auto;padding:20px;border-top:1px solid var(--lin
 .stmt-box{margin:0 0 26px;padding:16px;border:1px solid #cfd6e4;border-radius:14px;background:#fff}
 .stmt-box textarea{width:100%}.stmt-box .cause-l{display:block;font-weight:700;font-size:14.5px;margin:12px 0 4px}.stmt-box .cause-l em{font-style:normal;font-weight:400;color:#667089}
 [hidden]{display:none!important}
+
+/* ---- ui v2 (창업 준비 코치 개선 · 2026-11-19): 이 도구들에서만 쓰는 요소. hidden 이 기본이라 다른 도구엔 보이지 않는다 ---- */
+.resume-box{margin:16px 0 4px;padding:16px;border:1px solid #cfd6e4;border-left:4px solid #2457d6;border-radius:12px;background:#f4f7ff}
+.resume-box h3{margin:0 0 6px;font-size:17px}.resume-box p{margin:0 0 8px;color:#3a4357;font-size:15px}
+.resume-box details{margin:6px 0 10px}.resume-box pre{white-space:pre-wrap;word-break:break-word;font:inherit;font-size:14px;background:#fff;border:1px solid #e1e6f0;border-radius:8px;padding:10px;max-height:260px;overflow:auto}
+.start-wrap .start-q{font-weight:700;font-size:15px;margin:0 0 8px}
+.start-btns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.start-btns button{min-height:44px;padding:8px 16px;border:1.5px solid var(--line,#cfd6e4);border-radius:999px;background:#fff;font:inherit;font-size:15px;cursor:pointer}
+.start-btns button[aria-pressed=true]{border-color:#2457d6;background:#eaf0ff;color:#173d9e;font-weight:700}
+.start-hint{font-size:14px;color:#667089;margin:8px 0 0}
+.fields{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+.fields .fld label{display:block;font-weight:700;font-size:15.5px;margin-bottom:2px}.fields .fld .help{margin:0 0 6px;font-size:13.5px}
+.fields textarea{width:100%}
+.restored-note{display:block;margin-top:4px;font-size:13px;color:#8a5a00}
+.pin.recap{display:block}.pin.recap ul{margin:6px 0 0;padding-left:18px}.pin.recap li{margin:2px 0;white-space:pre-wrap}.pin.recap li b{color:#2457d6;font-size:13px;margin-right:6px}
+.attach-v2 textarea#q-attach-text{min-height:200px}.attach-v2.is-drag{border-color:#2457d6;background:#eef3ff}
+.attach-v2 input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.attach-v2 .filebtn{display:inline-flex;margin:4px 0}
+.attach-check{font-size:14px;margin:8px 0 0;padding:8px 10px;border-radius:8px}.attach-check.ok{background:#eaf7ee;color:#1c6b36}.attach-check.warn{background:#fff6e0;color:#7a4b00}
+.result2{display:block}.r2-origin{margin:0 0 10px;font-size:14px;color:#667089;font-weight:600}
+.def-grid{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
+.def-cell{border:1px solid #cfd6e4;border-radius:12px;background:#fff;padding:12px 14px}
+.def-cell .def-h{display:flex;justify-content:space-between;align-items:center;gap:8px}.def-cell .def-h b{font-size:15px;color:#173d9e}
+.def-cell .def-v{margin:6px 0 0;white-space:pre-wrap;word-break:break-word;font-size:15.5px}.def-cell textarea{width:100%;margin-top:6px}
+.def-cell .def-edited{font-size:12.5px;color:#8a5a00;margin-left:6px}
+.next-card{margin:22px 0 8px;padding:18px;border:2px solid #2457d6;border-radius:14px;background:#f4f7ff}
+.next-card h3{margin:0 0 6px;font-size:18px}.next-card p{margin:0 0 12px}.next-card .hint{margin:8px 0 0;font-size:14px;color:#3a4357}
+.ai-details{margin:18px 0 6px;border:1px solid #cfd6e4;border-radius:12px;padding:12px 14px;background:#fff}.ai-details summary{cursor:pointer;font-weight:700}
+.ai-details[open] summary{margin-bottom:8px}
+@media (max-width:520px){.start-btns button{flex:1 1 auto}}
