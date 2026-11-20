@@ -13,6 +13,7 @@ import {
 } from '../lib/training-needs.js';
 
 const publicSurveyPage = readFileSync(new URL('../tools/training-needs/index.html', import.meta.url), 'utf8');
+const publicSurveyScript = readFileSync(new URL('../tools/training-needs/app.js', import.meta.url), 'utf8');
 const adminSurveyPage = readFileSync(new URL('../admin-training-needs.html', import.meta.url), 'utf8');
 const proposalAdminPage = readFileSync(new URL('../admin-proposals.html', import.meta.url), 'utf8');
 const apiEntry = readFileSync(new URL('../api/cardnews-generate.js', import.meta.url), 'utf8');
@@ -170,9 +171,9 @@ test('회사별 전용 폼 식별자를 읽고 기존 code 링크도 유지한�
 
 test('전용 링크 없이 접속해도 관리자와 잇툴즈로 이동할 수 있다', () => {
   assert.match(publicSurveyPage, /id="accessActions"/);
-  assert.match(publicSurveyPage, /href="\.\.\/\.\.\/admin-training-needs\.html">\ud68c사별 설문 만들기/);
-  assert.match(publicSurveyPage, /href="\.\.\/">\uc804체 잇툴즈/);
-  assert.match(publicSurveyPage, /\$\('accessActions'\)\.classList\.remove\('hidden'\)/);
+  assert.match(publicSurveyPage, /href="\/admin-training-needs\.html"/);
+  assert.match(publicSurveyPage, /href="\/tools\.html"/);
+  assert.match(publicSurveyScript, /visible\('accessActions',true\)/);
 });
 
 test('관리자는 생성한 수요조사의 기본정보를 다시 수정할 수 있다', () => {
@@ -204,8 +205,8 @@ test('교육생 전용 링크는 로그인 검사 전에 공개 설문 전용 �
   const publicRoute = apiEntry.indexOf("if ((req.body?.engine) === 'training_needs_public')");
   const loginGate = apiEntry.indexOf("if (!token) return res.status(401)");
   assert.ok(publicRoute >= 0 && loginGate >= 0 && publicRoute < loginGate);
-  assert.match(publicSurveyPage, /engine:'training_needs_public'/);
-  assert.doesNotMatch(publicSurveyPage, /Authorization:/);
+  assert.match(publicSurveyScript, /engine:'training_needs_public'/);
+  assert.doesNotMatch(publicSurveyScript, /Authorization:/);
 });
 
 test('관리자 인증이 만료되면 세션을 갱신해 한 번 재시도하고 작성값을 보존한다', () => {
@@ -220,8 +221,8 @@ test('관리자와 공개 설문에서 샘플을 실제 조사와 명확히 구�
   assert.match(adminSurveyPage, /실제 누적 응답/);
   assert.match(adminSurveyPage, /샘플 응답/);
   assert.match(adminSurveyPage, /샘플 화면입니다\.<\/strong> 이 데이터는 실제 수요조사·누적 응답·분석 완료 집계에 포함되지 않습니다\./);
-  assert.match(publicSurveyPage, /샘플 설문입니다\.<\/strong> 기능을 확인하기 위한 시연용이며 실제 기관 수요조사로 집계되지 않습니다\./);
-  assert.match(publicSurveyPage, /현재 샘플 폼은 응답 기간이 끝났습니다\./);
+  assert.match(publicSurveyPage, /기능 확인용 샘플입니다\. 실제 교육생 응답 집계와 구분됩니다\./);
+  assert.match(publicSurveyScript, /visible\('sampleNotice', Boolean\(state\.survey\.is_sample\)\)/);
 });
 
 test('수요조사 수정값은 링크와 응답을 건드리지 않고 기본정보만 정규화한다', () => {
@@ -247,7 +248,8 @@ test('수요조사 수정값은 링크와 응답을 건드리지 않고 기본�
 });
 
 test('응답 완료 화면은 다른 서비스로 보내지 않고 감사 인사로 끝난다', () => {
-  assert.match(publicSurveyPage, /class="done-thanks">감사합니다\.<\/strong>/);
+  assert.match(publicSurveyPage, /알려주신 경험과 관심을 참고해 수업을 준비하겠습니다/);
+  assert.match(publicSurveyPage, /id="experienceCard"/);
   assert.doesNotMatch(publicSurveyPage, /class="done"[^;]+잇툴즈 둘러보기/);
 });
 

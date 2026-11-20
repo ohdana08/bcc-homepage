@@ -207,7 +207,10 @@ test('lecture request: loopback HTTP round-trip uses the real handlers and never
   assert.equal(learnerPage.status, 200);
   assert.match(learnerPage.headers.get('content-security-policy'), /connect-src 'self'/);
   const learnerHtml = await learnerPage.text();
-  assert.ok(learnerHtml.indexOf('window.BCC_API_BASE=location.origin') < learnerHtml.indexOf('src="../../pay-config.js"'));
+  assert.match(learnerHtml, /type="module" src="\.\/app\.js/);
+  assert.equal(learnerHtml.includes('pay-config.js'), false);
+  const learnerApp = await (await fetch(`${local.origin}/tools/training-needs/app.js`)).text();
+  assert.match(learnerApp, /fetch\('\/api\/cardnews-generate'/);
   const localConfig = await (await fetch(`${local.origin}/pay-config.js`)).text();
   assert.match(localConfig, /BCC_API_BASE=location.origin/);
   assert.equal(localConfig.includes('bcc-homepage.vercel.app'), false);
