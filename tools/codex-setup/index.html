@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#184f42">
+  <title>내 노트북에 Codex 세팅하기 | BCC 잇툴즈</title>
+  <meta name="description" content="Windows 노트북에 Codex를 세팅하고, 말로 시킨 수정이 GitHub와 Vercel 미리보기까지 반영되는지 5단계로 확인합니다.">
+  <link rel="canonical" href="https://bccconsulting.kr/tools/codex-setup/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="BCC 잇툴즈">
+  <meta property="og:title" content="내 노트북에 Codex 세팅하기 | BCC 잇툴즈">
+  <meta property="og:description" content="Windows 노트북에서 Codex 설치부터 GitHub·Vercel 연결까지 5단계로 따라 하세요.">
+  <meta property="og:url" content="https://bccconsulting.kr/tools/codex-setup/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23184f42'/%3E%3Cpath d='M18 22l10 10-10 10M32 44h14' stroke='%23dcecac' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/tools/codex-setup/styles.css?v=20261120">
+  <script defer src="/tools/codex-setup/app.js?v=20261120"></script>
+  <script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
+</head>
+<body>
+  <a class="skip-link" href="#steps">단계로 바로가기</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/tools.html" aria-label="BCC 잇툴즈"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><strong>BCC</strong><span class="brand-divider"></span><span class="brand-product">Codex 세팅하기</span></a>
+      <a class="hub-return" href="/tools.html"><span aria-hidden="true">←</span> 잇툴즈 전체보기</a>
+      <a class="hub-link" href="/tools/project-instruction/">AI 업무지시서 만들기</a>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="intro">
+      <p class="eyebrow">WINDOWS · CODEX · GITHUB · VERCEL</p>
+      <h1>내 노트북에서 <span>말로 시키면<br class="mobile-break"> 배포까지</span> 되게 세팅하기</h1>
+      <p class="intro-description">Windows 노트북 기준이에요. 단계마다 설치하고, 확인 문장을 Codex에 붙여 넣고, 됐으면 체크하세요. 진행 상황은 이 브라우저에만 저장돼요.</p>
+      <div class="progress" aria-live="polite">
+        <div class="progress-bar"><span id="progress-fill"></span></div>
+        <p id="progress-text">0 / 5 단계 완료</p>
+      </div>
+    </section>
+
+    <section class="need">
+      <h2>시작 전에 준비할 것</h2>
+      <ul>
+        <li><b>Windows 11 노트북</b> (Windows 10 최신 업데이트도 대부분 돼요)</li>
+        <li><b>ChatGPT 계정</b> (무료 계정도 Codex를 쓸 수 있지만 사용량 한도가 작아요)</li>
+        <li><b>Google 계정</b> (GitHub·Vercel 가입에 써요)</li>
+      </ul>
+      <p class="note">비밀번호, 인증코드, 토큰은 이 페이지나 Codex 채팅창에 절대 붙여 넣지 마세요. 로그인은 늘 각 사이트 화면에서 직접 해요.</p>
+    </section>
+
+    <ol id="steps" class="steps"></ol>
+
+    <section class="done-box" id="done-box" hidden>
+      <h2>세팅 완료</h2>
+      <p>이제 이 노트북에서 Codex에 말로 시키면, 코드 수정 → 테스트 → GitHub → Vercel 미리보기까지 이어져요. 다음은 내 업무지시서로 진짜 프로젝트를 시작해 보세요.</p>
+      <a class="primary" href="/tools/project-instruction/">AI 업무지시서 만들기 →</a>
+    </section>
+
+    <section class="trouble">
+      <h2>자주 막히는 곳</h2>
+      <details><summary>"node" 또는 "git"을 찾을 수 없다고 나와요</summary><p>설치 직후에는 Codex가 새 프로그램을 못 찾을 수 있어요. Codex(ChatGPT 앱)를 완전히 껐다가 다시 열고, 확인 문장을 다시 보내세요. 그래도 안 되면 노트북을 재시작하세요.</p></details>
+      <details><summary>Codex가 "권한을 승인해 주세요"라고 물어봐요</summary><p>무엇을 하려는지 읽어 보고, 이 실습 폴더 안의 작업이면 승인하세요. 폴더 밖 파일 삭제나 전체 접근 허용은 거절해도 돼요.</p></details>
+      <details><summary>GitHub에 올리는데 로그인 창이 떠요</summary><p>정상이에요. 브라우저에 뜨는 GitHub 화면에서 직접 로그인하고 승인하세요. 토큰을 만들어 채팅에 붙여 넣을 필요는 없어요.</p></details>
+      <details><summary>Vercel에서 내 저장소가 안 보여요</summary><p>Import 화면의 <b>Configure GitHub App</b>(또는 Adjust GitHub App Permissions)을 눌러, Vercel이 볼 수 있는 저장소 목록에 실습 저장소를 추가하세요.</p></details>
+      <details><summary>Vercel 배포가 실패했어요</summary><p>Vercel의 오류 화면 글자를 복사해 Codex에 붙여 넣고 "Vercel 배포가 이렇게 실패했어. 원인 찾아서 고쳐줘"라고 하세요. 고친 뒤 다시 GitHub에 올리면 Vercel이 자동으로 다시 배포해요.</p></details>
+    </section>
+
+    <footer class="foot">
+      <button type="button" id="reset" class="ghost">진행 상황 처음부터</button>
+      <p>막히면 <a href="https://pf.kakao.com/_xbrxjxkxj/chat">카톡으로 알려주세요</a>. · 비즈니스커리어컨설팅 BCC</p>
+    </footer>
+  </main>
+</body>
+</html>
