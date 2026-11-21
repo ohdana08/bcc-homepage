@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>강사결과물 · AI 프로젝트 연구소 | 오예림 BCC</title>
-<meta name="description" content="오예림 강사가 만든 잇툴즈, 콘텐츠 자동화 도구, 주식 매매 검토 대시보드와 코숏이들 뮤직비디오 3편을 살펴보세요.">
+<meta name="description" content="오예림 강사가 만든 AI 자기소개서 워크북, Claude 101 실습자료, 개인정보 튜토리얼, 웹 도구와 콘텐츠 자동화·뮤직비디오 작품을 소개합니다.">
 <link rel="canonical" href="https://bccconsulting.kr/projects.html">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <style>
@@ -67,6 +67,59 @@
 .video-grid figcaption { margin-top: 12px; }
 .video-grid h3 { font-size: 21px; }
 .video-grid figcaption a { color: var(--gold3); text-decoration: underline; text-underline-offset: 3px; }
+
+.works-jump, .work-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gold3);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.works-jump { margin-top: 12px; }
+.works-jump:focus-visible, .work-actions a:focus-visible {
+  outline: 2px solid var(--gold3);
+  outline-offset: 3px;
+}
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 32px;
+}
+.work-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  scroll-margin-top: 88px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.work-card:target { border-color: var(--gold3); }
+.work-preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2.1;
+  background: var(--preview-bg, #f5f2e9);
+}
+.work-preview img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+.work-copy { display: flex; flex: 1; flex-direction: column; padding: clamp(20px, 3vw, 32px); }
+.work-copy h3 { margin-bottom: 8px; font-size: clamp(22px, 3vw, 29px); line-height: 1.35; }
+.work-copy p { color: var(--dim); word-break: keep-all; }
+.work-actions { display: flex; flex-wrap: wrap; gap: 0 22px; margin-top: auto; padding-top: 15px; }
+.work-card.featured { grid-column: 1 / -1; display: grid; grid-template-columns: 2fr 3fr; }
+.featured .work-copy { align-self: center; }
+.work-card .cover { min-height: 241px; aspect-ratio: auto; padding: 20px; background: #d9d1c1; }
+.work-card .cover img { height: 210px; width: auto; box-shadow: 3px 6px 14px #302d2833; }
+#published-works + .toc { padding-top: 32px; }
+@media (max-width: 650px) {
+  .works-grid { grid-template-columns: 1fr; gap: 18px; }
+  .work-card.featured { display: flex; }
+  .work-card .cover { min-height: 0; }
+  .work-card .cover img { height: 185px; }
+}
 .investment-grid { margin-top: 26px; }
 @media (max-width: 700px) {
   .video-grid { grid-template-columns: 1fr; gap: 28px; }
@@ -98,7 +151,8 @@
   <div class="wrap">
     <div class="eyebrow">강사결과물</div>
     <h1>오예림의 AI 프로젝트 연구소</h1>
-    <p>수업에서 쓰는 잇툴즈부터 직접 만든 자동화 도구와 뮤직비디오까지, 오예림 강사의 작업을 살펴보세요.</p>
+    <p>오예림 강사가 만든 교재와 실습자료, 수업용 도구, 콘텐츠 자동화 프로그램과 뮤직비디오를 모았습니다.</p>
+    <a class="works-jump" href="#published-works">교재와 웹 도구 보기 ↓</a>
     <nav class="intro-links" aria-label="강사결과물 바로가기">
       <a href="/tools.html">
         <strong>잇툴즈</strong><span>창업 비용을 계산하고 면접을 연습하는 수업용 도구 모음</span>
@@ -127,9 +181,56 @@
     </nav>
   </div>
 </header>
+<main>
+<section class="case" id="published-works" aria-labelledby="published-title">
+  <div class="wrap">
+    <h2 id="published-title">강사가 만든 교재와 웹 도구</h2>
+    <div class="works-grid">
+      <article class="work-card featured" id="resume-workbook">
+        <div class="work-preview cover"><img src="/assets/instructor-portfolio/workbook-cover.jpg" alt="복붙 없이 내 이야기로 완성하는 AI 자기소개서 워크북 표지" width="480" height="680" loading="lazy"></div>
+        <div class="work-copy">
+          <h3>AI 자기소개서 실전 워크북</h3>
+          <p>지원자가 겪은 일을 상황·판단·행동·결과로 나눠 적고, 그 기록을 AI와 함께 자기소개서로 다듬는 37쪽 교재입니다.</p>
+          <div class="work-actions"><a href="/resume-workbook.html">유료 워크북 구성 보기 →</a></div>
+        </div>
+      </article>
+      <article class="work-card" id="claude101-materials">
+        <div class="work-preview" style="--preview-bg:#f6f1e9"><img src="/assets/instructor-portfolio/claude101.jpg" alt="" width="850" height="446" loading="lazy"></div>
+        <div class="work-copy">
+          <h3>Claude 101 실습자료와 무료 1강</h3>
+          <p>업무에 Claude를 써 보는 텍스트 실습 18개를 만들었습니다. 영상 1강에서는 회의 메모 일곱 줄을 Word 업무보고서로 정리하는 과정을 보여줍니다.</p>
+          <div class="work-actions"><a href="/claude101.html">실습자료 18개 보기 →</a><a href="/claude101-pro-sample.html">무료 1강 보기 →</a></div>
+        </div>
+      </article>
+      <article class="work-card" id="privacy-tutorial">
+        <div class="work-preview" style="--preview-bg:#fff"><img src="/portfolio/privacy-tutorial/07-ai-request.jpg" alt="" width="555" height="240" loading="lazy"></div>
+        <div class="work-copy">
+          <h3>AI 개인정보 실전 튜토리얼</h3>
+          <p>게시물에서 내 정보를 지워 달라는 메일을 어떻게 쓸까요? 가상 주소와 이메일 표시를 넣어 AI에 문안 작성을 부탁한 교안 예시입니다.</p>
+          <div class="work-actions"><a href="/portfolio/privacy-tutorial/">교안 예시 한 장 보기 →</a></div>
+        </div>
+      </article>
+      <article class="work-card" id="break-timer">
+        <div class="work-preview"><img src="/assets/instructor-portfolio/break-timer.jpg" alt="" width="760" height="428" loading="lazy"></div>
+        <div class="work-copy">
+          <h3>BCC 쉬는 시간 타이머</h3>
+          <p>강의실 화면에 띄워 두는 타이머입니다. 쉴 시간을 분 단위로 정하고 시작하면 마지막 1분과 쉬는 시간 종료를 화면으로 알려줍니다.</p>
+          <div class="work-actions"><a href="/portfolio/break-timer/">타이머 직접 쓰기 →</a></div>
+        </div>
+      </article>
+      <article class="work-card" id="gyeol-report">
+        <div class="work-preview" style="--preview-bg:#faf8f2"><img src="/assets/instructor-portfolio/gyeol.jpg" alt="" width="820" height="471" loading="lazy"></div>
+        <div class="work-copy">
+          <h3>결 · 무료 사주 리포트</h3>
+          <p>생년월일과 태어난 시간을 입력하면 사업과 독립을 주제로 한 사주 풀이가 나옵니다. 입력한 정보는 방문자의 기기 안에서 계산합니다.</p>
+          <div class="work-actions"><a href="/gyeol/free/">무료 리포트 열기 →</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
 <section class="toc"><div class="wrap toc-grid"><a href="#review-board">01 강의 후기 게시판</a><a href="#support-assistant">02 정부지원사업 도우미</a><a href="#education-design">03 AI 교육 설계</a><a href="#osmu-factory">04 콘텐츠 자동화</a><a href="#menu-cost">05 영산대 조리학과 원가계산기</a></div></section>
 
-<main>
 <section class="case" id="review-board"><div class="wrap"><div class="case-head"><div><div class="case-no">PROJECT 01 · WEB / DATA</div><h2>315개의 후기를<br>탐색 가능한 신뢰 자산으로</h2><p class="lead">폴더에 흩어진 이미지 후기는 많았지만 방문자가 필요한 강의의 증거를 찾기 어려웠습니다. 후기 자료를 기관·일정 기준으로 다시 구조화해 검색 가능한 게시판으로 전환했습니다.</p></div><div class="facts"><div class="fact"><b>STATUS</b>완료 · 실제 운영 중</div><div class="fact"><b>SCALE</b>19개 기관 · 후기 이미지 315장</div><div class="fact"><b>ROLE</b>정보 구조 설계 · 개인정보 검수 · 웹 구축</div></div></div><div class="case-grid"><div class="block"><h3>문제</h3><p>후기가 이미지 폴더에 쌓여 있어 강의 품질을 증명하는 공개 자산으로 활용하기 어려웠습니다.</p></div><div class="block"><h3>설계와 실행</h3><ul><li>기관 → 강의 일정 → 후기 구조 설계</li><li>기관명·강의명 검색 적용</li><li>확대 보기와 반응형 화면 구현</li></ul></div><div class="block"><h3>검증과 보호</h3><ul><li>이름·프로필·이메일 모자이크</li><li>공개본만 별도 관리</li><li>모바일과 PC 작동 확인</li></ul></div></div><div class="outcome"><strong>증명하는 역량</strong><p>비정형 자료를 정보 구조로 바꾸는 능력, 개인정보를 고려한 공개 설계, 실제 배포까지 끝내는 실행력을 보여줍니다.</p></div><div class="actions"><a class="btn" href="reviews.html">실제 결과물 보기</a></div></div></section>
 
 <section class="case" id="support-assistant"><div class="wrap"><div class="case-head"><div><div class="case-no">PROJECT 02 · AI SERVICE</div><h2>막막한 창업 질문을<br>진단과 실행 흐름으로</h2><p class="lead">예비창업자가 자신의 상황에 맞는 지원사업을 찾고 사업계획서 초안을 시작할 수 있도록, 상담 경험을 단계형 AI 서비스로 설계했습니다.</p></div><div class="facts"><div class="fact"><b>STATUS</b>공개 베타 · 개선 중</div><div class="fact"><b>FLOW</b>대화 → 추천 → 가입 → 진단 → 초안</div><div class="fact"><b>ROLE</b>서비스 기획 · 퍼널 설계 · 품질 점검</div></div></div><div class="case-grid"><div class="block"><h3>문제</h3><p>사용자는 어떤 공고가 맞는지, 사업계획서를 어디서 시작할지 모르는 상태에서 긴 질문부터 마주했습니다.</p></div><div class="block"><h3>핵심 판단</h3><ul><li>초기 질문을 선택형으로 단순화</li><li>규칙 기반 분기와 AI 역할 분리</li><li>최종 보고서에 AI 사용 집중</li></ul></div><div class="block"><h3>현재 개선</h3><ul><li>추천 정확도와 응답 속도 점검</li><li>리드·유입 측정 구조 검증</li><li>호출 비용과 보안 위험 축소</li></ul></div></div><div class="outcome"><strong>증명하는 역량</strong><p>현장 상담 노하우를 디지털 서비스로 구조화하고, 사용자 경험·측정·비용·보안을 함께 고려하는 제품 사고를 보여줍니다.</p></div><div class="actions"><a class="btn" href="https://ddakfit.bccconsulting.kr" target="_blank" rel="noopener">베타 서비스 보기</a></div></div></section>

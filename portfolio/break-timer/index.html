@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>쉬는 시간 타이머</title>
+<style>
+:root{
+  --cream:#f6f4ee; --ink:#1d2a24; --mute:#6b746f; --line:#e3e0d6;
+  --green:#2f5a46; --green-2:#24473a; --gold:#b8922e; --warn:#9a5a1e;
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--cream);color:var(--ink);font-family:var(--font);display:grid;grid-template-rows:auto 1fr auto;
+  transition:background .6s ease,color .6s ease;overflow:hidden;-webkit-font-smoothing:antialiased}
+header,footer{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px clamp(18px,4vw,48px);font-size:clamp(12px,1.1vw,15px);color:var(--mute)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);letter-spacing:.01em;white-space:nowrap}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--gold);display:inline-block}
+.back-link{color:inherit;text-underline-offset:.23em}
+.back-link:focus-visible,#snd:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.keys{display:flex;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+.keys b{font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin-right:6px;font-size:.92em}
+main{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,30px);padding:0 4vw}
+.clock{font-variant-numeric:tabular-nums;font-weight:800;line-height:1;letter-spacing:-.03em;
+  font-size:clamp(84px,25vw,380px);color:var(--green);transition:color .4s ease}
+.clock .sep{display:inline-block;transform:translateY(-.06em);opacity:.55;margin:0 .02em}
+.state-setup .clock{color:#b9c4bd}
+.state-paused .clock{opacity:.45}
+.state-warn .clock{color:var(--warn)}
+.track{width:min(72vw,900px);height:6px;background:var(--line);border-radius:999px;overflow:hidden}
+.track span{display:block;height:100%;width:100%;background:var(--gold);transform-origin:left center;transform:scaleX(1);transition:transform .25s linear}
+.note{min-height:1.6em;font-size:clamp(18px,2.4vw,32px);font-weight:600;color:var(--ink);text-align:center}
+.setup{display:none;align-items:center;gap:12px;font-size:clamp(18px,2.2vw,30px);font-weight:600}
+.setup input{width:3.2em;font:inherit;font-weight:800;text-align:center;color:var(--green);background:transparent;border:0;border-bottom:3px solid var(--gold);padding:2px 0;outline:none}
+.setup .hint{color:var(--mute);font-weight:500}
+.state-setup .setup{display:flex}
+.state-setup .track{opacity:.35}
+button{font:inherit;cursor:pointer}
+#snd{color:inherit;background:transparent;border:0;padding:0}
+.btn{display:none;border:0;border-radius:999px;padding:12px 26px;font-weight:700;font-size:clamp(15px,1.6vw,20px);background:var(--green);color:#fff}
+.btn:hover{background:var(--green-2)}
+.state-setup .btn.go,.state-running .btn.pause,.state-warn .btn.pause,.state-paused .btn.resume,.state-done .btn.again{display:inline-block}
+.state-done{background:var(--green);color:var(--cream)}
+.state-done .clock{color:var(--cream);animation:pulse 2.4s ease-in-out infinite}
+.state-done .note,.state-done header,.state-done footer,.state-done .brand{color:var(--cream)}
+.state-done .keys b{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:var(--cream)}
+.state-done .track{background:rgba(255,255,255,.2)}
+.state-done .btn{background:var(--cream);color:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.72}}
+@media (max-width:560px){.keys span:nth-child(n+2){display:none}}
+@media (prefers-reduced-motion:reduce){.state-done .clock{animation:none}*{transition:none!important}}
+.err{display:none;padding:40px;text-align:center;font-size:20px}
+.is-error main,.is-error header,.is-error footer{display:none}
+.is-error .err{display:block}
+</style>
+</head>
+<body class="state-setup">
+<header><div class="brand"><i></i><span id="t-title"></span></div>
+<div class="keys"><span><b>F</b>전체화면</span><span><b>Space</b>멈춤</span><span><b>↑↓</b>±1분</span><span><b>S</b>소리</span></div></header>
+<main>
+  <div class="clock" id="clock" aria-live="off">00<span class="sep">:</span>00</div>
+  <div class="track" aria-hidden="true"><span id="bar"></span></div>
+  <div class="setup"><label for="mins" id="t-label"></label><input id="mins" type="number" inputmode="numeric" min="1" max="120" value="10"><span class="hint" id="t-hint"></span></div>
+  <div class="note" id="note" role="status" aria-live="polite"></div>
+  <button class="btn go" id="go" type="button">시작</button>
+  <button class="btn pause" id="pause" type="button">멈춤</button>
+  <button class="btn resume" id="resume" type="button">다시 시작</button>
+  <button class="btn again" id="again" type="button">처음으로</button>
+</main>
+<footer><a class="back-link" href="/projects.html#break-timer">← 강사결과물 · BCC 비주얼 제작팀</a><button id="snd" type="button" aria-label="소리" aria-pressed="true">소리 켬</button></footer>
+<div class="err" id="err" role="alert">내용 설정을 확인해 주세요.</div>
+<script type="application/json" id="bcc-data">
+{
+  "title": "쉬는 시간",
+  "inputLabel": "쉴 시간",
+  "startHint": "분 · Enter",
+  "runningNote": "{time}에 다시 시작해요",
+  "pausedNote": "잠시 멈췄어요",
+  "doneNote": "쉬는 시간이 끝났어요",
+  "defaultMinutes": 10
+}
+</script>
+<script>
+(function(){
+  var LIMITS={title:16,inputLabel:8,startHint:12,runningNote:28,pausedNote:16,doneNote:24};
+  var $=function(id){return document.getElementById(id)};
+  var D;
+  try{
+    D=JSON.parse($('bcc-data').textContent);
+    Object.keys(LIMITS).forEach(function(k){
+      if(typeof D[k]!=='string'||!D[k]||D[k].length>LIMITS[k]) throw new Error(k);
+    });
+    if(!(Number.isInteger(D.defaultMinutes)&&D.defaultMinutes>=1&&D.defaultMinutes<=120)) throw new Error('defaultMinutes');
+  }catch(e){document.body.className='is-error';return;}
+
+  document.title=D.title+' 타이머';
+  $('t-title').textContent=D.title; $('t-label').textContent=D.inputLabel; $('t-hint').textContent=D.startHint;
+  var mins=$('mins'); mins.value=D.defaultMinutes;
+
+  var state='setup', endAt=0, total=0, left=0, tick=null, soundOn=true;
+  function pad(n){return (n<10?'0':'')+n}
+  function show(sec){
+    sec=Math.max(0,sec);
+    $('clock').innerHTML=pad(Math.floor(sec/60))+'<span class="sep">:</span>'+pad(sec%60);
+  }
+  function setState(s){state=s;document.body.className='state-'+s;}
+  function clamp(v){v=parseInt(v,10);if(isNaN(v))v=D.defaultMinutes;return Math.min(120,Math.max(1,v));}
+  function clockTime(ms){
+    var d=new Date(ms),h=d.getHours(),m=d.getMinutes();
+    return (h<12?'오전 ':'오후 ')+((h%12)||12)+'시 '+m+'분';
+  }
+  function beep(){
+    if(!soundOn)return;
+    try{
+      var A=window.AudioContext||window.webkitAudioContext,c=new A();
+      [0,.35,.7].forEach(function(t){
+        var o=c.createOscillator(),g=c.createGain();
+        o.frequency.value=660;g.gain.value=.0001;o.connect(g);g.connect(c.destination);
+        var s=c.currentTime+t;g.gain.exponentialRampToValueAtTime(.25,s+.03);g.gain.exponentialRampToValueAtTime(.0001,s+.3);
+        o.start(s);o.stop(s+.32);
+      });
+    }catch(e){}
+  }
+  function render(){
+    var sec=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+    left=sec;show(sec);
+    $('bar').style.transform='scaleX('+(total?sec/total:0)+')';
+    if(sec<=60&&state==='running'&&total>60)document.body.className='state-warn';
+    if(sec<=0){finish();}
+  }
+  function start(){
+    var m=clamp(mins.value);mins.value=m;
+    total=m*60;endAt=Date.now()+total*1000;
+    $('note').textContent=D.runningNote.replace('{time}',clockTime(endAt));
+    setState('running');clearInterval(tick);tick=setInterval(render,250);render();
+  }
+  function pause(){
+    if(state!=='running'&&state!=='warn')return;
+    clearInterval(tick);left=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+    $('note').textContent=D.pausedNote;setState('paused');
+  }
+  function resume(){
+    if(state!=='paused')return;
+    endAt=Date.now()+left*1000;
+    $('note').textContent=D.runningNote.replace('{time}',clockTime(endAt));
+    setState('running');clearInterval(tick);tick=setInterval(render,250);render();
+  }
+  function finish(){
+    clearInterval(tick);show(0);$('bar').style.transform='scaleX(0)';
+    $('note').textContent=D.doneNote;setState('done');beep();
+  }
+  function reset(){
+    clearInterval(tick);setState('setup');$('note').textContent='';
+    mins.value=D.defaultMinutes;show(D.defaultMinutes*60);$('bar').style.transform='scaleX(1)';mins.focus();mins.select();
+  }
+  function adjust(d){
+    if(state==='setup'){var m=clamp(clamp(mins.value)+d);mins.value=m;show(m*60);return;}
+    if(state==='running'||state==='warn'||state==='paused'){
+      var rem=state==='paused'?left:Math.max(0,Math.ceil((endAt-Date.now())/1000));
+      rem=Math.max(1,rem+d*60);total=Math.max(total,rem);
+      if(state==='paused'){left=rem;show(rem);}
+      else{endAt=Date.now()+rem*1000;$('note').textContent=D.runningNote.replace('{time}',clockTime(endAt));if(rem>60)setState('running');render();}
+    }
+  }
+  function toggleSound(){
+    soundOn=!soundOn;
+    $('snd').textContent=soundOn?'소리 켬':'소리 끔';
+    $('snd').setAttribute('aria-pressed',String(soundOn));
+  }
+  function fullscreen(){
+    var el=document.documentElement;
+    if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen();}
+    else if(el.requestFullscreen){el.requestFullscreen().catch(function(){});}
+  }
+  $('go').onclick=start;$('pause').onclick=pause;$('resume').onclick=resume;$('again').onclick=reset;$('snd').onclick=toggleSound;
+  mins.addEventListener('input',function(){if(state==='setup'&&mins.value!=='')show(clamp(mins.value)*60);});
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey||e.target.closest('a[href]'))return;
+    var k=e.key;
+    if((k==='Enter'||k===' ')&&e.target.closest('button'))return;
+    if(k==='Enter'){e.preventDefault();if(state==='setup')start();else if(state==='done')reset();}
+    else if(k===' '){e.preventDefault();if(state==='paused')resume();else pause();}
+    else if(k==='ArrowUp'){e.preventDefault();adjust(1);}
+    else if(k==='ArrowDown'){e.preventDefault();adjust(-1);}
+    else if(k==='f'||k==='F'){fullscreen();}
+    else if(k==='s'||k==='S'){toggleSound();}
+    else if(state==='setup'&&/^[0-9]$/.test(k)&&document.activeElement!==mins){mins.focus();mins.select();}
+  });
+  mins.addEventListener('focus',function(){mins.select();});
+  show(D.defaultMinutes*60);mins.focus();mins.select();
+})();
+</script>
+</body>
+</html>
