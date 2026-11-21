@@ -148,31 +148,5 @@
       }
     ],
     "featured": false
-  },
-  {
-    "id": "housing-3d-model",
-    "title": "건물 도면으로 만든 커피숍 3D 모델",
-    "category": "도면·3D 모델",
-    "course": "주거 관련 기관 · AI 업무활용 교육",
-    "description": "수업에서 실제 건축 도면(평면·입면·단면)을 AI에 주고 건물의 외관, 지붕을 연 내부, 층 구성을 입체로 확인했습니다. 교육 중 형태를 살펴보기 위해 만든 시각화 모델이며 시공용 도면이 아닙니다.",
-    "images": [
-      {
-        "src": "/assets/results/housing-3d-01.png",
-        "alt": "도면을 바탕으로 만든 커피숍 건물의 기본 3D 외관"
-      },
-      {
-        "src": "/assets/results/housing-3d-02.png",
-        "alt": "지붕을 열어 내부 공간을 살펴본 커피숍 3D 모델"
-      },
-      {
-        "src": "/assets/results/housing-3d-03.png",
-        "alt": "커피숍 3D 모델의 층 구성을 보여 주는 화면"
-      },
-      {
-        "src": "/assets/results/housing-3d-04.png",
-        "alt": "1층과 2층을 분리해 확인한 커피숍 3D 모델"
-      }
-    ],
-    "featured": false
   }
 ]
