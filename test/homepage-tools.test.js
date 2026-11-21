@@ -2,22 +2,34 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-test('두 AI 실험실을 나란히 공개하고 정부지원사업 도우미를 창업 실험실에 통합한다', async () => {
-  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-  const founderLabIndex = html.indexOf('data-tool="founder-metacognition"');
-  const jobLabIndex = html.indexOf('data-tool="job-lab"');
-  const freeChatbotIndex = html.indexOf('data-tool="free-chatbot"');
+const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
-  assert.ok(founderLabIndex >= 0);
-  assert.ok(jobLabIndex > founderLabIndex);
-  assert.ok(freeChatbotIndex > jobLabIndex);
-  assert.doesNotMatch(html, /data-tool="govplan"/);
-  assert.match(html, /data-tool-name="AI 창업 실험실"/);
-  assert.match(html, /data-tool-name="AI 취업 실험실"/);
-  assert.doesNotMatch(html, /창업 메타인지 실험실|AI 취업 실습실/);
-  assert.match(html, /정부지원사업 추천·사업계획서 작성까지 한 흐름으로/);
-  assert.match(html, /https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/startup/);
-  assert.match(html, /창업 실험 시작하기 →/);
-  assert.match(html, /취업 실험 시작하기 →/);
-  assert.match(html, /\.tools-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, 1fr\)/);
+test('홈페이지의 잇툴즈에서 창업 실습과 지원사업 찾기·진단·사업계획서, AI 코치를 연다', async () => {
+  const [home, tools, directory] = await Promise.all([
+    read('index.html'), read('tools.html'), read('ddakfit/index.html'),
+  ]);
+  assert.match(home, /<a\b[^>]*href="\/?tools\.html"[^>]*>잇툴즈<\/a>/);
+
+  const groups = tools.split(/<div class="it-group"\s+/);
+  const startup = groups.find(group => group.startsWith('id="startup"'));
+  assert.ok(startup, '잇툴즈의 창업 준비 도구 모음');
+  const cards = new Map();
+  for (const [, href, content] of startup.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)) {
+    const title = content.match(/<h3>([^<]+)<\/h3>/)?.[1];
+    if (title) cards.set(title, new URL(href.replaceAll('&amp;', '&'), 'https://bccconsulting.kr/tools.html'));
+  }
+  assert.equal(cards.get('창업 아이템 빈칸 찾기')?.href,
+    'https://ai-job-metacognition-lab.jinjoopower.chatgpt.site/startup/metacognition');
+  assert.equal(cards.get('지원사업 공고 사이트 모음')?.href, 'https://bccconsulting.kr/ddakfit/#links');
+  assert.match(directory, /<section\b[^>]*id="links"/);
+  for (const title of ['공고 진단받기', '사업계획서 쓰기']) {
+    const link = cards.get(title);
+    assert.ok(link, title);
+    assert.equal(link.origin + link.pathname, 'https://ddakfit.bccconsulting.kr/embed', title);
+    assert.equal(link.searchParams.get('start'), title === '공고 진단받기' ? 'direct' : null, title);
+  }
+  assert.match(tools, /<a\b[^>]*href="#coach"[^>]*>AI 코치/);
+  const coach = groups.find(group => group.startsWith('id="coach"'));
+  assert.ok(coach, 'AI 코치 목록');
+  assert.match(coach, /<a\b[^>]*href="\/?tools\/chatbots\/\?bot=business-process"[^>]*>\s*<div><b>창업아이디어검증코치<\/b>/);
 });

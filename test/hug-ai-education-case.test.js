@@ -4,13 +4,24 @@ import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('메인 사례·후기 영역에서 HUG 기관교육 상세 사례로 연결한다', async () => {
-  const homepage = await read('index.html');
+test('메인 HUG 수업 사례와 작품관의 두 실습 작품에서 같은 수업 기록으로 연결한다', async () => {
+  const [home, gallery] = await Promise.all([read('index.html'), read('student-works/index.html')]);
+  const detailLink = /<a\b[^>]*href="\/?cases\/hug-antigravity-netlify-20260828\.html"/;
+  const articles = page => page.match(/<article\b[^>]*>[\s\S]*?<\/article>/g) ?? [];
+  const homeCase = articles(home).find(card => card.includes('주택도시보증공사') && detailLink.test(card));
+  assert.ok(homeCase, '메인에서 주택도시보증공사의 수업 기록을 열 수 있다');
+  assert.match(homeCase, /<img\b[^>]*src="\/?assets\/results\/hug-result-01\.png"/);
+  assert.match(home, /<a\b[^>]*href="\/student-works\/#hug-homepage"/);
+  assert.match(home, /<a\b[^>]*href="\/student-works\/"/);
 
-  assert.match(homepage, /주택도시보증공사 AI 활용 교육/);
-  assert.match(homepage, /cases\/hug-antigravity-netlify-20260828\.html/);
-  assert.match(homepage, /hug-result-01\.png/);
-  assert.match(homepage, /hug-result-02\.png/);
+  const galleryCards = articles(gallery);
+  for (const [id, image] of [['hug-homepage', 'hug-result-01.png'], ['hug-strategy-portal', 'hug-result-02.png']]) {
+    const card = galleryCards.find(article => article.includes(`id="${id}"`));
+    assert.ok(card, id);
+    assert.ok(card.includes(`src="/assets/results/${image}"`), image);
+    assert.ok(card.includes(`href="/assets/results/${image}"`), `${id} 원본 이미지`);
+    assert.match(card, detailLink, `${id} 수업 기록`);
+  }
 });
 
 test('HUG 상세 사례는 두 공개 결과물과 교육 실습 범위를 함께 밝힌다', async () => {
