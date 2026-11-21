@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>영산대 조리학과 원가계산기</title>
+<!--
+계약: 아래 <script id="bcc-data"> 안의 JSON만 바꿔도 되는 화면이에요.
+필드 한도: title 18, lead 60, menuName 16, unit 4, 재료 name 12
+숫자: servings 1~200, targetRate 5~90, price 0~1000000, rows 최대 20줄
+이 주석과 JSON 밖의 코드는 바꾸지 않아요.
+-->
+<style>
+:root{--cream:#f6f4ee;--card:#fffdf8;--green:#2f5a46;--gold:#b8922e;--ink:#1d2a24;--sub:#5b6b62;--line:#ddd7c6;--warn:#9a5a1e;--bad:#a23b2c;--ok:#2f5a46}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--cream:#16201b;--card:#1d2a24;--ink:#efeadb;--sub:#a9b6ae;--line:#34463d;--green:#7fb596;--gold:#d8b45a;--warn:#e0a266;--bad:#e58d7e;--ok:#7fb596}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:26px;margin:4px 0 4px;color:var(--green);letter-spacing:-.02em}
+.lead{color:var(--sub);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+input[type=text]{width:100%;font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--cream);color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.num{text-align:right}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--sub);font-weight:600;text-align:left;padding:0 6px 6px}
+td{padding:4px 6px;vertical-align:middle}
+td.cost{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+td.cost small{display:block;font-weight:400;color:var(--bad);font-size:12px}
+tr.bad input{border-color:var(--bad)}
+.btn{font:inherit;font-size:15px;border:1px solid var(--green);background:transparent;color:var(--green);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn.fill{background:var(--green);color:#fff}
+:root[data-theme=dark] .btn.fill{color:#10201a}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .btn.fill{color:#10201a}}
+.btn.x{border-color:var(--line);color:var(--sub);padding:6px 10px;white-space:nowrap}
+.result{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.big{background:var(--cream);border-radius:12px;padding:14px;border:1px solid var(--line)}
+.big b{display:block;font-size:28px;font-variant-numeric:tabular-nums;color:var(--green);letter-spacing:-.02em}
+.big span{font-size:13px;color:var(--sub)}
+.status{margin-top:12px;padding:12px 14px;border-radius:10px;font-weight:700}
+.status.ok{background:rgba(47,90,70,.12);color:var(--ok)}
+.status.mid{background:rgba(184,146,46,.16);color:var(--warn)}
+.status.high{background:rgba(162,59,44,.12);color:var(--bad)}
+.warnbox{margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(162,59,44,.12);color:var(--bad);font-weight:700;font-size:14px}
+.warnbox:empty{display:none}
+.hint{font-size:12px;color:var(--sub);margin:4px 0 0}
+.status small{display:block;font-weight:400;color:var(--sub);margin-top:2px}
+.row2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}
+.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--ink);margin:0}
+.chk input{width:20px;height:20px}
+.cmp td,.cmp th{text-align:right;padding:6px 8px;font-variant-numeric:tabular-nums}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp tr.now td{background:rgba(184,146,46,.16);font-weight:700}
+.cmp tr+tr td{border-top:1px solid var(--line)}
+.h2{font-size:16px;margin:0 0 10px}
+.foot{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.msg{color:var(--sub);font-size:14px}
+.err{padding:20px;color:var(--bad);font-weight:700}
+.sr{position:absolute;left:-9999px}
+@media (max-width:700px){
+ .top,.row2,.result{grid-template-columns:1fr}
+ table.rows,table.rows tbody{display:block}
+ table.rows thead{display:none}
+ table.rows tr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+ table.rows tr:first-child{border-top:0}
+ table.rows td{padding:0;display:block}
+ table.rows td::before{content:attr(data-l);display:block;font-size:12px;color:var(--sub);margin-bottom:2px}
+ table.rows td:nth-child(1){grid-column:span 2}
+ table.rows td input{width:100%!important;min-width:0!important}
+ table.rows td.cost{text-align:left;align-self:end;padding-bottom:8px}
+ table.rows td:last-child{align-self:end}
+ table.rows td:last-child .btn{width:100%}
+ .cmp th:nth-child(4),.cmp td:nth-child(4){display:none}
+ .scroll{overflow:visible}
+ h1{font-size:22px}
+}
+@media print{.btn,.foot{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script type="application/json" id="bcc-data">
+{
+  "title": "영산대 조리학과 원가계산기",
+  "lead": "재료를 적으면 1인분 원가와 남는 금액이 바로 나와요.",
+  "menuName": "김치볶음밥",
+  "servings": 4,
+  "targetRate": 35,
+  "price": 9000,
+  "vatIncluded": true,
+  "rows": [
+    {"name": "쌀", "unit": "g", "buyQty": 10000, "buyPrice": 38000, "use": 400, "loss": 0},
+    {"name": "배추김치", "unit": "g", "buyQty": 1000, "buyPrice": 8000, "use": 300, "loss": 5},
+    {"name": "돼지 앞다리", "unit": "g", "buyQty": 600, "buyPrice": 7200, "use": 200, "loss": 10},
+    {"name": "대파", "unit": "개", "buyQty": 1, "buyPrice": 3500, "use": 0.5, "loss": 15},
+    {"name": "달걀", "unit": "개", "buyQty": 30, "buyPrice": 7500, "use": 4, "loss": 0},
+    {"name": "식용유", "unit": "ml", "buyQty": 1800, "buyPrice": 6500, "use": 40, "loss": 0}
+  ]
+}
+</script>
+<script>
+(function(){
+"use strict";
+var app=document.getElementById("app");
+var LIM={title:18,lead:60,menuName:16,unit:4,name:12};
+var D;
+function fail(){app.innerHTML='<div class="err">내용 설정을 확인해 주세요.</div>';}
+try{
+  D=JSON.parse(document.getElementById("bcc-data").textContent);
+  var ok=typeof D.title==="string"&&D.title.length<=LIM.title&&typeof D.lead==="string"&&D.lead.length<=LIM.lead&&
+    typeof D.menuName==="string"&&D.menuName.length<=LIM.menuName&&Array.isArray(D.rows)&&D.rows.length<=20&&
+    D.servings>=1&&D.servings<=200&&D.targetRate>=5&&D.targetRate<=90&&D.price>=0&&D.price<=1000000;
+  if(ok)D.rows.forEach(function(r){if(typeof r.name!=="string"||r.name.length>LIM.name||typeof r.unit!=="string"||r.unit.length>LIM.unit)ok=false;});
+  if(!ok){fail();return;}
+}catch(e){fail();return;}
+
+var $=function(s,el){return (el||document).querySelector(s);};
+function num(v){
+  if(typeof v==="number")return v;
+  var s=String(v==null?"":v).replace(/,/g,"").trim();
+  if(s===""||!/^-?(\d+\.?\d*|\.\d+)$/.test(s))return NaN;
+  return parseFloat(s);
+}
+function fmt(n,d){if(!isFinite(n))return "–";return n.toLocaleString("ko-KR",{maximumFractionDigits:d==null?0:d,minimumFractionDigits:0});}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+var state={menuName:D.menuName,servings:String(D.servings),targetRate:String(D.targetRate),price:String(D.price),vat:!!D.vatIncluded,
+  rows:D.rows.map(function(r){return {name:r.name,unit:r.unit,buyQty:String(r.buyQty),buyPrice:String(r.buyPrice),use:String(r.use),loss:String(r.loss)};})};
+
+function build(){
+  app.innerHTML=
+  '<h1>'+esc(D.title)+'</h1><p class="lead">'+esc(D.lead)+'</p>'+
+  '<div class="card"><div class="top">'+
+   '<div><label for="menu">메뉴 이름</label><input type="text" id="menu" maxlength="16"></div>'+
+   '<div><label for="serv">만든 인분 수</label><input type="text" id="serv" class="num" inputmode="decimal"><p class="hint">아래 “쓴 양”은 이 인분 수 전체에 쓴 양이에요</p></div>'+
+   '<div><label for="tgt">목표 원가율(%)</label><input type="text" id="tgt" class="num" inputmode="decimal"></div>'+
+  '</div></div>'+
+  '<div class="card"><h2 class="h2">재료</h2><div class="scroll"><table class="rows"><thead><tr>'+
+   '<th>재료</th><th>단위</th><th>산 양</th><th>산 값(원)</th><th>쓴 양</th><th>버리는 %<span class="sr"> (껍질·뼈 등 손질로 버리는 비율)</span></th><th style="text-align:right">원가(원)</th><th><span class="sr">삭제</span></th>'+
+  '</tr></thead><tbody id="body"></tbody></table></div>'+
+  '<p class="hint">버리는 %: 껍질·뼈·꼭지 등 손질하며 버리는 비율이에요. 모르면 0으로 두세요.</p><div class="foot" style="margin-top:10px"><button class="btn" id="add" type="button">+ 재료 한 줄 추가</button><span class="msg" id="rowmsg"></span></div></div>'+
+  '<div class="card"><div class="result">'+
+   '<div class="big"><span>재료비 합계</span><b id="tot">–</b></div>'+
+   '<div class="big"><span>1인분 원가(원)</span><b id="per">–</b></div>'+
+   '<div class="big"><span id="ratelab">원가율</span><b id="rate">–</b></div></div>'+
+   '<div class="warnbox" id="warn" role="alert"></div>'+
+   '<div class="status" id="status" aria-live="polite"></div>'+
+   '<p class="hint">남는 금액은 재료비만 뺀 금액이에요. 인건비·임대료·수수료는 아직 빠져 있어요.</p></div>'+
+  '<div class="card"><div class="row2">'+
+   '<div><label for="price">판매가(원)</label><input type="text" id="price" class="num" inputmode="decimal"></div>'+
+   '<div><label class="chk"><input type="checkbox" id="vat"> 부가세 10%가 들어 있는 가격이에요</label></div>'+
+   '<div><span class="msg" id="net"></span></div></div>'+
+   '<h2 class="h2" style="margin-top:16px">판매가를 바꾸면?</h2>'+
+   '<table class="cmp"><thead><tr><th>판매가</th><th>원가율</th><th>남는 금액</th><th>한 줄 평가</th></tr></thead><tbody id="cmp"></tbody></table>'+
+   '<p class="msg" id="sugg" style="margin-bottom:0"></p></div>'+
+  '<div class="foot"><button class="btn fill" id="copy" type="button">원가표 복사</button><button class="btn" id="reset" type="button">처음 값으로</button><span class="msg" id="copymsg" role="status" aria-live="polite"></span></div>';
+}
+
+function rowHTML(r,i){
+  return '<tr data-i="'+i+'"><td data-l="재료"><input type="text" data-k="name" maxlength="12" aria-label="재료 이름 '+(i+1)+'" value="'+esc(r.name)+'" style="min-width:90px"></td>'+
+  '<td data-l="단위"><input type="text" data-k="unit" maxlength="4" aria-label="단위" value="'+esc(r.unit)+'" style="width:56px"></td>'+
+  '<td data-l="산 양"><input type="text" class="num" inputmode="decimal" data-k="buyQty" aria-label="산 양" value="'+esc(r.buyQty)+'" style="width:84px"></td>'+
+  '<td data-l="산 값(원)"><input type="text" class="num" inputmode="decimal" data-k="buyPrice" aria-label="산 값" value="'+esc(r.buyPrice)+'" style="width:92px"></td>'+
+  '<td data-l="쓴 양"><input type="text" class="num" inputmode="decimal" data-k="use" aria-label="쓴 양" value="'+esc(r.use)+'" style="width:84px"></td>'+
+  '<td data-l="버리는 %"><input type="text" class="num" inputmode="decimal" data-k="loss" aria-label="버리는 비율" value="'+esc(r.loss)+'" style="width:64px"></td>'+
+  '<td class="cost" data-l="원가(원)" data-c="1">–</td><td><button class="btn x" type="button" data-del="1" aria-label="재료 '+(i+1)+' 지우기">지우기</button></td></tr>';
+}
+function renderRows(){
+  $("#body").innerHTML=state.rows.map(rowHTML).join("");
+}
+
+function calcRow(r){
+  var bq=num(r.buyQty),bp=num(r.buyPrice),u=num(r.use),l=r.loss.trim()===""?0:num(r.loss);
+  var empty=!r.name.trim()&&r.buyQty.trim()===""&&r.buyPrice.trim()===""&&r.use.trim()==="";
+  if(empty)return {skip:true};
+  if(!(bq>0)||!(bp>0)||!(u>0)||!isFinite(l)||l<0)return {err:"0보다 큰 숫자로 적어 주세요"};
+  if(bq>1e9||bp>1e9||u>1e9)return {err:"숫자가 너무 커요"};
+  if(l>=100)return {err:"버리는 %는 100보다 작아야 해요"};
+  var need=u/(1-l/100);
+  return {cost:bp/bq*need};
+}
+function judge(rate,tgt){
+  rate=Math.round(rate*10)/10;tgt=Math.round(tgt*10)/10;
+  if(rate<=tgt)return {c:"ok",t:"목표 안이에요"};
+  if(rate<=tgt+5)return {c:"mid",t:"조금 높아요"};
+  return {c:"high",t:"높아요"};
+}
+function compute(){
+  var serv=num(state.servings),tgt=num(state.targetRate),price=num(state.price);
+  var total=0,errs=0,used=0;
+  var trs=document.querySelectorAll("#body tr");
+  state.rows.forEach(function(r,i){
+    var c=calcRow(r),tr=trs[i],cell=$('[data-c]',tr);
+    tr.classList.toggle("bad",!!c.err);
+    if(c.skip){cell.textContent="–";}
+    else if(c.err){cell.innerHTML='<small>'+c.err+'</small>';errs++;}
+    else{cell.textContent=fmt(c.cost);total+=c.cost;used++;}
+  });
+  $("#rowmsg").textContent=errs?errs+"줄을 확인해 주세요. 그 줄은 합계에서 빠져 있어요.":"";
+  $("#warn").textContent=errs?"확인이 필요한 재료 "+errs+"줄이 합계에서 빠져 있어요. 실제 원가보다 낮게 나온 값이에요.":"";
+  $("#ratelab").textContent=state.vat?"원가율 (부가세 뺀 금액 기준)":"원가율 (판매가 기준)";
+  var servOK=serv>=1&&serv<=200, tgtOK=tgt>=5&&tgt<=90, priceOK=price>=0&&price<=1000000;
+  var per=servOK?total/serv:NaN;
+  $("#tot").textContent=used?fmt(total):"–";
+  $("#per").textContent=(used&&servOK)?fmt(per):"–";
+  var net=priceOK?(state.vat?price/1.1:price):NaN;
+  $("#net").textContent=priceOK&&price>0?(state.vat?"부가세를 뺀 매출은 약 "+fmt(net)+"원이에요":"받는 돈 그대로 계산해요"):"";
+  var st=$("#status");
+  var cmp=$("#cmp"),sg=$("#sugg");
+  if(!(used&&servOK)){st.className="status";st.textContent="재료와 인분 수(1~200)를 적어 주세요.";$("#rate").textContent="–";cmp.innerHTML="";sg.textContent="";return {per:NaN};}
+  if(!(price>0)||price>1000000){st.className="status";st.textContent=price>1000000?"판매가는 1,000,000원 이하로 적어 주세요.":"판매가를 적으면 원가율과 남는 금액이 나와요.";$("#rate").textContent="–";cmp.innerHTML="";sg.textContent="";return {per:per};}
+  if(!tgtOK){st.className="status";st.textContent="목표 원가율은 5~90 사이로 적어 주세요.";}
+  var rate=per/net*100;
+  $("#rate").textContent=fmt(rate,1)+"%";
+  if(tgtOK){
+    var j=judge(rate,tgt);
+    st.className="status "+j.c;
+    st.innerHTML=j.t+'<small>1인분에 '+fmt(net-per)+'원이 남아요 (목표 원가율 '+fmt(tgt,1)+'%)</small>';
+  }
+  var rowsH="";
+  [-1000,-500,0,500,1000].forEach(function(d){
+    var p=price+d;if(p<=0)return;
+    var n=state.vat?p/1.1:p,rt=per/n*100;
+    var jj=tgtOK?judge(rt,tgt).t:"";
+    rowsH+='<tr'+(d===0?' class="now"':'')+'><td>'+fmt(p)+'원'+(d===0?' (지금)':'')+'</td><td>'+fmt(rt,1)+'%</td><td>'+fmt(n-per)+'원</td><td>'+jj+'</td></tr>';
+  });
+  cmp.innerHTML=rowsH;
+  if(tgtOK){
+    var need=per/(tgt/100)*(state.vat?1.1:1);
+    var up=Math.ceil(need/100-1e-9)*100;
+    sg.textContent="목표 원가율 "+fmt(tgt,1)+"%에 맞추려면 판매가를 "+fmt(up)+"원 이상으로 해야 해요.";
+  }else sg.textContent="";
+  return {per:per,rate:rate,total:total,net:net};
+}
+function tableText(){
+  var out=[];var r=compute();
+  out.push("메뉴: "+(state.menuName||"-")+" / "+state.servings+"인분 기준");
+  var bad=state.rows.filter(function(x){var c=calcRow(x);return !!c.err;}).length;
+  if(bad)out.push("※ 확인이 필요한 재료 "+bad+"줄이 빠져 있어요. 원가가 실제보다 낮게 나왔어요.");
+  out.push("재료\t산 양\t산 값(원)\t쓴 양\t버리는 %\t원가(원)");
+  state.rows.forEach(function(row){
+    var c=calcRow(row);if(c.skip||c.err)return;
+    out.push([row.name,row.buyQty+row.unit,row.buyPrice,row.use+row.unit,(row.loss||0),fmt(c.cost)].join("\t"));
+  });
+  out.push("재료비 합계\t"+fmt(r.total||NaN)+"원");
+  out.push("1인분 원가\t"+fmt(r.per)+"원");
+  out.push("(원가율은 "+(state.vat?"부가세를 뺀 금액":"판매가")+" 기준, 남는 금액은 재료비만 뺀 금액)");
+  var price=num(state.price);
+  if(price>0&&isFinite(r.rate))out.push("판매가\t"+fmt(price)+"원"+(state.vat?" (부가세 포함)":"")+"\t원가율 "+fmt(r.rate,1)+"%\t남는 금액 "+fmt(r.net-r.per)+"원");
+  return out.join("\n");
+}
+
+function bind(){
+  $("#menu").value=state.menuName;$("#serv").value=state.servings;$("#tgt").value=state.targetRate;$("#price").value=state.price;$("#vat").checked=state.vat;
+  $("#menu").addEventListener("input",function(e){state.menuName=e.target.value;});
+  $("#serv").addEventListener("input",function(e){state.servings=e.target.value;compute();});
+  $("#tgt").addEventListener("input",function(e){state.targetRate=e.target.value;compute();});
+  $("#price").addEventListener("input",function(e){state.price=e.target.value;compute();});
+  $("#vat").addEventListener("change",function(e){state.vat=e.target.checked;compute();});
+  $("#body").addEventListener("input",function(e){
+    var t=e.target,tr=t.closest("tr");if(!tr||!t.dataset.k)return;
+    state.rows[+tr.dataset.i][t.dataset.k]=t.value;compute();
+  });
+  $("#body").addEventListener("click",function(e){
+    var b=e.target.closest("[data-del]");if(!b)return;
+    var i=+b.closest("tr").dataset.i;state.rows.splice(i,1);renderRows();compute();
+    var nx=$("#body tr:nth-child("+Math.min(i+1,state.rows.length)+") input");(nx||$("#add")).focus();
+  });
+  $("#add").addEventListener("click",function(){
+    if(state.rows.length>=20){$("#rowmsg").textContent="재료는 20줄까지 넣을 수 있어요.";return;}
+    state.rows.push({name:"",unit:"g",buyQty:"",buyPrice:"",use:"",loss:"0"});renderRows();compute();
+    var last=document.querySelectorAll("#body tr");last[last.length-1].querySelector("input").focus();
+  });
+  $("#reset").addEventListener("click",function(){
+    state={menuName:D.menuName,servings:String(D.servings),targetRate:String(D.targetRate),price:String(D.price),vat:!!D.vatIncluded,
+      rows:D.rows.map(function(r){return {name:r.name,unit:r.unit,buyQty:String(r.buyQty),buyPrice:String(r.buyPrice),use:String(r.use),loss:String(r.loss)};})};
+    build();renderRows();bind();compute();$("#menu").focus();
+  });
+  $("#copy").addEventListener("click",function(){
+    var txt=tableText(),m=$("#copymsg");
+    function done(ok){m.textContent=ok?"복사했어요. 사업계획서에 붙여 넣으세요.":"복사가 막혔어요. 아래 표를 직접 선택해 복사해 주세요.";if(!ok)prompt_fallback(txt);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
+    else done(false);
+  });
+}
+function prompt_fallback(txt){
+  var m=$("#copymsg");var old=document.getElementById("fallback");if(old)old.remove();var ta=document.createElement("textarea");ta.id="fallback";
+  ta.value=txt;ta.rows=8;ta.style.cssText="width:100%;margin-top:8px;font:14px monospace";ta.setAttribute("aria-label","원가표 글자");
+  m.parentNode.appendChild(ta);ta.focus();ta.select();
+}
+build();renderRows();bind();compute();
+})();
+</script>
+</body>
+</html>
