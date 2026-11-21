@@ -1,0 +1,90 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+// 가상 샘플 커피숍 3종(A·B·C)의 페이지를 만든다. 건물 설계는 assets/cafe3d.js 에 있다.
+const pages = {
+  a: { title: 'ㄱ자 마당 카페', sub: '단층 · 박공지붕 두 개가 만나는 가상 샘플 건물', back: ['/projects.html#cafe-a', '강사결과물로 돌아가기'], desc: '도면이 한 획씩 그려진 뒤 3D로 올라오는 ㄱ자 마당 카페. 가상으로 설계한 샘플 건물입니다.' },
+  b: { title: '팔각 온실 카페', sub: '정팔각 평면 · 유리 벽과 뾰족 지붕의 가상 샘플 건물', back: ['/student-works/#housing-3d-model', '수업결과물로 돌아가기'], desc: '도면이 한 획씩 그려진 뒤 3D로 올라오는 팔각 온실 카페. 수업에서 도면을 AI에 주고 확인한 실습을 새 샘플 건물로 다시 만들었습니다.' },
+  c: { title: '엇갈린 상자 카페', sub: '2층 상자가 1층 위로 튀어나온 가상 샘플 건물', back: ['/projects.html#cafe-c', '강사결과물로 돌아가기'], desc: '도면이 한 획씩 그려진 뒤 3D로 올라오는 엇갈린 상자 카페. 가상으로 설계한 샘플 건물입니다.' }
+};
+const css = `
+:root{--cream:#f6f4ee;--card:#fffdf8;--green:#2f5a46;--gold:#b8922e;--ink:#1d2a24;--sub:#5b6b62;--line:#ddd7c6;--stage:#e9e5d9}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--cream:#16201b;--card:#1d2a24;--ink:#efeadb;--sub:#a9b6ae;--line:#34463d;--green:#7fb596;--gold:#d8b45a}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--cream);color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.55}
+.top{max-width:1040px;margin:0 auto;padding:16px 16px 0;font-size:14px}.top a{color:var(--green);text-decoration:none;font-weight:600}
+.wrap{max-width:1040px;margin:0 auto;padding:8px 16px 56px}
+h1{font-size:28px;margin:10px 0 4px;color:var(--green);letter-spacing:-.02em}.lead{margin:0 0 16px;color:var(--sub)}
+.stage{position:relative;aspect-ratio:3/2;background:var(--stage);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+#plan{position:absolute;inset:0;width:100%;height:100%;transition:opacity .8s}#plan.off{opacity:0;pointer-events:none}
+#gl{position:absolute;inset:0;opacity:0;transition:opacity .8s;touch-action:none;cursor:grab;outline:none}#gl.on{opacity:1}#gl:focus-visible{box-shadow:inset 0 0 0 3px var(--gold)}
+#gl canvas{display:block;width:100%;height:100%}
+.st{fill:none;stroke-linecap:round;stroke-linejoin:round}.w1{stroke:#2f5a46;stroke-width:.14}.w2{stroke:#2f5a46;stroke-width:.06}.fn{stroke:#7a8a80;stroke-width:.05}
+.wn{stroke:#b8922e;stroke-width:.12}.dr{stroke:#8a5a2c;stroke-width:.14}.dash{stroke:#7a8a80;stroke-width:.05;stroke-dasharray:.3 .2}.dash2{stroke:#2f5a46;stroke-width:.06;stroke-dasharray:.3 .2}.dm{stroke:#5b6b62;stroke-width:.04}
+.tx{font-size:.55px;fill:#2f5a46;font-weight:600}.tx.sm{font-size:.5px;fill:#5b6b62;font-weight:500}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .stage{--stage:#1b2620}}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.btn{font:inherit;font-size:15px;border:1px solid var(--green);background:transparent;color:var(--green);border-radius:8px;padding:9px 14px;cursor:pointer}
+.btn[aria-pressed=true]{background:var(--green);color:#fff}.btn:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0}
+.facts div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}.facts dt{font-size:12px;color:var(--sub);margin:0 0 2px}.facts dd{margin:0;font-weight:600}
+.note{font-size:13px;color:var(--sub)}
+#nogl{padding:12px 14px;border-radius:10px;background:rgba(184,146,46,.15);margin:10px 0}
+#poster{display:none}
+body.still .top,body.still .bar,body.still .facts,body.still .note,body.still h1,body.still .lead{display:none}
+body.still .wrap{max-width:none;padding:0}
+body.still .stage{position:fixed;inset:0;aspect-ratio:auto;border:0;border-radius:0}
+body.still-plan #poster{display:none!important}
+body.still #poster{display:block;position:absolute;left:3.6%;top:3.8%;z-index:3;pointer-events:none}
+body.still #poster .pk{margin:0;font-size:1.1vw;letter-spacing:.06em;color:#5f7d70}
+body.still #poster h2{margin:.3vw 0 0;font-size:3.1vw;color:#223a34;letter-spacing:-.02em}
+body.still #poster p:last-child{margin:.4vw 0 0;font-size:1.25vw;color:#5b6b62}
+@media (max-width:640px){h1{font-size:22px}.btn{flex:1 1 calc(50% - 8px)}}
+`;
+for (const [k, p] of Object.entries(pages)) {
+  const dir = new URL(`../tools/cafe-3d/${k}/`, import.meta.url);
+  mkdirSync(dir, { recursive: true });
+  const html = `<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${p.title} · 도면에서 3D까지 | BCC</title>
+<meta name="description" content="${p.desc}">
+<link rel="canonical" href="https://bccconsulting.kr/tools/cafe-3d/${k}/">
+<meta property="og:title" content="${p.title} · 도면에서 3D까지 | BCC">
+<meta property="og:description" content="${p.desc}">
+<meta property="og:url" content="https://bccconsulting.kr/tools/cafe-3d/${k}/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>${css}</style>
+<script defer src="/assets/bcc-analytics.js?v=20261116a"></script>
+</head>
+<body data-key="${k}">
+<div class="top"><a href="${p.back[0]}">← ${p.back[1]}</a></div>
+<main class="wrap">
+  <h1>${p.title}</h1>
+  <p class="lead">${p.sub}. 도면이 한 획씩 그려지고 나면 벽이 올라가고 지붕이 내려앉습니다.</p>
+  <div class="stage" id="stage">
+    <svg id="plan" role="img" aria-label="${p.title} 평면도가 그려지는 화면" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="gl" tabindex="0" role="img" aria-label="${p.title} 3D 모델. 끌어서 돌리거나 화살표 키로 돌릴 수 있습니다"></div>
+    <div id="poster"></div>
+  </div>
+  <p id="nogl" hidden>이 브라우저에서는 3D를 그릴 수 없어 도면만 보여 드립니다. 최신 크롬·사파리·엣지에서 열어 보세요.</p>
+  <div class="bar" role="group" aria-label="보기 방식">
+    <button class="btn" id="b-replay" type="button">도면부터 다시 보기</button>
+    <button class="btn" id="b-plan" type="button">도면만 보기</button>
+    <button class="btn" id="b-3d" type="button">3D 보기</button>
+    <button class="btn" id="b-open" type="button" aria-pressed="false">지붕 열기</button>
+    <button class="btn" id="b-explode" type="button" aria-pressed="false">층별로 떼어 보기</button>
+    <button class="btn" id="b-auto" type="button" aria-pressed="false">자동 회전</button>
+  </div>
+  <dl class="facts" id="facts"></dl>
+  <p class="note">가상으로 설계한 샘플 건물이며 실제 건물과 관계가 없습니다. 교육 중 형태를 살펴보기 위한 시각화이고 시공용 도면이 아닙니다.</p>
+</main>
+<script src="/assets/vendor/three.r128.min.js"></script>
+<script src="/assets/cafe3d.js"></script>
+<script>Cafe3D.start();</script>
+</body>
+</html>
+`;
+  writeFileSync(new URL('index.html', dir), html);
+}
+console.log('built', Object.keys(pages).join(','));

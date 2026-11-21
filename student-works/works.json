@@ -148,5 +148,33 @@
       }
     ],
     "featured": false
+  },
+  {
+    "id": "octagon-cafe-3d",
+    "title": "도면에서 3D로 올린 팔각 온실 카페",
+    "category": "도면·3D 모델",
+    "course": "주거 관련 기관 · AI 업무활용 교육",
+    "description": "수업에서 도면을 AI에 주고 건물을 입체로 확인한 실습을 바탕으로, 새로 설계한 가상 샘플 건물(팔각 온실 카페)로 다시 만들었습니다. 도면이 한 획씩 그려진 뒤 3D로 올라옵니다. 교육용 시각화이며 시공용 도면이 아닙니다.",
+    "images": [
+      {
+        "src": "/assets/results/cafe-b-01.png",
+        "alt": "정팔각 카페의 평면도와 치수가 표시된 도면"
+      },
+      {
+        "src": "/assets/results/cafe-b-02.png",
+        "alt": "팔각 뿔 지붕과 유리 벽으로 만든 온실 카페의 3D 외관"
+      },
+      {
+        "src": "/assets/results/cafe-b-03.png",
+        "alt": "지붕을 열어 원형 카운터와 테이블을 살펴본 카페 내부"
+      },
+      {
+        "src": "/assets/results/cafe-b-04.png",
+        "alt": "지붕과 벽체를 분리해 구성을 보여 주는 3D 모델"
+      }
+    ],
+    "record": "/tools/cafe-3d/b/",
+    "recordLabel": "3D로 직접 돌려 보기",
+    "featured": false
   }
 ]
