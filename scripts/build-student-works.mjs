@@ -44,7 +44,7 @@ const homeUrl = new URL('../index.html', import.meta.url);
 let home = readFileSync(homeUrl, 'utf8');
 const section = `<!-- STUDENT_WORKS:START -->
 <section class="sw-section" id="student-works" aria-labelledby="sw-title"><div class="inner">
-<div class="sw-head"><div><p class="eyebrow">교육생 작품</p><h2 id="sw-title">수업에서 직접 만든 작품을 만나보세요.</h2><p>홈페이지, 홍보 콘텐츠, 영상 기획과 슬라이드.<br>내 주제로 만든 결과물을 한곳에 모았습니다.</p></div><a class="link" href="/student-works/">등록된 작품 ${works.length}개 모두 보기 →</a></div>
+<div class="sw-head"><div><p class="eyebrow">교육생 작품</p><h2 id="sw-title">수업에서 직접 만든 작품을 만나보세요.</h2><p>홈페이지, 홍보 콘텐츠, 영상 기획과 슬라이드.<br>내 주제로 만든 결과물을 한곳에 모았습니다.</p></div><div class="works-destinations"><a class="link" href="/student-works/">등록된 작품 ${works.length}개 모두 보기 →</a><a href="/portfolio/">수업·강사 결과물 보기 →</a></div></div>
 <div class="sw-grid sw-home-grid">${works.filter(w=>w.featured).map(w=>card(w,true)).join('\n')}</div>
 </div></section>
 <!-- STUDENT_WORKS:END -->`;
