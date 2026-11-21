@@ -45,3 +45,22 @@ test('survey read failures never become empty success pages',async()=>{
  const h=createInquiryNotificationHandler(()=>({from:()=>q}),()=>secret),r=response();await h({method:'POST',headers:{authorization:'Bearer '+secret},body:{...body,kind:'survey'}},r);
  assert.equal(r.code,503);assert.deepEqual(r.body,{error:'temporarily unavailable'});
 });
+
+function triggerWorker({failCreate=false}={}) {
+ const state={INQUIRY_NOTIFICATION_SECRET:secret,BCC_START_AT:'2026-11-20T00:00:00Z',BCC_SURVEY_START_AT:'2026-11-21T00:00:00Z',BCC_ADMIN_ACTION_START_AT:'2026-11-21T00:00:00Z',BCC_SENT_survey_saved:'saved',BCC_CHECKPOINT_simple:'checkpoint'},actions=[];
+ const trigger=(id,handler)=>({id,getHandlerFunction:()=>handler});
+ const triggers=[trigger('old','pollInquiryNotifications'),trigger('unrelated','anotherWorker')];
+ const ctx={console:{log(){}},PropertiesService:{getScriptProperties:()=>({getProperty:k=>state[k]||null,setProperty:(k,v)=>{state[k]=v;}})},LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},ScriptApp:{getProjectTriggers:()=>[...triggers],newTrigger:handler=>{let minutes;const builder={timeBased:()=>builder,everyMinutes:n=>{minutes=n;return builder;},create:()=>{actions.push(['create',handler,minutes]);if(failCreate)throw Error('quota');const t=trigger('new'+actions.length,handler);triggers.push(t);return t;}};return builder;},deleteTrigger:t=>{actions.push(['delete',t.id]);triggers.splice(triggers.indexOf(t),1);}}};
+ vm.createContext(ctx);vm.runInContext(fs.readFileSync(new URL('../ops/inquiry-gmail/Code.gs',import.meta.url),'utf8'),ctx);return {ctx,state,triggers,actions};
+}
+test('enable migrates to five minutes before removing only own triggers and repeated enable stays single',()=>{
+ const w=triggerWorker(),before={...w.state};w.ctx.enableNotifications();
+ assert.deepEqual(w.actions.slice(0,2),[['create','pollInquiryNotifications',5],['delete','old']]);
+ w.ctx.enableNotifications();assert.equal(w.triggers.filter(t=>t.getHandlerFunction()==='pollInquiryNotifications').length,1);assert.ok(w.triggers.some(t=>t.id==='unrelated'));
+ for(const [key,value] of Object.entries(before))assert.equal(w.state[key],value);
+ assert.equal(w.state.BCC_POLL_INTERVAL_MINUTES,'5');
+});
+test('trigger creation failure preserves the old worker and existing checkpoints',()=>{
+ const w=triggerWorker({failCreate:true}),before={...w.state};assert.throws(()=>w.ctx.enableNotifications(),/quota/);
+ assert.ok(w.triggers.some(t=>t.id==='old'));assert.equal(w.actions.some(a=>a[0]==='delete'),false);assert.deepEqual(w.state,before);
+});

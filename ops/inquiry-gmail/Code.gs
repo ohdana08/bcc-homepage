@@ -42,9 +42,12 @@ function enableNotifications() {
     if (!props.getProperty('BCC_ADMIN_ACTION_START_AT')) props.setProperty('BCC_ADMIN_ACTION_START_AT', new Date().toISOString());
     if (!props.getProperty('BCC_START_AT')) props.setProperty('BCC_START_AT', new Date().toISOString());
     const triggers = ScriptApp.getProjectTriggers().filter(function(t) { return t.getHandlerFunction() === 'pollInquiryNotifications'; });
-    if (!triggers.length) ScriptApp.newTrigger('pollInquiryNotifications').timeBased().everyMinutes(1).create();
-    triggers.slice(1).forEach(function(t) { ScriptApp.deleteTrigger(t); });
-    console.log('Notification worker enabled; historical inquiries excluded');
+    // Install before removing only our previous triggers: a creation failure must
+    // leave the current worker running. Existing checkpoints and sent IDs stay intact.
+    ScriptApp.newTrigger('pollInquiryNotifications').timeBased().everyMinutes(5).create();
+    triggers.forEach(function(t) { ScriptApp.deleteTrigger(t); });
+    props.setProperty('BCC_POLL_INTERVAL_MINUTES', '5');
+    console.log('Notification worker enabled; five-minute checks; historical inquiries excluded');
   } finally { lock.releaseLock(); }
 }
 
@@ -157,5 +160,5 @@ function pollSummaryNotifications_(props, secret, deadline, until) {
 function showNotificationStatus() {
   const props=PropertiesService.getScriptProperties();
   const count=ScriptApp.getProjectTriggers().filter(function(t){return t.getHandlerFunction()==='pollInquiryNotifications';}).length;
-  console.log(JSON.stringify({recipient:BCC_MAIL.recipient,trigger_count:count,configured:Boolean(props.getProperty('INQUIRY_NOTIFICATION_SECRET')),inquiries_started:props.getProperty('BCC_START_AT'),surveys_started:props.getProperty('BCC_SURVEY_START_AT'),admin_actions_started:props.getProperty('BCC_ADMIN_ACTION_START_AT'),last_success:props.getProperty('BCC_LAST_OK')}));
+  console.log(JSON.stringify({recipient:BCC_MAIL.recipient,trigger_count:count,poll_interval_minutes:props.getProperty('BCC_POLL_INTERVAL_MINUTES'),configured:Boolean(props.getProperty('INQUIRY_NOTIFICATION_SECRET')),inquiries_started:props.getProperty('BCC_START_AT'),surveys_started:props.getProperty('BCC_SURVEY_START_AT'),admin_actions_started:props.getProperty('BCC_ADMIN_ACTION_START_AT'),last_success:props.getProperty('BCC_LAST_OK')}));
 }
