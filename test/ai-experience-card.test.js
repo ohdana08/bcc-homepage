@@ -122,3 +122,21 @@ test('attachment download requires admin and correct survey/response scope',asyn
 test('AI analysis without client fails explicitly while ordinary admin remains independent',async()=>{
   await assert.rejects(handleTrainingNeedsAdmin({headers:{authorization:'Bearer test'},body:{action:'analyze',id:uuid}},response(),{db:mockDb(),client:null}),e=>e.httpStatus===503);
 });
+
+test('optional support detail survives submission, response card and planning summary', async()=>{
+  const db=mockDb();const res=response();
+  await handleTrainingNeedsPublic({method:'POST',headers:{origin:'https://bccconsulting.kr'},body:{action:'submit',code:'ABC12345',idempotency_key:key,answers:answers({support_detail:'회의록 정리가 어려워요. mail@example.com'})}},res,{db});
+  assert.ok([200,201].includes(res.statusCode),JSON.stringify(res.data));
+  assert.equal(res.data.card.support_detail,'회의록 정리가 어려워요. [이메일 삭제]');
+  const saved=db.calls.find(c=>c.rpc).args.p_answers;
+  assert.equal(saved.support_detail,res.data.card.support_detail);
+  assert.deepEqual(summarizeResponses([{answers:saved}]).experience_card.support_details,[saved.support_detail]);
+  assert.equal(normalizeExperienceAnswers(answers({support_detail:'가'.repeat(900)})).answers.support_detail.length,800);
+  assert.equal(experienceResponseCard({answers:answers()}).support_detail,'');
+});
+
+test('blank support detail keeps predeployment retry payload unchanged',()=>{
+  const original=normalizeExperienceAnswers(answers()).answers;
+  assert.equal(Object.hasOwn(original,'support_detail'),false);
+  assert.deepEqual(normalizeExperienceAnswers(answers({support_detail:'  '})).answers,original);
+});

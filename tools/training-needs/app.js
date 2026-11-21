@@ -27,6 +27,7 @@ export function cardText(card, survey) {
   const fields = [['experience_tasks', '해본 것'], ['creation_process', '만들어본 과정'], ['desired_work', '만들고 싶은 것'], ['support_needs', '필요한 도움']];
   for (const [id, label] of fields) parts.push(`\n${label}\n${(card[id] || []).join(' · ') || '제작 경험 질문 건너뜀'}${card.others?.[id] ? '\n' + card.others[id] : ''}`);
   if (card.tools_detail) parts.push(`\n사용해본 도구\n${card.tools_detail}`);
+  if (card.support_detail) parts.push(`\n더 알고 싶은 내용 · AI로 잘 안되는 업무\n${card.support_detail}`);
   if (card.desired_detail) parts.push(`\n나의 생각\n${card.desired_detail}`);
   const shared = [card.portfolio?.file?.name, card.portfolio?.url].filter(Boolean);
   parts.push(`\n공유한 결과물\n${shared.length ? shared.join('\n') : '공유하지 않음'}`);
@@ -68,6 +69,7 @@ if (typeof document !== 'undefined') {
         let body = q.type === 'portfolio' ? `<div class="upload-area"><label for="portfolioFile" class="upload-label">파일 또는 화면 캡처 1개 <span class="optional">선택</span></label><input id="portfolioFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><p>JPG · PNG · WebP · PDF. 큰 이미지는 1MB 이하로 줄여 전달합니다. PDF는 최대 1MB이며, 영상은 링크로 공유해 주세요.</p><p id="fileStatus" class="file-status" role="status"></p><button id="removeFile" class="text-button" type="button" hidden>선택한 파일 빼기</button></div><label class="field-label" for="portfolioUrl">또는 작품 링크 <span class="optional">선택</span></label><input id="portfolioUrl" class="text-input" type="url" maxlength="2000" inputmode="url" placeholder="https://" aria-describedby="portfolioHelp"><p id="portfolioHelp" class="help" style="margin-top:9px">공유할 자료가 없거나 공개하기 어려우면 이 항목은 비워두세요. 파일·링크에 이름, 연락처, 얼굴, 회사 기밀이 들어 있지 않은지 확인해 주세요.</p><label id="consentLabel" class="consent-label" hidden><input id="portfolioConsent" type="checkbox"><span>이 자료를 공유할 권한이 있으며, 해당 수업 준비를 위해 관리자에게 전달하는 데 동의합니다. 자료를 공유하지 않아도 설문에 참여할 수 있습니다.</span></label>` : optionsHtml(q);
         if(q.id === 'experience_tasks') body += '<details class="optional-detail"><summary>사용해본 AI 도구도 알려주고 싶어요 <span class="optional">선택</span></summary><label class="field-label" for="toolsDetail">도구 이름과 이용 방식</label><input id="toolsDetail" class="text-input" maxlength="160" placeholder="예: ChatGPT 무료, Gemini 유료"></details>';
         if(q.id === 'creation_process') body = `<div id="processSkipped" class="skipped" hidden>아직 경험이 없어도 괜찮아요. 이 질문은 건너뛸게요.</div><div id="processChoices">${body}</div>`;
+        if(q.id === 'support_needs') body += '<label class="field-label" for="supportDetail">더 알고 싶은 내용이나 AI로 잘 안되는 업무가 있나요? <span class="optional">선택</span></label><textarea id="supportDetail" class="text-input" maxlength="800" rows="3" placeholder="예: AI로 홍보 이미지를 만들 때 글자가 자꾸 틀려요. 회의록을 정리하는 방법도 배우고 싶어요."></textarea>';
         if(q.id === 'desired_work') body += '<label class="field-label" for="desiredDetail">하고 싶은 일을 한 문장으로 <span class="optional">선택</span></label><textarea id="desiredDetail" class="text-input" maxlength="400" rows="2" placeholder="예: 우리 가게를 소개하는 짧은 영상을 만들고 싶어요."></textarea>';
         return `<fieldset class="question" id="section-${esc(q.id)}"><legend><span class="number" aria-hidden="true">0${index+1}</span><span class="q-title">${esc(q.title)}${q.required === false ? '<span class="optional">선택</span>' : ''}</span></legend><p class="help">${esc(q.help || '')}</p>${body}<p id="error-${esc(q.id)}" class="question-error" role="alert" hidden></p></fieldset>`;
       }).join('');
@@ -147,7 +149,7 @@ if (typeof document !== 'undefined') {
         answers[q.id]=values;
         if(values.includes('other')) answers.others[q.id]=$(`other-${q.id}`).value.trim();
       }
-      answers.tools_detail=$('toolsDetail').value.trim();answers.desired_detail=$('desiredDetail').value.trim();
+      answers.support_detail=$('supportDetail').value.trim();answers.tools_detail=$('toolsDetail').value.trim();answers.desired_detail=$('desiredDetail').value.trim();
       answers.portfolio={url:$('portfolioUrl').value.trim(),consent:$('portfolioConsent').checked,...(state.file ? {file:state.file} : {})};
       return answers;
     }
@@ -190,6 +192,7 @@ if (typeof document !== 'undefined') {
       const labels=[['experience_tasks','해본 것'],['creation_process','만들어본 과정'],['desired_work','만들고 싶은 것'],['support_needs','필요한 도움']];
       const items=labels.map(([id,label])=>[label,(card[id]||[]).join(' · ') || '제작 경험 질문 건너뜀',card.others?.[id]]);
       if(card.tools_detail)items.push(['사용해본 도구',card.tools_detail]);
+      if(card.support_detail)items.push(['더 알고 싶은 내용 · AI로 잘 안되는 업무',card.support_detail]);
       if(card.desired_detail)items.push(['나의 생각',card.desired_detail]);
       const shared=[card.portfolio?.file?.name,card.portfolio?.url].filter(Boolean);
       items.push(['공유한 결과물',shared.join('\n')||'공유하지 않음']);
