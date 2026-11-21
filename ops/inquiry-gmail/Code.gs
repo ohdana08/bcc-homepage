@@ -44,10 +44,10 @@ function enableNotifications() {
     const triggers = ScriptApp.getProjectTriggers().filter(function(t) { return t.getHandlerFunction() === 'pollInquiryNotifications'; });
     // Install before removing only our previous triggers: a creation failure must
     // leave the current worker running. Existing checkpoints and sent IDs stay intact.
-    ScriptApp.newTrigger('pollInquiryNotifications').timeBased().everyMinutes(5).create();
+    ScriptApp.newTrigger('pollInquiryNotifications').timeBased().everyHours(1).create();
     triggers.forEach(function(t) { ScriptApp.deleteTrigger(t); });
-    props.setProperty('BCC_POLL_INTERVAL_MINUTES', '5');
-    console.log('Notification worker enabled; five-minute checks; historical inquiries excluded');
+    props.setProperty('BCC_POLL_INTERVAL_MINUTES', '60');
+    console.log('Notification worker enabled; hourly checks; historical inquiries excluded');
   } finally { lock.releaseLock(); }
 }
 
