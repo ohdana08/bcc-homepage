@@ -19,17 +19,29 @@ test('API selects only metadata and orders pagination stably',async()=>{
  assert.deepEqual(calls[1],['select','receipt,created_at']);assert.deepEqual(calls.at(-1),['range',100,199]);assert.equal(calls.filter(c=>c[0]==='order').length,2);
 });
 function worker({quota=100,fail=false,events=[]}={}){
- const state={INQUIRY_NOTIFICATION_SECRET:secret,BCC_START_AT:new Date(Date.now()-60000).toISOString()},mails=[],requests=[];
+ const state={INQUIRY_NOTIFICATION_SECRET:secret,BCC_START_AT:new Date(Date.now()-60000).toISOString(),BCC_SURVEY_START_AT:new Date(Date.now()-60000).toISOString(),BCC_ADMIN_ACTION_START_AT:new Date(Date.now()-60000).toISOString()},mails=[],requests=[];
  const props={getProperty:k=>state[k]||null,setProperty:(k,v)=>{state[k]=v;},getProperties:()=>({...state}),deleteProperty:k=>{delete state[k];}};
  const ctx={console:{log(){}},PropertiesService:{getScriptProperties:()=>props},LockService:{getScriptLock:()=>({tryLock:()=>true,releaseLock(){}})},MailApp:{getRemainingDailyQuota:()=>quota,sendEmail:m=>{if(fail)throw Error('send failed');mails.push(m);quota--;}},Utilities:{formatDate:()=> '20261116-test'},UrlFetchApp:{fetch:(u,o)=>{const p=JSON.parse(o.payload);requests.push(p);return {getResponseCode:()=>200,getContentText:()=>JSON.stringify({events:p.kind==='simple'?events:[],hasMore:false})};}}};
  vm.createContext(ctx);vm.runInContext(fs.readFileSync(new URL('../ops/inquiry-gmail/Code.gs',import.meta.url),'utf8'),ctx);return {ctx,state,mails,requests};
 }
-test('two test emails use real composition without API calls or state changes',()=>{
- const w=worker(),before={...w.state};w.ctx.sendTestEmails();assert.equal(w.mails.length,2);assert.equal(w.requests.length,0);assert.deepEqual(w.state,before);assert.ok(w.mails.every(m=>m.to==='ohdana08@gmail.com'&&m.subject.startsWith('[시험]')));assert.ok(w.mails[0].body.includes('https://bcc-admin-eight.vercel.app/'));assert.ok(w.mails[1].body.includes('admin-lecture-requests.html'));
+test('three test emails use real composition without API calls or state changes',()=>{
+ const w=worker(),before={...w.state};w.ctx.sendTestEmails();assert.equal(w.mails.length,3);assert.equal(w.requests.length,0);assert.deepEqual(w.state,before);assert.ok(w.mails.every(m=>m.to==='ohdana08@gmail.com'&&m.subject.startsWith('[시험]')));assert.ok(w.mails[0].body.includes('https://bcc-admin-eight.vercel.app/'));assert.ok(w.mails[1].body.includes('admin-lecture-requests.html'));
 });
 test('failed send and quota exhaustion do not acknowledge unsent inquiry',()=>{
  for(const options of [{fail:true},{quota:0}]){const w=worker({...options,events:[{kind:'simple',id:'abc',created_at:new Date().toISOString()}]});assert.throws(()=>w.ctx.pollInquiryNotifications());assert.equal(w.state.BCC_SENT_simple_abc,undefined);assert.equal(w.state.BCC_CHECKPOINT_simple,undefined);}
 });
 test('successful events deduplicate on repeated polls',()=>{
- const w=worker({events:[{kind:'simple',id:'abc',created_at:new Date().toISOString()}]});w.ctx.pollInquiryNotifications();w.ctx.pollInquiryNotifications();assert.equal(w.mails.length,1);assert.ok(w.state.BCC_SENT_simple_abc);assert.ok(w.state.BCC_LAST_OK);assert.ok(w.requests.every(r=>r.since>=w.state.BCC_START_AT));
+ const w=worker({events:[{kind:'simple',id:'abc',created_at:new Date().toISOString()}]});w.ctx.pollInquiryNotifications();w.ctx.pollInquiryNotifications();assert.equal(w.mails.length,1);assert.ok(w.state.BCC_SENT_simple_abc);assert.ok(w.state.BCC_LAST_OK);assert.ok(w.requests.filter(r=>['simple','detailed'].includes(r.kind)).every(r=>r.since>=w.state.BCC_START_AT));
+});
+
+test('survey route uses protected DB scope and handles empty completed set',async()=>{
+ const calls=[];const q={};for(const m of ['select','eq','neq','lte','order'])q[m]=(...a)=>{calls.push([m,...a]);return q;};q.range=async()=>({data:[]});
+ const h=createInquiryNotificationHandler(()=>({from:t=>{calls.push(['from',t]);return q;}}),()=>secret),r=response();
+ await h({method:'POST',headers:{authorization:'Bearer '+secret},body:{...body,kind:'survey'}},r);
+ assert.equal(r.code,200);assert.deepEqual(r.body,{events:[],hasMore:false,nextOffset:0});assert.equal(calls[0][1],'training_need_surveys');assert.ok(calls.some(c=>c[0]==='eq'&&c[1]==='is_sample'&&c[2]===false));
+});
+test('survey read failures never become empty success pages',async()=>{
+ const q={};for(const m of ['select','eq','neq','lte','order'])q[m]=()=>q;q.range=async()=>({error:new Error('private DB diagnostic')});
+ const h=createInquiryNotificationHandler(()=>({from:()=>q}),()=>secret),r=response();await h({method:'POST',headers:{authorization:'Bearer '+secret},body:{...body,kind:'survey'}},r);
+ assert.equal(r.code,503);assert.deepEqual(r.body,{error:'temporarily unavailable'});
 });
