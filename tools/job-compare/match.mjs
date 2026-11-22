@@ -1,3 +1,5 @@
+import {inferOccupations, titleOccupations} from './occupations.mjs';
+
 // Shared vocabulary lets a Korean résumé find terms in English-language postings.
 const vocabulary = [
   ['데이터', 'data'], ['분석', '분석가', '분석하고', 'analysis', 'analytics', 'analyst', 'analyze'],
@@ -24,6 +26,7 @@ const vocabulary = [
 const aliases = new Map(vocabulary.flatMap(([key,...words]) => [key,...words].map(w => [w,key])));
 const phrases = [...aliases.entries()].filter(([s]) => s.includes(' '));
 const common = new Set(('the and are for with you your our that this from who of in to on or an as at be by is we will for have strong ability skills experience experienced years year relevant work working team teams a plus preferred required qualifications responsibilities requirements understanding knowledge proficiency excellent other etc within including deliver seeking professional role relevant related level build support can across more using field skills 회사 업무 담당 대한 관련 이상 경험 경력 능력 보유 가능 우대 이해 수준 및 있는 있으신 갖춘 분 분들 필요한 업무를 경력을 경험을 경험이 경력이 다양한 다양한 경험자 활용 통해 위한 적극적인 자격 요건 자격요건 우대사항 자격조건 주요업무 우리 팀 저희 업무 수행 경험하신 업무경험 근무 지원 지원자 지원자격 또는 경우 해당 기타 있음 보유자 경력자 가능하신 사용 대한 대한 기업 전문 프로젝트 실무 탄탄한 우수한').split(/\s+/));
+const background = new Set('학력 신입 무관 대졸 고졸 정규직 계약직 경력직 학사 학위 졸업 경력무관 학력무관 경력자 경험자 영어 한국어 협업 팀워크 소통 degree bachelor bachelors communication teamwork'.split(' '));
 function terms(text) {
   const normalized = text.normalize('NFKC').toLowerCase();
   const words = normalized.match(/[a-z0-9][a-z0-9+#.-]*|[가-힣]+/g) || [];
@@ -40,8 +43,10 @@ function terms(text) {
   for (const [phrase,key] of phrases) if (normalized.includes(phrase)) found.add(key);
   return found;
 }
-function evidenceIndex(resume) {
-  const lines = resume.split(/\n+|(?<=[.!?。])\s+|[•●]/u).map(text=>text.trim()).filter(Boolean);
+function evidenceLines(resume) {
+  return resume.split(/\n+|(?<=[.!?。])\s+|[•●]/u).map(text=>text.trim()).filter(Boolean);
+}
+function evidenceIndex(lines) {
   const index = new Map();
   for (const line of lines) {
     for (const word of terms(line)) {
@@ -52,8 +57,11 @@ function evidenceIndex(resume) {
   return index;
 }
 export function compareJobs(jobs, resume, role = '') {
-  const evidence = evidenceIndex(resume);
+  const lines = evidenceLines(resume);
+  const evidence = evidenceIndex(lines);
+  const roleLines = lines.map(line=>({line, occupations:inferOccupations(line)}));
   const wanted = terms(role);
+  const target = new Set(role.trim() ? titleOccupations(role) : inferOccupations(resume));
   const postings = jobs.map(job => ({
     job, title:terms(job.title),
     rows:job.requirements.map(text => ({text, words:terms(text)}))
@@ -67,7 +75,10 @@ export function compareJobs(jobs, resume, role = '') {
   const weight = word => 1 + Math.log((jobs.length + 1) / (1 + (freq.get(word) || 0)));
   const overlap = (set,other) => [...set].filter(w => other.has(w));
   const sum = words => words.reduce((n,w) => n+weight(w),0);
-  return postings.map(({job,title,rows}) => {
+  const sorted = postings.map(({job,title,rows}) => {
+    const rolesInTitle = titleOccupations(job.title);
+    const targetInTitle = rolesInTitle.some(label=>target.has(label));
+    if (target.size && rolesInTitle.length && !targetInTitle) return null;
     const pairs = rows.map(({text,words}) => {
       const hits = new Map();
       for (const word of words) {
@@ -83,8 +94,43 @@ export function compareJobs(jobs, resume, role = '') {
     const ranked = pairs.filter(p=>p.score>0).sort((a,b)=>b.score-a.score);
     const roleInTitle = sum(overlap(title,wanted));
     const roleInBody = sum([...new Set(rows.flatMap(r=>overlap(r.words,wanted)))]);
-    const score = 5*roleInTitle + .5*roleInBody + 2*sum(overlap(title,evidence)) +
+    const titleWords = overlap(title,evidence).filter(word=>!background.has(word));
+    const titleCandidates = new Map();
+    for (const {line,occupations} of roleLines) {
+      const shared = occupations.filter(occupation => rolesInTitle.includes(occupation));
+      if (shared.length) titleCandidates.set(line,new Set(shared));
+    }
+    for (const word of titleWords) {
+      for (const line of evidence.get(word)) {
+        if (!titleCandidates.has(line)) titleCandidates.set(line,new Set());
+        titleCandidates.get(line).add(word);
+      }
+    }
+    const first = [...titleCandidates].sort((a,b)=>b[1].size-a[1].size)[0];
+    const titleEvidence = first ? {line:first[0], matched:[...first[1]]} : null;
+    const resumeTitle = sum(titleWords);
+    const specificEvidence = ranked.some(pair=>pair.matched.some(word=>!background.has(word)));
+    if (!specificEvidence && !resumeTitle && !targetInTitle) return null;
+    const score = (targetInTitle ? 5 : 0) + 5*roleInTitle + .5*roleInBody + 2*resumeTitle +
       ranked.slice(0,3).reduce((n,p)=>n+p.score,0);
-    return { job, pairs, ranked, score };
-  }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score).slice(0,3);
+    const bodyRoles = target.size && !rolesInTitle.length && ranked.length
+      ? titleOccupations(ranked.slice(0,2).map(pair=>pair.text).join(' '))
+      : [];
+    const roleConfirmed = targetInTitle || (target.size ? bodyRoles.some(label=>target.has(label)) : specificEvidence);
+    return { job, pairs, ranked, titleEvidence, score, roleConfirmed };
+  }).filter(r=>r && r.score>0).sort((a,b)=>b.score-a.score);
+  if (!sorted.length) return [];
+  const employer = posting => (posting.job.company || '').normalize('NFKC').toLowerCase()
+    .replace(/주식회사|\(주\)|\s/g,'');
+  const selected = [sorted[0]];
+  const employers = new Set([employer(sorted[0])]);
+  for (const posting of sorted.slice(1)) {
+    const name = employer(posting);
+    if (posting.roleConfirmed && name && !employers.has(name)) {
+      selected.push(posting);
+      employers.add(name);
+      if (selected.length === 3) return selected;
+    }
+  }
+  return [...selected,...sorted.filter(posting=>!selected.includes(posting))].slice(0,3);
 }

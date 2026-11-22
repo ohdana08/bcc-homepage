@@ -1,4 +1,6 @@
-// Public employer feeds only. Resume text is processed in the visitor's browser.
+import {parseOccupationQuery} from '../tools/job-compare/occupations.mjs';
+import {searchIncruit} from '../lib/job-compare-incruit.mjs';
+import {searchSecondaryWithStatus} from '../lib/job-compare-secondary.mjs';
 const boards = [
   ['krafton', '크래프톤'],
   ['moloco', '몰로코'],
@@ -59,18 +61,54 @@ async function readBoard([slug, company]) {
   return jobs;
 }
 
+// A warm deployment can reuse the same employer lists across occupation searches.
+const employerCache = new Map();
+function employerFeed(board) {
+  if (process.env.VERCEL !== '1') return readBoard(board);
+  const cached = employerCache.get(board[0]);
+  if (cached && cached.until > Date.now()) return cached.promise;
+  const promise = readBoard(board).catch(error => {
+    employerCache.delete(board[0]);
+    throw error;
+  });
+  employerCache.set(board[0], { promise, until: Date.now() + 5 * 60_000 });
+  return promise;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'GET 요청만 지원합니다.' });
   }
-  const results = await Promise.allSettled(boards.map(readBoard));
-  const healthy = results.filter(result => result.status === 'fulfilled');
-  const partial = healthy.length < boards.length;
-  if (!healthy.length) {
+  const terms = parseOccupationQuery(req.query?.q);
+  const feeds = [
+    { name: '인크루트', load: () => searchIncruit(terms) },
+    { name: '잡알리오', load: () => searchSecondaryWithStatus(terms) },
+    ...boards.map(board => ({ name: board[1], load: async () => ({ jobs: await employerFeed(board), partial: false }) }))
+  ];
+  const results = await Promise.allSettled(feeds.map(feed => feed.load()));
+  const jobs = [];
+  const seenUrls = new Set();
+  const seenTitles = new Set();
+  const normalize = text => text.normalize('NFKC').toLowerCase().replace(/[\s.,·()\[\]]+/g,'');
+  const sources = results.map((result,index) => {
+    const name = feeds[index].name;
+    if (result.status === 'rejected') return {name, count:0, status:'unavailable'};
+    const {jobs: candidates, partial} = result.value;
+    for (const job of candidates) {
+      const key = [job.company,job.title,job.location].map(normalize).join('|');
+      if (seenUrls.has(job.url) || seenTitles.has(key)) continue;
+      seenUrls.add(job.url);
+      seenTitles.add(key);
+      jobs.push({...job, source:name});
+    }
+    return {name, count:candidates.length, status:partial ? 'partial' : 'ok'};
+  });
+  const partial = sources.some(source => source.status !== 'ok');
+  if (sources.every(source => source.status === 'unavailable')) {
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(503).json({ jobs: [], partial: true, error: '채용 게시판을 불러오지 못했습니다.' });
+    return res.status(503).json({ jobs: [], partial: true, sources, error: '채용 게시판을 불러오지 못했습니다.' });
   }
   res.setHeader('Cache-Control', partial ? 'public, max-age=0, s-maxage=60' : 'public, max-age=0, s-maxage=900');
-  return res.status(200).json({ jobs: healthy.flatMap(result => result.value), partial });
+  return res.status(200).json({ jobs, partial, sources });
 }

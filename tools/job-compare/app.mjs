@@ -1,5 +1,6 @@
 import {readDocument} from '../document-mate/files.mjs';
 import {compareJobs} from './match.mjs';
+import {inferOccupations} from './occupations.mjs';
 
 const get = id => document.getElementById(id);
 const form = get('compare-form');
@@ -74,11 +75,11 @@ function cell(label,text) {
   el.append(node('strong',label),node('p',text));
   return el;
 }
-function jobCard({job,ranked,pairs}) {
+function jobCard({job,ranked,pairs,titleEvidence}) {
   const article = node('article',null,'job');
   const head = node('div',null,'jobtop');
   const heading = node('div');
-  heading.append(node('p',job.company+' · '+job.location,'company'),node('h3',job.title));
+  heading.append(node('p',[job.company,job.location,job.source].filter(Boolean).join(' · '),'company'),node('h3',job.title));
   const source = node('a','공고 원문 ↗','source');
   source.href = job.url;
   source.target = '_blank';
@@ -86,9 +87,21 @@ function jobCard({job,ranked,pairs}) {
   source.setAttribute('aria-label',job.company+' '+job.title+' 공고 원문 새 창에서 열기');
   head.append(heading,source);
   article.append(head);
+  if (job.source === '인크루트') {
+    article.append(node('p','인크루트에 공개된 경력·학력 조건을 표시합니다. 상세 업무와 자격 요건은 공고 원문에서 확인하세요.','note'));
+  }
   const shown = ranked.slice(0,2);
   if (!shown.length) {
-    article.append(node('p','직무명 또는 희망 직무와 관련된 공고입니다. 요건과 직접 겹치는 이력서 표현은 찾지 못했습니다.'));
+    if (titleEvidence) {
+      const grid = node('div',null,'grid');
+      const proof = cell('이 직무와 관련된 이력서 문장',titleEvidence.line);
+      proof.append(node('p','연결한 직무·표현 · '+titleEvidence.matched.join(', '),'terms'));
+      grid.append(cell('공고의 직무명',job.title),proof);
+      article.append(grid);
+    }
+    article.append(node('p', titleEvidence
+      ? '아래 지원 요건과 직접 겹치는 이력서 표현은 찾지 못했습니다.'
+      : '희망 직무와 관련된 공고입니다. 아래 지원 요건과 직접 겹치는 이력서 표현은 찾지 못했습니다.'));
   }
   for (const pair of shown) {
     const grid = node('div',null,'grid');
@@ -97,7 +110,12 @@ function jobCard({job,ranked,pairs}) {
     grid.append(cell('공고에 나온 요건',pair.text),proof);
     article.append(grid);
   }
-  const rest = pairs.filter(p=>!shown.includes(p));
+  if (!shown.length && pairs.length) {
+    const list = node('ul');
+    for (const pair of pairs.slice(0,2)) list.append(node('li',pair.text));
+    article.append(list);
+  }
+  const rest = shown.length ? pairs.filter(p=>!shown.includes(p)) : pairs.slice(2);
   if (rest.length) {
     const more = node('details');
     more.append(node('summary','다른 공고 요건 '+rest.length+'개 보기'));
@@ -113,8 +131,9 @@ function jobCard({job,ranked,pairs}) {
   const details = node('details');
   details.append(node('summary','채용 문의 초안 보기'));
   const intro = '안녕하세요. '+job.company+'의 '+job.title+' 공고를 보고 문의드립니다.';
-  const question = shown.length
-    ? '제 이력서에는 다음 경험이 있습니다.\n“'+shown[0].line+'”\n이 경험을 지원서에 담을 때 어떤 업무 사례를 구체적으로 설명하면 좋을까요?'
+  const experience = shown[0]?.line || titleEvidence?.line;
+  const question = experience
+    ? '제 이력서에는 다음 경험이 있습니다.\n“'+experience+'”\n이 경험을 지원서에 담을 때 어떤 업무 사례를 구체적으로 설명하면 좋을까요?'
     : '지원서를 준비하고 있습니다. 이 직무에서 가장 중요하게 살펴보시는 경험은 무엇인가요?';
   details.append(node('p',intro+'\n'+question+'\n감사합니다.','draft'),
     node('p','연락 가능한 경로는 위 공고 원문에서 확인하세요.','note'));
@@ -136,20 +155,30 @@ form.addEventListener('submit', async event => {
   status.textContent = '기업의 채용 공고를 불러오는 중입니다…';
   const timer = setTimeout(()=>controller.abort(),30000);
   try {
-    const response = await fetch('/api/job-compare-list',{signal:controller.signal,credentials:'omit'});
+    const occupations = inferOccupations(resume.value, role.value);
+    const search = new URL('/api/job-compare-list', location.origin);
+    if (occupations.length) search.searchParams.set('q', occupations.join(','));
+    const response = await fetch(search,{signal:controller.signal,credentials:'omit'});
     if (!response.ok) throw new Error();
     const payload = await response.json();
     if (!Array.isArray(payload.jobs)) throw new Error();
     if (request !== controller) return;
     const jobs = payload.jobs.filter(validJob);
     const matches = compareJobs(jobs,resume.value,role.value);
-    const limited = payload.partial ? ' 일부 기업의 공고를 불러오지 못했습니다.' : '';
+    const companyCount = new Set(jobs.map(job => job.company.trim())).size;
+    const scope = occupations.length ? '검색 직무 · '+occupations.join(', ')+'. ' : '직무명 자동 분류 없이 조회했습니다. ';
+    const coverage = '기업·기관 '+companyCount+'곳이 올린 국내 근무 공고 '+jobs.length+'건';
+    const sources = Array.isArray(payload.sources) ? payload.sources : [];
+    const counts = sources.filter(s => typeof s.name === 'string' && s.count>0).map(s => s.name+' '+s.count+'건');
+    const sourceText = counts.length ? ' 조회 출처 · '+counts.join(', ')+'.' : '';
+    const missing = sources.filter(s=>s.status==='partial' || s.status==='unavailable').map(s=>s.name);
+    const limited = payload.partial ? ' '+(missing.length ? missing.join('·')+'에서 일부 공고를 불러오지 못했습니다.' : '일부 출처의 응답이 누락되어 조회된 공고만 비교했습니다.') : '';
     if (!jobs.length || !matches.length) {
-      status.textContent = (jobs.length ? '확인한 '+jobs.length+'개 공고에서 관련 표현을 찾지 못했습니다. 경력에 사용한 기술이나 희망 직무를 구체적으로 입력해 보세요.' : '현재 비교할 국내 근무 공고를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요.')+limited;
+      status.textContent = scope + (jobs.length ? coverage+'에서 이력서와 연결할 공고를 찾지 못했습니다. 희망 직무나 사용한 기술을 구체적으로 입력해 보세요.' : '현재 조회된 국내 근무 공고가 없습니다. 다른 희망 직무로 다시 비교해 보세요.')+sourceText+limited;
       return;
     }
     get('results-title').textContent = '내 이력서와 비교한 공고 '+matches.length+'개';
-    get('summary').textContent = '조회한 국내 근무 공고 '+jobs.length+'개에서 희망 직무와 경력·기술 표현이 겹치는 순서입니다. 경력 연수와 필수 조건 충족 여부는 원문에서 확인하세요.'+limited;
+    get('summary').textContent = scope+coverage+'에서 희망 직무와 이력서의 관련 표현을 바탕으로 골랐습니다. 같은 직무의 후보가 여럿이면 서로 다른 기업·기관이 올린 공고를 우선합니다. 경력 연수와 필수 조건은 원문에서 확인하세요.'+sourceText+limited;
     get('job-cards').replaceChildren(...matches.map(jobCard));
     status.textContent = '';
     result.hidden = false;

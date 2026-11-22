@@ -33,3 +33,24 @@ test('total board failure is distinct from an empty list of open jobs', async t 
   assert.equal(res.code, 503);
   assert.equal(res.headers['Cache-Control'], 'no-store');
 });
+
+test('multiple-employer RSS compares real domestic conditions, drops closed and overseas jobs, and coalesces repeated links', async t => {
+  const item = (id, country, end='채용시') => `<item><title><![CDATA[[병원${id}] 간호사 채용]]></title><link>https://job.incruit.com/jobdb_info/jobpost.asp?job=${id}</link><description><![CDATA[▨ 회사명 : 병원${id}<br>▨ 경력 : 신입<br>▨ 학력 : 대졸↑<br>▨ 지역 : |${country}<br>▨ 마감일 : ${end}<br>]]></description><pubDate>Sun, 02 Nov 2025 12:00:00 +0900</pubDate></item>`;
+  const examples = item(1,'경기>수원시')+item(1,'경기>수원시')+item(2,'일본')+item(3,'부산','11/11(화)')+item(4,'충남');
+  const requests = [];
+  t.mock.method(globalThis,'fetch',async url => {
+    requests.push(String(url));
+    if (String(url).startsWith('https://www.incruit.com/rss/')) return new Response('<rss><channel>'+examples+'</channel></rss>');
+    throw new Error('Other sources down');
+  });
+  const res = response();
+  await handler({method:'GET',query:{q:'간호사,PRIVATE_TEXT'}},res);
+  assert.equal(res.code,200);
+  assert.equal(res.data.jobs.length,2);
+  assert.deepEqual(res.data.jobs[0].requirements,['경력 : 신입','학력 : 대졸↑']);
+  assert.equal(res.data.jobs[0].location,'경기 수원시');
+  assert.deepEqual(res.data.sources[0],{name:'인크루트',count:2,status:'ok'});
+  assert.equal(requests.filter(u=>u.includes('incruit.com')).length,1);
+  assert.ok(requests.includes('https://www.incruit.com/rss/job.asp?occ1=190'));
+  assert.ok(requests.every(u=>!u.includes('PRIVATE_TEXT')));
+});
