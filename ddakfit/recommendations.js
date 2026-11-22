@@ -46,13 +46,11 @@
     original.rel = 'noopener noreferrer';
     original.addEventListener('click', () => track('notice'));
     const diagnosis = node('a', '이 공고로 진단받기 →', 'button');
-    // Build the destination from the validated original, never an arbitrary upstream redirect.
-    const next = new URL('https://ddakfit.bccconsulting.kr/embed');
-    next.searchParams.set('start', 'direct');
-    next.searchParams.set('noticeUrl', url);
-    diagnosis.href = next.href;
-    diagnosis.referrerPolicy = 'no-referrer';
-    diagnosis.addEventListener('click', () => track('diagnosis'));
+    diagnosis.href = '#diagnosis';
+    diagnosis.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (openNoticeDiagnosis(url)) track('diagnosis');
+    });
     actions.append(original, diagnosis);
     item.append(actions, node('p', '진단은 Google 로그인 후 공고문·양식을 첨부해 진행합니다.', 'hint'));
     return item;
