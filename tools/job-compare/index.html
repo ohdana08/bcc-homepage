@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="내 이력서의 경험과 국내 근무 채용 공고의 요건을 대조하고, 지원 전에 확인할 내용을 정리하세요.">
+  <title>내 이력서로 채용 공고 3개 비교하기 | BCC 잇툴즈</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <header><a class="brand" href="/tools.html"><b>BCC</b> 잇툴즈</a><a href="/tools.html#job">취업 도구 목록 <span aria-hidden="true">↗</span></a></header>
+  <main>
+    <div class="intro"><h1>내 이력서로<br>채용 공고 <em>3개</em> 비교하기</h1>
+      <p>크래프톤·몰로코·센드버드의 국내 근무 공고에서 최대 3개를 골라, 기업이 찾는 경험과 내 이력서의 문장을 나란히 보여줍니다.</p>
+    </div>
+    <section class="paper" aria-labelledby="resume-title">
+      <form id="compare-form">
+        <div class="input-head"><label id="resume-title" for="resume">이력서 내용</label><label class="upload"><span aria-hidden="true">↑</span> 파일에서 읽기<input id="resume-file" type="file" accept=".pdf,.docx,.hwpx,.txt,.md" aria-label="이력서 파일에서 읽기" aria-describedby="file-types"></label></div>
+        <textarea id="resume" maxlength="12000" required autocomplete="off" spellcheck="false" placeholder="경력, 프로젝트, 사용한 도구를 붙여 넣으세요.&#10;예) SQL로 고객의 구매 데이터를 분석하고 주간 리포트를 작성했습니다."></textarea>
+        <div class="hints"><span id="file-types">텍스트형 PDF · DOCX · HWPX · TXT · MD, 최대 5MB</span><span id="char-count">0 / 12,000자</span></div>
+        <p class="message" id="file-status" role="status"></p>
+        <label class="role-label" for="role">희망 직무 <small>선택</small></label>
+        <input id="role" type="text" maxlength="100" placeholder="예) 데이터 분석, 영업" autocomplete="off">
+        <div class="form-foot"><p>이력서는 이 브라우저에서만 읽습니다.<br>이름과 연락처는 생략해도 됩니다.</p><button type="submit" id="compare">채용 공고 비교하기 <span aria-hidden="true">→</span></button></div>
+      </form>
+    </section>
+    <p id="status" class="status" role="status"></p>
+    <section id="results" aria-labelledby="results-title" hidden>
+      <h2 id="results-title" tabindex="-1">공고 비교 결과</h2>
+      <p id="summary"></p><div id="job-cards"></div>
+    </section>
+  </main>
+</body>
+</html>

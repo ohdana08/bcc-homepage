@@ -99,6 +99,19 @@
       ]
     },
     {
+      "source": "/tools/job-compare/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; connect-src 'self'; worker-src 'self' blob:; form-action 'none'; object-src 'none'; base-uri 'none'"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
+    },
+    {
       "source": "/tools/document-mate/(.*)",
       "headers": [
         {
