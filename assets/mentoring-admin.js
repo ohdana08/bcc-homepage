@@ -1,12 +1,8 @@
 const $=id=>document.getElementById(id);
 let client, owner, epoch=0, busy=false;
 const statusText=(text,error=false)=>{$('status').textContent=text;$('status').classList.toggle('error',error);};
-const timeLabel=value=>value?new Date(value).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false}):'';
-function hideCode() {
-  $('issued-code').textContent='';$('issued-for').textContent='';$('issued').hidden=true;
-}
 function clearPrivate() {
-  epoch++;owner=null;hideCode();$('workspace').hidden=true;$('slots').replaceChildren();$('login').hidden=false;
+  epoch++;owner=null;$('workspace').hidden=true;$('slots').replaceChildren();$('login').hidden=false;
 }
 function showSlots(slots) {
   const fragment=document.createDocumentFragment();
@@ -14,8 +10,8 @@ function showSlots(slots) {
     const form=document.createElement('form');form.className='slot';form.autocomplete='off';
     const heading=document.createElement('h2');heading.textContent='참여자 '+item.slot;
     const badge=document.createElement('small');
-    const status={empty:'등록 가능',active:'본인 인증 완료',invited:'초대코드 발급됨'};
-    badge.textContent=status[item.status]+(item.status==='invited'&&item.expires_at?' · '+timeLabel(item.expires_at)+'까지':'');
+    const status={empty:'등록 가능',active:'본인 인증 완료',invited:'이메일 등록 완료'};
+    badge.textContent=status[item.status];
     form.append(heading,badge);
     const field=(type,label,value)=>{
       const wrap=document.createElement('label');wrap.textContent=label;
@@ -23,20 +19,16 @@ function showSlots(slots) {
       el.readOnly=item.status!=='empty';el.maxLength=type==='email'?254:80;wrap.append(el);form.append(wrap);return el;
     };
     const name=field('text','대표 이름',item.name), email=field('email','인증 이메일',item.email);
-    if(item.status!=='active') {
+    if(item.status==='empty') {
       const submit=document.createElement('button');submit.type='submit';submit.className='issue';
-      submit.textContent=item.status==='invited'?'새 초대코드 발급':'등록하고 코드 발급';form.append(submit);
+      submit.textContent='이메일 등록';form.append(submit);
       form.onsubmit=event=>{
         event.preventDefault();
-        if(item.status==='invited'&&!window.confirm('이전 코드는 만료됩니다. 새 코드를 발급할까요?'))return;
         action(async()=>{
-          hideCode();
+          
           const created=await call('POST',{slot:item.slot,name:name.value.trim(),email:email.value.trim()});
           if(!created)return;
-          $('issued-for').textContent=name.value+' · '+email.value+(created.expires_at?' · '+timeLabel(created.expires_at)+'까지':'');
-          $('issued-code').textContent=created.code;$('issued').hidden=false;$('copy').focus();
-          // Keep a newly issued code visible even if refreshing the status list fails.
-          await reload();statusText('개인 초대코드를 발급했습니다.');
+          await reload();statusText('이메일을 등록했습니다.');
         });
       };
     }
@@ -70,9 +62,7 @@ async function action(work) {
   try {await work();}catch(error){statusText(error.message||'요청을 처리하지 못했습니다.',true);}
   finally{busy=false;document.querySelectorAll('.issue,#refresh').forEach(el=>el.disabled=false);}
 }
-$('hide').onclick=hideCode;
-$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('issued-code').textContent);statusText('초대코드를 복사했습니다.');}catch{statusText('화면의 코드를 선택해 복사해주세요.');}};
-$('refresh').onclick=()=>action(async()=>{hideCode();await reload();statusText('등록 상태를 불러왔습니다.');});
+$('refresh').onclick=()=>action(async()=>{await reload();statusText('등록 상태를 불러왔습니다.');});
 window.addEventListener('pagehide',clearPrivate);
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 async function init() {

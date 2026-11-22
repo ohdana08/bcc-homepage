@@ -31,12 +31,12 @@ test('admin can view three slots but upstream secrets cannot reach listing',asyn
   assert.equal(result.status,200);assert.equal(result.data.slots.length,3);assert.equal(result.data.slots[0].code,undefined);
   assert.match(result.headers['Cache-Control'],/no-store/);
 });
-test('mint one code and only forward the fixed registration fields',async()=>{
+test('register a verified email and forward only the fixed registration fields',async()=>{
   const result=await invoke(request('POST',{slot:2,name:'합성 대표',email:'Sample@Example.test',role:'admin'}),{fetch:async(url,init)=>{
     assert.ok(url.endsWith('/slots/2'));assert.deepEqual(JSON.parse(init.body),{name:'합성 대표',email:'sample@example.test'});
     return Response.json({slot:2,code:'synthetic-first-view',token:'secret'});
   }});
-  assert.equal(result.status,200);assert.deepEqual(result.data,{slot:2,code:'synthetic-first-view',expires_at:null});
+  assert.equal(result.status,200);assert.deepEqual(result.data,{slot:2});
   assert.equal((await invoke(request('POST',{slot:4,email:'bad',name:'x'}),{fetch:noFetch})).status,400);
 });
 test('refuse an insecure origin and small credential; safe upstream conflicts',async()=>{

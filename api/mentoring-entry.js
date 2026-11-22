@@ -26,7 +26,7 @@ export default async function enterWorkspace(req, res) {
       headers:{Authorization:'Bearer '+secret,'Content-Type':'application/json'},
       body:JSON.stringify({verified_email:user.email,flow,code}),cache:'no-store',redirect:'error',signal:AbortSignal.timeout(12000)});
     if(!upstream.ok) return fail([400,401,403,429].includes(upstream.status)?upstream.status:503,
-      upstream.status===429?'잠시 후 다시 시도해주세요.':'등록 이메일과 초대코드를 확인해주세요. 입장 시간이 지났다면 다시 시작해주세요.');
+      upstream.status===429?'잠시 후 다시 시도해주세요.':'멘토에게 등록한 이메일인지 확인해주세요. 입장 시간이 지났다면 다시 시작해주세요.');
     const {ticket}=await upstream.json();
     if(!/^[\w-]{43}$/.test(ticket||'')) return fail(503,'입장 정보를 다시 요청해주세요.');
     return res.json({ticket,redeem_url:host.origin+'/api/auth/redeem'});
