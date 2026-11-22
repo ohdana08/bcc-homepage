@@ -1,0 +1,115 @@
+.catalog-header,
+.catalog {
+  padding-inline: max(20px, 4vw);
+}
+.catalog-header { padding-top: clamp(28px, 4vw, 58px); }
+.catalog-header p { color: var(--gold3); font-size: 15px; font-weight: 650; }
+.catalog-header h1 {
+  margin-top: 5px;
+  font-size: clamp(38px, 4.8vw, 64px);
+  letter-spacing: -.06em;
+  line-height: 1.15;
+}
+.catalog { padding-block: 22px clamp(44px, 6vw, 80px); }
+.catalog, .catalog-item { scroll-margin-top: 84px; }
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.catalog-filters legend,
+.catalog-filters input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.catalog-filters label {
+  display: inline-grid;
+  place-items: center;
+  min-height: 44px;
+  padding-inline: 19px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  color: var(--dim);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 650;
+}
+.catalog-filters label:hover { border-color: var(--gold3); }
+.catalog-filters input:checked + label {
+  border-color: var(--gold3);
+  background: var(--gold3);
+  color: #181510;
+}
+.catalog-filters input:focus-visible + label,
+.catalog a:focus-visible { outline: 2px solid var(--gold3); outline-offset: 3px; }
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(32px, 4vw, 58px) 24px;
+}
+.catalog-item { min-width: 0; }
+.catalog-item:target .catalog-cover { outline: 2px solid var(--gold3); }
+.catalog-cover {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #e9e6df;
+}
+.catalog-cover img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.catalog-cover.film { background: #171719; }
+.catalog-cover.film img, .catalog-cover.model img { object-fit: cover; }
+.catalog-cover.book { background: #dacfc0; padding: 10px; }
+.catalog-cover.book img { width: auto; max-width: 100%; box-shadow: 3px 4px 10px #47403944; }
+.catalog-caption { padding: 14px 1px 0; }
+.catalog-access { color: var(--gold3); font-size: 14px; font-weight: 700; }
+.catalog-caption h2 { margin: 4px 0; font-size: clamp(20px, 2.1vw, 26px); line-height: 1.35; letter-spacing: -.04em; }
+.catalog-caption p { font-size: 15px; color: var(--dim); word-break: keep-all; }
+.item-link, .sample-link { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; font-weight: 650; font-size: 14px; }
+.item-link:hover, .sample-link:hover, .catalog-caption h2 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.sample-link { margin-inline-start: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.studio-notes {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 28px;
+  margin-top: 46px;
+  padding-block: 30px 0;
+  border-top: 1px solid var(--border);
+}
+.studio-notes h2 { font-size: 24px; }
+.studio-notes p { font-size: 15px; color: var(--dim); }
+.studio-notes nav { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.studio-notes a { display: flex; justify-content: space-between; gap: 8px; padding-block: 11px; border-bottom: 1px solid var(--border); }
+.studio-notes a:hover, .studio-notes a span { color: var(--gold3); }
+.catalog:has(#catalog-free:checked) .catalog-item:not([data-kind="free"]),
+.catalog:has(#catalog-paid:checked) .catalog-item:not([data-kind="paid"]),
+.catalog:has(#catalog-showcase:checked) .catalog-item:not([data-kind="showcase"]),
+.catalog:has(#catalog-free:checked, #catalog-paid:checked) .studio-notes,
+.catalog:has(#catalog-free:checked, #catalog-paid:checked) ~ .project-details { display: none; }
+
+@media (max-width: 850px) {
+  .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 18px; }
+  .studio-notes { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 580px) {
+  .nav-in { gap: 8px; }
+  .brand { font-size: 13px; }
+  .brand img { height: 34px; }
+  .back { font-size: 13px; white-space: nowrap; }
+  .catalog { padding-top: 16px; }
+  .catalog-filters { gap: 4px; padding-bottom: 12px; margin-bottom: 18px; }
+  .catalog-filters label { padding-inline: 11px; font-size: 13px; }
+  .catalog-grid { grid-template-columns: 1fr; }
+  .studio-notes nav { grid-template-columns: 1fr; }
+}

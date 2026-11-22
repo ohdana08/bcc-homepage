@@ -72,7 +72,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script defer src="/assets/bcc-inquiry.js?v=20261116a"></script>
 <script defer src="/assets/contact-anchor.js?v=20261116a"></script>
 <link rel="stylesheet" href="/assets/student-works.css?v=20261117a">
-<link rel="stylesheet" href="/assets/portfolio-entry.css">
+<link rel="stylesheet" href="/assets/portfolio-entry.css?v=20261122b">
 <script defer src="/assets/portfolio-entry.js"></script>
 </head>
 <body>
@@ -140,7 +140,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <main id="main" tabindex="-1">
 <section class="hero entry-hero" aria-labelledby="hero-title">
   <div class="entry-grid">
-    <div>
+    <div class="entry-intro">
       <span class="entry-credential">2014년부터 교육·컨설팅 현장에서</span>
       <h1 id="hero-title">
         <span class="entry-kicker">보고서부터 홈페이지까지,</span>
@@ -150,13 +150,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <p class="entry-copy">기업·대학·공공기관에서 각자의 업무를 가져와<br>수업 시간에 직접 만들어 봅니다.</p>
       <div class="entry-actions">
         <a href="/lecture-request/?utm_source=homepage&amp;utm_medium=hero&amp;utm_campaign=always_on" data-education-topic="institution" data-education-action="hero">기관 교육 문의하기 <span aria-hidden="true">↗</span></a>
-        <a href="/portfolio/">결과물 보기 <span aria-hidden="true">→</span></a>
       </div>
     </div>
+    <nav class="entry-works" aria-label="결과물 바로 보기">
+      <a class="entry-work entry-student" href="/student-works/">
+        <img src="/assets/results/hug-result-01.png" width="1280" height="720" alt="">
+        <span class="entry-work-caption"><strong>수업결과물 <span aria-hidden="true">→</span></strong><small>HUG 안심중개 홈페이지</small></span>
+      </a>
+      <a class="entry-work entry-instructor" href="/projects.html">
+        <img src="/assets/results/cafe-a-01.png" width="2200" height="1500" alt="">
+        <span class="entry-work-caption"><strong>강사결과물 <span aria-hidden="true">→</span></strong><small>ㄱ자 마당 카페 3D 모델</small></span>
+      </a>
+    </nav>
     <div class="entry-portrait">
-      <img src="/assets/profile-oh-yerim.jpeg" alt="실습 중인 교육생 옆에서 설명하는 오예림 강사" width="735" height="735" fetchpriority="high">
-      <a class="entry-institutions" href="/institutions.html">주택도시보증공사 · 부산대학교<br>부산경제진흥원 · 부경대학교</a>
-      <a class="entry-reviews" href="/reviews.html"><small>교육생이 남긴 후기</small><strong>315장</strong></a>
+      <img src="/assets/profile-oh-yerim.jpeg" alt="실습 중인 교육생 옆에서 설명하는 오예림 강사" width="735" height="735">
+      <div>
+        <a class="entry-institutions" href="/institutions.html">주택도시보증공사 · 부산대학교<br>부산경제진흥원 · 부경대학교</a>
+        <a class="entry-reviews" href="/reviews.html">교육생이 남긴 후기 <strong>315장</strong> →</a>
+      </div>
     </div>
   </div>
 </section>
