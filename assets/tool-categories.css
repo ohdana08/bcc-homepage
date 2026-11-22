@@ -19,3 +19,32 @@
 .category-footer { background: #111; color: #eee; padding: 20px 0; font-size: 13px; }
 .category-footer .inner { flex-wrap: wrap; gap: 8px 20px; }
 .category-footer a { text-decoration: underline; }
+
+.price-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.price-overview a {
+  display: block;
+  padding: clamp(12px, 2vw, 24px);
+  border: 1px solid #8ba69b;
+  border-radius: 12px;
+  background: #edf6f0;
+  color: #164738;
+  text-decoration: none;
+}
+.price-overview a[href="#paid-tools"] {
+  background: #fff4dd;
+  color: #633e06;
+  border-color: #c4aa77;
+}
+.price-overview strong { display: block; font-size: clamp(17px, 2.2vw, 26px); }
+.price-overview strong span { font-size: .72em; white-space: nowrap; }
+.price-overview small { display: block; margin-top: 6px; line-height: 1.45; word-break: keep-all; }
+.price-overview a:hover strong, .price-overview a:focus-visible strong { text-decoration: underline; }
+.price-section { scroll-margin-top: 16px; }
+.price-section + .price-section { margin-top: 56px; }
+.price-section > h2 { margin-bottom: 18px; padding-bottom: 10px; border-bottom: 2px solid #245c49; font-size: clamp(22px, 3vw, 32px); }
+#paid-tools > h2 { border-color: #886127; }
