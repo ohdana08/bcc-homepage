@@ -64,3 +64,17 @@ test('trigger creation failure preserves the old worker and existing checkpoints
  const w=triggerWorker({failCreate:true}),before={...w.state};assert.throws(()=>w.ctx.enableNotifications(),/quota/);
  assert.ok(w.triggers.some(t=>t.id==='old'));assert.equal(w.actions.some(a=>a[0]==='delete'),false);assert.deepEqual(w.state,before);
 });
+
+test('simple inquiries read from the admin feed and propagate failures for retry', async () => {
+  const window = { since: body.since, until: body.until, offset: 0 };
+  const req = { method: 'POST', headers: { authorization: 'Bearer ' + secret }, body: { kind: 'simple', ...window } };
+  const page = { events: [{ kind: 'simple', id: 'qa', created_at: body.since }], hasMore: false };
+  const localDb = () => assert.fail('simple inquiries must not read the homepage DB');
+  const ok = response();
+  await createInquiryNotificationHandler(localDb, () => secret, async args => { assert.deepEqual(args, window); return page; })(req, ok);
+  assert.equal(ok.code, 200);
+  assert.deepEqual(ok.body, page);
+  const unavailable = response();
+  await createInquiryNotificationHandler(localDb, () => secret, async () => { throw Error('unavailable'); })(req, unavailable);
+  assert.equal(unavailable.code, 503);
+});
