@@ -193,3 +193,6 @@ form.addEventListener('submit', async event => {
     }
   }
 });
+
+// Accept submissions only after the module has installed the comparison handler.
+button.disabled = false;
