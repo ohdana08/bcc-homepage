@@ -57,3 +57,17 @@
 #recommendation-selection{margin:12px 0}
 @media(max-width:900px){.recommendation-list{grid-template-columns:1fr}}
 @media(max-width:580px){.hero{padding-top:28px}.recommendation{padding:20px 16px;scroll-margin-top:150px}.recommendation h2{font-size:20px}.recommendation-fields{grid-template-columns:1fr;gap:14px}.recommendation-form-actions{align-items:stretch;flex-direction:column}.recommendation-form-actions .button{width:100%}.recommendation-status{scroll-margin-top:150px}}
+
+.fit-entry { min-height: calc(100svh - 76px); padding-block: clamp(16px, 5vh, 62px); }
+.fit-menu { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; max-width: 900px; margin: clamp(0px,7vh,84px) auto; }
+.fit-menu a { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: clamp(66px,12vh,112px); padding: 12px clamp(16px,3vw,36px); border: 1px solid #22493e; border-radius: 14px; background: white; color: #19392e; font-weight: 750; font-size: clamp(16px,2vw,24px); text-decoration: none; word-break: keep-all; }
+.fit-menu a:first-child, .fit-menu a:hover { background: #184d40; color: white; }
+.fit-menu a:focus-visible { outline: 3px solid #1978b3; outline-offset: 3px; }
+.fit-entry > section, .fit-back { display: none; }
+.fit-entry > section:target, .region-entry > #links { display: block; }
+.fit-entry:has(> section:target) .fit-menu, .region-entry .fit-menu { display: none; }
+.fit-entry:has(> section:target) .fit-back, .region-entry .fit-back { display: inline-block; margin-bottom: 20px; }
+@media (max-width: 580px) {
+  .fit-menu { grid-template-columns: 1fr; gap: 8px; margin: 0; }
+  .fit-menu a { min-height: 48px; padding: 10px 18px; }
+}
