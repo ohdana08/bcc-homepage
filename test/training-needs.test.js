@@ -169,10 +169,12 @@ test('회사별 전용 폼 식별자를 읽고 기존 code 링크도 유지한�
   assert.equal(resolvePublicFormReference({ form: 'ab12cd34', code: 'ef56ab78' }), 'AB12CD34');
 });
 
-test('전용 링크 없이 접속해도 관리자와 잇툴즈로 이동할 수 있다', () => {
+test('업무·교육 도구에서 수요조사를 열고 전용 링크 없이도 안내와 돌아가기 링크를 볼 수 있다', () => {
   assert.match(publicSurveyPage, /id="accessActions"/);
   assert.match(publicSurveyPage, /href="\/admin-training-needs\.html"/);
-  assert.match(publicSurveyPage, /href="\/tools\.html"/);
+  const directory = readFileSync(new URL('../work-tools/index.html', import.meta.url), 'utf8');
+  assert.match(directory, /href="\/tools\/training-needs\/"/);
+  assert.match(publicSurveyPage, /href="\/work-tools\/"/);
   assert.match(publicSurveyScript, /visible\('accessActions',true\)/);
 });
 
