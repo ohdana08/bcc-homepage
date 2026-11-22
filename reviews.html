@@ -18,6 +18,10 @@
     .gallery{margin-top:46px}.gallery-head{display:flex;align-items:end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:18px}.gallery-head h2{margin:0;font-size:28px}.gallery-head span{color:var(--dim)}.schedule{margin-top:34px}.schedule h3{font-size:19px;margin:0 0 14px}.schedule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.photo{border:0;padding:0;background:var(--surface);border-radius:12px;overflow:hidden;aspect-ratio:4/5;cursor:zoom-in}.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:.25s}.photo:hover img{transform:scale(1.025)}
     .empty{padding:60px 20px;text-align:center;color:var(--dim)}dialog{width:min(94vw,1000px);max-height:92vh;padding:0;border:1px solid var(--line);border-radius:16px;background:#070707;color:#fff}dialog::backdrop{background:rgba(0,0,0,.88)}dialog img{display:block;max-width:100%;max-height:86vh;margin:auto}.close{position:absolute;right:12px;top:12px;width:42px;height:42px;border:1px solid #555;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:24px;cursor:pointer}
     footer{text-align:center;padding:28px;color:var(--dim);border-top:1px solid var(--line)}@media(max-width:640px){.hero{padding-top:58px}.nav-inner{padding:10px 16px}.nav .home-label{display:none}main{padding-inline:16px}.schedule-grid{grid-template-columns:repeat(2,1fr)}}
+    #kakao-reviews{scroll-margin-top:90px}
+    #kakao-review-stat{text-decoration:underline;text-underline-offset:4px}
+    #kakao-review-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px;margin-top:20px}
+    #kakao-review-list blockquote{margin:0;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);white-space:pre-line;overflow-wrap:anywhere}
   </style>
 <script defer src="/assets/bcc-analytics.js?v=20261107b"></script>
 </head>
@@ -28,15 +32,21 @@
     <h1>오예림 강사의<br>교육생 후기</h1>
     <p>비즈니스커리어컨설팅(BCC) 오예림 강사가 진행한 교육의 참여자 후기를 모았습니다. 기관과 교육 과정을 선택해 확인하세요.</p>
     <a class="profile-link" href="/ai-instructor/">오예림 강사 소개와 이력 확인 →</a>
-    <div class="stats"><div class="stat"><strong id="centerCount">0</strong>개 센터</div><div class="stat"><strong id="imageCount">0</strong>개 후기</div></div>
+    <div class="stats"><div class="stat"><strong id="centerCount">0</strong>개 센터</div><div class="stat"><strong id="imageCount">0</strong>장 후기 이미지</div><a class="stat" href="#kakao-reviews" hidden id="kakao-review-stat">카카오 채널 후기 <strong data-kakao-review-count></strong>건 ↓</a></div>
   </header>
   <main>
     <div class="toolbar"><input class="search" id="search" type="search" placeholder="센터명 또는 강의명 검색" aria-label="후기 검색"></div>
     <section class="centers" id="centers" aria-label="센터 목록"></section>
     <section class="gallery" id="gallery"><div class="empty">센터를 선택하면 강의별 후기가 표시됩니다.</div></section>
+    <section class="gallery" id="kakao-reviews" aria-labelledby="kakao-title" hidden>
+      <div class="gallery-head"><h2 id="kakao-title">카카오 채널 강의 후기</h2><span><strong data-kakao-review-count></strong>건</span></div>
+      <div id="kakao-review-list"></div>
+    </section>
   </main>
   <dialog id="lightbox"><button class="close" type="button" aria-label="닫기">×</button><img id="lightboxImage" alt="확대된 강의 후기"></dialog>
   <footer>© 2026 BCC 비즈니스커리어컨설팅. All rights reserved.</footer>
+  <script src="/kakao-lecture-reviews.js"></script>
+  <script src="/assets/kakao-review-cards.js"></script>
   <script src="reviews-data.js"></script>
   <script>
     const data = window.REVIEWS_DATA || [];

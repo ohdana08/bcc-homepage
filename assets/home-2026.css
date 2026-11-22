@@ -480,6 +480,7 @@ body.has-hero .nav.is-top .nav-signup{background:#fff;border-color:#fff;color:va
 .rv-grid{columns:4;column-gap:14px}
 .rv-tile{display:block;break-inside:avoid;margin:0 0 14px;background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--line);color:inherit;text-decoration:none;transition:transform .18s,box-shadow .18s}
 .rv-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.rv-tile blockquote{margin:0;padding:20px 16px 6px;font-size:16px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere}
 .rv-tile img{display:block;width:100%;height:auto}
 .rv-tile span{display:block;padding:10px 12px;font-size:12.5px;color:var(--mute)}
 .rv-note{margin:26px 0 0;font-size:13.5px;color:var(--mute)}
