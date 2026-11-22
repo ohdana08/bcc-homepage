@@ -61,7 +61,9 @@
 .fit-entry { min-height: calc(100svh - 76px); padding-block: clamp(16px, 5vh, 62px); }
 .fit-menu { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; max-width: 900px; margin: clamp(0px,7vh,84px) auto; }
 .fit-menu a { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: clamp(66px,12vh,112px); padding: 12px clamp(16px,3vw,36px); border: 1px solid #22493e; border-radius: 14px; background: white; color: #19392e; font-weight: 750; font-size: clamp(16px,2vw,24px); text-decoration: none; word-break: keep-all; }
-.fit-menu a:first-child, .fit-menu a:hover { background: #184d40; color: white; }
+@media (hover: hover) {
+  .fit-menu a:hover { background: #184d40; color: white; }
+}
 .fit-menu a:focus-visible { outline: 3px solid #1978b3; outline-offset: 3px; }
 .fit-entry > section, .fit-back { display: none; }
 .fit-entry > section:target, .region-entry > #links { display: block; }
