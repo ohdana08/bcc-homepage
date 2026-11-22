@@ -3,5 +3,5 @@
 <title>등록 이메일 확인 · 모두의창업 멘토링</title><link rel="stylesheet" href="/assets/mentoring-auth.css"><script defer src="/assets/mentoring-auth.js"></script></head>
 <body><main><a href="/student-works/#modu-round-two">← 수업결과물</a><p class="course">모두의창업 멘토링</p><h1>등록 이메일 확인</h1><p>멘토에게 등록한 이메일과 같은 계정으로 본인을 확인하세요.</p>
 <section id="methods" hidden><button id="google">Google 계정으로 확인</button><details><summary>기존 BCC 이메일 계정으로 확인</summary><form id="password-form"><label>이메일<input id="email" type="email" autocomplete="username" required></label><label>비밀번호<input id="pw" type="password" autocomplete="current-password" required></label><button>본인 확인</button></form></details></section>
-<form id="invitation" hidden><p id="account"></p><label>개인 초대코드<input id="invite" autocomplete="off" type="password" maxlength="256"></label><p>처음 방문할 때만 입력하세요. 이미 등록을 마쳤다면 비워두세요.</p><button>내 작업공간 열기</button></form>
+<form id="invitation" hidden><p id="account"></p><label>개인 초대코드<input id="invite" autocomplete="off" type="password" required maxlength="256"></label><p>첫 입장에는 멘토에게 받은 개인 초대코드를 입력하세요.</p><button>내 작업공간 열기</button></form>
 <p role="status" id="status">입장 정보를 확인하고 있습니다.</p><a href="/api/mentoring-entry">입장 다시 시작</a></main></body></html>
