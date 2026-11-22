@@ -7,7 +7,7 @@ var h=location.hash;
 
 
 /* 예전 메인의 섹션 앵커 → 분리된 페이지로 안내 */
-var map={"#itschool":"online.html","#outcomes":"online.html","#tools":"tools.html","#services":"education.html","#process":"education.html#process","#faq":"education.html#faq","#reviews":"#results","#about":"#instructor","#explog":"#results","#osmu":"#results"};
+var map={"#itschool":"online.html","#outcomes":"online.html","#tools":"#tool-entries","#services":"education.html","#process":"education.html#process","#faq":"education.html#faq","#reviews":"#results","#about":"#instructor","#explog":"#results","#osmu":"#results"};
 if(map[h]&&map[h].charAt(0)!=="#"){location.replace(map[h]+location.search);return;}
 if(map[h]&&map[h].charAt(0)==="#"){location.hash=map[h];}
 })();</script>
@@ -113,7 +113,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <details name="entry-menu">
         <summary>실습 도구</summary>
         <div class="entry-dropdown">
-          <a href="/tools.html" data-nav="ittools">잇툴즈</a>
+          <a href="/employment-tools/" data-nav="employment">AI 활용 취업도구</a>
+        <a href="/startup-tools/" data-nav="startup">AI 활용 창업도구</a>
+        <a href="/work-tools/" data-nav="work">업무·교육 도구</a>
           <a href="/ddakfit/">딱지원핏</a>
         </div>
       </details>
@@ -130,7 +132,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <a href="/claude101.html" data-education-topic="individual" data-education-action="navigation">무료 실습 해보기</a>
         <a href="/cases/">전체 교육 사례</a>
         <a href="/reviews.html">교육생 후기</a>
-        <a href="/tools.html" data-nav="ittools-mobile">잇툴즈</a>
+        <a href="/employment-tools/" data-nav="employment-mobile">AI 활용 취업도구</a>
+        <a href="/startup-tools/" data-nav="startup-mobile">AI 활용 창업도구</a>
+        <a href="/work-tools/" data-nav="work-mobile">업무·교육 도구</a>
         <a href="/ddakfit/">딱지원핏</a>
       </nav>
     </details>
@@ -151,12 +155,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <a href="/lecture-request/?utm_source=homepage&amp;utm_medium=hero&amp;utm_campaign=always_on" data-education-topic="institution" data-education-action="hero">기관 교육 문의하기 <span aria-hidden="true">↗</span></a>
       </div>
     </div>
-    <nav class="entry-works" aria-label="AI 활용 도구와 결과물">
-      <a class="entry-work entry-job" href="/tools.html#job">
+    <nav class="entry-works" id="tool-entries" aria-label="AI 활용 도구와 결과물">
+      <a class="entry-work entry-job" href="/employment-tools/">
         <img src="/assets/demo/interview-talk.jpg" width="1280" height="800" alt="">
         <span class="entry-work-caption"><strong>AI 활용 취업도구 <span aria-hidden="true">→</span></strong><small>채용 공고 비교 · 면접 연습</small></span>
       </a>
-      <a class="entry-work entry-startup" href="/tools.html#startup">
+      <a class="entry-work entry-startup" href="/startup-tools/">
         <img src="/assets/demo/startup-simulator.jpg" width="1280" height="800" alt="">
         <span class="entry-work-caption"><strong>AI 활용 창업도구 <span aria-hidden="true">→</span></strong><small>사업계획 · 마케팅</small></span>
       </a>
@@ -360,7 +364,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </a>
       </li>
     </ol>
-    <p class="course-alt">혼자 배우고 싶으면 <a href="online.html" data-education-topic="individual" data-education-action="courses-alt">온라인 과정</a>, 도구만 쓰고 싶으면 <a href="tools.html" data-nav="ittools-courses">잇툴즈</a>로 가세요. 가입 없이 바로 됩니다.</p>
+    <p class="course-alt">혼자 배우고 싶으면 <a href="online.html" data-education-topic="individual" data-education-action="courses-alt">온라인 과정</a>, 직접 써 보려면 <a href="/employment-tools/">취업도구</a>와 <a href="/startup-tools/">창업도구</a>에서 고르세요.</p>
   </div>
 </section>
 
@@ -533,7 +537,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <b>혼자 배우기</b>
         <a href="online.html">온라인 과정</a>
         <a href="claude101.html">Claude 101 무료 실습</a>
-        <a href="tools.html" data-nav="ittools-footer">잇툴즈</a>
+        <a href="/employment-tools/" data-nav="employment-footer">AI 활용 취업도구</a>
+        <a href="/startup-tools/" data-nav="startup-footer">AI 활용 창업도구</a>
+        <a href="/work-tools/" data-nav="work-footer">업무·교육 도구</a>
         <a href="/ddakfit/">딱지원핏</a>
       </div>
       <div>

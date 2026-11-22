@@ -1,0 +1,21 @@
+.category-bar { background: #111; color: #fff; border-bottom: 2px solid #e3ef00; }
+.category-bar .inner, .category-footer .inner { display: flex; align-items: center; gap: 20px; }
+.category-bar .inner { justify-content: space-between; min-height: 60px; }
+.category-bar a { font-size: 14px; font-weight: 700; }
+.category-brand { display: inline-flex; align-items: baseline; gap: 8px; }
+.category-brand b { font-size: 26px; font-style: italic; letter-spacing: -.07em; }
+.category-page { padding-block: clamp(28px,5vw,64px) 72px; }
+.category-heading { margin-bottom: 24px; }
+.category-heading p { margin-top: 10px; font-size: clamp(15px,1.5vw,18px); color: var(--ink-2); }
+.it-category-links, .category-resources { display: flex; gap: 10px 20px; flex-wrap: wrap; }
+.it-category-links { margin-bottom: 24px; }
+.it-category-links a, .category-resources a { font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.category-page .it-sub, .category-resources { margin-top: clamp(32px,5vw,58px); scroll-margin-top: 16px; }
+.category-page .it-sub h2, .category-resources h2 { font-size: clamp(21px,2.5vw,30px); }
+.category-page .it-sub h2 span { font-size: 14px; color: var(--mute); }
+.category-resources h2 { width: 100%; }
+.it-media-codex { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 5px; padding: 12px 20px; background: #184f42; }
+.it-media-codex span { color: #effacb; font-size: 13px; font-weight: 700; }
+.category-footer { background: #111; color: #eee; padding: 20px 0; font-size: 13px; }
+.category-footer .inner { flex-wrap: wrap; gap: 8px 20px; }
+.category-footer a { text-decoration: underline; }

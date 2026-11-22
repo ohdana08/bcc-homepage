@@ -3,15 +3,12 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const home = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-const tools = readFileSync(new URL("../tools.html", import.meta.url), "utf8");
-const legacyTools = readFileSync(new URL("../tools/index.html", import.meta.url), "utf8");
+const tools = readFileSync(new URL("../employment-tools/index.html", import.meta.url), "utf8");
 const jobLab = readFileSync(new URL("../job-lab.html", import.meta.url), "utf8");
 
-test("잇툴즈 취업 도구와 기존 AI 취업 실험실에서 면접 연습을 시작한다", () => {
-  assert.match(home, /<a\b[^>]*href="\/?tools\.html"[^>]*>잇툴즈<\/a>/);
-  const job = tools.split(/<div class="it-group"\s+/).find(group => group.startsWith('id="job"'));
-  assert.ok(job, '잇툴즈의 취업 준비 도구 모음');
-  const jobLinks = [...job.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)];
+test("취업도구 전용 페이지와 기존 AI 취업 실험실에서 면접 연습을 시작한다", () => {
+  assert.ok(home.includes('href="/employment-tools/"'));
+  const jobLinks = [...tools.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)];
   for (const [title, destination] of [
     ["20분 메타인지", "https://ai-job-metacognition-lab.jinjoopower.chatgpt.site/employment/metacognition"],
     ["면접톡", "https://bcc-interview-talk.vercel.app/"],
@@ -22,10 +19,7 @@ test("잇툴즈 취업 도구와 기존 AI 취업 실험실에서 면접 연습�
     assert.equal(target.origin + target.pathname, destination, title);
   }
 
-  const legacyCard = legacyTools.match(/<a\b[^>]*data-tool-id="job-lab"[^>]*>/)?.[0] ?? "";
-  assert.match(legacyCard, /data-tool-name="AI 취업 실험실"/);
-  assert.match(legacyCard, /href="https:\/\/ai-job-metacognition-lab\.jinjoopower\.chatgpt\.site\/employment\?/);
-  assert.doesNotMatch(legacyTools, /data-tool-id="interview-talk"/);
+  assert.match(tools, /AI 취업 실험실/);
   assert.match(jobLab, /AI 취업 실험실/);
   assert.doesNotMatch(jobLab, /AI 취업 실습실/);
 

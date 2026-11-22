@@ -106,14 +106,19 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://bccconsulting.kr/tools.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <loc>https://bccconsulting.kr/employment-tools/</loc>
+    <lastmod>2026-11-22</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bccconsulting.kr/tools/</loc>
-    <lastmod>2026-10-07</lastmod>
-    <priority>0.7</priority>
+    <loc>https://bccconsulting.kr/startup-tools/</loc>
+    <lastmod>2026-11-22</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bccconsulting.kr/work-tools/</loc>
+    <lastmod>2026-11-22</lastmod>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://bccconsulting.kr/tools/bmc/</loc>

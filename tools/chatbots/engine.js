@@ -17,13 +17,18 @@ async function copy(text, btn){ try { await navigator.clipboard.writeText(text);
 function show(id){ ['intro-card','q-card','review-card','result-card','lock-card'].forEach(k => $(k).hidden = (k !== id)); }
 
 function renderHead(){
-  document.title = `${bot.name} | BCC 잇툴즈`;
-  $('bot-eyebrow').textContent = `잇툴즈 · ${bot.group_label || '챗봇 도구'}`;
+  document.title = `${bot.name} | BCC AI 코치`;
+  $('bot-eyebrow').textContent = `${bot.group_label || 'BCC AI 코치'}`;
   $('bot-title').textContent = bot.name;
   $('bot-tagline').textContent = bot.tagline || '';
   $('bot-meta').innerHTML = [`질문 ${bot.steps.length}개`, bot.audience, bot.time].filter(Boolean).map(t => `<span>${esc(t)}</span>`).join('');
   if (bot.notice) { $('bot-notice').textContent = bot.notice; $('bot-notice').hidden = false; }
-  $('nav-group').href = `../../tools.html#${bot.group || 'startup'}`;
+  const area = bot.group === 'job' ? ['취업도구','/employment-tools/']
+    : bot.group === 'work' ? ['업무·교육 도구','/work-tools/'] : ['창업도구','/startup-tools/'];
+  for (const link of document.querySelectorAll('[data-category-return]')) {
+    link.href = area[1];
+    link.textContent = area[0] + ' 목록';
+  }
   const defHow = usesGen() ? ['질문에 하나씩 답합니다.','입력한 내용으로 만든 결과물 초안을 바로 받습니다.','더 다듬고 싶으면 완성 프롬프트를 내 AI에 붙여넣습니다.'] : ['시작 질문 몇 개에 답합니다.','완성 프롬프트를 복사해 ChatGPT·Claude·Gemini에 붙여넣습니다.','AI가 원래 챗봇처럼 질문을 이어가며 결과물을 완성해 줍니다.'];
   $('how-list').innerHTML = (bot.how || defHow).map(t => `<li>${esc(t)}</li>`).join('');
 }
@@ -107,7 +112,7 @@ function buildDraft(){
   const gen = usesGen() ? generators[bot.id] : null;
   const a = {}; bot.steps.forEach(s => { a[s.key] = valueText(s) === '(비움)' ? '' : valueText(s); a[s.key + '_raw'] = answers[s.key]; });
   const body = gen ? gen(a) : (bot.draft_template ? fillTemplate(bot, answers, bot.draft_template, { today: todayStr() }) : bot.steps.map(s => `## ${s.label || s.question}\n${valueText(s)}\n`).join('\n'));
-  return head + body + `\n\n---\n이 정리본은 비즈니스커리어컨설팅 잇툴즈 「${bot.name}」에서 만들었습니다. https://bccconsulting.kr/tools/chatbots/?bot=${bot.id}`;
+  return head + body + `\n\n---\n이 정리본은 비즈니스커리어컨설팅 AI 코치 「${bot.name}」에서 만들었습니다. https://bccconsulting.kr/tools/chatbots/?bot=${bot.id}`;
 }
 function buildPrompt(){ return buildPromptLib(bot, answers, { today: todayStr() }); }
 function mdToHtml(md){
@@ -175,9 +180,9 @@ async function isAdmin(){
   } catch { return false; }
 }
 async function init(){
-  if (!botId) { $('bot-title').textContent = '어떤 도구를 열지 알 수 없어요'; $('bot-tagline').innerHTML = '<a href="../../tools.html">잇툴즈 목록</a>에서 도구를 골라주세요.'; $('intro-card').hidden = true; return; }
+  if (!botId) { $('bot-title').textContent = '어떤 도구를 열지 알 수 없어요'; $('bot-tagline').innerHTML = '<a href="/#tool-entries">실습 도구 목록</a>에서 도구를 골라주세요.'; $('intro-card').hidden = true; return; }
   try { bot = await fetch(`./bots/${botId}.json?v=20261118`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }); }
-  catch { $('bot-title').textContent = '이 도구를 찾을 수 없어요'; $('bot-tagline').innerHTML = '<a href="../../tools.html">잇툴즈 목록</a>에서 다시 골라주세요.'; $('intro-card').hidden = true; return; }
+  catch { $('bot-title').textContent = '이 도구를 찾을 수 없어요'; $('bot-tagline').innerHTML = '<a href="/#tool-entries">실습 도구 목록</a>에서 다시 골라주세요.'; $('intro-card').hidden = true; return; }
   renderHead();
   if (bot.admin_only) { const ok = await isAdmin(); if (!ok) { show('lock-card'); return; } }
   load();

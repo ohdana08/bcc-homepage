@@ -2,7 +2,7 @@
  * PostHog only: existing GA4 tracking retains its own conversion definitions. */
 (() => {
   'use strict';
-  const pages = {'/':'home','/index.html':'home','/claude101.html':'claude_intro','/tools.html':'tools','/ai-automation-education/':'automation','/ai-automation-education/index.html':'automation','/geo-education/':'geo','/geo-education/index.html':'geo','/lecture-request/':'lecture_request','/lecture-request/index.html':'lecture_request'};
+  const pages = {'/':'home','/index.html':'home','/claude101.html':'claude_intro','/tools.html':'tools','/employment-tools/':'tools','/employment-tools/index.html':'tools','/startup-tools/':'tools','/startup-tools/index.html':'tools','/work-tools/':'tools','/work-tools/index.html':'tools','/ai-automation-education/':'automation','/ai-automation-education/index.html':'automation','/geo-education/':'geo','/geo-education/index.html':'geo','/lecture-request/':'lecture_request','/lecture-request/index.html':'lecture_request'};
   const url = new URL(location.href);
   const page = pages[url.pathname];
   if (!page || !['https://bccconsulting.kr','https://www.bccconsulting.kr'].includes(url.origin)) return;
