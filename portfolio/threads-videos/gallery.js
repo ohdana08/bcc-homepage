@@ -38,6 +38,8 @@ document.querySelector('.grid').addEventListener('click', event => {
   history.pushState(null, '', link.hash);
   openedFromList = true;
   showWork();
+  const player = media.querySelector('video');
+  if (player) player.play().catch(() => { /* Playback controls remain available. */ });
 });
 dialog.addEventListener('close', () => {
   media.replaceChildren();
