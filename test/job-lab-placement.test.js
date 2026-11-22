@@ -19,7 +19,7 @@ test("취업도구 전용 페이지와 기존 AI 취업 실험실에서 면접 �
     assert.equal(target.origin + target.pathname, destination, title);
   }
 
-  assert.match(tools, /AI 취업 실험실/);
+  assert.doesNotMatch(tools, /<h3>AI 취업 실험실<\/h3>/);
   assert.match(jobLab, /AI 취업 실험실/);
   assert.doesNotMatch(jobLab, /AI 취업 실습실/);
 
