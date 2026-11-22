@@ -12,6 +12,11 @@ test('registered works have distinct anchors and readable existing images', () =
   assert.equal(new Set(works.map(work => work.id)).size, works.length);
   for (const work of works) {
     assert.ok(page.includes(`id="${work.id}"`), work.id);
+    if (work.privateWorkspace) {
+      assert.equal(work.images.length, 0);
+      assert.ok(page.includes('href="/api/mentoring-entry"'));
+      continue;
+    }
     assert.ok(work.images.length > 0);
     for (const image of work.images) {
       assert.match(image.src, /^\/assets\/results\/[a-z0-9-]+\.(jpg|png)$/);

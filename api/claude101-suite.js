@@ -16,7 +16,10 @@ import { handleDdakfitRecommendations } from '../lib/ddakfit-recommendations.js'
 
 import { handleInquiryNotifications } from '../lib/inquiry-notifications.js';
 
+import { handleMentoringAdmin } from '../lib/mentoring-admin.js';
+
 const HANDLERS = {
+  'mentoring-admin': handleMentoringAdmin,
   'lecture-desk': handleLectureDesk,
   'inquiry-notifications': handleInquiryNotifications,
   'ddakfit-recommendations': handleDdakfitRecommendations,

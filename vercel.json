@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/api/mentoring-admin",
+      "destination": "/api/claude101-suite?fn=mentoring-admin"
+    },
+    {
       "source": "/api/lecture-desk",
       "destination": "/api/claude101-suite?fn=lecture-desk"
     },
@@ -252,6 +256,27 @@
     },
     {
       "source": "/admin-training-needs.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/admin-mentoring.html",
       "headers": [
         {
           "key": "Cache-Control",

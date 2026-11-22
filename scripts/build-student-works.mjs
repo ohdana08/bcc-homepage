@@ -3,7 +3,10 @@ const works = JSON.parse(readFileSync(new URL('../student-works/works.json', imp
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image = (item, lazy = true) => `<img src="${esc(item.src)}" alt="${esc(item.alt)}"${lazy ? ' loading="lazy"' : ''}>`;
 const details = work => work.images.map((item, i) => `<figure>${image(item)}<figcaption><span>${esc(item.alt)}</span><a class="link" href="${esc(item.src)}" target="_blank" rel="noopener">이미지 ${i + 1} 크게 열기 ↗</a></figcaption></figure>`).join('');
-const card = (work, home = false) => `<article class="sw-card"${home ? '' : ` id="${esc(work.id)}" data-work data-category="${esc(work.category)}"`}>
+const workspaceCard = work => `<article class="sw-card" id="${esc(work.id)}" data-work data-category="${esc(work.category)}">
+  <div class="sw-card-body"><p class="sw-category">${esc(work.category)}</p><h3>${esc(work.title)}</h3><p class="sw-course">${esc(work.course)}</p><p class="sw-description">${esc(work.description)}</p><div class="sw-card-links"><a class="btn btn-primary" href="/api/mentoring-entry">내 사업계획서 열기 →</a></div></div>
+</article>`;
+const card = (work, home = false) => work.privateWorkspace ? workspaceCard(work) : `<article class="sw-card"${home ? '' : ` id="${esc(work.id)}" data-work data-category="${esc(work.category)}"`}>
   <a class="sw-preview" href="${home ? `/student-works/#${esc(work.id)}` : esc(work.images[0].src)}"${home ? '' : ' data-preview'} aria-label="${esc(work.title)} ${home ? '작품 보기' : '크게 보기'}">${image(work.images[0])}<span class="sw-preview-label">${home ? '작품 보기 ↗' : `${work.images.length}장 크게 보기`}</span></a>
   <div class="sw-card-body"><p class="sw-category">${esc(work.category)}</p><h3>${esc(work.title)}</h3><p class="sw-course">${esc(work.course)}</p>${home ? '' : `<p class="sw-description">${esc(work.description)}</p><div class="sw-card-links">${work.images.map((item, i) => `<a class="link" href="${esc(item.src)}" target="_blank" rel="noopener">이미지 ${i + 1} 열기 ↗</a>`).join('')}${work.download ? `<a class="link" href="${esc(work.download.src)}" download>${esc(work.download.label)} ↓</a>` : ''}${work.record ? `<a class="link" href="${esc(work.record)}">${esc(work.recordLabel || '수업 기록')} →</a>` : ''}</div>`}</div>${home ? '' : `<template>${details(work)}</template>`}
 </article>`;

@@ -176,5 +176,14 @@
     "record": "/tools/cafe-3d/b/",
     "recordLabel": "3D로 직접 돌려 보기",
     "featured": false
+  },
+  {
+    "id": "modu-round-two",
+    "title": "모두의창업 멘토링 2라운드 사업계획서",
+    "category": "기획서·슬라이드",
+    "course": "모두의창업 멘토링",
+    "description": "4주간의 멘토링 자료로 사업계획서와 붙임 3종을 작성합니다.",
+    "privateWorkspace": true,
+    "images": []
   }
 ]
