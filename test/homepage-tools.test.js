@@ -31,5 +31,13 @@ test('홈페이지의 잇툴즈에서 창업 실습과 지원사업 찾기·진�
   assert.match(tools, /<a\b[^>]*href="#coach"[^>]*>AI 코치/);
   const coach = groups.find(group => group.startsWith('id="coach"'));
   assert.ok(coach, 'AI 코치 목록');
-  assert.match(coach, /<a\b[^>]*href="\/?tools\/chatbots\/\?bot=business-process"[^>]*>\s*<div><b>창업아이디어검증코치<\/b>/);
+  for (const id of ['coach-startup', 'coach-marketing', 'coach-job']) {
+    assert.ok(coach.includes(`href="#${id}"`));
+  }
+  const job = groups.find(group => group.startsWith('id="job"'));
+  assert.ok(job.includes('id="coach-job"'));
+  assert.ok(job.includes('href="/resume-workbook.html"'));
+  assert.ok(startup.includes('id="coach-marketing"'));
+  assert.ok(startup.includes('href="tools/funnel-map/"'));
+  assert.match(startup, /<a\b[^>]*href="\/?tools\/chatbots\/\?bot=business-process"[^>]*>\s*<div><b>창업아이디어검증코치<\/b>/);
 });

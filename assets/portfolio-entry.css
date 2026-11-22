@@ -204,23 +204,27 @@
 .entry-work img {
   width: 100%;
   height: auto;
-  aspect-ratio: 1.12;
+  aspect-ratio: 2.4;
   object-fit: contain;
 }
+.entry-job { background: #174b40; }
+.entry-startup { background: #fff; color: #111; }
+.entry-startup img, .entry-job img { object-fit: cover; }
 .entry-student img { background: #e5eaf0; }
 .entry-instructor { color: #111; background: var(--entry-accent); }
 .entry-instructor img { background: #e9e4d8; }
 .entry-work-caption {
   display: grid;
-  gap: 7px;
-  padding: clamp(13px, 1.45vw, 24px);
+  gap: 5px;
+  padding: clamp(11px, 1.05vw, 17px);
 }
 .entry-work-caption strong {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 4px;
-  font-size: clamp(20px, 1.95vw, 33px);
+  font-size: clamp(16px, 1.62vw, 26px);
+  word-break: keep-all;
   line-height: 1.2;
   letter-spacing: -.055em;
 }
@@ -297,9 +301,9 @@
   .entry-actions { margin-top: 15px; }
   .entry-actions a { min-height: 40px; padding: 10px 17px; font-size: 14px; }
   .entry-work { border-radius: 12px; }
-  .entry-work img { aspect-ratio: 1.9; }
+  .entry-work img { aspect-ratio: 2.3; }
   .entry-work-caption { gap: 3px; padding: 10px 12px; }
-  .entry-work-caption strong { font-size: 20px; }
+  .entry-work-caption strong { font-size: clamp(15px, 4.2vw, 21px); }
   .entry-portrait img { width: 58px; height: 58px; }
 
 }
