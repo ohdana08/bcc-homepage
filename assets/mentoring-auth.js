@@ -1,9 +1,14 @@
 'use strict';
+function showStatus(text, busy = false) {
+ const status = document.getElementById('status');
+ status.dataset.busy = String(busy);
+ status.textContent = text;
+}
 (async()=>{
- const $=id=>document.getElementById(id), msg=text=>{$('status').textContent=text;};
+ const $=id=>document.getElementById(id);
  const storage=sessionStorage, params=new URLSearchParams(location.search);
  const key='bcc-mentoring-flow', pk='bcc-mentoring-pkce', flow=params.get('flow')||storage.getItem(key);
- if(!/^[\w-]{43}$/.test(flow||'')){msg('수업결과물의 입장 버튼을 눌러 시작해주세요.');return;}
+ if(!/^[\w-]{43}$/.test(flow||'')){showStatus('수업결과물의 입장 버튼을 눌러 시작해주세요.');return;}
  if(params.has('flow')){storage.setItem(key,flow);storage.removeItem(pk);}
  const authCode=params.get('code');
  history.replaceState(null,'',location.pathname);
@@ -18,13 +23,14 @@
   if(!response.ok) throw Error('본인 확인에 실패했습니다. 계정 정보를 확인하거나 입장을 다시 시작해주세요.');
   const data=await response.json(); token=data.access_token;
   $('methods').hidden=true;$('account').textContent=data.user.email+' 계정으로 확인했습니다.';
-  msg('내 작업공간을 열고 있습니다.');
+  showStatus('내 작업공간을 열고 있습니다.', true);
   await enter();
  }
  async function startGoogle(){
+  showStatus('Google 계정 선택 화면으로 이동합니다.', true);
   try{const verifier=b64(crypto.getRandomValues(new Uint8Array(48)));storage.setItem(pk,verifier);
    const url=api('authorize');url.search=new URLSearchParams({provider:'google',redirect_to:callback,code_challenge:b64(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))),code_challenge_method:'s256',prompt:'select_account'});location.assign(url);
-  }catch{$('methods').hidden=false;msg('다시 Google 로그인을 선택해주세요.');}
+  }catch{$('methods').hidden=false;showStatus('다시 Google 로그인을 선택해주세요.');}
  }
  $('google').onclick=startGoogle;
  async function enter(){
@@ -35,7 +41,7 @@
    const form=document.createElement('form');form.action=body.redeem_url;form.method='POST';const input=document.createElement('input');input.type='hidden';input.name='ticket';input.value=body.ticket;form.append(input);document.body.append(form);
    storage.removeItem(key);storage.removeItem(pk);token='';form.submit();return true;
  }
- if(!authCode){msg('Google 계정 선택 화면으로 이동합니다.');await startGoogle();return;}
- if(authCode){const verifier=storage.getItem(pk);storage.removeItem(pk);if(!verifier){msg('인증을 시작한 브라우저에서 다시 진행해주세요.');return;}
-  try{await signIn('pkce',{auth_code:authCode,code_verifier:verifier});}catch(err){msg(err.message);}}
-})().catch(()=>{document.getElementById('status').textContent='접속 정보를 확인하기 어렵습니다. 입장을 다시 시작해주세요.';});
+ if(!authCode){await startGoogle();return;}
+ if(authCode){const verifier=storage.getItem(pk);storage.removeItem(pk);if(!verifier){showStatus('인증을 시작한 브라우저에서 다시 진행해주세요.');return;}
+  try{await signIn('pkce',{auth_code:authCode,code_verifier:verifier});}catch(err){showStatus(err.message);}}
+})().catch(()=>{showStatus('접속 정보를 확인하기 어렵습니다. 입장을 다시 시작해주세요.');});
