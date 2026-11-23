@@ -21,12 +21,12 @@
   msg('내 작업공간을 열고 있습니다.');
   await enter();
  }
- $('google').onclick=async()=>{
+ async function startGoogle(){
   try{const verifier=b64(crypto.getRandomValues(new Uint8Array(48)));storage.setItem(pk,verifier);
    const url=api('authorize');url.search=new URLSearchParams({provider:'google',redirect_to:callback,code_challenge:b64(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))),code_challenge_method:'s256',prompt:'select_account'});location.assign(url);
-  }catch{msg('Google 인증을 시작할 수 없습니다. 입장을 다시 시작해주세요.');}
- };
- $('password-form').onsubmit=async e=>{e.preventDefault();const pw=$('pw').value;$('pw').value='';try{await signIn('password',{email:$('email').value.trim(),password:pw});}catch(err){msg(err.message);}};
+  }catch{$('methods').hidden=false;msg('다시 Google 로그인을 선택해주세요.');}
+ }
+ $('google').onclick=startGoogle;
  async function enter(){
    const res=await fetch('/api/mentoring-entry',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({flow})});
    const body=await res.json();
@@ -35,7 +35,7 @@
    const form=document.createElement('form');form.action=body.redeem_url;form.method='POST';const input=document.createElement('input');input.type='hidden';input.name='ticket';input.value=body.ticket;form.append(input);document.body.append(form);
    storage.removeItem(key);storage.removeItem(pk);token='';form.submit();return true;
  }
- $('methods').hidden=false;msg('');
+ if(!authCode){msg('Google 계정 선택 화면으로 이동합니다.');await startGoogle();return;}
  if(authCode){const verifier=storage.getItem(pk);storage.removeItem(pk);if(!verifier){msg('인증을 시작한 브라우저에서 다시 진행해주세요.');return;}
   try{await signIn('pkce',{auth_code:authCode,code_verifier:verifier});}catch(err){msg(err.message);}}
 })().catch(()=>{document.getElementById('status').textContent='접속 정보를 확인하기 어렵습니다. 입장을 다시 시작해주세요.';});
