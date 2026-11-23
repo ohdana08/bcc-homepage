@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script src="/assets/browser-session.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="robots" content="noindex,nofollow" />
@@ -212,7 +213,7 @@
     if (supabase) return supabase;
     const config = await fetch(API + '/api/config').then((res) => res.json());
     if (!config.supabaseUrl || !config.supabaseAnonKey) throw new Error('홈페이지 연결 설정을 불러오지 못했습니다.');
-    supabase = createClient(config.supabaseUrl, config.supabaseAnonKey, { auth:{ persistSession:true, autoRefreshToken:true, storage:window.localStorage } });
+    supabase = createClient(config.supabaseUrl, config.supabaseAnonKey, { auth:{ persistSession:true, autoRefreshToken:true, storage:window.bccBrowserSession } });
     return supabase;
   }
 

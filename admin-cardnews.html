@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script src="/assets/browser-session.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="robots" content="noindex" />
@@ -248,7 +249,7 @@
     if (!c.supabaseUrl || !c.supabaseAnonKey) throw new Error('설정을 불러오지 못했습니다.');
     // 로그인 세션을 localStorage 에 확실히 보관 + 자동 갱신 → 매번 로그인 안 해도 됨
     supabase = createClient(c.supabaseUrl, c.supabaseAnonKey, {
-      auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage },
+      auth: { persistSession: true, autoRefreshToken: true, storage:window.bccBrowserSession },
     });
     return supabase;
   }

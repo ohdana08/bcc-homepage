@@ -132,7 +132,7 @@ $('sign-out').addEventListener('click', async () => { if (state.client) await st
 async function initialize() {
   status('관리자 권한을 확인하고 있습니다.');
   try {
-    if (!state.client) { const response = await fetch('/api/config', { cache: 'no-store' }); const config = await response.json(); if (!response.ok || !config.supabaseUrl || !config.supabaseAnonKey) throw new Error('로그인 설정을 불러오지 못했습니다.'); state.client = createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage } }); }
+    if (!state.client) { const response = await fetch('/api/config', { cache: 'no-store' }); const config = await response.json(); if (!response.ok || !config.supabaseUrl || !config.supabaseAnonKey) throw new Error('로그인 설정을 불러오지 못했습니다.'); state.client = createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storage:window.bccBrowserSession } }); }
     const { data } = await state.client.auth.getSession(); state.session = data.session;
     if (!state.session) { clearPrivateView(); $('auth-panel').hidden = false; status('관리자 계정으로 로그인해 주세요.'); return; }
     await loadList();

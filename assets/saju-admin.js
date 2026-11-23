@@ -13,7 +13,7 @@ async function getClient() {
   const response = await fetch('/api/config', { cache: 'no-store' });
   const config = await response.json();
   if (!response.ok || !config.supabaseUrl || !config.supabaseAnonKey) throw new Error('로그인 설정을 불러오지 못했습니다.');
-  client = createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage } });
+  client = createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storage:window.bccBrowserSession } });
   client.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT' || (activeUser && session?.user?.id !== activeUser)) {
       clearPreview(); $('login').hidden = false; status('관리자 로그인이 필요합니다.');

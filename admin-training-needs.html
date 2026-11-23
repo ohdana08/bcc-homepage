@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script src="/assets/browser-session.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="robots" content="noindex,nofollow" />
@@ -89,7 +90,7 @@
   const state={surveys:[],cases:[],metrics:{open:0,responses:0,analyzed:0,total:0,samples:0},selected:null,bundle:null,session:null,sb:null};
   function toast(message,duration=2600){$('toast').textContent=message;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),duration)}
   function openModal(id){$(id).classList.remove('hidden')} function closeModal(id){$(id).classList.add('hidden')}
-  async function getClient(){const config=await fetch(API+'/api/config').then(r=>r.json());return createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage}})}
+  async function getClient(){const config=await fetch(API+'/api/config').then(r=>r.json());return createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:window.bccBrowserSession}})}
   async function requireAdmin(sb){const {data:{session}}=await sb.auth.getSession();if(!session)return null;const response=await fetch(API+'/api/my-enrollments',{headers:{Authorization:'Bearer '+session.access_token}});if(!response.ok)return null;const data=await response.json();return data.profile?.is_admin?session:null}
   function adminRequest(action,payload,accessToken){return fetch(API+'/api/cardnews-generate',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+accessToken},body:JSON.stringify({engine:'training_needs_admin',action,...payload})})}
   async function api(action,payload={}){

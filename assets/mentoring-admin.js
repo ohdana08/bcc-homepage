@@ -93,7 +93,7 @@ async function init() {
   try {
     const config=await fetch('/api/config',{cache:'no-store'}).then(r=>r.json());
     const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2.108.2');
-    client=createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage}});
+    client=createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:window.bccBrowserSession}});
     client.auth.onAuthStateChange((event,session)=>{
       if(event==='SIGNED_OUT'||(owner&&session?.user?.id!==owner)){clearPrivate();statusText('관리자 로그인이 필요합니다.');}
     });

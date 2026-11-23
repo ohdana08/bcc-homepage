@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<script src="/assets/browser-session.js"></script>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
   <title>잇툴즈 이용 신청 | BCC 관리자</title><link rel="icon" href="/logo.png"><link rel="stylesheet" href="/lecture-request/style.css">
   <style>
@@ -93,7 +94,7 @@
       const [{createClient},cr]=await Promise.all([import('https://esm.sh/@supabase/supabase-js@2'),fetch('/api/config',{cache:'no-store'})]);
       if(!cr.ok)throw new Error('홈페이지 연결 설정을 불러오지 못했습니다.');
       const c=await cr.json();if(!c.supabaseUrl||!c.supabaseAnonKey)throw new Error('홈페이지 연결 설정을 확인해 주세요.');
-      state.sb=createClient(c.supabaseUrl,c.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage}});
+      state.sb=createClient(c.supabaseUrl,c.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storage:window.bccBrowserSession}});
       const {data:{session}}=await state.sb.auth.getSession();if(!session){deny();return}
       await load();$('boot').classList.add('hidden');$('app').classList.remove('hidden');
     }catch(err){deny(err.message||'관리자 연결을 확인해 주세요.')}})();

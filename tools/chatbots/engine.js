@@ -173,7 +173,7 @@ async function isAdmin(){
   try {
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
     const c = await fetch(API + '/api/config').then(r => r.json()); if (!c.supabaseUrl) return false;
-    const sb = createClient(c.supabaseUrl, c.supabaseAnonKey);
+    const sb = createClient(c.supabaseUrl, c.supabaseAnonKey,{auth:{storage:window.bccBrowserSession}});
     const { data: { session } } = await sb.auth.getSession(); if (!session) return false;
     const r = await fetch(API + '/api/my-enrollments', { headers: { Authorization: 'Bearer ' + session.access_token } }); if (!r.ok) return false;
     const d = await r.json(); return !!(d.profile && d.profile.is_admin);
