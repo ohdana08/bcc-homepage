@@ -2,7 +2,7 @@ const $=id=>document.getElementById(id);
 let client, owner, epoch=0, busy=false;
 const statusText=(text,error=false)=>{$('status').textContent=text;$('status').classList.toggle('error',error);};
 function clearPrivate() {
-  epoch++;owner=null;$('workspace').hidden=true;$('slots').replaceChildren();$('login').hidden=false;
+  epoch++;owner=null;$('results').replaceChildren();$('results-status').textContent='';$('workspace').hidden=true;$('slots').replaceChildren();$('login').hidden=false;
 }
 function showSlots(slots) {
   const fragment=document.createDocumentFragment();
@@ -52,9 +52,33 @@ async function call(method,data) {
   }
   return result;
 }
+function showResults(result, slots) {
+  const panel=$('results');
+  panel.replaceChildren();
+  if (!result) {
+    const entered=slots.filter(slot=>slot.expires_at).length;
+    $('results-status').textContent=entered<3
+      ? '첫 입장 '+entered+'/3명 · 세 대표가 각자 7일을 사용한 뒤 결과가 생성됩니다.'
+      : '세 대표의 이용 종료 후 10분 이내에 결과가 생성됩니다.';
+    return;
+  }
+  $('results-status').textContent='수업이 종료되었습니다. 홈페이지용 사례는 공개 전 검토용 초안입니다.';
+  for (const [label,content] of [['멘토용 결과표',result.mentor_report],['홈페이지 수업 사례 초안',result.gallery_draft]]) {
+    const section=document.createElement('section');
+    const heading=document.createElement('h3');heading.textContent=label;
+    const body=document.createElement('p');body.style.whiteSpace='pre-wrap';body.textContent=content;
+    const download=document.createElement('button');download.type='button';download.textContent=label+' 내려받기';
+    download.onclick=()=>{
+      const url=URL.createObjectURL(new Blob(['\uFEFF'+content],{type:'text/plain;charset=utf-8'}));
+      const link=document.createElement('a');link.href=url;link.download=label+'.txt';link.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    };
+    section.append(heading,body,download);panel.append(section);
+  }
+}
 async function reload() {
   const result=await call('GET');if(!result)return;
-  showSlots(result.slots);$('workspace').hidden=false;$('login').hidden=true;
+  showSlots(result.slots);showResults(result.result,result.slots);$('workspace').hidden=false;$('login').hidden=true;
 }
 async function action(work) {
   if(busy)return;busy=true;
