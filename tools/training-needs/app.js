@@ -23,7 +23,7 @@ export function isAmbiguousSubmission(error) {
   return !error.status || error.status >= 500;
 }
 export function cardText(card, survey) {
-  const parts = ['나의 AI 경험 카드', survey.institution_label, survey.title];
+  const parts = ['AI경험카드', survey.institution_label, survey.title];
   const fields = [['experience_tasks', '해본 것'], ['creation_process', '만들어본 과정'], ['desired_work', '만들고 싶은 것'], ['support_needs', '필요한 도움']];
   for (const [id, label] of fields) parts.push(`\n${label}\n${(card[id] || []).join(' · ') || '제작 경험 질문 건너뜀'}${card.others?.[id] ? '\n' + card.others[id] : ''}`);
   if (card.tools_detail) parts.push(`\n사용해본 도구\n${card.tools_detail}`);
@@ -64,7 +64,7 @@ if (typeof document !== 'undefined') {
       $('surveyTitle').textContent = state.survey.title;
       $('surveyMeta').textContent = [state.survey.audience_label, state.survey.lecture_date && `강의일 ${state.survey.lecture_date}`, state.survey.response_deadline && `응답 마감 ${state.survey.response_deadline}`].filter(Boolean).join(' · ');
       visible('sampleNotice', Boolean(state.survey.is_sample));
-      document.title = `${state.survey.institution_label} · 나의 AI 경험 카드 | BCC`;
+      document.title = `${state.survey.institution_label} · AI경험카드 | BCC`;
       $('questionMount').innerHTML = state.questions.map((q,index) => {
         let body = q.type === 'portfolio' ? `<div class="upload-area"><label for="portfolioFile" class="upload-label">파일 또는 화면 캡처 1개 <span class="optional">선택</span></label><input id="portfolioFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><p>JPG · PNG · WebP · PDF. 큰 이미지는 1MB 이하로 줄여 전달합니다. PDF는 최대 1MB이며, 영상은 링크로 공유해 주세요.</p><p id="fileStatus" class="file-status" role="status"></p><button id="removeFile" class="text-button" type="button" hidden>선택한 파일 빼기</button></div><label class="field-label" for="portfolioUrl">또는 작품 링크 <span class="optional">선택</span></label><input id="portfolioUrl" class="text-input" type="url" maxlength="2000" inputmode="url" placeholder="https://" aria-describedby="portfolioHelp"><p id="portfolioHelp" class="help" style="margin-top:9px">공유할 자료가 없거나 공개하기 어려우면 이 항목은 비워두세요. 파일·링크에 이름, 연락처, 얼굴, 회사 기밀이 들어 있지 않은지 확인해 주세요.</p><label id="consentLabel" class="consent-label" hidden><input id="portfolioConsent" type="checkbox"><span>이 자료를 공유할 권한이 있으며, 해당 수업 준비를 위해 관리자에게 전달하는 데 동의합니다. 자료를 공유하지 않아도 설문에 참여할 수 있습니다.</span></label>` : optionsHtml(q);
         if(q.id === 'experience_tasks') body += '<details class="optional-detail"><summary>사용해본 AI 도구도 알려주고 싶어요 <span class="optional">선택</span></summary><label class="field-label" for="toolsDetail">도구 이름과 이용 방식</label><input id="toolsDetail" class="text-input" maxlength="160" placeholder="예: ChatGPT 무료, Gemini 유료"></details>';
@@ -196,12 +196,12 @@ if (typeof document !== 'undefined') {
       if(card.desired_detail)items.push(['나의 생각',card.desired_detail]);
       const shared=[card.portfolio?.file?.name,card.portfolio?.url].filter(Boolean);
       items.push(['공유한 결과물',shared.join('\n')||'공유하지 않음']);
-      $('experienceCard').innerHTML=`<div class="card-top"><h3>나의 AI 경험 카드</h3><span>BCC EXPERIENCE</span></div><p class="card-course">${esc(state.survey.institution_label)}<br>${esc(state.survey.title)}</p><dl>${items.map(([label,value,detail])=>`<div class="card-item"><dt>${esc(label)}</dt><dd>${esc(value)}${detail ? '\n'+esc(detail):''}</dd></div>`).join('')}</dl>`;
+      $('experienceCard').innerHTML=`<div class="card-top"><h3>AI경험카드</h3><span>BCC EXPERIENCE</span></div><p class="card-course">${esc(state.survey.institution_label)}<br>${esc(state.survey.title)}</p><dl>${items.map(([label,value,detail])=>`<div class="card-item"><dt>${esc(label)}</dt><dd>${esc(value)}${detail ? '\n'+esc(detail):''}</dd></div>`).join('')}</dl>`;
       visible('surveyView',false);visible('doneView',true);$('experienceForm').reset();$('questionMount').replaceChildren();state.answers={};
       $('doneView').focus();$('doneView').scrollIntoView({block:'start'});
     }
     $('experienceForm').addEventListener('submit',submit);
-    $('downloadCard').addEventListener('click',()=>{if(!state.card)return;const blob=new Blob(['\ufeff'+cardText(state.card,state.survey)],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='나의-AI-경험-카드.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+    $('downloadCard').addEventListener('click',()=>{if(!state.card)return;const blob=new Blob(['\ufeff'+cardText(state.card,state.survey)],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='AI경험카드.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
     $('printCard').addEventListener('click',()=>window.print());
     async function load() {
       visible('retryLoad',false);$('accessStatus').textContent='';

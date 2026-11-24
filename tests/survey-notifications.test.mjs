@@ -18,7 +18,7 @@ test('completion handles target, KST end of deadline, explicit closure and sampl
 });
 test('summary separates cohorts and strips direct contact, files and links',()=>{
  const text=surveySummaryText(base,rows,surveyCompletion(base,rows,until));
- assert.match(text,/나의 AI 경험 카드 · 1명/);assert.match(text,/기존 설문 · 1명/);assert.match(text,/회의록 정리 \[이메일 삭제\]/);
+ assert.match(text,/AI경험카드 · 1명/);assert.match(text,/기존 설문 · 1명/);assert.match(text,/회의록 정리 \[이메일 삭제\]/);
  for(const secret of ['private.test','SECRET','mail@example.com'])assert.ok(!text.includes(secret));
  assert.match(text,/AI에 요청하기/);
 });
