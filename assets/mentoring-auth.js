@@ -36,10 +36,14 @@ function showStatus(text, busy = false) {
  async function enter(){
    const res=await fetch('/api/mentoring-entry',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({flow})});
    const body=await res.json();
+   if(body.code==='unregistered'){           // 다른 계정을 골랐을 때: 이유를 알리고 바로 다시 고르게 한다.
+     token='';$('account').textContent=$('account').textContent.replace(' 계정으로 확인했습니다.',' 계정을 골랐습니다.');
+     showStatus(body.error);$('google').textContent='다른 Google 계정 고르기';$('methods').hidden=false;return false;
+   }
    if(!res.ok)throw Error(body.error||'입장 정보를 확인해주세요.');
    if(new URL(body.redeem_url).origin!=='https://bcc-modu-mentoring.vercel.app')throw Error('작업공간 주소를 확인해주세요.');
    const form=document.createElement('form');form.action=body.redeem_url;form.method='POST';const input=document.createElement('input');input.type='hidden';input.name='ticket';input.value=body.ticket;form.append(input);document.body.append(form);
-   storage.removeItem(key);storage.removeItem(pk);token='';form.submit();return true;
+   storage.removeItem(key);storage.removeItem(pk);storage.setItem('bcc-mentoring-done',String(Date.now()));token='';form.submit();return true;
  }
  if(!authCode){await startGoogle();return;}
  if(authCode){const verifier=storage.getItem(pk);storage.removeItem(pk);if(!verifier){showStatus('인증을 시작한 브라우저에서 다시 진행해주세요.');return;}

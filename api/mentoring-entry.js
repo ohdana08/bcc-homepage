@@ -25,6 +25,10 @@ export default async function enterWorkspace(req, res) {
     const upstream=await fetch(host.origin+'/api/internal/participant-ticket',{method:'POST',
       headers:{Authorization:'Bearer '+secret,'Content-Type':'application/json'},
       body:JSON.stringify({verified_email:user.email,flow,code}),cache:'no-store',redirect:'error',signal:AbortSignal.timeout(12000)});
+    if(upstream.status===403){
+      const reason=await upstream.json().catch(()=>({}));
+      if(reason.code==='unregistered') return res.status(403).json({code:'unregistered',error:'이 계정은 등록되지 않았습니다. 등록한 이메일의 계정으로 로그인해 주세요.'});
+    }
     if(!upstream.ok) return fail([400,401,403,429].includes(upstream.status)?upstream.status:503,
       upstream.status===429?'잠시 후 다시 시도해주세요.':'멘토에게 등록한 이메일인지 확인해주세요. 입장 시간이 지났다면 다시 시작해주세요.');
     const {ticket}=await upstream.json();
